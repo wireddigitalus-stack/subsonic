@@ -67,14 +67,9 @@ export function Navbar() {
                 priority
               />
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-black text-sm sm:text-base tracking-wider text-white">
-                SUBSONIC
-              </span>
-              <span className="font-extrabold text-xs sm:text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                SOCIETY
-              </span>
-            </div>
+            <span className="font-extrabold text-sm sm:text-base tracking-wider text-white">
+              SUBSONIC SOCIETY
+            </span>
           </Link>
 
           {/* Clean Desktop Navigation with Modern Submenus */}

@@ -29,7 +29,7 @@ export function Footer() {
                 />
               </div>
               <span className="font-extrabold text-lg tracking-wider text-white">
-                SUBSONIC <span className="text-amber-400">SOCIETY</span>
+                SUBSONIC SOCIETY
               </span>
             </div>
 
