@@ -14,7 +14,8 @@ import {
   X,
   Target,
   Flame,
-  Radio
+  Radio,
+  Mountain
 } from "lucide-react";
 
 export function Navbar() {
@@ -23,6 +24,7 @@ export function Navbar() {
 
   const navLinks = [
     { name: "Overview", href: "/", icon: Target },
+    { name: "Bristol Pro", href: "/bristol-pro", icon: Mountain, badge: "18 Stages" },
     { name: "Event Calendar", href: "/calendar", icon: Calendar },
     { name: "Competitor Chat", href: "/chat", icon: MessageSquare, badge: "AI Shield" },
     { name: "Admin Telemetry", href: "/admin", icon: Activity, badge: "Live" },

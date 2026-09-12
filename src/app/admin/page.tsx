@@ -21,13 +21,19 @@ import {
   Target, 
   Radio, 
   Eye,
-  Sliders
+  Sliders,
+  Database,
+  Play,
+  Share2,
+  Route
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
   computeTelemetryAnalytics, 
-  clearLocalTelemetry 
+  clearLocalTelemetry,
+  recordTelemetryEvent
 } from "@/lib/telemetry";
+import { isSupabaseConfigured } from "@/lib/supabase";
 import { TelemetryEvent, MatchEvent, ChatMessage } from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 
@@ -37,9 +43,10 @@ export default function AdminDashboardPage() {
   const [passkeyError, setPasskeyError] = useState(false);
 
   const [events, setEvents] = useState<TelemetryEvent[]>([]);
-  const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "AI_MODERATION" | "EVENTS">("CLICKSTREAM");
+  const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION" | "EVENTS">("CLICKSTREAM");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
+  const [simulating, setSimulating] = useState(false);
 
   // Load telemetry events from local ring buffer
   const loadData = () => {
@@ -89,6 +96,60 @@ export default function AdminDashboardPage() {
     downloadAnchor.click();
     downloadAnchor.remove();
   };
+
+  const handleSimulateTraffic = () => {
+    setSimulating(true);
+    const mockClicks = [
+      { targetElement: "button_register_bristol_pro", targetText: "Register Squad ($275)", targetCategory: "Bristol Pro Portal", pageRoute: "/bristol-pro" },
+      { targetElement: "tab_ballistics_solver", targetText: "Mountain DOPE Solver", targetCategory: "Ballistics", pageRoute: "/bristol-pro" },
+      { targetElement: "fb_like_click_fb-post-01", targetText: "Like Post", targetCategory: "Facebook Feed", pageRoute: "/" },
+      { targetElement: "chat_switch_channel_ballistics-and-gear", targetText: "#ballistics-and-gear", targetCategory: "Chat", pageRoute: "/chat" },
+      { targetElement: "export_ics_bristol-pro-invitational-2026", targetText: "Add to Calendar (.ics)", targetCategory: "Event Calendar", pageRoute: "/calendar" },
+    ];
+    mockClicks.forEach((item, idx) => {
+      setTimeout(() => {
+        recordTelemetryEvent({
+          eventType: "click",
+          targetElement: item.targetElement,
+          targetText: item.targetText,
+          targetCategory: item.targetCategory,
+          pageRoute: item.pageRoute,
+        });
+      }, idx * 100);
+    });
+    setTimeout(() => {
+      recordTelemetryEvent({
+        eventType: "dwell",
+        targetElement: "page:/bristol-pro",
+        targetText: "Stayed 84s on /bristol-pro",
+        targetCategory: "Engagement",
+        pageRoute: "/bristol-pro",
+        dwellSeconds: 84,
+      });
+      loadData();
+      setSimulating(false);
+    }, 800);
+  };
+
+  const visitorJourneys = React.useMemo(() => {
+    const map: Record<string, { visitorId: string; sessionId: string; device: any; events: TelemetryEvent[]; startTime: string; totalDwell: number }> = {};
+    events.forEach((e) => {
+      const key = e.sessionId || e.visitorId;
+      if (!map[key]) {
+        map[key] = {
+          visitorId: e.visitorId,
+          sessionId: e.sessionId,
+          device: e.device,
+          events: [],
+          startTime: e.timestamp,
+          totalDwell: 0,
+        };
+      }
+      map[key].events.push(e);
+      if (e.dwellSeconds) map[key].totalDwell += e.dwellSeconds;
+    });
+    return Object.values(map).slice(0, 20);
+  }, [events]);
 
   const stats = computeTelemetryAnalytics(events);
 
@@ -159,13 +220,17 @@ export default function AdminDashboardPage() {
       {/* Admin Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 animate-pulse" />
               Live Site Intelligence & Admin Hub
             </span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
               Live Clickstream Active
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono flex items-center gap-1">
+              <Database className="w-3 h-3 text-blue-400" />
+              <span>{isSupabaseConfigured ? "Supabase Cloud Online" : "Local Telemetry Engine"}</span>
             </span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
@@ -178,6 +243,17 @@ export default function AdminDashboardPage() {
 
         {/* Global Actions */}
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={handleSimulateTraffic}
+            data-telemetry="admin_simulate_traffic"
+            disabled={simulating}
+            className="px-3.5 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
+            title="Simulate visitor clicks and dwell times"
+          >
+            <Play className={`w-3.5 h-3.5 ${simulating ? "animate-spin text-amber-400" : ""}`} />
+            <span>{simulating ? "Generating Events..." : "Simulate Clicks"}</span>
+          </button>
+
           <button
             onClick={loadData}
             className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white"
@@ -274,6 +350,7 @@ export default function AdminDashboardPage() {
           { id: "CLICKSTREAM", label: "Live Clickstream", icon: MousePointerClick },
           { id: "DWELL_TIME", label: "Dwell Time & Visits", icon: Clock },
           { id: "HEATMAP", label: "Most Clicked Elements", icon: Flame },
+          { id: "SESSIONS", label: "Visitor Journeys", icon: Route, badge: visitorJourneys.length },
           { id: "AI_MODERATION", label: "AI Moderation Queue", icon: ShieldAlert, badge: flaggedMessages.length },
           { id: "EVENTS", label: "Match Director Hub", icon: Calendar },
         ].map((tab) => {
@@ -472,6 +549,77 @@ export default function AdminDashboardPage() {
                         {Math.round((item.count / (stats.totalClicks || 1)) * 100)}% of total
                       </div>
                     </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: VISITOR JOURNEYS & SESSION REPLAY */}
+      {activeAdminTab === "SESSIONS" && (
+        <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-6">
+          <div>
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Route className="w-5 h-5 text-purple-400" />
+              Visitor Journeys & Multi-Touch Click Paths
+            </h3>
+            <p className="text-xs text-slate-300 mt-1">
+              Step-by-step audit of individual marksman sessions: what pages they entered, what they clicked, and where they spent their time.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {visitorJourneys.length === 0 ? (
+              <div className="text-slate-500 text-center py-8">
+                No visitor sessions recorded yet. Click &quot;Simulate Clicks&quot; above or browse the site to view live session logs.
+              </div>
+            ) : (
+              visitorJourneys.map((journey, idx) => (
+                <div
+                  key={journey.sessionId || idx}
+                  className="p-5 rounded-2xl bg-black/50 border border-white/5 space-y-3 font-mono"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/5 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">Session #{idx + 1}</span>
+                      <span className="text-slate-500">•</span>
+                      <span className="text-slate-300 font-mono text-[11px]">{journey.sessionId}</span>
+                      <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] text-purple-300">
+                        {journey.device?.isIOS ? "🍎 iOS Mobile" : journey.device?.isMobile ? "📱 Mobile" : "💻 Desktop"}
+                      </span>
+                    </div>
+
+                    <div className="text-slate-400 text-[11px]">
+                      Dwell Total: <strong className="text-emerald-400">{journey.totalDwell}s</strong> • {journey.events.length} Interactions
+                    </div>
+                  </div>
+
+                  {/* Step by step timeline */}
+                  <div className="space-y-2 pt-1">
+                    {journey.events.slice(0, 8).map((evt, eIdx) => (
+                      <div key={evt.id || eIdx} className="flex items-start gap-3 text-xs">
+                        <span className="text-slate-500 text-[10px] w-14 shrink-0 pt-0.5">
+                          {new Date(evt.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                        </span>
+                        <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0 mt-1.5" />
+                        <div className="flex-1 text-slate-300">
+                          <span className="text-white font-bold">{evt.eventType.toUpperCase()}: </span>
+                          <span className="text-amber-300">{evt.targetElement}</span>
+                          {evt.targetText && <span className="text-slate-400"> (&ldquo;{evt.targetText}&rdquo;)</span>}
+                          <span className="text-blue-400 text-[10px] ml-2">on {evt.pageRoute}</span>
+                          {evt.dwellSeconds && (
+                            <span className="text-emerald-400 text-[10px] ml-2 font-bold">[{evt.dwellSeconds}s dwell]</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {journey.events.length > 8 && (
+                      <div className="text-[11px] text-slate-500 pl-16">
+                        + {journey.events.length - 8} more interaction steps in this session...
+                      </div>
+                    )}
                   </div>
                 </div>
               ))

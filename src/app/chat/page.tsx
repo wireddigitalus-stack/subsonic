@@ -16,7 +16,11 @@ import {
   Radio, 
   Bot, 
   Info,
-  BadgeAlert
+  BadgeAlert,
+  Volume2,
+  VolumeX,
+  Eye,
+  X
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage } from "@/lib/types";
@@ -30,11 +34,35 @@ const CHANNELS = [
   { id: "match-day-alerts", name: "match-day-alerts", badge: "OFFICIAL", desc: "Match Director broadcasts only" },
 ];
 
+function playTacticalChirp() {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const audioCtx = new AudioContextClass();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(940, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1880, audioCtx.currentTime + 0.07);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.07);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.07);
+  } catch {
+    // Silent fallback
+  }
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
   const [currentChannel, setCurrentChannel] = useState("bristol-championship");
   const [inputText, setInputText] = useState("");
   const [currentUserRole, setCurrentUserRole] = useState<"MEMBER" | "PRO_COMPETITOR" | "MATCH_DIRECTOR">("PRO_COMPETITOR");
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [inspectingMessage, setInspectingMessage] = useState<ChatMessage | null>(null);
   const [aiBlockedNotice, setAiBlockedNotice] = useState<string | null>(null);
   const [aiInspectionDetails, setAiInspectionDetails] = useState<any | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -99,6 +127,9 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, newMsg]);
     setInputText("");
+    if (soundEnabled) {
+      playTacticalChirp();
+    }
   };
 
   const handleAddReaction = (messageId: string, emoji: string) => {
@@ -275,12 +306,29 @@ export default function ChatPage() {
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>LIVE COMMS</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                data-telemetry="chat_toggle_audio"
+                className={`px-2.5 py-1 rounded-lg border text-xs flex items-center gap-1.5 font-mono transition-colors ${
+                  soundEnabled
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    : "bg-white/5 text-slate-500 border-white/10"
+                }`}
+                title="Toggle tactical audio chirps"
+              >
+                {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">{soundEnabled ? "Audio ON" : "Muted"}</span>
+              </button>
+
+              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>LIVE COMMS</span>
+              </div>
             </div>
           </div>
 
@@ -334,6 +382,16 @@ export default function ChatPage() {
                       </div>
 
                       <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+                        <button
+                          type="button"
+                          onClick={() => setInspectingMessage(msg)}
+                          data-telemetry="chat_inspect_ai_analysis"
+                          className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors"
+                          title="Inspect AI Neural Sentiment & Policy Breakdown"
+                        >
+                          <Eye className="w-2.5 h-2.5" />
+                          <span>AI Sentinel</span>
+                        </button>
                         <span>{msg.timestamp}</span>
                         {isFlagged ? (
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
@@ -421,6 +479,92 @@ export default function ChatPage() {
           </form>
         </div>
       </div>
+
+      {/* AI Neural Analysis Inspection Modal */}
+      {inspectingMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="ios-glass rounded-3xl max-w-md w-full border border-cyan-500/30 shadow-2xl p-6 sm:p-8 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-cyan-400" />
+                <h3 className="text-base font-bold text-white">
+                  Subsonic AI Sentinel Analysis
+                </h3>
+              </div>
+              <button
+                onClick={() => setInspectingMessage(null)}
+                className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-black/50 border border-white/5 space-y-1">
+              <div className="text-[10px] font-mono text-slate-400">INSPECTED TRANSMISSION:</div>
+              <div className="text-xs sm:text-sm text-white italic">&ldquo;{inspectingMessage.content}&rdquo;</div>
+              <div className="text-[10px] text-slate-400 font-mono pt-1">
+                Sender: {inspectingMessage.author.name} ({inspectingMessage.author.role})
+              </div>
+            </div>
+
+            {/* Metric Bars */}
+            <div className="space-y-3 font-mono text-xs">
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Toxicity & Hostility Score</span>
+                  <span className={`font-bold ${(inspectingMessage.aiModerationReport?.toxicityScore || 0) > 30 ? "text-amber-400" : "text-emerald-400"}`}>
+                    {inspectingMessage.aiModerationReport?.toxicityScore || 0}%
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${(inspectingMessage.aiModerationReport?.toxicityScore || 0) > 30 ? "bg-amber-500" : "bg-emerald-500"}`}
+                    style={{ width: `${Math.max(4, inspectingMessage.aiModerationReport?.toxicityScore || 0)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Safety & Threat Score</span>
+                  <span className="text-emerald-400 font-bold">
+                    {inspectingMessage.aiModerationReport?.threatScore || 0}% Threat
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: "4%" }} />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Regulated Firearm Sales Compliance</span>
+                  <span className="text-emerald-400 font-bold">100% Policy Compliant</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: "100%" }} />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-[11px] text-slate-300 space-y-1 font-mono">
+              <div className="text-amber-400 font-bold">STATUS: {inspectingMessage.moderationStatus}</div>
+              <div>Sentiment: {inspectingMessage.aiModerationReport?.sentiment || "NEUTRAL"}</div>
+              {inspectingMessage.aiModerationReport?.flagReason && (
+                <div className="text-amber-300 mt-1">Notice: {inspectingMessage.aiModerationReport.flagReason}</div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setInspectingMessage(null)}
+              className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
+            >
+              Close Inspector
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
