@@ -27,6 +27,7 @@ import { ChatMessage } from "@/lib/types";
 import { evaluateChatMessage } from "@/lib/ai-moderator";
 import { recordTelemetryEvent } from "@/lib/telemetry";
 import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const CHANNELS = [
   { id: "bristol-championship", name: "bristol-pro-shootout", badge: "PRO SQUADS", desc: "Stages, DOPE & mountain winds" },
@@ -73,6 +74,101 @@ export default function ChatPage() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Hydrate from Supabase and subscribe to realtime transmissions
+  useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return;
+
+    // 1. Initial fetch from cloud
+    supabase
+      .from("chat_messages")
+      .select("*")
+      .order("created_at", { ascending: true })
+      .limit(100)
+      .then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          const cloudMsgs: ChatMessage[] = data.map((d: any) => ({
+            id: d.id,
+            channelId: d.channel_id,
+            author: {
+              id: d.author_id,
+              name: d.author_name,
+              callsign: d.author_callsign,
+              role: d.author_role,
+              badgeText: d.author_badge,
+            },
+            content: d.content,
+            timestamp: new Date(d.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            reactions: d.reactions || [],
+            moderationStatus: d.moderation_status || "APPROVED",
+            aiModerationReport: {
+              toxicityScore: d.ai_toxicity_score || 0,
+              threatScore: d.ai_threat_score || 0,
+              policyScore: d.ai_policy_score || 0,
+              sentiment: d.ai_sentiment || "NEUTRAL",
+              flagReason: d.ai_flag_reason || undefined,
+            },
+          }));
+
+          // Merge with initial data avoiding duplicate IDs
+          setMessages((prev) => {
+            const existingIds = new Set(prev.map((m) => m.id));
+            const fresh = cloudMsgs.filter((cm) => !existingIds.has(cm.id));
+            return [...prev, ...fresh];
+          });
+        }
+      });
+
+    // 2. Realtime channel subscription
+    const channel = supabase
+      .channel("realtime-comms-room")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "chat_messages" },
+        (payload: any) => {
+          const row = payload.new;
+          if (!row) return;
+          const incoming: ChatMessage = {
+            id: row.id,
+            channelId: row.channel_id,
+            author: {
+              id: row.author_id,
+              name: row.author_name,
+              callsign: row.author_callsign,
+              role: row.author_role,
+              badgeText: row.author_badge,
+            },
+            content: row.content,
+            timestamp: new Date(row.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            reactions: row.reactions || [],
+            moderationStatus: row.moderation_status || "APPROVED",
+            aiModerationReport: {
+              toxicityScore: row.ai_toxicity_score || 0,
+              threatScore: row.ai_threat_score || 0,
+              policyScore: row.ai_policy_score || 0,
+              sentiment: row.ai_sentiment || "NEUTRAL",
+              flagReason: row.ai_flag_reason || undefined,
+            },
+          };
+
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === incoming.id)) return prev;
+            return [...prev, incoming];
+          });
+
+          if (soundEnabled) {
+            playTacticalChirp();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [soundEnabled]);
 
   useEffect(() => {
     scrollToBottom();
@@ -163,6 +259,36 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, newMsg]);
     setInputText("");
+
+    // Persist to Supabase Cloud Database
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from("chat_messages")
+        .insert([
+          {
+            id: newMsg.id,
+            channel_id: newMsg.channelId,
+            author_id: newMsg.author.id,
+            author_name: newMsg.author.name,
+            author_callsign: newMsg.author.callsign,
+            author_role: newMsg.author.role,
+            author_badge: newMsg.author.badgeText,
+            content: newMsg.content,
+            moderation_status: newMsg.moderationStatus,
+            ai_toxicity_score: newMsg.aiModerationReport?.toxicityScore || 0,
+            ai_threat_score: newMsg.aiModerationReport?.threatScore || 0,
+            ai_policy_score: newMsg.aiModerationReport?.policyScore || 0,
+            ai_flag_reason: newMsg.aiModerationReport?.flagReason || null,
+            ai_sentiment: newMsg.aiModerationReport?.sentiment || "NEUTRAL",
+            reactions: newMsg.reactions,
+            created_at: new Date().toISOString(),
+          },
+        ])
+        .then(({ error }) => {
+          if (error) console.warn("Supabase chat persist warning:", error.message);
+        });
+    }
+
     if (soundEnabled) {
       playTacticalChirp();
     }

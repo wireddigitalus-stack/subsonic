@@ -35,7 +35,7 @@ import {
   clearLocalTelemetry,
   recordTelemetryEvent
 } from "@/lib/telemetry";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { TelemetryEvent, MatchEvent, ChatMessage, CommsAbuseAlert } from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
@@ -58,6 +58,34 @@ export default function AdminDashboardPage() {
   const loadData = () => {
     const evts = getLocalTelemetryEvents();
     setEvents(evts);
+
+    // If Supabase is connected, hydrate with cloud database events
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from("telemetry_events")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(250)
+        .then((res: { data: any; error: any }) => {
+          if (!res.error && res.data && res.data.length > 0) {
+            const cloudEvts: TelemetryEvent[] = res.data.map((d: any) => ({
+              id: d.id,
+              eventType: d.event_type,
+              targetElement: d.target_element,
+              targetText: d.target_text,
+              targetCategory: d.target_category,
+              pageRoute: d.page_route,
+              dwellSeconds: d.dwell_seconds,
+              scrollDepth: d.scroll_depth,
+              timestamp: d.created_at,
+              device: d.device_data || { isMobile: false, isIOS: false, screenWidth: 1280, screenHeight: 800, userAgent: "" },
+              sessionId: d.session_id,
+              visitorId: d.visitor_id,
+            }));
+            setEvents(cloudEvts);
+          }
+        });
+    }
 
     const alerts = getCommsAbuseAlerts();
     setAbuseAlerts(alerts);
