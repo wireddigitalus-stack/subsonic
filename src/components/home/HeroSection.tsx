@@ -35,16 +35,6 @@ export function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Hero Title & Mission */}
         <div className="space-y-4 max-w-4xl">
-          <div className="relative w-full max-w-md h-14 sm:h-16 mb-2">
-            <Image
-              src="/assets/subsonic-banner-wide.png"
-              alt="Subsonic Society"
-              fill
-              className="object-contain object-left"
-              priority
-            />
-          </div>
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
             THE HIGH-STAKES <br />
             <span className="amber-gradient-text">

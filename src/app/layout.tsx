@@ -24,6 +24,20 @@ export const metadata: Metadata = {
     icon: "/assets/subsonic-coin.jpg",
     apple: "/assets/subsonic-coin.jpg",
   },
+  alternates: {
+    canonical: "https://subsonicsociety.com",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "Subsonic Society | Precision Rimfire Competition & Media Platform",
     description:
@@ -37,10 +51,99 @@ export const metadata: Metadata = {
         height: 630,
         alt: "Subsonic Society Bristol TN Precision Rimfire",
       },
+      {
+        url: "/assets/subsonic-banner-wide.png",
+        width: 2172,
+        height: 724,
+        alt: "Subsonic Society Official Brand Logo",
+      },
+      {
+        url: "/assets/subsonic-coin.jpg",
+        width: 600,
+        height: 600,
+        alt: "Subsonic Society .22 Rimfire Official Challenge Coin",
+      },
     ],
     locale: "en_US",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Subsonic Society | Precision Rimfire Media & Mountain Pro Championship",
+    description:
+      "High-stakes precision rimfire shooting media, pro competitions in Bristol, TN mountains, and tactical community.",
+    images: ["/assets/subsonic-facebook-cover.jpg"],
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["SportsOrganization", "Organization"],
+      "@id": "https://subsonicsociety.com/#organization",
+      "name": "Subsonic Society",
+      "alternateName": ["Subsonic Society .22 Rimfire", "Subsonic Society Precision Rimfire"],
+      "url": "https://subsonicsociety.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
+        "caption": "Subsonic Society Official Logo"
+      },
+      "image": [
+        "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
+        "https://subsonicsociety.com/assets/subsonic-coin.jpg",
+        "https://subsonicsociety.com/assets/subsonic-facebook-cover.jpg"
+      ],
+      "description": "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
+      "sameAs": [
+        "https://www.facebook.com/p/Subsonic-Society-61578052196057/"
+      ],
+      "sport": "Precision Rimfire Rifle Shooting (.22LR)",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Bristol",
+        "addressRegion": "TN",
+        "addressCountry": "US"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://subsonicsociety.com/#website",
+      "url": "https://subsonicsociety.com",
+      "name": "Subsonic Society",
+      "publisher": {
+        "@id": "https://subsonicsociety.com/#organization"
+      }
+    },
+    {
+      "@type": "SportsEvent",
+      "@id": "https://subsonicsociety.com/#bristol-pro-championship",
+      "name": "Subsonic Society High Country Mountain Pro Rimfire Shootout",
+      "description": "The premier 18-stage high-stakes precision rimfire pro championship in the mountains of Bristol, Tennessee (Elevation: 3,420 FT). $28,500 cash and gear purse.",
+      "startDate": "2026-10-17T08:00:00-04:00",
+      "endDate": "2026-10-18T17:00:00-04:00",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "Place",
+        "name": "Subsonic Society Mountain Ridge Range",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bristol",
+          "addressRegion": "TN",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "elevation": "3,420 FT"
+        }
+      },
+      "organizer": {
+        "@id": "https://subsonicsociety.com/#organization"
+      }
+    }
+  ]
 };
 
 export const viewport: Viewport = {
@@ -58,6 +161,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body className="bg-[#07090E] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
         <TelemetryProvider>
           <Navbar />

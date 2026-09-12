@@ -47,11 +47,14 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-2 transition-all duration-300">
       <div className="max-w-7xl mx-auto">
         <nav className="ios-glass rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border border-white/10 shadow-ios-glass">
-          {/* Brand Logo */}
+          {/* Brand Logo with Challenge Coin, Full Wide Wordmark, Home Link & AI Search Optimization */}
           <Link 
             href="/" 
+            rel="home"
+            title="Subsonic Society - Precision Rimfire Shooting Media & Mountain Pro Competitions"
+            aria-label="Subsonic Society Homepage"
             data-telemetry="nav_brand_logo"
-            className="flex items-center gap-3 group shrink-0"
+            className="flex items-center gap-2.5 sm:gap-3 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xl"
           >
             <div 
               className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black flex items-center justify-center shrink-0"
@@ -59,7 +62,7 @@ export function Navbar() {
             >
               <Image
                 src="/assets/subsonic-coin.jpg"
-                alt="Subsonic Society Coin"
+                alt="Subsonic Society Official Minted Challenge Coin Emblem"
                 width={38}
                 height={38}
                 style={{ width: 38, height: 38, objectFit: "cover" }}
@@ -67,8 +70,22 @@ export function Navbar() {
                 priority
               />
             </div>
-            <span className="font-extrabold text-sm sm:text-base tracking-wider text-white">
-              SUBSONIC SOCIETY
+            
+            {/* Full Metallic Gold Wide Logo */}
+            <div className="relative h-7 sm:h-9 w-32 sm:w-44 flex items-center">
+              <Image
+                src="/assets/subsonic-banner-wide.png"
+                alt="Subsonic Society - Precision Rimfire Shooting Sports and Media Platform"
+                fill
+                sizes="(max-width: 640px) 130px, 180px"
+                className="object-contain object-left group-hover:brightness-110 transition-all duration-200"
+                priority
+              />
+            </div>
+
+            {/* AI Search & Screen Reader Crawlability */}
+            <span className="sr-only">
+              Subsonic Society: Precision Rimfire Shooting Media, Bristol TN Mountain Pro Rimfire Championship, .22LR Ballistics & Pro Shooters
             </span>
           </Link>
 
