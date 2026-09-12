@@ -33,19 +33,6 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Top Badges */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold shadow-sm">
-            <Mountain className="w-3.5 h-3.5" />
-            <span>BRISTOL, TENNESSEE • HIGH COUNTRY PRO RIMFIRE</span>
-          </div>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono">
-            <Crosshair className="w-3.5 h-3.5 text-blue-400" />
-            <span>ELEVATION: 3,420 FT</span>
-          </div>
-        </div>
-
         {/* Hero Title & Mission */}
         <div className="space-y-4 max-w-4xl">
           <div className="relative w-full max-w-md h-14 sm:h-16 mb-2">
@@ -160,6 +147,19 @@ export function HeroSection() {
               AI Monitored
             </span>
           </Link>
+        </div>
+
+        {/* Location & Elevation Badges Below Hero */}
+        <div className="flex flex-wrap items-center gap-2.5 pt-4 border-t border-white/5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-mono font-semibold shadow-sm">
+            <Mountain className="w-3.5 h-3.5" />
+            <span>BRISTOL, TENNESSEE • HIGH COUNTRY PRO RIMFIRE</span>
+          </div>
+
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs font-mono">
+            <Crosshair className="w-3.5 h-3.5 text-blue-400" />
+            <span>ELEVATION: 3,420 FT</span>
+          </div>
         </div>
       </div>
     </section>
