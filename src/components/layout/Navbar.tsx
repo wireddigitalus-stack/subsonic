@@ -259,7 +259,7 @@ export function Navbar() {
             <Link
               href="/calendar"
               data-telemetry="nav_primary_register_cta"
-              className="px-4 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
+              className="hidden md:flex px-4 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all items-center gap-1.5"
             >
               <Flame className="w-3.5 h-3.5 fill-black" />
               <span>Enter Shootout</span>
@@ -335,6 +335,19 @@ export function Navbar() {
               >
                 <Activity className="w-4 h-4 text-cyan-400" />
                 <span>Admin Telemetry Portal</span>
+              </Link>
+            </div>
+
+            {/* Mobile Action: Enter Shootout */}
+            <div className="pt-2 border-t border-white/10">
+              <Link
+                href="/calendar"
+                onClick={() => setMobileMenuOpen(false)}
+                data-telemetry="mobile_nav_enter_shootout"
+                className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
+              >
+                <Flame className="w-4 h-4 fill-black" />
+                <span>Enter Shootout</span>
               </Link>
             </div>
           </div>
