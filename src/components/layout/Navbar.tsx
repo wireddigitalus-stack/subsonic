@@ -38,13 +38,13 @@ export function Navbar() {
             data-telemetry="nav_brand_logo"
             className="flex items-center gap-3 group"
           >
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-amber-500/30 shadow-tactical-glow bg-black/40 flex items-center justify-center p-0.5">
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-amber-400/70 shadow-[0_0_18px_rgba(245,158,11,0.45)] bg-black/80 flex items-center justify-center shrink-0">
               <Image
-                src="/assets/subsonic-logo-round.png"
-                alt="Subsonic Society"
-                width={40}
-                height={40}
-                className="object-contain transform group-hover:scale-110 transition-transform duration-300"
+                src="/assets/subsonic-coin.jpg"
+                alt="Subsonic Society Coin"
+                width={44}
+                height={44}
+                className="object-cover w-full h-full transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300"
                 priority
               />
             </div>

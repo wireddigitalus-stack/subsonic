@@ -19,13 +19,13 @@ export function Footer() {
           {/* Column 1: Brand & Mission */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/30 bg-black/50 p-1 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black/60 flex items-center justify-center shrink-0">
                 <Image
-                  src="/assets/subsonic-logo-round.png"
-                  alt="Subsonic Society"
-                  width={36}
-                  height={36}
-                  className="object-contain"
+                  src="/assets/subsonic-coin.jpg"
+                  alt="Subsonic Society Coin"
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
                 />
               </div>
               <span className="font-extrabold text-lg tracking-wider text-white">

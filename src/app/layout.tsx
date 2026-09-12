@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Subsonic Society" }],
   icons: {
-    icon: "/assets/subsonic-logo-round.png",
-    apple: "/assets/subsonic-logo-round.png",
+    icon: "/assets/subsonic-coin.jpg",
+    apple: "/assets/subsonic-coin.jpg",
   },
   openGraph: {
     title: "Subsonic Society | Precision Rimfire Competition & Media Platform",
