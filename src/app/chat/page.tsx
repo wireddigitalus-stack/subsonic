@@ -605,11 +605,14 @@ export default function ChatPage() {
             <span className="hidden md:inline">{soundEnabled ? "Radio Audio ON" : "Muted"}</span>
           </button>
 
-          {/* AI Sentinel Pill */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden sm:inline">Google Gemini 2.5 Flash Sentinel</span>
-            <span className="sm:hidden">Gemini AI</span>
+          {/* AI Sentinel Pill (Compact Badge) */}
+          <div
+            title="Google Gemini 2.5 Flash Sentinel Active"
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] font-mono text-emerald-300"
+          >
+            <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+            <span className="hidden sm:inline">Gemini 2.5 Flash</span>
+            <span className="sm:hidden">Gemini</span>
           </div>
 
           {/* Shooter Profile Button */}
@@ -1100,7 +1103,10 @@ export default function ChatPage() {
 
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 px-1">
               <span>Transmitting as: <strong className="text-slate-300">{shooterProfile.name} ({shooterProfile.callsign})</strong></span>
-              <span>Protected by Google Gemini 2.5 Flash Sentinel</span>
+              <span className="flex items-center gap-1 text-[9px] text-emerald-400/80">
+                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                Gemini 2.5 Sentinel
+              </span>
             </div>
           </form>
         </div>
