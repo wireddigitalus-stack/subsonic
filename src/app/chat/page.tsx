@@ -183,7 +183,8 @@ export default function ChatPage() {
   const [isAiScanning, setIsAiScanning] = useState(false);
   const [copiedDopeId, setCopiedDopeId] = useState<string | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // Messages Container Ref (Used for internal container scrolling ONLY without moving the window)
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Channels filtered by current active Net tab
   const visibleChannels = ALL_CHANNELS.filter((ch) => ch.netType === activeNetTab);
@@ -206,9 +207,24 @@ export default function ChatPage() {
     }
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Dedicated container-only scroll that NEVER scrolls the outer window or jumps to the footer
+  const scrollContainerToBottom = (smooth = true) => {
+    if (!messagesContainerRef.current) return;
+    const container = messagesContainerRef.current;
+    if (smooth) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    } else {
+      container.scrollTop = container.scrollHeight;
+    }
   };
+
+  // Scroll inner container to bottom only when switching channels
+  useEffect(() => {
+    scrollContainerToBottom(false);
+  }, [currentChannel]);
 
   // Supabase Hydration & Realtime Subscription
   useEffect(() => {
@@ -300,6 +316,9 @@ export default function ChatPage() {
             return [...prev, incoming];
           });
 
+          // Scroll down inside container for new incoming message
+          setTimeout(() => scrollContainerToBottom(true), 50);
+
           if (soundEnabled) {
             playTacticalChirp(1120);
           }
@@ -313,10 +332,6 @@ export default function ChatPage() {
       }
     };
   }, [soundEnabled]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, currentChannel]);
 
   // Handle Transmitting Message (Standard or DOPE Card)
   const handleTransmit = async (content: string, type: "STANDARD" | "DOPE_DROP" = "STANDARD", dopeCard?: DopeCardData) => {
@@ -434,6 +449,9 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, newMsg]);
     setInputText("");
+
+    // Smoothly scroll only within the container for user's own sent message
+    setTimeout(() => scrollContainerToBottom(true), 50);
 
     // Persist to Supabase Cloud Database
     if (isSupabaseConfigured && supabase) {
@@ -620,6 +638,7 @@ export default function ChatPage() {
         <div className="flex items-center gap-2">
           {/* Pro Competitor Tab */}
           <button
+            type="button"
             onClick={() => {
               setActiveNetTab("PRO");
               if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
@@ -644,6 +663,7 @@ export default function ChatPage() {
 
           {/* Public Society Tab */}
           <button
+            type="button"
             onClick={() => {
               setActiveNetTab("PUBLIC");
               if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
@@ -697,6 +717,7 @@ export default function ChatPage() {
                 return (
                   <button
                     key={ch.id}
+                    type="button"
                     onClick={() => setCurrentChannel(ch.id)}
                     data-telemetry={`chat_channel_${ch.id}`}
                     className={`w-full p-3.5 rounded-2xl text-left transition-all border ${
@@ -812,8 +833,11 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Messages Stream */}
-          <div className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto max-h-[580px]">
+          {/* Messages Stream: scrollable container ONLY without moving outer page */}
+          <div
+            ref={messagesContainerRef}
+            className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto max-h-[560px] min-h-[420px]"
+          >
             {filteredMessages.length === 0 ? (
               <div className="text-center py-16 space-y-3">
                 <MessageSquare className="w-10 h-10 text-slate-600 mx-auto" />
@@ -997,8 +1021,9 @@ export default function ChatPage() {
                       {msg.reactions.map((reaction) => (
                         <button
                           key={reaction.emoji}
+                          type="button"
                           onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                          className="px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1.5 transition-all"
+                          className="px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1.5 transition-all active:scale-95"
                         >
                           <span>{reaction.emoji}</span>
                           <span className="font-mono text-[10px] font-bold">{reaction.count}</span>
@@ -1010,6 +1035,7 @@ export default function ChatPage() {
                         {["🎯", "🔥", "⛰️", "💡", "👏", "🏆"].map((emoji) => (
                           <button
                             key={emoji}
+                            type="button"
                             onClick={() => handleAddReaction(msg.id, emoji)}
                             className="p-1 text-xs hover:scale-125 transition-transform"
                             title={`React with ${emoji}`}
@@ -1023,7 +1049,6 @@ export default function ChatPage() {
                 );
               })
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* AI Blocked Notice Banner */}
@@ -1100,6 +1125,7 @@ export default function ChatPage() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsDopeModalOpen(false)}
                 className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
               >
@@ -1236,6 +1262,7 @@ export default function ChatPage() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsProfileModalOpen(false)}
                 className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
               >
@@ -1345,6 +1372,7 @@ export default function ChatPage() {
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={() => setInspectingMessage(null)}
                 className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
               >
@@ -1422,4 +1450,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
