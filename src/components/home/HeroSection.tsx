@@ -109,7 +109,7 @@ export function HeroSection() {
         {/* Action Button Bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
           <Link
-            href="/calendar"
+            href="/register?match=match-001"
             data-telemetry="hero_cta_register_match"
             className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-sm flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-[0.98] transition-all"
           >

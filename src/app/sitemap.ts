@@ -29,5 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/register`,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
   ];
 }

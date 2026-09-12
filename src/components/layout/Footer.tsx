@@ -58,11 +58,20 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/calendar"
-                  data-telemetry="footer_link_calendar"
-                  className="hover:text-amber-400 transition-colors flex items-center gap-1.5"
+                  href="/register"
+                  data-telemetry="footer_link_register"
+                  className="hover:text-amber-400 transition-colors flex items-center gap-1.5 font-semibold text-amber-400/90"
                 >
                   <Target className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Register Match Squad</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/bristol-pro"
+                  data-telemetry="footer_link_bristol_pro"
+                  className="hover:text-amber-400 transition-colors flex items-center gap-1.5"
+                >
                   <span>Bristol Pro Shootout</span>
                 </Link>
               </li>

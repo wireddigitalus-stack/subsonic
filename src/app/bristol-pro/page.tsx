@@ -103,7 +103,7 @@ export default function BristolProPortalPage() {
 
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <Link
-                href="/calendar"
+                href="/register?match=match-001"
                 data-telemetry="bristol_portal_register_cta"
                 className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
               >
@@ -264,7 +264,7 @@ export default function BristolProPortalPage() {
                 Bristol Mountain Ridge Range Sector {Math.ceil(selectedStage.num / 4)}
               </span>
               <Link
-                href="/calendar"
+                href="/register?match=match-001"
                 className="text-white hover:text-amber-400 font-bold flex items-center gap-1"
               >
                 <span>Register this Stage</span>

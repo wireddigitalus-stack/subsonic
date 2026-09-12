@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { 
   Calendar as CalendarIcon, 
   MapPin, 
@@ -230,17 +231,14 @@ export default function CalendarPage() {
                   <span>Stage Briefing</span>
                 </button>
 
-                <button
-                  onClick={() => {
-                    setSelectedMatch(match);
-                    setIsRegistering(true);
-                  }}
+                <Link
+                  href={`/register?match=${match.id}`}
                   data-telemetry={`match_register_button_${match.id}`}
                   className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all"
                 >
                   <Flame className="w-3.5 h-3.5 fill-black" />
                   <span>Enter (${match.entryFee})</span>
-                </button>
+                </Link>
               </div>
             </div>
           );
@@ -360,14 +358,14 @@ export default function CalendarPage() {
                 <span>Add to Apple / Google Calendar (.ics)</span>
               </button>
 
-              <button
-                onClick={() => setIsRegistering(true)}
+              <Link
+                href={`/register?match=${selectedMatch.id}`}
                 data-telemetry={`open_registration_modal_${selectedMatch.id}`}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all"
               >
                 <Flame className="w-4 h-4 fill-black" />
                 <span>Proceed to Squad Registration (${selectedMatch.entryFee})</span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
