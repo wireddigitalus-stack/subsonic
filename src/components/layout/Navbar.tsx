@@ -57,27 +57,25 @@ export function Navbar() {
             className="flex items-center gap-2.5 sm:gap-3 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xl"
           >
             <div 
-              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black flex items-center justify-center shrink-0"
-              style={{ width: 38, height: 38, minWidth: 38, minHeight: 38, maxWidth: 38, maxHeight: 38 }}
+              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black flex items-center justify-center shrink-0 w-[38px] h-[38px] sm:w-[40px] sm:h-[40px]"
             >
               <Image
                 src="/assets/subsonic-coin.jpg"
                 alt="Subsonic Society Official Minted Challenge Coin Emblem"
-                width={38}
-                height={38}
-                style={{ width: 38, height: 38, objectFit: "cover" }}
-                className="rounded-full transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover rounded-full transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
             
-            {/* Full Metallic Gold Wide Logo */}
-            <div className="relative h-7 sm:h-9 w-32 sm:w-44 flex items-center">
+            {/* Full Metallic Gold Wide Logo - Exactly Even in Height with Coin */}
+            <div className="relative h-[38px] w-[144px] sm:h-[40px] sm:w-[152px] flex items-center shrink-0">
               <Image
-                src="/assets/subsonic-banner-wide.png"
+                src="/assets/subsonic-banner-trimmed.png"
                 alt="Subsonic Society - Precision Rimfire Shooting Sports and Media Platform"
                 fill
-                sizes="(max-width: 640px) 130px, 180px"
+                sizes="(max-width: 640px) 144px, 152px"
                 className="object-contain object-left group-hover:brightness-110 transition-all duration-200"
                 priority
               />
