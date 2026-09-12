@@ -89,7 +89,44 @@ body {
   background: rgba(245, 158, 11, 0.4);
 }
 
+/* Native iOS Slim Overlay Scrollbar */
+.ios-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.ios-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.ios-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ios-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.ios-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
+}
+
+/* Hide scrollbar utility for clean horizontal swipe pills */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* iOS Safe Area spacing */
 .safe-bottom-padding {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 1rem));
 }
+

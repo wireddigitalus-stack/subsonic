@@ -30,8 +30,11 @@ import {
   Sliders,
   UserCheck,
   ChevronRight,
+  ChevronDown,
   ExternalLink,
-  MessageSquare
+  MessageSquare,
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData } from "@/lib/types";
@@ -159,6 +162,9 @@ export default function ChatPage() {
   const [inputText, setInputText] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
 
+  // Fullscreen / Handheld Immersive Mode
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // Shooter Profile State
   const [shooterProfile, setShooterProfile] = useState<ShooterProfile>(DEFAULT_PROFILE);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -183,7 +189,7 @@ export default function ChatPage() {
   const [isAiScanning, setIsAiScanning] = useState(false);
   const [copiedDopeId, setCopiedDopeId] = useState<string | null>(null);
 
-  // Messages Container Ref (Used for internal container scrolling ONLY without moving the window)
+  // Messages Container Ref for internal container-only scrolling
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Channels filtered by current active Net tab
@@ -207,7 +213,18 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Dedicated container-only scroll that NEVER scrolls the outer window or jumps to the footer
+  // Handle ESC key to exit fullscreen
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen]);
+
+  // Dedicated container-only scroll that NEVER scrolls the outer window or jumps to footer
   const scrollContainerToBottom = (smooth = true) => {
     if (!messagesContainerRef.current) return;
     const container = messagesContainerRef.current;
@@ -557,289 +574,314 @@ export default function ChatPage() {
   };
 
   return (
-    <div data-section="chat" className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 space-y-5">
+    <div
+      data-section="chat"
+      className={
+        isFullscreen
+          ? "fixed inset-0 z-[60] bg-[#07090E] p-2 sm:p-4 flex flex-col h-[100dvh] w-full overflow-hidden animate-fadeIn"
+          : "max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-5"
+      }
+    >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
-      <div className="ios-glass rounded-2xl p-4 border border-amber-500/20 shadow-tactical-glow flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        {/* Left: Weather & Elevation Telemetry */}
-        <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-white font-bold tracking-wider">HOLSTON RIDGE TELEMETRY:</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-            <Compass className="w-3.5 h-3.5 text-amber-400" />
-            <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-            <Wind className="w-3.5 h-3.5 text-cyan-400" />
-            <span>WIND: <strong className="text-cyan-300">9-14 MPH @ 270° WNW</strong></span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-            <Thermometer className="w-3.5 h-3.5 text-orange-400" />
-            <span>TEMP: <strong className="text-white">64°F</strong></span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-            <Target className="w-3.5 h-3.5 text-emerald-400" />
-            <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
-          </div>
-        </div>
-
-        {/* Right: Quick Controls & Profile Pill */}
-        <div className="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-white/10">
-          {/* Audio Chirp Toggle */}
-          <button
-            type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs flex items-center gap-1.5 font-mono transition-colors ${
-              soundEnabled
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                : "bg-white/5 text-slate-400 border-white/10"
-            }`}
-            title="Toggle Tactical Radio Chirp"
-          >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span className="hidden md:inline">{soundEnabled ? "Radio Audio ON" : "Muted"}</span>
-          </button>
-
-          {/* AI Sentinel Pill (Compact Badge) */}
-          <div
-            title="Google Gemini 2.5 Flash Sentinel Active"
-            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] font-mono text-emerald-300"
-          >
-            <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-            <span className="hidden sm:inline">Gemini 2.5 Flash</span>
-            <span className="sm:hidden">Gemini</span>
-          </div>
-
-          {/* Shooter Profile Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setProfileForm(shooterProfile);
-              setIsProfileModalOpen(true);
-            }}
-            data-telemetry="chat_edit_shooter_profile"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
-          >
-            <div className="w-5 h-5 rounded-lg bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]">
-              {shooterProfile.callsign.slice(0, 2)}
-            </div>
-            <span className="font-mono font-bold text-amber-300 group-hover:text-amber-200">
-              {shooterProfile.callsign}
-            </span>
-            <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
-          </button>
-        </div>
-      </div>
-
-      {/* 2. DUAL NETWORK TABS (PRO NET vs PUBLIC NET) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-2">
-        <div className="flex items-center gap-2">
-          {/* Pro Competitor Tab */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveNetTab("PRO");
-              if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
-                setCurrentChannel("bristol-pro-shootout");
-              }
-            }}
-            data-telemetry="chat_switch_net_pro"
-            className={`px-4 py-2 rounded-xl font-mono text-xs font-bold tracking-wider flex items-center gap-2 transition-all ${
-              activeNetTab === "PRO"
-                ? "bg-amber-500 text-black shadow-tactical-glow"
-                : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
-            }`}
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>COMPETITOR PRO NET</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-              activeNetTab === "PRO" ? "bg-black/30 text-black font-extrabold" : "bg-white/10 text-slate-300"
-            }`}>
-              4 CHANNELS
-            </span>
-          </button>
-
-          {/* Public Society Tab */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveNetTab("PUBLIC");
-              if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
-                setCurrentChannel("general-society");
-              }
-            }}
-            data-telemetry="chat_switch_net_public"
-            className={`px-4 py-2 rounded-xl font-mono text-xs font-bold tracking-wider flex items-center gap-2 transition-all ${
-              activeNetTab === "PUBLIC"
-                ? "bg-blue-600 text-white shadow-lg"
-                : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>PUBLIC COMMS NET</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-              activeNetTab === "PUBLIC" ? "bg-white/20 text-white" : "bg-white/10 text-slate-300"
-            }`}>
-              3 CHANNELS
-            </span>
-          </button>
-        </div>
-
-        {/* Tactical Status Tag */}
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-          <span className="text-[11px]">ACCESS LEVEL:</span>
-          <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold">
-            {activeNetTab === "PRO" ? "VERIFIED COMPETITOR (ENCRYPTED)" : "OPEN COMMUNITY (UNRESTRICTED)"}
-          </span>
-        </div>
-      </div>
-
-      {/* 3. MAIN COMMS MATRIX (CHANNELS SIDEBAR + MESSAGE STREAM) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[620px]">
-        {/* LEFT COLUMN: Channels Sidebar & DOPE Preset Launcher (4 cols) */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="ios-glass rounded-3xl p-4 sm:p-5 border border-white/10 space-y-4">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                {activeNetTab === "PRO" ? "Pro Squad Channels" : "Society Channels"}
-              </span>
-              <span className="text-[10px] font-mono text-amber-400">
-                {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Active Shooters
-              </span>
+      {!isFullscreen ? (
+        <div className="ios-glass rounded-2xl p-3 sm:p-4 border border-amber-500/20 shadow-tactical-glow flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
+          {/* Left: Weather & Elevation Telemetry */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-white font-bold tracking-wider hidden sm:inline">HOLSTON RIDGE:</span>
+              <span className="text-white font-bold tracking-wider sm:hidden">RIDGE:</span>
             </div>
 
-            {/* Channels List */}
-            <div className="space-y-2">
-              {visibleChannels.map((ch) => {
-                const isActive = currentChannel === ch.id;
-                return (
-                  <button
-                    key={ch.id}
-                    type="button"
-                    onClick={() => setCurrentChannel(ch.id)}
-                    data-telemetry={`chat_channel_${ch.id}`}
-                    className={`w-full p-3.5 rounded-2xl text-left transition-all border ${
-                      isActive
-                        ? "ios-glass bg-amber-500/15 border-amber-500/40 shadow-tactical-glow text-white"
-                        : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] text-slate-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1.5 font-mono font-bold text-sm">
-                        <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
-                        <span>{ch.name}</span>
-                      </div>
-                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
-                        isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
-                      }`}>
-                        {ch.badge}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">
-                      {ch.desc}
-                    </p>
-                  </button>
-                );
-              })}
+            <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+              <Compass className="w-3 h-3 text-amber-400" />
+              <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
             </div>
 
-            {/* DOPE Drop Action Box */}
-            <div className="pt-4 border-t border-white/10 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase text-slate-300 font-bold flex items-center gap-1.5">
-                  <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-                  Tactical DOPE Card
-                </span>
-                <span className="text-[10px] font-mono text-emerald-400">Holston 340y Spec</span>
+            <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+              <Wind className="w-3 h-3 text-cyan-400" />
+              <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+              <Thermometer className="w-3.5 h-3.5 text-orange-400" />
+              <span>TEMP: <strong className="text-white">64°F</strong></span>
+            </div>
+
+            <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+              <Target className="w-3.5 h-3.5 text-emerald-400" />
+              <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
+            </div>
+          </div>
+
+          {/* Right: Quick Controls & Profile Pill */}
+          <div className="flex items-center justify-between lg:justify-end gap-2 sm:gap-3 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-white/10">
+            {/* Fullscreen Button */}
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(true)}
+              data-telemetry="chat_enter_fullscreen"
+              className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
+              title="Expand to Fullscreen Fill Hand Mode"
+            >
+              <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Fullscreen</span>
+            </button>
+
+            {/* Audio Chirp Toggle */}
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`px-2 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono transition-colors ${
+                soundEnabled
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+              title="Toggle Tactical Radio Chirp"
+            >
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              <span className="hidden md:inline">{soundEnabled ? "Audio ON" : "Muted"}</span>
+            </button>
+
+            {/* AI Sentinel Pill (Compact Badge) */}
+            <div
+              title="Google Gemini 2.5 Flash Sentinel Active"
+              className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] font-mono text-emerald-300"
+            >
+              <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+              <span className="hidden sm:inline">Gemini 2.5 Flash</span>
+              <span className="sm:hidden">Gemini</span>
+            </div>
+
+            {/* Shooter Profile Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setProfileForm(shooterProfile);
+                setIsProfileModalOpen(true);
+              }}
+              data-telemetry="chat_edit_shooter_profile"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
+            >
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] sm:text-[10px]">
+                {shooterProfile.callsign.slice(0, 2)}
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                Broadcast target yardage, elevation dial, and wind hold directly into the channel.
-              </p>
+              <span className="font-mono font-bold text-amber-300 group-hover:text-amber-200 text-[11px] sm:text-xs">
+                {shooterProfile.callsign}
+              </span>
+              <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Fullscreen Minimal Top Navigation Bar */
+        <div className="ios-glass rounded-2xl px-4 py-2.5 border border-white/10 flex items-center justify-between gap-3 mb-2 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 font-mono font-bold text-sm text-white">
+              <span className="text-amber-400">#</span>
+              <span>{currentChannelData.name}</span>
+            </div>
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+              {currentChannelData.badge}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px]">
+              <Wind className="w-3 h-3 text-cyan-400" />
+              <span>9-14 MPH WNW</span>
+            </div>
+
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300">
+              <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+              <span>Gemini 2.5</span>
+            </div>
+
+            {/* Exit Fullscreen Button */}
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(false)}
+              className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-xs flex items-center gap-1 font-mono transition-all"
+              title="Exit Fullscreen (Esc)"
+            >
+              <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Exit Full</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 2. MOBILE-FIRST SWIPEABLE CHANNEL SELECTOR (Zero-scroll horizontal pills on mobile) */}
+      <div className="space-y-2">
+        {/* Network Mode Selector Tabs */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNetTab("PRO");
+                if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
+                  setCurrentChannel("bristol-pro-shootout");
+                }
+              }}
+              className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeNetTab === "PRO"
+                  ? "bg-amber-500 text-black shadow-tactical-glow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Lock className="w-3 h-3" />
+              <span>PRO NET</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNetTab("PUBLIC");
+                if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
+                  setCurrentChannel("general-society");
+                }
+              }}
+              className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeNetTab === "PUBLIC"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Users className="w-3 h-3" />
+              <span>PUBLIC NET</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {!isFullscreen && (
               <button
                 type="button"
-                onClick={() => setIsDopeModalOpen(true)}
-                data-telemetry="chat_open_dope_modal"
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                onClick={() => setIsFullscreen(true)}
+                className="lg:hidden p-1.5 px-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono flex items-center gap-1"
+                title="Expand to Fullscreen"
               >
-                <Crosshair className="w-4 h-4" />
-                <span>DROP VERIFIED DOPE CARD</span>
+                <Maximize2 className="w-3 h-3" />
+                <span>Full App</span>
               </button>
-            </div>
-
-            {/* Quick Radio Call Presets */}
-            <div className="pt-3 border-t border-white/10 space-y-2">
-              <span className="text-[10px] font-mono text-slate-400 uppercase font-bold flex items-center gap-1">
-                <Radio className="w-3 h-3 text-cyan-400" />
-                Quick Radio Transmissions:
-              </span>
-              <div className="flex flex-col gap-1.5 text-[11px] font-mono">
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("Impact confirmed on Stage 4 diamond! Center hold.")}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 truncate"
-                >
-                  🎯 &ldquo;Impact confirmed on Stage 4!&rdquo;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("Wind switch: Gusting 12mph from 3 o'clock across the draw.")}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 truncate"
-                >
-                  💨 &ldquo;Wind switch: Gusting 12mph from 3 o'clock&rdquo;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("Range is cold. Chamber flags in all rifles.")}
-                  className="text-left px-2.5 py-1.5 rounded-lg bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 truncate"
-                >
-                  🛑 &ldquo;Range is cold. Chamber flags in.&rdquo;
-                </button>
-              </div>
-            </div>
+            )}
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hidden sm:inline">
+              {activeNetTab === "PRO" ? "VERIFIED SQUAD COMMS" : "OPEN SOCIETY"}
+            </span>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Chat Stream & Transmitter Box (8 cols) */}
-        <div className="lg:col-span-8 ios-glass rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden shadow-2xl">
-          {/* Channel Header Bar */}
-          <div className="p-4 sm:p-5 border-b border-white/10 bg-black/40 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 font-mono">
-              <span className="text-amber-400 font-bold text-xl">#</span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-bold text-base">
-                    {currentChannelData.name}
-                  </span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                    {currentChannelData.badge}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400">
-                  {currentChannelData.desc}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+        {/* Horizontal Swipeable Channel Pills (Native iOS Swipe Strip) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+          {visibleChannels.map((ch) => {
+            const isActive = currentChannel === ch.id;
+            return (
+              <button
+                key={ch.id}
+                type="button"
+                onClick={() => setCurrentChannel(ch.id)}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border ${
+                  isActive
+                    ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
+                    : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
+                <span>{ch.name}</span>
+                <span className={`text-[9px] px-1 rounded ${
+                  isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
+                }`}>
+                  {ch.activeUsers}
                 </span>
-                <span>COMMS LINK STABLE</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. MAIN COMMS MATRIX ("Fill Hand" Mobile Architecture) */}
+      <div className={`grid grid-cols-1 ${!isFullscreen ? "lg:grid-cols-12" : ""} gap-4 flex-1 overflow-hidden min-h-0`}>
+        {/* DESKTOP-ONLY Channels Sidebar (Hidden in Fullscreen or Mobile) */}
+        {!isFullscreen && (
+          <div className="hidden lg:block lg:col-span-4 space-y-4">
+            <div className="ios-glass rounded-3xl p-4 sm:p-5 border border-white/10 space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
+                  {activeNetTab === "PRO" ? "Pro Squad Channels" : "Society Channels"}
+                </span>
+                <span className="text-[10px] font-mono text-amber-400">
+                  {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Active Shooters
+                </span>
+              </div>
+
+              {/* Channels List */}
+              <div className="space-y-2">
+                {visibleChannels.map((ch) => {
+                  const isActive = currentChannel === ch.id;
+                  return (
+                    <button
+                      key={ch.id}
+                      type="button"
+                      onClick={() => setCurrentChannel(ch.id)}
+                      data-telemetry={`chat_channel_${ch.id}`}
+                      className={`w-full p-3 rounded-2xl text-left transition-all border ${
+                        isActive
+                          ? "ios-glass bg-amber-500/15 border-amber-500/40 shadow-tactical-glow text-white"
+                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] text-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5 font-mono font-bold text-sm">
+                          <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
+                          <span>{ch.name}</span>
+                        </div>
+                        <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                          isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
+                        }`}>
+                          {ch.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 line-clamp-1">
+                        {ch.desc}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* DOPE Drop Action Box */}
+              <div className="pt-3 border-t border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase text-slate-300 font-bold flex items-center gap-1.5">
+                    <Crosshair className="w-3.5 h-3.5 text-amber-400" />
+                    Tactical DOPE Card
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400">Holston 340y Spec</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsDopeModalOpen(true)}
+                  data-telemetry="chat_open_dope_modal"
+                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                >
+                  <Crosshair className="w-4 h-4" />
+                  <span>DROP VERIFIED DOPE CARD</span>
+                </button>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Messages Stream: scrollable container ONLY without moving outer page */}
+        {/* MAIN CHAT STREAM & TRANSMITTER (Fills handheld screen seamlessly) */}
+        <div
+          className={`${
+            !isFullscreen ? "lg:col-span-8 h-[calc(100dvh-13.5rem)] sm:h-[620px]" : "h-full"
+          } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden shadow-2xl relative`}
+        >
+          {/* Messages Stream: Native iOS momentum scrollbar, NO outer page bounce */}
           <div
             ref={messagesContainerRef}
-            className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto max-h-[560px] min-h-[420px]"
+            className="p-3 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto ios-scrollbar overscroll-contain min-h-0"
           >
             {filteredMessages.length === 0 ? (
               <div className="text-center py-16 space-y-3">
@@ -859,20 +901,20 @@ export default function ChatPage() {
                 return (
                   <div
                     key={msg.id}
-                    className={`p-4 sm:p-5 rounded-2xl border transition-all space-y-3 ${
+                    className={`p-3.5 sm:p-5 rounded-2xl border transition-all space-y-2.5 sm:space-y-3 ${
                       isMD
                         ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
                         : isDopeDrop
-                        ? "bg-black/60 border-cyan-500/30 shadow-lg"
+                        ? "bg-black/70 border-cyan-500/30 shadow-lg"
                         : isFlagged
                         ? "bg-amber-500/5 border-amber-500/20"
                         : "bg-white/[0.02] border-white/5 hover:border-white/10"
                     }`}
                   >
                     {/* Message Header: Author, Badge, Callsign, Timestamp */}
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs border ${
+                    <div className="flex flex-wrap items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs border shrink-0 ${
                           isMD
                             ? "bg-amber-500 text-black border-amber-400"
                             : isDopeDrop
@@ -882,17 +924,17 @@ export default function ChatPage() {
                           {msg.author.callsign?.slice(0, 2) || "SS"}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-white">
+                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <span className="text-xs sm:text-sm font-bold text-white">
                               {msg.author.name}
                             </span>
                             {msg.author.callsign && (
-                              <span className="text-xs font-mono text-amber-400 font-bold">
+                              <span className="text-[11px] sm:text-xs font-mono text-amber-400 font-bold">
                                 [{msg.author.callsign}]
                               </span>
                             )}
                             <span
-                              className={`text-[9px] font-mono px-2 py-0.5 rounded uppercase font-bold ${
+                              className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded uppercase font-bold ${
                                 isMD
                                   ? "bg-amber-500 text-black font-extrabold"
                                   : isPro
@@ -904,7 +946,7 @@ export default function ChatPage() {
                             </span>
                           </div>
                           {msg.author.rifleSetup && (
-                            <div className="text-[10px] font-mono text-slate-400 truncate max-w-[280px] sm:max-w-md">
+                            <div className="text-[10px] font-mono text-slate-400 truncate max-w-[200px] sm:max-w-md">
                               Rig: {msg.author.rifleSetup}
                             </div>
                           )}
@@ -912,12 +954,12 @@ export default function ChatPage() {
                       </div>
 
                       {/* Right Meta: AI Sentinel Inspector Button & Time */}
-                      <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 font-mono">
                         <button
                           type="button"
                           onClick={() => setInspectingMessage(msg)}
                           data-telemetry="chat_inspect_sentinel"
-                          className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors"
+                          className="text-[9px] sm:text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono px-1.5 sm:px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors"
                           title="Inspect AI Neural Sentiment & Policy Breakdown"
                         >
                           <Eye className="w-2.5 h-2.5" />
@@ -937,21 +979,21 @@ export default function ChatPage() {
 
                     {/* Standard Content */}
                     {msg.content && (
-                      <p className="text-sm text-slate-200 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
                         {msg.content}
                       </p>
                     )}
 
                     {/* DEDICATED TACTICAL DOPE CARD RENDERER */}
                     {msg.dopeCard && (
-                      <div className="p-4 rounded-2xl bg-black/80 border border-cyan-500/40 shadow-tactical-glow space-y-3">
+                      <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/85 border border-cyan-500/40 shadow-tactical-glow space-y-2.5 sm:space-y-3">
                         <div className="flex items-center justify-between pb-2 border-b border-cyan-500/20">
                           <div className="flex items-center gap-2 font-mono">
-                            <Target className="w-4 h-4 text-cyan-400" />
-                            <span className="text-xs font-bold text-white uppercase tracking-wider">
-                              VERIFIED BALLISTIC DOPE CARD
+                            <Target className="w-3.5 h-3.5 text-cyan-400" />
+                            <span className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider">
+                              BALLISTIC DOPE CARD
                             </span>
-                            <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
+                            <span className="px-1.5 sm:px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold">
                               {msg.dopeCard.targetDistance}
                             </span>
                           </div>
@@ -959,46 +1001,46 @@ export default function ChatPage() {
                           <button
                             type="button"
                             onClick={() => copyDopeToClipboard(msg.id, msg.dopeCard!)}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-mono text-slate-300 hover:text-white transition-colors"
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[10px] font-mono text-slate-300 hover:text-white transition-colors"
                           >
                             {copiedDopeId === msg.id ? (
                               <>
                                 <Check className="w-3 h-3 text-emerald-400" />
-                                <span className="text-emerald-300">DOPE COPIED!</span>
+                                <span className="text-emerald-300">COPIED!</span>
                               </>
                             ) : (
                               <>
                                 <Copy className="w-3 h-3" />
-                                <span>COPY DATA</span>
+                                <span>COPY</span>
                               </>
                             )}
                           </button>
                         </div>
 
                         {/* DOPE Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
-                          <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[10px] text-slate-400 uppercase">ELEVATION</span>
-                            <div className="text-sm font-bold text-amber-400">{msg.dopeCard.elevationMils}</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+                          <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
+                            <span className="text-[9px] text-slate-400 uppercase">ELEVATION</span>
+                            <div className="text-xs sm:text-sm font-bold text-amber-400">{msg.dopeCard.elevationMils}</div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[10px] text-slate-400 uppercase">WIND HOLD</span>
-                            <div className="text-sm font-bold text-cyan-300">{msg.dopeCard.windHoldMils}</div>
+                          <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
+                            <span className="text-[9px] text-slate-400 uppercase">WIND HOLD</span>
+                            <div className="text-xs sm:text-sm font-bold text-cyan-300">{msg.dopeCard.windHoldMils}</div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[10px] text-slate-400 uppercase">WIND SPEED</span>
-                            <div className="text-xs font-semibold text-slate-200 truncate">{msg.dopeCard.windVelocity || "8-14 MPH"}</div>
+                          <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
+                            <span className="text-[9px] text-slate-400 uppercase">WIND SPEED</span>
+                            <div className="text-[11px] sm:text-xs font-semibold text-slate-200 truncate">{msg.dopeCard.windVelocity || "8-14 MPH"}</div>
                           </div>
-                          <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[10px] text-slate-400 uppercase">DENSITY ALT</span>
-                            <div className="text-xs font-semibold text-emerald-300">{msg.dopeCard.densityAltitude || "+2,150 FT"}</div>
+                          <div className="p-2 sm:p-2.5 rounded-lg sm:rounded-xl bg-white/[0.04] border border-white/5 space-y-0.5">
+                            <span className="text-[9px] text-slate-400 uppercase">DENSITY ALT</span>
+                            <div className="text-[11px] sm:text-xs font-semibold text-emerald-300">{msg.dopeCard.densityAltitude || "+2,150 FT"}</div>
                           </div>
                         </div>
 
                         {/* Ammo & Notes */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-mono text-slate-400 pt-1 gap-1">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 pt-0.5 gap-1">
                           {msg.dopeCard.ammo && (
-                            <div>Ammo Lot: <strong className="text-slate-200">{msg.dopeCard.ammo}</strong></div>
+                            <div>Ammo: <strong className="text-slate-200">{msg.dopeCard.ammo}</strong></div>
                           )}
                           {msg.dopeCard.notes && (
                             <div className="text-cyan-300 italic sm:text-right">
@@ -1011,8 +1053,8 @@ export default function ChatPage() {
 
                     {/* AI Flag Reason Notice */}
                     {isFlagged && msg.aiModerationReport?.flagReason && (
-                      <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-start gap-2">
-                        <BadgeAlert className="w-4 h-4 shrink-0 mt-0.5" />
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-start gap-2">
+                        <BadgeAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                         <div>
                           <strong>Moderation Alert:</strong> {msg.aiModerationReport.flagReason}
                         </div>
@@ -1020,13 +1062,13 @@ export default function ChatPage() {
                     )}
 
                     {/* Reactions Bar */}
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex items-center gap-1.5 sm:gap-2 pt-0.5">
                       {msg.reactions.map((reaction) => (
                         <button
                           key={reaction.emoji}
                           type="button"
                           onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                          className="px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1.5 transition-all active:scale-95"
+                          className="px-2 sm:px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1 sm:gap-1.5 transition-all active:scale-95"
                         >
                           <span>{reaction.emoji}</span>
                           <span className="font-mono text-[10px] font-bold">{reaction.count}</span>
@@ -1034,7 +1076,7 @@ export default function ChatPage() {
                       ))}
 
                       {/* Quick Reactions Palette */}
-                      <div className="flex items-center gap-1 pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-0.5 sm:gap-1 pl-1.5 sm:pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
                         {["🎯", "🔥", "⛰️", "💡", "👏", "🏆"].map((emoji) => (
                           <button
                             key={emoji}
@@ -1056,30 +1098,63 @@ export default function ChatPage() {
 
           {/* AI Blocked Notice Banner */}
           {aiBlockedNotice && (
-            <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake">
+            <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake shrink-0">
               <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
               <div className="flex-1 font-medium">{aiBlockedNotice}</div>
             </div>
           )}
 
-          {/* TRANSMITTER INPUT BAR */}
-          <form onSubmit={handleSendMessage} className="p-4 bg-black/60 border-t border-white/10 space-y-2">
-            <div className="flex items-center gap-2">
+          {/* Quick Push-To-Talk Radio Chips above input */}
+          <div className="px-3 pt-2 bg-black/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-white/10 shrink-0">
+            <Radio className="w-3 h-3 text-cyan-400 shrink-0 ml-1" />
+            <button
+              type="button"
+              onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
+              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/5 transition-all"
+            >
+              🎯 &ldquo;Impact!&rdquo;
+            </button>
+            <button
+              type="button"
+              onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
+              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-white/5 transition-all"
+            >
+              💨 &ldquo;Wind switch 12mph&rdquo;
+            </button>
+            <button
+              type="button"
+              onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
+              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/5 transition-all"
+            >
+              🛑 &ldquo;Cold range&rdquo;
+            </button>
+            <button
+              type="button"
+              onClick={() => quickBroadcast("DOPE verified out to 465 yards.")}
+              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all"
+            >
+              📋 &ldquo;DOPE verified&rdquo;
+            </button>
+          </div>
+
+          {/* TRANSMITTER INPUT BAR (Pinned at bottom of handheld view) */}
+          <form onSubmit={handleSendMessage} className="p-3 sm:p-4 bg-black/85 space-y-1.5 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <input
                 type="text"
-                placeholder={`Broadcast to #${currentChannelData.name} as [${shooterProfile.callsign}]...`}
+                placeholder={`Broadcast to #${currentChannelData.name}...`}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
+                className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
               />
 
               <button
                 type="button"
                 onClick={() => setIsDopeModalOpen(true)}
-                className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all flex items-center gap-1.5 text-xs font-mono"
+                className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all flex items-center gap-1 text-xs font-mono shrink-0"
                 title="Drop DOPE Card"
               >
-                <Crosshair className="w-4 h-4" />
+                <Crosshair className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span className="hidden sm:inline">DOPE</span>
               </button>
 
@@ -1087,24 +1162,24 @@ export default function ChatPage() {
                 type="submit"
                 disabled={isAiScanning}
                 data-telemetry="chat_send_button"
-                className="p-3 px-5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-xs font-mono disabled:opacity-50"
+                className="p-2.5 sm:p-3 px-4 sm:px-5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-xs font-mono disabled:opacity-50 shrink-0"
                 title="Transmit message"
               >
                 {isAiScanning ? (
                   <span className="animate-spin text-sm">⏳</span>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     <span className="hidden sm:inline">TRANSMIT</span>
                   </>
                 )}
               </button>
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 px-1">
-              <span>Transmitting as: <strong className="text-slate-300">{shooterProfile.name} ({shooterProfile.callsign})</strong></span>
+            <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-slate-500 px-1">
+              <span>Transmitting as: <strong className="text-slate-300">[{shooterProfile.callsign}]</strong></span>
               <span className="flex items-center gap-1 text-[9px] text-emerald-400/80">
-                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
                 Gemini 2.5 Sentinel
               </span>
             </div>
@@ -1114,8 +1189,8 @@ export default function ChatPage() {
 
       {/* 4. TACTICAL DOPE DROP BUILDER MODAL */}
       {isDopeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-lg w-full border border-cyan-500/40 shadow-2xl p-6 sm:p-8 space-y-6">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="ios-glass rounded-3xl max-w-lg w-full border border-cyan-500/40 shadow-2xl p-5 sm:p-8 space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
@@ -1139,9 +1214,9 @@ export default function ChatPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSendDopeCard} className="space-y-4">
+            <form onSubmit={handleSendDopeCard} className="space-y-3.5 sm:space-y-4">
               {/* Target Distance & Stage */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-slate-300">Target Distance</label>
                   <input
@@ -1149,7 +1224,7 @@ export default function ChatPage() {
                     value={dopeFormData.targetDistance}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, targetDistance: e.target.value })}
                     placeholder="e.g. 340 YDS"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1160,13 +1235,13 @@ export default function ChatPage() {
                     value={dopeFormData.targetDescription}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, targetDescription: e.target.value })}
                     placeholder="e.g. Stage 4 Diamond KYL"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Elevation & Wind Holds */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-amber-400 font-bold">Elevation Dial / Hold</label>
                   <input
@@ -1174,7 +1249,7 @@ export default function ChatPage() {
                     value={dopeFormData.elevationMils}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, elevationMils: e.target.value })}
                     placeholder="e.g. 8.4 MIL"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1185,14 +1260,14 @@ export default function ChatPage() {
                     value={dopeFormData.windHoldMils}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, windHoldMils: e.target.value })}
                     placeholder="e.g. L 0.6 MIL"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold focus:border-cyan-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold focus:border-cyan-400 focus:outline-none"
                     required
                   />
                 </div>
               </div>
 
               {/* Wind Speed & Ammo Lot */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-slate-300">Wind Speed & Vector</label>
                   <input
@@ -1200,7 +1275,7 @@ export default function ChatPage() {
                     value={dopeFormData.windVelocity}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, windVelocity: e.target.value })}
                     placeholder="e.g. 9 MPH @ 260° WNW"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -1210,7 +1285,7 @@ export default function ChatPage() {
                     value={dopeFormData.ammo}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, ammo: e.target.value })}
                     placeholder="e.g. Lapua Center-X (1,062 FPS)"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1223,7 +1298,7 @@ export default function ChatPage() {
                   value={dopeFormData.notes}
                   onChange={(e) => setDopeFormData({ ...dopeFormData, notes: e.target.value })}
                   placeholder="e.g. Watch for downdraft in canyon draw..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none resize-none"
                 />
               </div>
 
@@ -1232,16 +1307,16 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={() => setIsDopeModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow flex items-center gap-2"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow flex items-center gap-2"
                 >
                   <Crosshair className="w-4 h-4" />
-                  <span>TRANSMIT DOPE CARD</span>
+                  <span>TRANSMIT DOPE</span>
                 </button>
               </div>
             </form>
@@ -1251,8 +1326,8 @@ export default function ChatPage() {
 
       {/* 5. SHOOTER PROFILE CUSTOMIZER MODAL */}
       {isProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-md w-full border border-amber-500/40 shadow-2xl p-6 sm:p-8 space-y-5">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="ios-glass rounded-3xl max-w-md w-full border border-amber-500/40 shadow-2xl p-5 sm:p-8 space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
@@ -1276,14 +1351,14 @@ export default function ChatPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="space-y-4">
+            <form onSubmit={handleSaveProfile} className="space-y-3 sm:space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-mono text-slate-300">Shooter Full Name</label>
                 <input
                   type="text"
                   value={profileForm.name}
                   onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                   required
                 />
               </div>
@@ -1295,7 +1370,7 @@ export default function ChatPage() {
                   value={profileForm.callsign}
                   onChange={(e) => setProfileForm({ ...profileForm, callsign: e.target.value.toUpperCase() })}
                   placeholder="e.g. APEX-22"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
                   required
                 />
               </div>
@@ -1305,7 +1380,7 @@ export default function ChatPage() {
                 <select
                   value={profileForm.division}
                   onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                 >
                   <option value="Open Division Pro">Open Division Pro</option>
                   <option value="Production Division">Production Division</option>
@@ -1322,7 +1397,7 @@ export default function ChatPage() {
                   value={profileForm.rifleSetup}
                   onChange={(e) => setProfileForm({ ...profileForm, rifleSetup: e.target.value })}
                   placeholder="e.g. Vudoo V-22 / Bartlein MTU / ZCO 527"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                 />
               </div>
 
@@ -1334,7 +1409,7 @@ export default function ChatPage() {
                       key={r}
                       type="button"
                       onClick={() => setProfileForm({ ...profileForm, role: r })}
-                      className={`py-2 px-2 rounded-xl border text-center transition-all ${
+                      className={`py-1.5 px-2 rounded-xl border text-center transition-all text-xs ${
                         profileForm.role === r
                           ? "bg-amber-500 text-black font-bold border-amber-400"
                           : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
@@ -1346,17 +1421,17 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3">
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsProfileModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
+                  className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow"
                 >
                   SAVE PROFILE
                 </button>
@@ -1368,8 +1443,8 @@ export default function ChatPage() {
 
       {/* 6. AI SENTINEL INSPECTION MODAL */}
       {inspectingMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-md w-full border border-cyan-500/40 shadow-2xl p-6 sm:p-8 space-y-5">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="ios-glass rounded-3xl max-w-md w-full border border-cyan-500/40 shadow-2xl p-5 sm:p-8 space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-cyan-400" />
@@ -1386,7 +1461,7 @@ export default function ChatPage() {
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-black/50 border border-white/5 space-y-1">
+            <div className="p-3 rounded-2xl bg-black/50 border border-white/5 space-y-1">
               <div className="text-[10px] font-mono text-slate-400">INSPECTED TRANSMISSION:</div>
               <div className="text-xs sm:text-sm text-white italic">&ldquo;{inspectingMessage.content}&rdquo;</div>
               <div className="text-[10px] text-slate-400 font-mono pt-1">
