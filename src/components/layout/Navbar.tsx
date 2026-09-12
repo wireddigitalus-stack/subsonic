@@ -1,148 +1,273 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { 
+  ChevronDown, 
+  Mountain, 
   Calendar, 
+  Crosshair, 
   MessageSquare, 
+  Radio, 
   Activity, 
-  ShieldCheck, 
-  ExternalLink, 
+  Flame, 
   Menu, 
   X,
-  Target,
-  Flame,
-  Radio,
-  Mountain
+  ExternalLink,
+  ShieldCheck,
+  Trophy
 } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const navLinks = [
-    { name: "Overview", href: "/", icon: Target },
-    { name: "Bristol Pro", href: "/bristol-pro", icon: Mountain, badge: "18 Stages" },
-    { name: "Event Calendar", href: "/calendar", icon: Calendar },
-    { name: "Competitor Chat", href: "/chat", icon: MessageSquare, badge: "AI Shield" },
-    { name: "Admin Telemetry", href: "/admin", icon: Activity, badge: "Live" },
-  ];
+  // Close dropdown on route change
+  useEffect(() => {
+    setActiveDropdown(null);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const handleMouseEnter = (menuKey: string) => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setActiveDropdown(menuKey);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 180);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-3 pb-2 transition-all duration-300">
       <div className="max-w-7xl mx-auto">
-        <nav className="ios-glass rounded-2xl px-4 py-2.5 flex items-center justify-between border border-white/10 shadow-ios-glass">
+        <nav className="ios-glass rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border border-white/10 shadow-ios-glass">
           {/* Brand Logo */}
           <Link 
             href="/" 
             data-telemetry="nav_brand_logo"
-            className="flex items-center gap-3 group"
+            className="flex items-center gap-3 group shrink-0"
           >
             <div 
-              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.4)] bg-black flex items-center justify-center shrink-0"
-              style={{ width: 42, height: 42, minWidth: 42, minHeight: 42, maxWidth: 42, maxHeight: 42 }}
+              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black flex items-center justify-center shrink-0"
+              style={{ width: 38, height: 38, minWidth: 38, minHeight: 38, maxWidth: 38, maxHeight: 38 }}
             >
               <Image
                 src="/assets/subsonic-coin.jpg"
                 alt="Subsonic Society Coin"
-                width={42}
-                height={42}
-                style={{ width: 42, height: 42, objectFit: "cover" }}
-                className="rounded-full transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300"
+                width={38}
+                height={38}
+                style={{ width: 38, height: 38, objectFit: "cover" }}
+                className="rounded-full transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-sm sm:text-base tracking-wider text-white font-sans">
-                  SUBSONIC
-                </span>
-                <span className="font-bold text-xs sm:text-sm px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  SOCIETY
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-400 font-mono tracking-tight hidden sm:block">
-                BRISTOL TN • PRECISION RIMFIRE
-              </p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-black text-sm sm:text-base tracking-wider text-white">
+                SUBSONIC
+              </span>
+              <span className="font-extrabold text-xs sm:text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                SOCIETY
+              </span>
             </div>
           </Link>
 
-          {/* Dynamic Island: Live Competition Status */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 shadow-inner">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-            </span>
-            <span className="text-[11px] font-mono font-medium text-slate-300">
-              BRISTOL PRO INVITATIONAL:
-            </span>
-            <span className="text-[11px] font-mono font-bold text-amber-400">
-              OCTOBER 17-18
-            </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5">
-              465 YARDS
-            </span>
-          </div>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-1 bg-white/[0.03] p-1 rounded-xl border border-white/5">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  data-telemetry={`nav_link_${link.name.toLowerCase().replace(/\s+/g, "_")}`}
-                  className={`relative px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 ${
-                    isActive
-                      ? "bg-white/15 text-white shadow-sm border border-white/15"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-slate-400"}`} />
-                  <span>{link.name}</span>
-                  {link.badge && (
-                    <span
-                      className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono uppercase ${
-                        link.badge === "Live"
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                          : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                      }`}
-                    >
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex items-center gap-2">
-            {/* Facebook Direct Link */}
-            <a
-              href="https://www.facebook.com/p/Subsonic-Society-61578052196057/"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-telemetry="nav_facebook_cta"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 hover:text-white transition-all shadow-sm"
+          {/* Clean Desktop Navigation with Modern Submenus */}
+          <div className="hidden md:flex items-center gap-1 bg-white/[0.02] px-2 py-1 rounded-xl border border-white/5">
+            {/* Overview Link */}
+            <Link
+              href="/"
+              data-telemetry="nav_link_overview"
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                pathname === "/"
+                  ? "bg-white/15 text-white shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
             >
-              <Radio className="w-3.5 h-3.5 text-blue-400" />
-              <span>FB Feed</span>
-              <ExternalLink className="w-3 h-3 text-blue-400" />
-            </a>
+              Overview
+            </Link>
 
-            {/* Register Pro Button */}
+            {/* Submenu 1: Competitions */}
+            <div 
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("competition")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "competition" ? null : "competition")}
+                data-telemetry="nav_dropdown_competition"
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  pathname.includes("/bristol-pro") || pathname.includes("/calendar") || activeDropdown === "competition"
+                    ? "bg-white/15 text-white shadow-sm"
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <span>Competitions</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === "competition" ? "rotate-180 text-amber-400" : "text-slate-400"}`} />
+              </button>
+
+              {/* Submenu Panel */}
+              {activeDropdown === "competition" && (
+                <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
+                  <Link
+                    href="/bristol-pro"
+                    data-telemetry="nav_submenu_bristol_pro"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                      <Mountain className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
+                        <span>Bristol Mountain Pro</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">18 Stages</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Course of fire, 465-yd targets & live leaderboard
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/calendar"
+                    data-telemetry="nav_submenu_calendar"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-blue-400">
+                        Event Calendar & Squads
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        2026 match schedule & online registration
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/bristol-pro"
+                    data-telemetry="nav_submenu_ballistics"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                      <Crosshair className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-purple-400">
+                        Mountain DOPE Solver
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Elevation holds & wind deflection matrix
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Submenu 2: Community & Comms */}
+            <div 
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("community")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === "community" ? null : "community")}
+                data-telemetry="nav_dropdown_community"
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  pathname.includes("/chat") || activeDropdown === "community"
+                    ? "bg-white/15 text-white shadow-sm"
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <span>Community</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${activeDropdown === "community" ? "rotate-180 text-amber-400" : "text-slate-400"}`} />
+              </button>
+
+              {/* Submenu Panel */}
+              {activeDropdown === "community" && (
+                <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
+                  <Link
+                    href="/chat"
+                    data-telemetry="nav_submenu_chat"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
+                        <span>Competitor Comms</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">AI Shield</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Tactical channels & match discussions
+                      </p>
+                    </div>
+                  </Link>
+
+                  <a
+                    href="https://www.facebook.com/p/Subsonic-Society-61578052196057/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-telemetry="nav_submenu_facebook"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
+                      <Radio className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-blue-300 flex items-center gap-1">
+                        <span>Facebook Feed</span>
+                        <ExternalLink className="w-3 h-3 text-blue-400" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Latest video reels, match scores & photos
+                      </p>
+                    </div>
+                  </a>
+
+                  <Link
+                    href="/admin"
+                    data-telemetry="nav_submenu_admin"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-cyan-400 flex items-center gap-1.5">
+                        <span>Telemetry Admin</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">Live</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Visitor clicks, dwell time & moderation
+                      </p>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right Action: Clean Primary Register CTA */}
+          <div className="flex items-center gap-3">
             <Link
               href="/calendar"
-              data-telemetry="nav_register_pro_cta"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
+              data-telemetry="nav_primary_register_cta"
+              className="px-4 py-2 rounded-xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
             >
               <Flame className="w-3.5 h-3.5 fill-black" />
-              <span>Register Match</span>
+              <span>Enter Shootout</span>
             </Link>
 
             {/* Mobile Menu Button */}
@@ -157,49 +282,65 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Mobile Dropdown Panel */}
+        {/* Mobile Dropdown Panel with Clean Groupings */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-2 ios-glass rounded-2xl p-3 border border-white/10 shadow-2xl flex flex-col gap-1.5 animate-fadeIn">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  data-telemetry={`mobile_nav_${link.name.toLowerCase().replace(/\s+/g, "_")}`}
-                  className={`flex items-center justify-between p-2.5 rounded-xl text-sm font-medium ${
-                    isActive
-                      ? "bg-white/15 text-white border border-white/10"
-                      : "text-slate-300 hover:bg-white/5"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? "text-amber-400" : "text-slate-400"}`} />
-                    <span>{link.name}</span>
-                  </div>
-                  {link.badge && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-mono">
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+          <div className="md:hidden mt-2 ios-glass rounded-2xl p-4 border border-white/10 shadow-2xl space-y-4 animate-fadeIn">
+            {/* Group 1: Competition */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
+                Competitions
+              </span>
+              <Link
+                href="/bristol-pro"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-bold text-white hover:bg-white/10"
+              >
+                <Mountain className="w-4 h-4 text-amber-400" />
+                <span>Bristol Mountain Pro (18 Stages)</span>
+              </Link>
+              <Link
+                href="/calendar"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-medium text-slate-200 hover:bg-white/10"
+              >
+                <Calendar className="w-4 h-4 text-blue-400" />
+                <span>Event Calendar & Squad Registration</span>
+              </Link>
+            </div>
 
-            <div className="pt-2 mt-1 border-t border-white/10 flex gap-2">
+            {/* Group 2: Community */}
+            <div className="space-y-1.5 pt-2 border-t border-white/5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold px-2">
+                Community
+              </span>
+              <Link
+                href="/chat"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-medium text-slate-200 hover:bg-white/10"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-400" />
+                <span>Competitor Comms (AI Shield)</span>
+              </Link>
               <a
                 href="https://www.facebook.com/p/Subsonic-Society-61578052196057/"
                 target="_blank"
                 rel="noopener noreferrer"
-                data-telemetry="mobile_nav_facebook_link"
-                className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl text-xs font-semibold bg-blue-600/20 text-blue-300 border border-blue-500/30"
+                className="flex items-center justify-between p-2.5 rounded-xl text-xs font-medium text-slate-200 hover:bg-white/10"
               >
-                <Radio className="w-3.5 h-3.5" />
-                <span>Facebook Page</span>
-                <ExternalLink className="w-3 h-3" />
+                <div className="flex items-center gap-2.5">
+                  <Radio className="w-4 h-4 text-blue-400" />
+                  <span>Facebook Dispatch Feed</span>
+                </div>
+                <ExternalLink className="w-3 h-3 text-slate-400" />
               </a>
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-white/10"
+              >
+                <Activity className="w-4 h-4 text-cyan-400" />
+                <span>Admin Telemetry Portal</span>
+              </Link>
             </div>
           </div>
         )}
