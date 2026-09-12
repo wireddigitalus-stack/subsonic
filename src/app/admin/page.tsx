@@ -25,7 +25,9 @@ import {
   Database,
   Play,
   Share2,
-  Route
+  Route,
+  BellRing,
+  X
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -34,8 +36,10 @@ import {
   recordTelemetryEvent
 } from "@/lib/telemetry";
 import { isSupabaseConfigured } from "@/lib/supabase";
-import { TelemetryEvent, MatchEvent, ChatMessage } from "@/lib/types";
+import { TelemetryEvent, MatchEvent, ChatMessage, CommsAbuseAlert } from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
+import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
+import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 
 export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,15 +47,20 @@ export default function AdminDashboardPage() {
   const [passkeyError, setPasskeyError] = useState(false);
 
   const [events, setEvents] = useState<TelemetryEvent[]>([]);
+  const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
+  const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION" | "EVENTS">("CLICKSTREAM");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
 
-  // Load telemetry events from local ring buffer
+  // Load telemetry events and comms abuse alerts
   const loadData = () => {
     const evts = getLocalTelemetryEvents();
     setEvents(evts);
+
+    const alerts = getCommsAbuseAlerts();
+    setAbuseAlerts(alerts);
 
     // Also populate any flagged chat items
     const flagged = INITIAL_CHAT_MESSAGES.filter((m) => m.moderationStatus === "FLAGGED" || (m.aiModerationReport && m.aiModerationReport.toxicityScore > 30));
@@ -66,8 +75,18 @@ export default function AdminDashboardPage() {
       loadData();
     };
 
+    const handleAbuseUpdate = () => {
+      setAbuseAlerts(getCommsAbuseAlerts());
+    };
+
     window.addEventListener("subsonic-telemetry-new-event", handleNewEvent);
-    return () => window.removeEventListener("subsonic-telemetry-new-event", handleNewEvent);
+    window.addEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
+    window.addEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
+    return () => {
+      window.removeEventListener("subsonic-telemetry-new-event", handleNewEvent);
+      window.removeEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
+      window.removeEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
+    };
   }, []);
 
   const handleUnlock = (e: React.FormEvent) => {
@@ -215,8 +234,50 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const activeAbuseCount = abuseAlerts.filter((a) => a.status === "ACTIVE").length;
+  const criticalAbuseCount = abuseAlerts.filter((a) => a.status === "ACTIVE" && a.severity === "CRITICAL").length;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Top Persistent Comms Abuse Alert Banner */}
+      {activeAbuseCount > 0 && !globalBannerDismissed && activeAdminTab !== "AI_MODERATION" && (
+        <div className="rounded-2xl bg-gradient-to-r from-red-950/90 via-black to-red-950/90 border-2 border-red-500/70 p-4 sm:p-5 shadow-[0_0_25px_rgba(239,68,68,0.35)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse">
+          <div className="flex items-center gap-3.5">
+            <span className="w-10 h-10 rounded-xl bg-red-600/30 text-red-400 border border-red-500/50 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-5 h-5" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-bold text-red-400 uppercase tracking-wider">
+                  🚨 {criticalAbuseCount > 0 ? "CRITICAL COMMS ABUSE ALERT" : "COMMS SAFETY VIOLATION"}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-red-600 text-white font-mono text-[10px] font-black">
+                  {activeAbuseCount} ACTIVE
+                </span>
+              </div>
+              <div className="text-sm font-semibold text-white mt-0.5">
+                Hostile transmission or unauthorized commerce flagged in competitor chat channels.
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setActiveAdminTab("AI_MODERATION")}
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs font-mono flex items-center gap-1.5 shadow-[0_0_12px_rgba(239,68,68,0.5)] transition-all"
+            >
+              <span>Inspect & Neutralize →</span>
+            </button>
+            <button
+              onClick={() => setGlobalBannerDismissed(true)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs transition-all"
+              title="Dismiss banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Admin Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
@@ -351,7 +412,13 @@ export default function AdminDashboardPage() {
           { id: "DWELL_TIME", label: "Dwell Time & Visits", icon: Clock },
           { id: "HEATMAP", label: "Most Clicked Elements", icon: Flame },
           { id: "SESSIONS", label: "Visitor Journeys", icon: Route, badge: visitorJourneys.length },
-          { id: "AI_MODERATION", label: "AI Moderation Queue", icon: ShieldAlert, badge: flaggedMessages.length },
+          { 
+            id: "AI_MODERATION", 
+            label: "AI Comms Abuse Defense", 
+            icon: ShieldAlert, 
+            badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
+            isAlert: activeAbuseCount > 0
+          },
           { id: "EVENTS", label: "Match Director Hub", icon: Calendar },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -362,14 +429,20 @@ export default function AdminDashboardPage() {
               onClick={() => setActiveAdminTab(tab.id as any)}
               className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
                 isActive
-                  ? "bg-amber-500 text-black shadow-tactical-glow font-bold"
+                  ? tab.isAlert 
+                    ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-bold" 
+                    : "bg-amber-500 text-black shadow-tactical-glow font-bold"
+                  : tab.isAlert
+                  ? "text-red-400 bg-red-950/40 hover:bg-red-900/50 border border-red-500/30"
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              <Icon className="w-3.5 h-3.5" />
+              <Icon className={`w-3.5 h-3.5 ${tab.isAlert ? "text-red-300 animate-pulse" : ""}`} />
               <span>{tab.label}</span>
-              {typeof tab.badge === "number" && tab.badge > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-red-600 text-white text-[10px] font-mono">
+              {tab.badge && (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${
+                  tab.isAlert ? "bg-red-600 text-white animate-pulse" : "bg-white/20 text-white"
+                }`}>
                   {tab.badge}
                 </span>
               )}
@@ -628,84 +701,9 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 4: AI Moderation Command Center */}
+      {/* TAB 4: AI Comms Abuse Defense & Moderation Command Center */}
       {activeAdminTab === "AI_MODERATION" && (
-        <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-red-400" />
-                AI Content Moderation & Policy Queue
-              </h3>
-              <p className="text-xs text-slate-300 mt-1">
-                Automated NLP reviews of competitor chat messages flagging toxicity, safety breaches, or illegal sales.
-              </p>
-            </div>
-            <span className="text-xs font-mono px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
-              {flaggedMessages.length} Review Items
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            {flaggedMessages.length === 0 ? (
-              <div className="text-center py-12 text-slate-500 text-xs">
-                No flagged messages currently in the review queue. All transmissions clear.
-              </div>
-            ) : (
-              flaggedMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className="p-5 rounded-2xl bg-black/50 border border-red-500/30 space-y-3"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-white">{msg.author.name}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">
-                        {msg.author.badgeText}
-                      </span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-slate-400 font-mono">Channel: #{msg.channelId}</span>
-                    </div>
-                    <span className="font-mono text-red-400 font-bold text-[11px]">
-                      Toxicity: {msg.aiModerationReport?.toxicityScore || 65}%
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-slate-200 bg-white/[0.03] p-3 rounded-xl border border-white/5">
-                    &ldquo;{msg.content}&rdquo;
-                  </p>
-
-                  <div className="text-xs text-amber-300/90 font-mono flex items-center gap-1.5">
-                    <span>AI Flag Rationale: {msg.aiModerationReport?.flagReason || "Unsportsmanlike conduct detected."}</span>
-                  </div>
-
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
-                    <button
-                      onClick={() => {
-                        setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id));
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs text-slate-300 flex items-center gap-1"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      <span>Dismiss Flag</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id));
-                        alert(`Message approved for broadcast.`);
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Approve Transmission</span>
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        <CommsAbuseModerator />
       )}
 
       {/* TAB 5: Match Director Hub */}

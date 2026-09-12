@@ -26,6 +26,7 @@ import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage } from "@/lib/types";
 import { evaluateChatMessage } from "@/lib/ai-moderator";
 import { recordTelemetryEvent } from "@/lib/telemetry";
+import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
 
 const CHANNELS = [
   { id: "bristol-championship", name: "bristol-pro-shootout", badge: "PRO SQUADS", desc: "Stages, DOPE & mountain winds" },
@@ -98,7 +99,42 @@ export default function ChatPage() {
     if (evaluation.shouldBlock) {
       setAiBlockedNotice(evaluation.flagReason || "Message blocked by AI Policy Guard.");
       setTimeout(() => setAiBlockedNotice(null), 6000);
+
+      // Record to Admin Comms Abuse Alert Module
+      recordCommsAbuseAlert({
+        severity: evaluation.threatScore > 75 || evaluation.policyScore > 90 ? "CRITICAL" : "HIGH",
+        category: evaluation.policyScore > 90 ? "ILLEGAL_COMMERCE" : evaluation.threatScore > 70 ? "PHYSICAL_THREAT" : "HARASSMENT",
+        shooterName: currentUserRole === "MATCH_DIRECTOR" ? "Garrett Vance (MD)" : currentUserRole === "PRO_COMPETITOR" ? "Bristol Marksman" : "Guest Shooter",
+        shooterCallsign: currentUserRole === "PRO_COMPETITOR" ? "APEX-22" : "GUEST-COMMS",
+        shooterRole: currentUserRole,
+        squad: "Live Channel #" + currentChannel,
+        channel: currentChannel,
+        messageContent: inputText,
+        toxicityScore: evaluation.toxicityScore,
+        threatScore: evaluation.threatScore,
+        policyScore: evaluation.policyScore,
+        aiRationale: evaluation.flagReason || "Transmission blocked by Subsonic AI Policy Guard.",
+        autoActionTaken: "Transmission Dropped • Offender Flagged in Admin Console",
+      });
       return;
+    }
+
+    if (evaluation.status === "FLAGGED") {
+      recordCommsAbuseAlert({
+        severity: "HIGH",
+        category: "UNSPORTSMANLIKE",
+        shooterName: currentUserRole === "MATCH_DIRECTOR" ? "Garrett Vance (MD)" : currentUserRole === "PRO_COMPETITOR" ? "Bristol Marksman" : "Guest Shooter",
+        shooterCallsign: currentUserRole === "PRO_COMPETITOR" ? "APEX-22" : "GUEST-COMMS",
+        shooterRole: currentUserRole,
+        squad: "Live Channel #" + currentChannel,
+        channel: currentChannel,
+        messageContent: inputText,
+        toxicityScore: evaluation.toxicityScore,
+        threatScore: evaluation.threatScore,
+        policyScore: evaluation.policyScore,
+        aiRationale: evaluation.flagReason || "Unsportsmanlike conduct or inflammatory accusations flagged.",
+        autoActionTaken: "Flagged with Warning Badge • Forwarded to Review Queue",
+      });
     }
 
     // Otherwise post message (either APPROVED or FLAGGED)

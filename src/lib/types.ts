@@ -117,3 +117,23 @@ export interface AthleteProfile {
   imageUrl: string;
   podiums: number;
 }
+
+export interface CommsAbuseAlert {
+  id: string;
+  timestamp: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM";
+  category: "PHYSICAL_THREAT" | "ILLEGAL_COMMERCE" | "HARASSMENT" | "SPAM_SOLICITATION" | "UNSPORTSMANLIKE";
+  shooterName: string;
+  shooterCallsign: string;
+  shooterRole: string;
+  squad: string;
+  channel: string;
+  messageContent: string;
+  toxicityScore: number;
+  threatScore: number;
+  policyScore: number;
+  status: "ACTIVE" | "WARNED" | "MUTED" | "DISQUALIFIED" | "DISMISSED";
+  aiRationale: string;
+  autoActionTaken: string;
+}
+
