@@ -170,7 +170,7 @@ export default function RootLayout({
       <body className="bg-[#07090E] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
         <TelemetryProvider>
           <Navbar />
-          <main className="flex-1 safe-bottom-padding pt-20">
+          <main className="flex-1 safe-bottom-padding pt-20 sm:pt-24">
             {children}
           </main>
           <Footer />

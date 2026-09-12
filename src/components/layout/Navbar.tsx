@@ -57,25 +57,25 @@ export function Navbar() {
             className="flex items-center gap-2.5 sm:gap-3 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 rounded-xl"
           >
             <div 
-              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black flex items-center justify-center shrink-0 w-[38px] h-[38px] sm:w-[40px] sm:h-[40px]"
+              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.4)] bg-black flex items-center justify-center shrink-0 w-[42px] h-[42px] sm:w-[50px] sm:h-[50px] lg:w-[54px] lg:h-[54px]"
             >
               <Image
                 src="/assets/subsonic-coin.jpg"
                 alt="Subsonic Society Official Minted Challenge Coin Emblem"
-                width={40}
-                height={40}
+                width={54}
+                height={54}
                 className="w-full h-full object-cover rounded-full transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300"
                 priority
               />
             </div>
             
-            {/* Full Metallic Gold Wide Logo - Exactly Even in Height with Coin */}
-            <div className="relative h-[38px] w-[144px] sm:h-[40px] sm:w-[152px] flex items-center shrink-0">
+            {/* Full Metallic Gold Wide Logo - Exactly Even in Height with Coin & Prominently Scaled */}
+            <div className="relative h-[42px] w-[208px] sm:h-[50px] sm:w-[248px] lg:h-[54px] lg:w-[268px] flex items-center shrink-0">
               <Image
                 src="/assets/subsonic-banner-trimmed.png"
                 alt="Subsonic Society - Precision Rimfire Shooting Sports and Media Platform"
                 fill
-                sizes="(max-width: 640px) 144px, 152px"
+                sizes="(max-width: 640px) 208px, (max-width: 1024px) 248px, 268px"
                 className="object-contain object-left group-hover:brightness-110 transition-all duration-200"
                 priority
               />
