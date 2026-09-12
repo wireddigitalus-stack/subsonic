@@ -165,7 +165,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
     likesCount: 184,
     commentsCount: 39,
     sharesCount: 22,
-    imageUrl: "/assets/subsonic-competition-mountain.png",
+    imageUrl: "/assets/subsonic-facebook-cover.jpg",
     externalUrl: "https://www.facebook.com/p/Subsonic-Society-61578052196057/",
     tags: ["#SubsonicSociety", "#BristolTN", "#PrecisionRimfire", "#22LR", "#PRSrimfire"],
   },

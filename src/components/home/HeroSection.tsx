@@ -18,14 +18,14 @@ import { CountdownBanner } from "./CountdownBanner";
 export function HeroSection() {
   return (
     <section data-section="hero" className="relative pt-4 pb-16 overflow-hidden">
-      {/* Mountain Ambient Background */}
-      <div className="absolute inset-0 pointer-events-none -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[620px] opacity-30">
+      {/* Ambient Banner Backdrop */}
+      <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="relative w-full h-[520px] max-w-7xl mx-auto opacity-20 filter blur-[2px]">
           <Image
-            src="/assets/subsonic-competition-mountain.png"
-            alt="Bristol TN Mountain Range"
+            src="/assets/subsonic-facebook-cover.jpg"
+            alt="Subsonic Society Banner"
             fill
-            className="object-cover object-top mask-image-gradient"
+            className="object-cover object-center"
             priority
           />
         </div>
@@ -48,7 +48,17 @@ export function HeroSection() {
 
         {/* Hero Title & Mission */}
         <div className="space-y-4 max-w-4xl">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.05]">
+          <div className="relative w-full max-w-md h-14 sm:h-16 mb-2">
+            <Image
+              src="/assets/subsonic-banner-wide.png"
+              alt="Subsonic Society"
+              fill
+              className="object-contain object-left"
+              priority
+            />
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
             THE HIGH-STAKES <br />
             <span className="amber-gradient-text">
               MOUNTAIN PRO RIMFIRE

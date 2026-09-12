@@ -38,13 +38,17 @@ export function Navbar() {
             data-telemetry="nav_brand_logo"
             className="flex items-center gap-3 group"
           >
-            <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-amber-400/70 shadow-[0_0_18px_rgba(245,158,11,0.45)] bg-black/80 flex items-center justify-center shrink-0">
+            <div 
+              className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.4)] bg-black flex items-center justify-center shrink-0"
+              style={{ width: 42, height: 42, minWidth: 42, minHeight: 42, maxWidth: 42, maxHeight: 42 }}
+            >
               <Image
                 src="/assets/subsonic-coin.jpg"
                 alt="Subsonic Society Coin"
-                width={44}
-                height={44}
-                className="object-cover w-full h-full transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300"
+                width={42}
+                height={42}
+                style={{ width: 42, height: 42, objectFit: "cover" }}
+                className="rounded-full transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-300"
                 priority
               />
             </div>
