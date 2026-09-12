@@ -59,9 +59,22 @@ export interface MatchEvent {
   featured?: boolean;
 }
 
+export interface DopeCardData {
+  targetDistance: string; // e.g. "340 YDS"
+  targetDescription?: string; // e.g. "Stage 4 Diamond KYL"
+  elevationMils: string; // e.g. "8.4 MIL"
+  windHoldMils: string; // e.g. "L 0.6 MIL"
+  windVelocity?: string; // e.g. "9 MPH @ 260°"
+  ammo?: string; // e.g. "Lapua Center-X 40gr"
+  densityAltitude?: string; // e.g. "+2,150 FT"
+  notes?: string;
+}
+
 export interface ChatMessage {
   id: string;
   channelId: string;
+  type?: "STANDARD" | "DOPE_DROP" | "MATCH_ALERT" | "RADIO_CHECK";
+  dopeCard?: DopeCardData;
   author: {
     id: string;
     name: string;
@@ -69,6 +82,8 @@ export interface ChatMessage {
     avatarUrl?: string;
     role: "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER";
     badgeText?: string;
+    division?: string;
+    rifleSetup?: string;
   };
   content: string;
   timestamp: string;
@@ -84,6 +99,7 @@ export interface ChatMessage {
     policyScore: number;
     flagReason?: string;
     sentiment: "POSITIVE" | "NEUTRAL" | "SUSPICIOUS" | "TOXIC";
+    aiEngine?: string;
   };
 }
 
