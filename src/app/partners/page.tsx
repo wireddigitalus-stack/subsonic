@@ -142,7 +142,18 @@ export default function PartnersPage() {
                 <span>Premier Presenting Partner</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+              <div className="pt-2 pb-1">
+                <Image
+                  src="/assets/modacam-logo-dark.png"
+                  alt="MODACAM Custom Rifles"
+                  width={380}
+                  height={84}
+                  className="h-12 sm:h-14 w-auto object-contain drop-shadow-[0_4px_16px_rgba(239,68,68,0.25)]"
+                  priority
+                />
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
                 MODACAM CUSTOM RIFLES
               </h2>
 
@@ -200,18 +211,35 @@ export default function PartnersPage() {
             </div>
 
             <div className="lg:col-span-4 flex justify-center">
-              <div className="p-8 rounded-3xl ios-glass-card border border-amber-500/30 text-center space-y-4 max-w-sm">
-                <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto">
-                  <Crosshair className="w-10 h-10" />
+              <div className="p-8 rounded-3xl ios-glass-card border border-amber-500/40 text-center space-y-5 max-w-sm w-full relative overflow-hidden group shadow-tactical-glow">
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none" />
+                
+                {/* Official Logo Display */}
+                <div className="p-4 rounded-2xl bg-black/60 border border-white/10 flex items-center justify-center">
+                  <Image
+                    src="/assets/modacam-logo-dark.png"
+                    alt="MODACAM Custom Rifles Official Logo"
+                    width={320}
+                    height={70}
+                    className="h-12 sm:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_2px_12px_rgba(239,68,68,0.25)]"
+                  />
                 </div>
-                <h3 className="text-xl font-black text-white">
-                  CUSTOM MATCH BUILDS
-                </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Engineered specifically for the high-angle winds and cold temperatures of Appalachian high-country matches.
-                </p>
-                <div className="text-[11px] font-mono text-amber-400 pt-1">
-                  BRISTOL, TN RIDGE TESTED
+
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-mono text-amber-400 font-bold tracking-widest uppercase block">
+                    MASTER RIFLE BUILDER
+                  </span>
+                  <h3 className="text-lg font-black text-white">
+                    CUSTOM MATCH BUILDS
+                  </h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Hand-crafted rimfire platforms engineered specifically for the extreme high-angle winds and cold mountain air of Appalachian matches.
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span>CHAMBER: <strong className="text-amber-400">MATCH .22LR</strong></span>
+                  <span>TESTED: <strong className="text-white">BRISTOL, TN</strong></span>
                 </div>
               </div>
             </div>

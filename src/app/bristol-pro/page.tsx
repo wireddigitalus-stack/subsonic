@@ -84,6 +84,18 @@ export default function BristolProPortalPage() {
               <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono font-bold">
                 PRO SHOOTING CHAMPIONSHIP
               </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/10 text-xs font-mono">
+                <span className="text-slate-400">Presented by</span>
+                <Link href="/partners" className="inline-flex items-center hover:opacity-80 transition-opacity">
+                  <Image
+                    src="/assets/modacam-logo-dark.png"
+                    alt="MODACAM Custom Rifles"
+                    width={110}
+                    height={24}
+                    className="h-3.5 w-auto object-contain"
+                  />
+                </Link>
+              </div>
               <span className="px-3 py-1 rounded-full bg-white/10 text-slate-300 text-xs font-mono">
                 BRISTOL, TN • 3,420 FT ELEVATION
               </span>

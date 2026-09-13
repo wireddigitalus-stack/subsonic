@@ -196,11 +196,17 @@ export default function MatchesPage() {
               </div>
 
               <div className="max-w-3xl space-y-4">
-                <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-bold uppercase">
-                  <span>Presented by</span>
-                  <span className="text-white bg-white/10 px-2 py-0.5 rounded border border-white/10">
-                    Modacam Custom Rifles
-                  </span>
+                <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-black/60 border border-white/10">
+                  <span className="text-[11px] font-mono text-slate-400 font-semibold">Presented by</span>
+                  <Link href="/partners" className="inline-flex items-center hover:opacity-80 transition-opacity">
+                    <Image
+                      src="/assets/modacam-logo-dark.png"
+                      alt="MODACAM Custom Rifles"
+                      width={120}
+                      height={26}
+                      className="h-4 sm:h-4.5 w-auto object-contain"
+                    />
+                  </Link>
                 </div>
 
                 <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">

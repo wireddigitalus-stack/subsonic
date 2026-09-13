@@ -36,9 +36,18 @@ export default function HomePage() {
                   <Flame className="w-3.5 h-3.5 fill-black" />
                   Upcoming Match Spotlight
                 </span>
-                <span className="text-xs font-mono text-slate-300">
-                  Presented by <strong className="text-white">Modacam Custom Rifles</strong>
-                </span>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/50 border border-white/10">
+                  <span className="text-[11px] font-mono text-slate-400">Presented by</span>
+                  <Link href="/partners" className="inline-flex items-center hover:opacity-80 transition-opacity">
+                    <Image
+                      src="/assets/modacam-logo-dark.png"
+                      alt="MODACAM Custom Rifles"
+                      width={120}
+                      height={26}
+                      className="h-4 w-auto object-contain"
+                    />
+                  </Link>
+                </div>
               </div>
 
               <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
@@ -108,6 +117,20 @@ export default function HomePage() {
                   <p className="text-xs text-slate-300 mt-1">
                     Guaranteed $7,500 cash purse payouts across Open, Production, and Senior divisions, presented by Modacam Custom Rifles.
                   </p>
+                </div>
+                <div className="pt-3 border-t border-white/10 flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider">
+                    Official Presenting Partner
+                  </span>
+                  <Link href="/partners" className="hover:opacity-80 transition-opacity">
+                    <Image
+                      src="/assets/modacam-logo-dark.png"
+                      alt="MODACAM Custom Rifles"
+                      width={160}
+                      height={35}
+                      className="h-6 w-auto object-contain"
+                    />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -267,61 +290,99 @@ export default function HomePage() {
 
       {/* 6. Presenting Sponsors Ribbon */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 text-center">
-          <div className="space-y-1">
-            <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
-              Precision Powered By
+        <div className="ios-glass rounded-3xl p-6 sm:p-10 border border-white/10 space-y-8 text-center relative overflow-hidden">
+          {/* Subtle Ambient Backlight Glow */}
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-amber-500/10 blur-3xl pointer-events-none rounded-full" />
+
+          <div className="space-y-1 relative z-10">
+            <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-bold flex items-center justify-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              PRECISION POWERED BY INDUSTRY LEADERS
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             </span>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
+            <h3 className="text-xl sm:text-3xl font-black text-white tracking-tight">
               PRESENTING SPONSORS & INDUSTRY PARTNERS
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 items-center justify-center pt-2">
+          {/* Marquee Presenting Sponsor Hero Card */}
+          <div className="relative z-10 max-w-2xl mx-auto">
             <Link
               href="/partners"
-              className="p-4 rounded-2xl bg-white/5 border border-amber-500/30 hover:bg-amber-500/10 transition-all flex flex-col items-center justify-center space-y-1"
+              className="group block p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-amber-500/40 hover:border-amber-400 shadow-tactical-glow transition-all duration-300 hover:shadow-glow relative overflow-hidden"
             >
-              <span className="text-xs font-mono text-amber-400 font-bold">PRESENTING</span>
-              <span className="text-sm font-black text-white">MODACAM</span>
-              <span className="text-[10px] text-slate-400">Custom Rifles</span>
-            </Link>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-2xl rounded-full pointer-events-none" />
+              <div className="flex flex-col items-center justify-center space-y-3.5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[11px] font-mono font-bold tracking-wider uppercase">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Premier Presenting Partner</span>
+                </div>
 
-            <Link
-              href="/partners"
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1"
-            >
-              <span className="text-xs font-mono text-blue-400 font-bold">AMMO</span>
-              <span className="text-sm font-black text-white">LAPUA</span>
-              <span className="text-[10px] text-slate-400">Center-X / Midas+</span>
-            </Link>
+                <div className="py-2 px-4 flex items-center justify-center">
+                  <Image
+                    src="/assets/modacam-logo-dark.png"
+                    alt="MODACAM Custom Rifles"
+                    width={400}
+                    height={88}
+                    className="h-12 sm:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_4px_16px_rgba(239,68,68,0.25)]"
+                    priority
+                  />
+                </div>
 
-            <Link
-              href="/partners"
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1"
-            >
-              <span className="text-xs font-mono text-emerald-400 font-bold">OPTICS</span>
-              <span className="text-sm font-black text-white">VORTEX</span>
-              <span className="text-[10px] text-slate-400">Razor HD Gen III</span>
-            </Link>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-md font-medium leading-relaxed">
+                  Hand-crafted match grade rimfire platforms & custom chambering. Presenting sponsor of the $7,500 Invitational Purse.
+                </p>
 
-            <Link
-              href="/partners"
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1"
-            >
-              <span className="text-xs font-mono text-purple-400 font-bold">ACTIONS</span>
-              <span className="text-sm font-black text-white">VUDOO</span>
-              <span className="text-[10px] text-slate-400">Gun Works V-22</span>
+                <div className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 font-bold group-hover:text-amber-300 pt-1">
+                  <span>Explore Modacam Match Builds</span>
+                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
             </Link>
+          </div>
 
-            <Link
-              href="/partners"
-              className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1 col-span-2 sm:col-span-1"
-            >
-              <span className="text-xs font-mono text-cyan-400 font-bold">CHASSIS</span>
-              <span className="text-sm font-black text-white">MDT</span>
-              <span className="text-[10px] text-slate-400">ACC Elite</span>
-            </Link>
+          {/* Industry Collaborators Grid */}
+          <div className="relative z-10 pt-2">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-4">
+              Official Match Providers & Technical Collaborators
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+              <Link
+                href="/partners"
+                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1 group"
+              >
+                <span className="text-[10px] font-mono text-blue-400 font-bold tracking-wider">OFFICIAL AMMUNITION</span>
+                <span className="text-sm font-black text-white group-hover:text-amber-400 transition-colors">LAPUA</span>
+                <span className="text-[10px] text-slate-400">Center-X / Midas+</span>
+              </Link>
+
+              <Link
+                href="/partners"
+                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1 group"
+              >
+                <span className="text-[10px] font-mono text-emerald-400 font-bold tracking-wider">PRECISION OPTICS</span>
+                <span className="text-sm font-black text-white group-hover:text-amber-400 transition-colors">VORTEX</span>
+                <span className="text-[10px] text-slate-400">Razor HD Gen III</span>
+              </Link>
+
+              <Link
+                href="/partners"
+                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1 group"
+              >
+                <span className="text-[10px] font-mono text-purple-400 font-bold tracking-wider">ACTIONS & REPEATERS</span>
+                <span className="text-sm font-black text-white group-hover:text-amber-400 transition-colors">VUDOO</span>
+                <span className="text-[10px] text-slate-400">Gun Works V-22</span>
+              </Link>
+
+              <Link
+                href="/partners"
+                className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all flex flex-col items-center justify-center space-y-1 group"
+              >
+                <span className="text-[10px] font-mono text-cyan-400 font-bold tracking-wider">CHASSIS SYSTEMS</span>
+                <span className="text-sm font-black text-white group-hover:text-amber-400 transition-colors">MDT</span>
+                <span className="text-[10px] text-slate-400">ACC Elite</span>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
