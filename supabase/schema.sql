@@ -79,11 +79,33 @@ CREATE TABLE IF NOT EXISTS public.registrations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. ROW LEVEL SECURITY (RLS) POLICIES
+-- 5. LIVE SOCIAL MEDIA POSTS TABLE (Facebook / Meta / Make.com sync)
+CREATE TABLE IF NOT EXISTS public.social_posts (
+    id TEXT PRIMARY KEY,
+    post_id TEXT UNIQUE,
+    platform TEXT NOT NULL DEFAULT 'FACEBOOK',
+    content TEXT NOT NULL,
+    published_at TEXT NOT NULL,
+    image_url TEXT,
+    external_url TEXT NOT NULL,
+    likes_count INTEGER DEFAULT 0,
+    comments_count INTEGER DEFAULT 0,
+    shares_count INTEGER DEFAULT 0,
+    tags JSONB DEFAULT '[]'::jsonb,
+    category TEXT DEFAULT 'ALL',
+    raw_payload JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_posts_created_at ON public.social_posts(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_social_posts_category ON public.social_posts(category);
+
+-- 6. ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE public.telemetry_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.social_posts ENABLE ROW LEVEL SECURITY;
 
 -- Allow public telemetry insertion
 CREATE POLICY "Allow public telemetry ingest" ON public.telemetry_events
@@ -107,3 +129,12 @@ CREATE POLICY "Allow public read matches" ON public.matches
 -- Allow registering for matches
 CREATE POLICY "Allow competitor registrations" ON public.registrations
     FOR INSERT WITH CHECK (true);
+
+-- Allow public reading of live social posts
+CREATE POLICY "Allow reading social posts" ON public.social_posts
+    FOR SELECT USING (true);
+
+-- Allow inserting/updating social posts via webhook
+CREATE POLICY "Allow webhook upsert social posts" ON public.social_posts
+    FOR ALL USING (true);
+

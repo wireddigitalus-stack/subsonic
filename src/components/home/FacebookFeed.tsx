@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { INITIAL_FACEBOOK_POSTS } from "@/lib/initial-data";
 import { FacebookPostItem } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 const FB_PAGE_URL = "https://www.facebook.com/p/Subsonic-Society-61578052196057/";
 
@@ -40,6 +41,65 @@ export function FacebookFeed() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeLightboxPost, setActiveLightboxPost] = useState<FacebookPostItem | null>(null);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
+
+  // Live Sync with Supabase social_posts table
+  const fetchLivePosts = async () => {
+    if (!supabase) return;
+    try {
+      const { data, error } = await supabase
+        .from("social_posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        const formatted: FacebookPostItem[] = data.map((d: any) => ({
+          id: d.id,
+          content: d.content,
+          publishedAt: new Date(d.published_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric"
+          }),
+          imageUrl: d.image_url,
+          externalUrl: d.external_url || FB_PAGE_URL,
+          likesCount: d.likes_count || 0,
+          commentsCount: d.comments_count || 0,
+          sharesCount: d.shares_count || 0,
+          tags: Array.isArray(d.tags) ? d.tags : [],
+          category: d.category || "ALL"
+        }));
+
+        setPosts((prev) => {
+          const liveIds = new Set(formatted.map((p) => p.id));
+          const baseRemaining = INITIAL_FACEBOOK_POSTS.filter((p) => !liveIds.has(p.id));
+          return [...formatted, ...baseRemaining];
+        });
+      }
+    } catch (err) {
+      console.error("[FacebookFeed] Live sync error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLivePosts();
+
+    if (supabase) {
+      const channel = supabase
+        .channel("social_posts_feed_sync")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "social_posts" },
+          () => {
+            fetchLivePosts();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase?.removeChannel(channel);
+      };
+    }
+  }, []);
 
   // Custom UI Scroll Controller State (Replacing Browser Default)
   const feedScrollRef = useRef<HTMLDivElement>(null);
