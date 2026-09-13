@@ -25,6 +25,7 @@ interface Shooter {
   homeRange: string;
   podiums: number;
   featuredMatch: string;
+  image: string;
   quote: string;
   rifleSetup: {
     action: string;
@@ -52,6 +53,7 @@ const SHOOTERS_DATA: Shooter[] = [
     homeRange: "Holston Range, Bristol, TN",
     podiums: 14,
     featuredMatch: "The Subsonic Society Invitational 2026",
+    image: "/assets/subsonic-coin.jpg",
     quote: "In the Bristol mountains, the wind never blows the same way two seconds in a row. You have to trust your bubble level, watch the trees along the hollow, and commit to the shot.",
     rifleSetup: {
       action: "Vudoo Gun Works V-22 (3-Lug Rimfire)",
@@ -87,6 +89,7 @@ const SHOOTERS_DATA: Shooter[] = [
     homeRange: "Smoky Mountain Precision, TN",
     podiums: 19,
     featuredMatch: "300X Long Gong Challenge",
+    image: "/assets/subsonic-logo-dark.png",
     quote: "Subsonic rimfire is pure shooting discipline. Without recoil to mask your flaws, every breath and trigger press is written directly onto the steel plate.",
     rifleSetup: {
       action: "Zermatt RimX Precision Rimfire Action",
@@ -118,6 +121,7 @@ const SHOOTERS_DATA: Shooter[] = [
     homeRange: "Tri-Cities Rimfire Club, Bristol, TN",
     podiums: 8,
     featuredMatch: "200X Mountain Match",
+    image: "/assets/subsonic-logo-round.png",
     quote: "You don't need a $10,000 custom rig to win if you master stage timing, barricade stability, and find a lot of ammunition your factory barrel loves.",
     rifleSetup: {
       action: "CZ 457 MTR (Match Target Rifle Factory Tuned)",
@@ -185,20 +189,30 @@ export default function ShootersPage() {
                         : "ios-glass border-white/5 hover:border-white/20"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="text-xs font-mono text-amber-400 font-bold uppercase">
-                          {shooter.division}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-full overflow-hidden border border-amber-400/60 shadow-sm relative shrink-0 bg-black">
+                          <Image
+                            src={shooter.image}
+                            alt={shooter.name}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
-                        <h3 className="text-lg font-black text-white">
-                          {shooter.name}
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {shooter.ranking}
-                        </p>
+                        <div>
+                          <div className="text-xs font-mono text-amber-400 font-bold uppercase">
+                            {shooter.division}
+                          </div>
+                          <h3 className="text-sm sm:text-base font-black text-white">
+                            {shooter.name}
+                          </h3>
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            {shooter.ranking}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-mono font-bold shrink-0">
+                      <div className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-mono font-bold shrink-0">
                         {shooter.podiums} Podiums
                       </div>
                     </div>
@@ -230,21 +244,31 @@ export default function ShootersPage() {
             {/* Header Card */}
             <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
-                      {selectedShooter.callsign}
-                    </span>
-                    <span className="text-xs font-mono text-slate-400">
-                      {selectedShooter.homeRange}
-                    </span>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
+                    <Image
+                      src={selectedShooter.image}
+                      alt={selectedShooter.name}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
-                  <h2 className="text-2xl sm:text-4xl font-black text-white">
-                    {selectedShooter.name}
-                  </h2>
-                  <p className="text-sm font-semibold text-emerald-400">
-                    {selectedShooter.ranking}
-                  </p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
+                        {selectedShooter.callsign}
+                      </span>
+                      <span className="text-xs font-mono text-slate-400">
+                        {selectedShooter.homeRange}
+                      </span>
+                    </div>
+                    <h2 className="text-2xl sm:text-4xl font-black text-white">
+                      {selectedShooter.name}
+                    </h2>
+                    <p className="text-sm font-semibold text-emerald-400">
+                      {selectedShooter.ranking}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="text-right">

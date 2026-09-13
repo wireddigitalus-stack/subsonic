@@ -247,12 +247,12 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-4 flex justify-center">
-              <div className="w-44 h-44 rounded-3xl overflow-hidden border-2 border-white/10 bg-black/60 relative p-4 flex items-center justify-center">
+              <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_35px_rgba(245,158,11,0.4)] bg-black relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 <Image
-                  src="/assets/subsonic-logo-round.png"
-                  alt="Wyatt Sterling"
+                  src="/assets/subsonic-coin.jpg"
+                  alt="Wyatt 'Ghost' Sterling - Subsonic Society Pro"
                   fill
-                  className="object-contain p-2"
+                  className="object-cover"
                 />
               </div>
             </div>

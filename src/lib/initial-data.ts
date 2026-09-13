@@ -222,7 +222,7 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
       ammo: "Lapua Center-X 40gr Subsonic",
     },
     quote: "In the Bristol mountains, the wind never blows the same way two seconds in a row. You have to trust your bubble level and read the grass on the draw.",
-    imageUrl: "/assets/subsonic-logo-round.png",
+    imageUrl: "/assets/subsonic-coin.jpg",
     podiums: 14,
   },
   {
