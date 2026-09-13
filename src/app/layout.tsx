@@ -55,25 +55,29 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-coin.jpg",
+        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        secureUrl: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
         width: 1200,
         height: 630,
+        type: "image/jpeg",
         alt: "Subsonic Society - Precision Is In Our DNA | Competition • Testing • Education • Community",
       },
       {
-        url: "/assets/subsonic-facebook-cover.jpg",
+        url: "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
+        secureUrl: "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
         width: 1200,
         height: 630,
-        alt: "Subsonic Society Bristol TN Precision Rimfire",
+        type: "image/jpeg",
+        alt: "Subsonic Society Symmetrical Coin Share Card",
       },
       {
-        url: "/assets/subsonic-banner-wide.png",
+        url: "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
         width: 2172,
         height: 724,
         alt: "Subsonic Society Official Brand Logo",
       },
       {
-        url: "/assets/subsonic-coin.jpg",
+        url: "https://subsonicsociety.com/assets/subsonic-coin.jpg",
         width: 600,
         height: 600,
         alt: "Subsonic Society Official Crest Emblem",
@@ -87,7 +91,7 @@ export const metadata: Metadata = {
     title: "Subsonic Society | Precision Rimfire Media & Mountain Pro Championship",
     description:
       "High-stakes precision rimfire shooting media, pro competitions in Bristol, TN mountains, and tactical community.",
-    images: ["/assets/subsonic-social-share-coin.jpg"],
+    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
   },
 };
 
@@ -106,10 +110,10 @@ const structuredData = {
         "caption": "Subsonic Society Official Logo"
       },
       "image": [
+        "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
         "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
         "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
-        "https://subsonicsociety.com/assets/subsonic-coin.jpg",
-        "https://subsonicsociety.com/assets/subsonic-facebook-cover.jpg"
+        "https://subsonicsociety.com/assets/subsonic-coin.jpg"
       ],
       "description": "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
       "sameAs": [
