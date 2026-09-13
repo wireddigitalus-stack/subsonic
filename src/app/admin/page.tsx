@@ -27,7 +27,19 @@ import {
   Share2,
   Route,
   BellRing,
-  X
+  X,
+  UserCheck,
+  Trophy,
+  Mail,
+  Search,
+  ExternalLink,
+  ChevronRight,
+  Filter,
+  FileText,
+  Building2,
+  Phone,
+  Sparkles,
+  Tag
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -38,10 +50,17 @@ import {
   downloadTelemetryExport
 } from "@/lib/telemetry";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { TelemetryEvent, MatchEvent, ChatMessage, CommsAbuseAlert } from "@/lib/types";
+import { 
+  TelemetryEvent, 
+  MatchEvent, 
+  ChatMessage, 
+  CommsAbuseAlert,
+  SocietyMember,
+  MatchRegistration,
+  ContactLead
+} from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
-import { FacebookDispatchManager } from "@/components/admin/FacebookDispatchManager";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 
 export default function AdminDashboardPage() {
@@ -52,10 +71,28 @@ export default function AdminDashboardPage() {
   const [events, setEvents] = useState<TelemetryEvent[]>([]);
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION" | "EVENTS" | "DISPATCHES">("CLICKSTREAM");
+  const [activeAdminTab, setActiveAdminTab] = useState<
+    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION"
+  >("MEMBERS");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
+
+  // Members, Registrations & Leads state
+  const [members, setMembers] = useState<SocietyMember[]>([]);
+  const [registrations, setRegistrations] = useState<MatchRegistration[]>([]);
+  const [leads, setLeads] = useState<ContactLead[]>([]);
+
+  const [memberSearch, setMemberSearch] = useState("");
+  const [memberStateFilter, setMemberStateFilter] = useState("ALL");
+
+  const [regSearch, setRegSearch] = useState("");
+  const [regMatchFilter, setRegMatchFilter] = useState("ALL");
+  const [regDivisionFilter, setRegDivisionFilter] = useState("ALL");
+
+  const [leadSearch, setLeadSearch] = useState("");
+  const [leadCategoryFilter, setLeadCategoryFilter] = useState("ALL");
+  const [leadStatusFilter, setLeadStatusFilter] = useState("ALL");
 
   // Load telemetry events from persistent server storage, Supabase, and local client buffer
   const loadData = async () => {
@@ -115,6 +152,66 @@ export default function AdminDashboardPage() {
     // Also populate any flagged chat items
     const flagged = INITIAL_CHAT_MESSAGES.filter((m) => m.moderationStatus === "FLAGGED" || (m.aiModerationReport && m.aiModerationReport.toxicityScore > 30));
     setFlaggedMessages(flagged);
+
+    // Fetch Society Members
+    try {
+      const res = await fetch("/api/join");
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data.members || []);
+      }
+    } catch (err) {
+      console.warn("Error fetching society members:", err);
+    }
+
+    // Fetch Registered Shooters
+    try {
+      const res = await fetch("/api/register");
+      if (res.ok) {
+        const data = await res.json();
+        setRegistrations(data.registrations || []);
+      }
+    } catch (err) {
+      console.warn("Error fetching registrations:", err);
+    }
+
+    // Fetch Contact Leads & Inquiries
+    try {
+      const res = await fetch("/api/contact");
+      if (res.ok) {
+        const data = await res.json();
+        setLeads(data.leads || []);
+      }
+    } catch (err) {
+      console.warn("Error fetching contact leads:", err);
+    }
+  };
+
+  const handleUpdateLeadStatus = async (id: string, newStatus: "NEW" | "IN_REVIEW" | "CONTACTED" | "ARCHIVED") => {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      if (res.ok) {
+        setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+      }
+    } catch (err) {
+      console.warn("Error updating lead status:", err);
+    }
+  };
+
+  const downloadMembersExport = () => {
+    window.open("/api/join?export=csv", "_blank");
+  };
+
+  const downloadRegistrationsExport = () => {
+    window.open("/api/register?export=csv", "_blank");
+  };
+
+  const downloadLeadsExport = () => {
+    window.open("/api/contact?export=csv", "_blank");
   };
 
   useEffect(() => {
@@ -295,6 +392,44 @@ export default function AdminDashboardPage() {
 
   const activeAbuseCount = abuseAlerts.filter((a) => a.status === "ACTIVE").length;
   const criticalAbuseCount = abuseAlerts.filter((a) => a.status === "ACTIVE" && a.severity === "CRITICAL").length;
+
+  const filteredMembers = members.filter((m) => {
+    const matchesState = memberStateFilter === "ALL" || m.state === memberStateFilter;
+    const matchesSearch =
+      !memberSearch ||
+      m.full_name.toLowerCase().includes(memberSearch.toLowerCase()) ||
+      m.email.toLowerCase().includes(memberSearch.toLowerCase()) ||
+      m.member_id.toLowerCase().includes(memberSearch.toLowerCase()) ||
+      (m.rifle_setup && m.rifle_setup.toLowerCase().includes(memberSearch.toLowerCase()));
+    return matchesState && matchesSearch;
+  });
+
+  const filteredRegistrations = registrations.filter((r) => {
+    const matchesMatch = regMatchFilter === "ALL" || r.match_id === regMatchFilter;
+    const matchesDiv = regDivisionFilter === "ALL" || r.rifle_division === regDivisionFilter;
+    const matchesSearch =
+      !regSearch ||
+      r.competitor_name.toLowerCase().includes(regSearch.toLowerCase()) ||
+      (r.competitor_callsign && r.competitor_callsign.toLowerCase().includes(regSearch.toLowerCase())) ||
+      r.competitor_email.toLowerCase().includes(regSearch.toLowerCase()) ||
+      r.ticket_number.toLowerCase().includes(regSearch.toLowerCase()) ||
+      r.rifle_model.toLowerCase().includes(regSearch.toLowerCase()) ||
+      r.match_title.toLowerCase().includes(regSearch.toLowerCase());
+    return matchesMatch && matchesDiv && matchesSearch;
+  });
+
+  const filteredLeads = leads.filter((l) => {
+    const matchesCat = leadCategoryFilter === "ALL" || l.category === leadCategoryFilter;
+    const matchesStatus = leadStatusFilter === "ALL" || l.status === leadStatusFilter;
+    const matchesSearch =
+      !leadSearch ||
+      l.name.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      l.email.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      (l.company && l.company.toLowerCase().includes(leadSearch.toLowerCase())) ||
+      (l.subject && l.subject.toLowerCase().includes(leadSearch.toLowerCase())) ||
+      l.message.toLowerCase().includes(leadSearch.toLowerCase());
+    return matchesCat && matchesStatus && matchesSearch;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -480,7 +615,17 @@ export default function AdminDashboardPage() {
       {/* Admin Navigation Tabs */}
       <div className="bg-black/60 p-1.5 rounded-2xl border border-white/10 flex flex-wrap gap-1">
         {[
-          { id: "CLICKSTREAM", label: "Live Clickstream", icon: MousePointerClick },
+          { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
+          { id: "REGISTRATIONS", label: "Registered Shooters", icon: Trophy, badge: `${registrations.length}` },
+          { 
+            id: "LEADS", 
+            label: "Leads & Inquiries", 
+            icon: Mail, 
+            badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
+            isAlert: leads.filter((l) => l.status === "NEW").length > 0
+          },
+          { id: "EVENTS", label: "Match Schedule", icon: Calendar },
+          { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick },
           { id: "DWELL_TIME", label: "Dwell Time & Visits", icon: Clock },
           { id: "HEATMAP", label: "Most Clicked Elements", icon: Flame },
           { id: "SESSIONS", label: "Visitor Journeys", icon: Route, badge: visitorJourneys.length },
@@ -491,8 +636,6 @@ export default function AdminDashboardPage() {
             badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
             isAlert: activeAbuseCount > 0
           },
-          { id: "EVENTS", label: "Match Director Hub", icon: Calendar },
-          { id: "DISPATCHES", label: "Facebook Dispatches", icon: Radio, badge: "LIVE" },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeAdminTab === tab.id;
@@ -523,6 +666,577 @@ export default function AdminDashboardPage() {
           );
         })}
       </div>
+
+      {/* TAB: ALL SOCIETY MEMBERS DIRECTORY */}
+      {activeAdminTab === "MEMBERS" && (
+        <div className="space-y-6">
+          {/* Header & Controls */}
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-xl font-black text-white">
+                    Subsonic Society Members ({filteredMembers.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Verified digital pass holders, competitors, and ballistics testing community members.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={downloadMembersExport}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Members CSV</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick KPI Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Total Members</span>
+                <span className="text-2xl font-black font-mono text-amber-400">{members.length}</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">States Represented</span>
+                <span className="text-2xl font-black font-mono text-blue-400">
+                  {Array.from(new Set(members.map((m) => m.state))).length} States
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Pro / Master Class</span>
+                <span className="text-2xl font-black font-mono text-emerald-400">
+                  {members.filter((m) => m.experience_level.toLowerCase().includes("pro") || m.experience_level.toLowerCase().includes("master")).length}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Appalachian Core</span>
+                <span className="text-2xl font-black font-mono text-purple-400">
+                  {members.filter((m) => ["TN", "VA", "NC", "KY"].includes(m.state)).length}
+                </span>
+              </div>
+            </div>
+
+            {/* Search & State Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by shooter name, email, member ID, or rifle rig..."
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <select
+                  value={memberStateFilter}
+                  onChange={(e) => setMemberStateFilter(e.target.value)}
+                  className="px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-white focus:outline-none focus:border-amber-400 w-full sm:w-auto"
+                >
+                  <option value="ALL">All States</option>
+                  {Array.from(new Set(members.map((m) => m.state)))
+                    .sort()
+                    .map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Members Table */}
+          <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 bg-black/50 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    <th className="p-4">Member ID</th>
+                    <th className="p-4">Marksman Name</th>
+                    <th className="p-4">Email</th>
+                    <th className="p-4">State</th>
+                    <th className="p-4">Classification</th>
+                    <th className="p-4">Primary Rifle Rig</th>
+                    <th className="p-4">Interests</th>
+                    <th className="p-4">Date Joined</th>
+                    <th className="p-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-mono">
+                  {filteredMembers.map((m) => (
+                    <tr key={m.member_id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-4 font-bold text-amber-400">
+                        {m.member_id}
+                      </td>
+                      <td className="p-4 font-sans font-bold text-white">
+                        {m.full_name}
+                      </td>
+                      <td className="p-4 text-slate-300">
+                        <a href={`mailto:${m.email}`} className="hover:text-amber-400 hover:underline">
+                          {m.email}
+                        </a>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-bold">
+                          {m.state}
+                        </span>
+                      </td>
+                      <td className="p-4 font-sans text-slate-200">
+                        {m.experience_level}
+                      </td>
+                      <td className="p-4 font-sans text-xs text-slate-300 max-w-xs truncate">
+                        {m.rifle_setup || "Custom Rimfire"}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-wrap gap-1 max-w-xs">
+                          {(m.interests || []).map((int, i) => (
+                            <span key={i} className="text-[9px] px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-sans">
+                              {int}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-4 text-slate-400 text-[11px]">
+                        {new Date(m.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="p-4 text-right">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                          {m.status || "ACTIVE"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredMembers.length === 0 && (
+                    <tr>
+                      <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
+                        No members matching current search criteria.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: REGISTERED MATCH SHOOTERS */}
+      {activeAdminTab === "REGISTRATIONS" && (
+        <div className="space-y-6">
+          {/* Header & Controls */}
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-xl font-black text-white">
+                    Registered Match Competitors ({filteredRegistrations.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Confirmed match competitors, squad assignments, rifle divisions, and registration revenues.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={downloadRegistrationsExport}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Match Roster CSV</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick KPI Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Total Competitors</span>
+                <span className="text-2xl font-black font-mono text-amber-400">{registrations.length}</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Open Division Pro</span>
+                <span className="text-2xl font-black font-mono text-blue-400">
+                  {registrations.filter((r) => r.rifle_division === "OPEN").length}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Production & Senior</span>
+                <span className="text-2xl font-black font-mono text-purple-400">
+                  {registrations.filter((r) => ["PRODUCTION", "SENIOR"].includes(r.rifle_division)).length}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Entry Fees Collected</span>
+                <span className="text-2xl font-black font-mono text-emerald-400">
+                  ${registrations.reduce((acc, r) => acc + (r.total_price || 275), 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            {/* Filters Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search competitor, callsign, ticket, rifle..."
+                  value={regSearch}
+                  onChange={(e) => setRegSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <select
+                  value={regMatchFilter}
+                  onChange={(e) => setRegMatchFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:outline-none focus:border-amber-400"
+                >
+                  <option value="ALL">All Matches</option>
+                  <option value="subsonic-invitational-2026">The Subsonic Society Invitational ($7,500 Purse)</option>
+                  <option value="300x-long-gong-challenge">300X Long Gong Challenge</option>
+                  <option value="200x-mountain-match">200X Mountain Match</option>
+                </select>
+              </div>
+
+              <div>
+                <select
+                  value={regDivisionFilter}
+                  onChange={(e) => setRegDivisionFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:outline-none focus:border-amber-400"
+                >
+                  <option value="ALL">All Divisions</option>
+                  <option value="OPEN">Open Division Pro</option>
+                  <option value="PRODUCTION">Production Division</option>
+                  <option value="SENIOR">Senior Division (55+)</option>
+                  <option value="LADIES">Ladies Rimfire Pro</option>
+                  <option value="YOUTH">Junior / Youth</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Registrations Table */}
+          <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 bg-black/50 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    <th className="p-4">Pass Ticket #</th>
+                    <th className="p-4">Competitor</th>
+                    <th className="p-4">Match</th>
+                    <th className="p-4">Division</th>
+                    <th className="p-4">Squad & Flight</th>
+                    <th className="p-4">Rifle & Optic Setup</th>
+                    <th className="p-4">Ammunition</th>
+                    <th className="p-4">Fee Paid</th>
+                    <th className="p-4 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-mono">
+                  {filteredRegistrations.map((r) => (
+                    <tr key={r.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-4 font-bold text-amber-400">
+                        {r.ticket_number}
+                      </td>
+                      <td className="p-4 font-sans">
+                        <div className="font-bold text-white flex items-center gap-1.5">
+                          <span>{r.competitor_name}</span>
+                          {r.competitor_callsign && (
+                            <span className="text-[10px] font-mono text-amber-400 px-1.5 py-0.2 rounded bg-amber-500/10 border border-amber-500/30">
+                              [{r.competitor_callsign}]
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                          {r.competitor_email} {r.competitor_phone ? `• ${r.competitor_phone}` : ""}
+                        </div>
+                      </td>
+                      <td className="p-4 font-sans text-xs text-slate-200 max-w-xs truncate">
+                        {r.match_title}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          r.rifle_division === "OPEN"
+                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                            : r.rifle_division === "PRODUCTION"
+                            ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                            : r.rifle_division === "SENIOR"
+                            ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                            : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        }`}>
+                          {r.rifle_division}
+                        </span>
+                      </td>
+                      <td className="p-4 font-sans text-slate-300">
+                        <div className="font-bold text-xs text-white">{r.squad_name}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">{r.squad_flight}</div>
+                      </td>
+                      <td className="p-4 font-sans text-xs text-slate-300 max-w-xs">
+                        <div className="font-semibold text-slate-200">{r.rifle_model}</div>
+                        <div className="text-[10px] text-slate-400">{r.optic}</div>
+                      </td>
+                      <td className="p-4 text-[11px] text-slate-300">
+                        {r.ammo_lot}
+                      </td>
+                      <td className="p-4 font-bold text-white">
+                        ${r.total_price}
+                      </td>
+                      <td className="p-4 text-right">
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                          {r.payment_status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredRegistrations.length === 0 && (
+                    <tr>
+                      <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
+                        No competitor registrations matching filters.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: CONTACT LEADS & INQUIRIES */}
+      {activeAdminTab === "LEADS" && (
+        <div className="space-y-6">
+          {/* Header & Controls */}
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-xl font-black text-white">
+                    Contact Leads & Inquiries ({filteredLeads.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Transmissions from potential sponsors, match hosts, range inquiries, and media.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={downloadLeadsExport}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Leads CSV</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick KPI Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Total Inquiries</span>
+                <span className="text-2xl font-black font-mono text-amber-400">{leads.length}</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">New / Unanswered</span>
+                <span className="text-2xl font-black font-mono text-red-400">
+                  {leads.filter((l) => l.status === "NEW").length}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Sponsorship Leads</span>
+                <span className="text-2xl font-black font-mono text-emerald-400">
+                  {leads.filter((l) => l.category === "SPONSORSHIP").length}
+                </span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/5">
+                <span className="text-[10px] font-mono text-slate-400 block uppercase">Match Host Proposals</span>
+                <span className="text-2xl font-black font-mono text-blue-400">
+                  {leads.filter((l) => l.category === "MATCH_HOST").length}
+                </span>
+              </div>
+            </div>
+
+            {/* Filters Bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by name, company, email, or message..."
+                  value={leadSearch}
+                  onChange={(e) => setLeadSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <select
+                  value={leadCategoryFilter}
+                  onChange={(e) => setLeadCategoryFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:outline-none focus:border-amber-400"
+                >
+                  <option value="ALL">All Categories</option>
+                  <option value="SPONSORSHIP">Sponsorship & Prize Table</option>
+                  <option value="MATCH_HOST">Match Host Proposals</option>
+                  <option value="SUBSONIC_DNA">Subsonic DNA Testing</option>
+                  <option value="GENERAL">General & Membership</option>
+                  <option value="MEDIA">Media & Press</option>
+                </select>
+              </div>
+
+              <div>
+                <select
+                  value={leadStatusFilter}
+                  onChange={(e) => setLeadStatusFilter(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:outline-none focus:border-amber-400"
+                >
+                  <option value="ALL">All Statuses</option>
+                  <option value="NEW">NEW (Unread)</option>
+                  <option value="IN_REVIEW">IN REVIEW</option>
+                  <option value="CONTACTED">CONTACTED / REPLIED</option>
+                  <option value="ARCHIVED">ARCHIVED</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Leads Cards Grid */}
+          <div className="space-y-4">
+            {filteredLeads.map((lead) => (
+              <div
+                key={lead.id}
+                className={`ios-glass rounded-3xl p-6 border transition-all space-y-4 ${
+                  lead.status === "NEW"
+                    ? "border-amber-500/50 shadow-tactical-glow bg-gradient-to-r from-amber-500/10 via-black/40 to-black/60"
+                    : "border-white/10 hover:border-white/20 bg-black/30"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className="font-bold text-base text-white">{lead.name}</span>
+                    {lead.company && (
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 font-mono">
+                        {lead.company}
+                      </span>
+                    )}
+                    <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                      lead.category === "SPONSORSHIP"
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                        : lead.category === "MATCH_HOST"
+                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
+                        : lead.category === "SUBSONIC_DNA"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                        : "bg-purple-500/20 text-purple-300 border border-purple-500/40"
+                    }`}>
+                      {lead.category.replace("_", " ")}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-mono text-slate-400">
+                      {new Date(lead.created_at).toLocaleString()}
+                    </span>
+
+                    {/* Status Dropdown */}
+                    <select
+                      value={lead.status}
+                      onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value as any)}
+                      className={`text-xs font-mono font-bold px-3 py-1 rounded-xl border focus:outline-none ${
+                        lead.status === "NEW"
+                          ? "bg-amber-500 text-black border-amber-400"
+                          : lead.status === "CONTACTED"
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                          : lead.status === "IN_REVIEW"
+                          ? "bg-blue-500/20 text-blue-400 border-blue-500/40"
+                          : "bg-black/60 text-slate-400 border-white/10"
+                      }`}
+                    >
+                      <option value="NEW">NEW</option>
+                      <option value="IN_REVIEW">IN REVIEW</option>
+                      <option value="CONTACTED">CONTACTED</option>
+                      <option value="ARCHIVED">ARCHIVED</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Subject & Message Content */}
+                <div className="space-y-2">
+                  {lead.subject && (
+                    <h4 className="text-sm font-bold text-slate-100">
+                      {lead.subject}
+                    </h4>
+                  )}
+                  <div className="p-4 rounded-2xl bg-black/40 border border-white/5 text-xs text-slate-300 leading-relaxed font-sans">
+                    {lead.message}
+                  </div>
+                </div>
+
+                {/* Contact Coordinates & Action Buttons */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400">
+                    <a
+                      href={`mailto:${lead.email}`}
+                      className="inline-flex items-center gap-1.5 text-white hover:text-amber-400 hover:underline"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{lead.email}</span>
+                    </a>
+                    {lead.phone && (
+                      <a
+                        href={`tel:${lead.phone}`}
+                        className="inline-flex items-center gap-1.5 text-white hover:text-amber-400 hover:underline"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-blue-400" />
+                        <span>{lead.phone}</span>
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`mailto:${lead.email}?subject=Re: ${encodeURIComponent(lead.subject || "Subsonic Society Inquiry")}`}
+                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-all"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>Reply via Email</span>
+                    </a>
+
+                    {lead.status !== "CONTACTED" && (
+                      <button
+                        onClick={() => handleUpdateLeadStatus(lead.id, "CONTACTED")}
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Mark Contacted</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredLeads.length === 0 && (
+              <div className="ios-glass rounded-3xl p-12 text-center text-slate-400 border border-white/10 font-sans">
+                No inquiries or leads matching selected filters.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: Live Clickstream Stream */}
       {activeAdminTab === "CLICKSTREAM" && (
@@ -831,11 +1545,6 @@ export default function AdminDashboardPage() {
             ))}
           </div>
         </div>
-      )}
-
-      {/* TAB 7: LIVE FACEBOOK DISPATCH STATION */}
-      {activeAdminTab === "DISPATCHES" && (
-        <FacebookDispatchManager />
       )}
     </div>
   );

@@ -98,6 +98,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/contact" className="hover:text-amber-400 transition-colors">
+                  Contact & Inquiries
+                </Link>
+              </li>
+              <li>
                 <Link href="/join" className="text-amber-400 font-bold hover:underline transition-all">
                   Join Free Membership
                 </Link>

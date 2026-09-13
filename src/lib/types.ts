@@ -154,3 +154,49 @@ export interface CommsAbuseAlert {
   autoActionTaken: string;
 }
 
+export interface SocietyMember {
+  member_id: string;
+  full_name: string;
+  email: string;
+  state: string;
+  experience_level: string;
+  rifle_setup: string;
+  interests: string[];
+  created_at: string;
+  status?: "ACTIVE" | "PROVISIONAL" | "HONORARY";
+}
+
+export interface MatchRegistration {
+  id: string;
+  ticket_number: string;
+  match_id: string;
+  match_title: string;
+  competitor_name: string;
+  competitor_callsign?: string;
+  competitor_email: string;
+  competitor_phone?: string;
+  rifle_division: string;
+  squad_name: string;
+  squad_flight?: string;
+  rifle_model: string;
+  optic: string;
+  ammo_lot: string;
+  addons?: string[];
+  total_price: number;
+  payment_status: "PAID" | "PENDING" | "WAIVED";
+  created_at: string;
+}
+
+export interface ContactLead {
+  id: string;
+  name: string;
+  company?: string;
+  email: string;
+  phone?: string;
+  category: "GENERAL" | "SPONSORSHIP" | "MATCH_HOST" | "SUBSONIC_DNA" | "MEDIA";
+  subject?: string;
+  message: string;
+  created_at: string;
+  status: "NEW" | "IN_REVIEW" | "CONTACTED" | "ARCHIVED";
+}
+

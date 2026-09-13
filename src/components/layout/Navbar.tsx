@@ -25,7 +25,8 @@ import {
   Award,
   Sparkles,
   Compass,
-  Target
+  Target,
+  Mail
 } from "lucide-react";
 
 export function Navbar() {
@@ -175,6 +176,23 @@ export function Navbar() {
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
                         Presenting sponsors & industry leaders
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/contact"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-cyan-400">
+                        Contact & Inquiries
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Match inquiries, sponsorship & leads
                       </p>
                     </div>
                   </Link>
@@ -408,6 +426,14 @@ export function Navbar() {
               >
                 <Award className="w-4 h-4 text-emerald-400" />
                 <span>Modacam & Sponsors</span>
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
+              >
+                <Mail className="w-4 h-4 text-cyan-400" />
+                <span>Contact & Inquiries</span>
               </Link>
             </div>
 

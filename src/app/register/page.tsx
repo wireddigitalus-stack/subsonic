@@ -257,7 +257,35 @@ function RegisterContent() {
       targetText: `Match: ${selectedMatch.id} | Shooter: ${name} | Total: $${totalPrice}`,
     });
 
-    // 2. Persist to Supabase Database
+    // 2. Persist to server API and durable JSONL storage
+    try {
+      await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticketNumber: registrationData.ticketNumber,
+          matchId: selectedMatch.id,
+          matchTitle: selectedMatch.title,
+          competitorName: name,
+          competitorCallsign: callsign,
+          competitorEmail: email,
+          competitorPhone: phone,
+          rifleDivision: selectedDivision,
+          squadName: squadInfo?.name || "Squad 1",
+          squadFlight: squadInfo?.flight || "Morning",
+          rifleModel: rifleModel,
+          optic: optic,
+          ammoLot: ammoLot,
+          addons: selectedAddons,
+          totalPrice: totalPrice,
+          paymentStatus: "PAID",
+        }),
+      });
+    } catch (apiErr) {
+      console.warn("API registration persist warning:", apiErr);
+    }
+
+    // 3. Persist to Supabase Database if configured
     if (isSupabaseConfigured && supabase) {
       try {
         await supabase.from("registrations").insert([

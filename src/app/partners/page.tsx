@@ -105,8 +105,24 @@ export default function PartnersPage() {
   const [inquiryMessage, setInquiryMessage] = useState("");
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: inquiryName,
+          company: inquiryCompany,
+          email: inquiryEmail,
+          category: "SPONSORSHIP",
+          subject: `Sponsorship Inquiry from ${inquiryCompany || inquiryName}`,
+          message: inquiryMessage,
+        }),
+      });
+    } catch (err) {
+      console.warn("Contact API error:", err);
+    }
     setInquirySubmitted(true);
   };
 
