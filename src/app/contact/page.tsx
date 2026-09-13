@@ -225,7 +225,7 @@ export default function ContactPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g. Wyatt Sterling"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                       />
                     </div>
 
@@ -238,7 +238,7 @@ export default function ContactPage() {
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
                         placeholder="e.g. Holston Mountain Precision"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                       />
                     </div>
 
@@ -252,7 +252,7 @@ export default function ContactPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e.g. shooter@subsonicsociety.org"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                       />
                     </div>
 
@@ -265,7 +265,7 @@ export default function ContactPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="e.g. (423) 555-0192"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                       />
                     </div>
                   </div>
@@ -279,7 +279,7 @@ export default function ContactPage() {
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
                       placeholder="e.g. Stage Sponsorship Inquiry for Bristol Pro Match"
-                      className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                      className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                     />
                   </div>
 
@@ -293,7 +293,7 @@ export default function ContactPage() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Provide details regarding your inquiry, rifle setup, proposed stage sponsorship, or range question..."
-                      className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed"
+                      className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed"
                     />
                   </div>
                 </div>

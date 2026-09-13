@@ -183,7 +183,7 @@ export default function ShopPage() {
 
       {/* Category Tabs */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 p-1.5 ios-glass rounded-2xl border border-white/10 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 ios-glass rounded-2xl border border-white/10 overflow-x-auto no-scrollbar">
           {[
             { id: "ALL", label: "All Gear" },
             { id: "APPAREL", label: "Apparel & Jerseys" },
@@ -193,7 +193,7 @@ export default function ShopPage() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                 selectedCategory === cat.id
                   ? "bg-amber-500 text-black shadow-tactical-glow"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
@@ -275,8 +275,8 @@ export default function ShopPage() {
 
       {/* Order Reservation Modal */}
       {orderedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-white/20 shadow-2xl space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="ios-glass rounded-3xl p-5 sm:p-6 max-w-md w-full border border-white/20 shadow-2xl space-y-5 max-h-[92dvh] overflow-y-auto overscroll-contain ios-scrollbar">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
@@ -321,7 +321,7 @@ export default function ShopPage() {
                     value={orderName}
                     onChange={(e) => setOrderName(e.target.value)}
                     placeholder="e.g. Wyatt Sterling"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60"
                   />
                 </div>
 
@@ -333,7 +333,7 @@ export default function ShopPage() {
                     value={orderEmail}
                     onChange={(e) => setOrderEmail(e.target.value)}
                     placeholder="e.g. marksman@subsonicsociety.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60"
                   />
                 </div>
 
@@ -343,7 +343,7 @@ export default function ShopPage() {
                     <select
                       value={orderSize}
                       onChange={(e) => setOrderSize(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-500/60"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-500/60"
                     >
                       <option value="S" className="bg-[#0e131d]">Small (S)</option>
                       <option value="M" className="bg-[#0e131d]">Medium (M)</option>
@@ -362,7 +362,7 @@ export default function ShopPage() {
                     max="10"
                     value={orderQuantity}
                     onChange={(e) => setOrderQuantity(parseInt(e.target.value) || 1)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-500/60"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-500/60"
                   />
                 </div>
 

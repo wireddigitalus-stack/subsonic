@@ -170,8 +170,8 @@ export function BallisticsCalculator() {
       </div>
 
       {/* Trajectory Table */}
-      <div className="overflow-x-auto rounded-2xl border border-white/5 bg-black/50">
-        <table className="w-full text-left text-xs font-mono">
+      <div className="overflow-x-auto rounded-2xl border border-white/5 bg-black/50 ios-scrollbar touch-pan-x pb-1">
+        <table className="w-full text-left text-xs font-mono min-w-[560px]">
           <thead className="bg-white/5 text-slate-400 border-b border-white/10">
             <tr>
               <th className="p-3">Distance</th>

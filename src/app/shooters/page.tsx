@@ -176,21 +176,21 @@ export default function ShootersPage() {
               Featured Athletes
             </span>
 
-            <div className="space-y-3">
+            <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible no-scrollbar gap-3 pb-2 lg:pb-0">
               {SHOOTERS_DATA.map((shooter) => {
                 const isSelected = selectedShooter.id === shooter.id;
                 return (
                   <button
                     key={shooter.id}
                     onClick={() => setSelectedShooter(shooter)}
-                    className={`w-full text-left p-5 rounded-2xl transition-all border ${
+                    className={`w-[280px] sm:w-[320px] lg:w-full shrink-0 lg:shrink text-left p-4 sm:p-5 rounded-2xl transition-all border ${
                       isSelected
                         ? "ios-glass-card border-amber-500/60 shadow-tactical-glow bg-amber-500/5"
                         : "ios-glass border-white/5 hover:border-white/20"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="w-11 h-11 rounded-full overflow-hidden border border-amber-400/60 shadow-sm relative shrink-0 bg-black">
                           <Image
                             src={shooter.image}
@@ -199,14 +199,14 @@ export default function ShootersPage() {
                             className="object-cover"
                           />
                         </div>
-                        <div>
-                          <div className="text-xs font-mono text-amber-400 font-bold uppercase">
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-mono text-amber-400 font-bold uppercase truncate">
                             {shooter.division}
                           </div>
-                          <h3 className="text-sm sm:text-base font-black text-white">
+                          <h3 className="text-sm sm:text-base font-black text-white truncate">
                             {shooter.name}
                           </h3>
-                          <p className="text-[11px] text-slate-400 mt-0.5">
+                          <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 truncate">
                             {shooter.ranking}
                           </p>
                         </div>
@@ -222,7 +222,7 @@ export default function ShootersPage() {
             </div>
 
             {/* Nomination Card */}
-            <div className="p-5 rounded-2xl ios-glass border border-white/10 space-y-3 mt-6">
+            <div className="p-5 rounded-2xl ios-glass border border-white/10 space-y-3 mt-4 lg:mt-6">
               <span className="text-xs font-mono text-amber-400 font-bold uppercase block">
                 Nominate a Shooter
               </span>
@@ -242,10 +242,10 @@ export default function ShootersPage() {
           {/* Right Column: Deep Profile & Rifle Breakdown */}
           <div className="lg:col-span-2 space-y-6">
             {/* Header Card */}
-            <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
+            <div className="ios-glass rounded-3xl p-5 sm:p-8 border border-white/10 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
                     <Image
                       src={selectedShooter.image}
                       alt={selectedShooter.name}
@@ -253,27 +253,27 @@ export default function ShootersPage() {
                       className="object-cover"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
                         {selectedShooter.callsign}
                       </span>
-                      <span className="text-xs font-mono text-slate-400">
+                      <span className="text-xs font-mono text-slate-400 truncate">
                         {selectedShooter.homeRange}
                       </span>
                     </div>
-                    <h2 className="text-2xl sm:text-4xl font-black text-white">
+                    <h2 className="text-xl sm:text-4xl font-black text-white">
                       {selectedShooter.name}
                     </h2>
-                    <p className="text-sm font-semibold text-emerald-400">
+                    <p className="text-xs sm:text-sm font-semibold text-emerald-400">
                       {selectedShooter.ranking}
                     </p>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[10px] font-mono text-slate-400 block uppercase">PODIUM FINISHES</span>
-                  <span className="text-3xl font-black text-amber-400 font-mono">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                  <span className="text-[10px] font-mono text-slate-400 uppercase">PODIUM FINISHES</span>
+                  <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">
                     {selectedShooter.podiums}
                   </span>
                 </div>

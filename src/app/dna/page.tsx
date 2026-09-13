@@ -211,7 +211,7 @@ export default function SubsonicDnaPage() {
 
       {/* Navigation Tabs */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 p-1.5 ios-glass rounded-2xl border border-white/10 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 ios-glass rounded-2xl border border-white/10 overflow-x-auto no-scrollbar touch-pan-x">
           <button
             onClick={() => setActiveTab("LOT_TESTING")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
@@ -471,8 +471,11 @@ export default function SubsonicDnaPage() {
               </p>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
+            <div className="overflow-x-auto ios-scrollbar touch-pan-x pb-2 -mx-2 sm:mx-0 px-2 sm:px-0">
+              <div className="sm:hidden text-[10px] text-amber-400/80 font-mono mb-2 flex items-center gap-1">
+                <span>← Swipe table horizontally for full 465-yard wind holds →</span>
+              </div>
+              <table className="w-full text-left text-xs font-mono min-w-[620px]">
                 <thead>
                   <tr className="border-b border-white/10 text-slate-400">
                     <th className="py-3 px-4">DISTANCE</th>

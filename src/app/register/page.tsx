@@ -708,7 +708,7 @@ function RegisterContent() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Wyatt Sterling"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -720,7 +720,7 @@ function RegisterContent() {
                       value={callsign}
                       onChange={(e) => setCallsign(e.target.value.toUpperCase())}
                       placeholder="e.g. GHOST-22"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-base sm:text-xs font-bold focus:border-amber-400 focus:outline-none"
                     />
                   </div>
 
@@ -731,7 +731,7 @@ function RegisterContent() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="shooter@subsonicsociety.com"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -743,7 +743,7 @@ function RegisterContent() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="(423) 555-0199"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -755,7 +755,7 @@ function RegisterContent() {
                       value={cityState}
                       onChange={(e) => setCityState(e.target.value)}
                       placeholder="e.g. Bristol, TN / Holston Mountain Club"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                     />
                   </div>
 
@@ -766,7 +766,7 @@ function RegisterContent() {
                       value={sanctionId}
                       onChange={(e) => setSanctionId(e.target.value)}
                       placeholder="e.g. PRS-2026-8812"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -778,7 +778,7 @@ function RegisterContent() {
                     value={emergencyContact}
                     onChange={(e) => setEmergencyContact(e.target.value)}
                     placeholder="e.g. Sarah Sterling - (423) 555-0182"
-                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
 
@@ -830,7 +830,7 @@ function RegisterContent() {
                       value={rifleModel}
                       onChange={(e) => setRifleModel(e.target.value)}
                       placeholder="e.g. Vudoo V-22 / MDT ACC Elite"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -842,7 +842,7 @@ function RegisterContent() {
                       value={optic}
                       onChange={(e) => setOptic(e.target.value)}
                       placeholder="e.g. ZCO ZC527 MPCT3X 5-27x56"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -854,7 +854,7 @@ function RegisterContent() {
                       value={ammoLot}
                       onChange={(e) => setAmmoLot(e.target.value)}
                       placeholder="e.g. Lapua Center-X (1,062 FPS)"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                       required
                     />
                   </div>
@@ -866,7 +866,7 @@ function RegisterContent() {
                       value={muzzleDevice}
                       onChange={(e) => setMuzzleDevice(e.target.value)}
                       placeholder="e.g. Harrell Tuner / Dead Air Mask"
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                     />
                   </div>
                 </div>

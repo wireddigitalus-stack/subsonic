@@ -41,8 +41,8 @@ export function HeroSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Core Pillars Badge */}
-        <div className="flex items-center max-w-full">
-          <div className="inline-flex flex-wrap items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[10px] sm:text-xs font-mono max-w-full tracking-tight sm:tracking-normal">
+        <div className="flex items-center justify-center sm:justify-start max-w-full">
+          <div className="inline-flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[9px] sm:text-xs font-mono max-w-full tracking-tight sm:tracking-normal text-center">
             <span className="text-amber-400 font-bold">COMPETITION</span>
             <span className="text-slate-500">•</span>
             <span className="text-blue-400 font-bold">TESTING</span>
@@ -122,64 +122,66 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* 4 PRIMARY BUTTONS as requested by Allen: WATCH • MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+        {/* 4 PRIMARY BUTTONS: WATCH • MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-2">
           {/* Button 1: WATCH */}
           <Link
             href="/watch"
             data-telemetry="hero_primary_btn_watch"
-            className="p-4 rounded-2xl ios-glass border border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-white font-black text-sm flex items-center justify-between group transition-all"
+            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400">
-                <Play className="w-4 h-4 fill-red-400" />
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-red-400" />
               </div>
-              <span>WATCH</span>
+              <span className="truncate">WATCH</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
           {/* Button 2: MATCHES */}
           <Link
             href="/matches"
             data-telemetry="hero_primary_btn_matches"
-            className="p-4 rounded-2xl ios-glass border border-white/10 hover:border-amber-500/50 hover:bg-amber-500/10 text-white font-black text-sm flex items-center justify-between group transition-all"
+            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-amber-500/50 hover:bg-amber-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
-                <Target className="w-4 h-4" />
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <span>MATCHES</span>
+              <span className="truncate">MATCHES</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
           {/* Button 3: SUBSONIC DNA */}
           <Link
             href="/dna"
             data-telemetry="hero_primary_btn_dna"
-            className="p-4 rounded-2xl ios-glass border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-black text-sm flex items-center justify-between group transition-all"
+            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
-                <Microscope className="w-4 h-4" />
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                <Microscope className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <span>SUBSONIC DNA</span>
+              <span className="truncate">DNA LAB</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
           {/* Button 4: JOIN THE SOCIETY */}
           <Link
             href="/join"
             data-telemetry="hero_primary_btn_join"
-            className="p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-sm flex items-center justify-between shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
+            className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs sm:text-sm flex items-center justify-between shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
           >
-            <div className="flex items-center gap-2.5">
-              <Users className="w-4 h-4 fill-black" />
-              <span>JOIN THE SOCIETY</span>
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
+              </div>
+              <span className="truncate">JOIN NOW</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-black" />
+            <ChevronRight className="w-4 h-4 text-black shrink-0" />
           </Link>
         </div>
 

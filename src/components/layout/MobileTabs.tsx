@@ -32,7 +32,7 @@ export function MobileTabs() {
   return (
     <div 
       data-section="mobile-tabs" 
-      className="md:hidden fixed bottom-3 left-3 right-3 z-50 pointer-events-auto"
+      className="md:hidden fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-50 pointer-events-auto"
     >
       <div className="ios-bottom-sheet rounded-3xl p-1.5 px-3 border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.85)] flex items-center justify-around">
         {tabs.map((tab) => {

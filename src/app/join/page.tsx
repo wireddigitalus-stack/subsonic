@@ -336,7 +336,7 @@ export default function JoinSocietyPage() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Wyatt Sterling"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
                     />
                   </div>
 
@@ -348,7 +348,7 @@ export default function JoinSocietyPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="e.g. wyatt@rimfirepro.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
                     />
                   </div>
 
@@ -360,7 +360,7 @@ export default function JoinSocietyPage() {
                         value={stateCode}
                         onChange={(e) => setStateCode(e.target.value)}
                         placeholder="e.g. TN, NC, VA"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
                       />
                     </div>
 
@@ -369,7 +369,7 @@ export default function JoinSocietyPage() {
                       <select
                         value={experienceLevel}
                         onChange={(e) => setExperienceLevel(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-500/60"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-500/60"
                       >
                         <option value="Beginner / Rimfire Enthusiast" className="bg-[#0e131d]">Beginner / Rimfire Enthusiast</option>
                         <option value="Club Match Competitor" className="bg-[#0e131d]">Club Match Competitor</option>
@@ -386,7 +386,7 @@ export default function JoinSocietyPage() {
                       value={rifleSetup}
                       onChange={(e) => setRifleSetup(e.target.value)}
                       placeholder="e.g. Vudoo V-22 / ZCO 527, or CZ 457 / Vortex"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-500/60 transition-colors"
                     />
                   </div>
 
