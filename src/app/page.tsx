@@ -399,7 +399,7 @@ export default function HomePage() {
               CLAIM YOUR FREE DIGITAL MEMBER CREDENTIAL
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Instant Apple Wallet style digital pass, priority notice on match registrations, Subsonic DNA laboratory lot data, and AI-moderated competitor comms. No annual fees.
+              Instant Apple Wallet style digital pass, priority notice on match registrations, Subsonic DNA laboratory lot data, and staff-moderated competitor comms. No annual fees.
             </p>
           </div>
 

@@ -11,13 +11,20 @@ import {
   Radio
 } from "lucide-react";
 
+interface TabItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string;
+}
+
 export function MobileTabs() {
   const pathname = usePathname();
 
-  const tabs = [
+  const tabs: TabItem[] = [
     { name: "Home", href: "/", icon: Home },
     { name: "Calendar", href: "/calendar", icon: CalendarDays },
-    { name: "Chat", href: "/chat", icon: MessageSquare, badge: "AI" },
+    { name: "Chat", href: "/chat", icon: MessageSquare },
     { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
     { name: "Admin", href: "/admin", icon: BarChart3 },
   ];

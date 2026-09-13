@@ -299,7 +299,7 @@ export default function JoinSocietyPage() {
 
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span><strong>AI-Moderated Competitor Comms:</strong> Discuss ballistic DOPE, wind holds, and gear without social media bans.</span>
+                    <span><strong>Staff-Moderated Competitor Comms:</strong> Discuss ballistic DOPE, wind holds, and gear without social media bans.</span>
                   </div>
                 </div>
               </div>

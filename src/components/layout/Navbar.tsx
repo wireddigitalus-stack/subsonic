@@ -393,7 +393,7 @@ export function Navbar() {
                     <div>
                       <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
                         <span>Competitor Comms</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">AI Shield</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
                         DOPE drops & squad chat

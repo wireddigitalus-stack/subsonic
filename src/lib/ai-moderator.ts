@@ -45,7 +45,7 @@ export function evaluateChatMessage(content: string, authorRole: string = "MEMBE
         threatScore: 85,
         policyScore: 98,
         sentiment: "SUSPICIOUS",
-        flagReason: "AI Policy Violation: Direct/unregulated firearm or NFA transaction prohibited on public channels.",
+        flagReason: "Safety Policy Violation: Direct or unregulated firearm/NFA transactions are prohibited on public channels.",
         shouldBlock: true,
         timestamp,
       };
@@ -61,7 +61,7 @@ export function evaluateChatMessage(content: string, authorRole: string = "MEMBE
         threatScore: 40,
         policyScore: 92,
         sentiment: "SUSPICIOUS",
-        flagReason: "AI Spam Filter: External solicitation or suspicious link detected.",
+        flagReason: "Safety Policy Violation: External solicitation or suspicious links are prohibited.",
         shouldBlock: true,
         timestamp,
       };
@@ -85,8 +85,8 @@ export function evaluateChatMessage(content: string, authorRole: string = "MEMBE
       policyScore: 75,
       sentiment: "TOXIC",
       flagReason: isVeryHostile
-        ? "AI Threat Guard: Hostile language or physical threat detected."
-        : "AI Code of Conduct: Unsportsmanlike conduct or inflammatory accusations flagged for review.",
+        ? "Range Conduct Violation: Hostile language or physical threats are strictly prohibited."
+        : "Range Conduct Policy: Unsportsmanlike conduct or inflammatory accusations flagged for marshal review.",
       shouldBlock: isVeryHostile,
       timestamp,
     };

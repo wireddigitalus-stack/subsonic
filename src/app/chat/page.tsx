@@ -15,12 +15,10 @@ import {
   Target,
   Flame,
   Radio,
-  Bot,
   Info,
   BadgeAlert,
   Volume2,
   VolumeX,
-  Eye,
   X,
   Crosshair,
   Compass,
@@ -183,8 +181,7 @@ export default function ChatPage() {
     notes: "Hold left edge. Expect 0.2 mil vertical drop in canyon draw.",
   });
 
-  // AI Moderation Inspection & Status
-  const [inspectingMessage, setInspectingMessage] = useState<ChatMessage | null>(null);
+  // Moderation Status Notice
   const [aiBlockedNotice, setAiBlockedNotice] = useState<string | null>(null);
   const [isAiScanning, setIsAiScanning] = useState(false);
   const [copiedDopeId, setCopiedDopeId] = useState<string | null>(null);
@@ -391,12 +388,12 @@ export default function ChatPage() {
       targetElement: "chat_transmit",
       targetCategory: "Comms",
       pageRoute: "/chat",
-      targetText: `Channel: ${currentChannel} | Net: ${activeNetTab} | Type: ${type} | AI: ${evaluation.status}`,
+      targetText: `Channel: ${currentChannel} | Net: ${activeNetTab} | Type: ${type} | Status: ${evaluation.status}`,
     });
 
     // Check if blocked
     if (evaluation.shouldBlock) {
-      setAiBlockedNotice(evaluation.flagReason || "Transmission blocked by AI Safety Sentinel.");
+      setAiBlockedNotice(evaluation.flagReason || "Transmission blocked: Flagged by Range Safety Marshals.");
       setTimeout(() => setAiBlockedNotice(null), 7000);
 
       // Report to Admin Abuse Telemetry Hub
@@ -649,14 +646,14 @@ export default function ChatPage() {
               <span>{soundEnabled ? "ON" : "OFF"}</span>
             </button>
 
-            {/* AI Sentinel Pill (Compact Badge) */}
+            {/* Range Safety / Staff Moderated Badge */}
             <div
-              title="Google Gemini 2.5 Flash Sentinel Active"
+              title="Staff Moderated Comms Network"
               className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] font-mono text-emerald-300"
             >
               <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-              <span className="hidden sm:inline">Gemini 2.5 Flash</span>
-              <span className="sm:hidden">Gemini</span>
+              <span className="hidden sm:inline">Staff Moderated</span>
+              <span className="sm:hidden">Staff</span>
             </div>
 
             {/* Shooter Profile Button */}
@@ -698,9 +695,9 @@ export default function ChatPage() {
               <span>9-14 MPH WNW</span>
             </div>
 
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300" title="Staff Moderated">
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
-              <span>Gemini 2.5</span>
+              <span>Staff Moderated</span>
             </div>
 
             {/* Audio Chirp Toggle (Compact Micro-Button) */}
@@ -979,18 +976,8 @@ export default function ChatPage() {
                         </div>
                       </div>
 
-                      {/* Right Meta: AI Sentinel Inspector Button & Time */}
+                      {/* Right Meta: Timestamp & Verification Status */}
                       <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 font-mono">
-                        <button
-                          type="button"
-                          onClick={() => setInspectingMessage(msg)}
-                          data-telemetry="chat_inspect_sentinel"
-                          className="text-[9px] sm:text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-mono px-1.5 sm:px-2 py-0.5 rounded bg-cyan-950/40 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors"
-                          title="Inspect AI Neural Sentiment & Policy Breakdown"
-                        >
-                          <Eye className="w-2.5 h-2.5" />
-                          <span>AI Sentinel</span>
-                        </button>
                         <span>{msg.timestamp}</span>
                         {isFlagged ? (
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
@@ -1077,7 +1064,7 @@ export default function ChatPage() {
                       </div>
                     )}
 
-                    {/* AI Flag Reason Notice */}
+                    {/* Staff Moderation Flag Notice */}
                     {isFlagged && msg.aiModerationReport?.flagReason && (
                       <div className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-start gap-2">
                         <BadgeAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
@@ -1122,7 +1109,7 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* AI Blocked Notice Banner */}
+          {/* Blocked Transmission Notice Banner */}
           {aiBlockedNotice && (
             <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake shrink-0">
               <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
@@ -1206,7 +1193,7 @@ export default function ChatPage() {
               <span>Transmitting as: <strong className="text-slate-300">[{shooterProfile.callsign}]</strong></span>
               <span className="flex items-center gap-1 text-[9px] text-emerald-400/80">
                 <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
-                Gemini 2.5 Sentinel
+                Staff Moderated
               </span>
             </div>
           </form>
@@ -1463,94 +1450,6 @@ export default function ChatPage() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* 6. AI SENTINEL INSPECTION MODAL */}
-      {inspectingMessage && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-md w-full border border-cyan-500/40 shadow-2xl p-5 sm:p-8 space-y-4 sm:space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-base font-bold text-white">
-                  Subsonic AI Sentinel Analysis
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setInspectingMessage(null)}
-                className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-3 rounded-2xl bg-black/50 border border-white/5 space-y-1">
-              <div className="text-[10px] font-mono text-slate-400">INSPECTED TRANSMISSION:</div>
-              <div className="text-xs sm:text-sm text-white italic">&ldquo;{inspectingMessage.content}&rdquo;</div>
-              <div className="text-[10px] text-slate-400 font-mono pt-1">
-                Sender: {inspectingMessage.author.name} [{inspectingMessage.author.callsign || "COMMS"}] • {inspectingMessage.author.role}
-              </div>
-            </div>
-
-            {/* Metric Bars */}
-            <div className="space-y-3 font-mono text-xs">
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Toxicity & Hostility Score</span>
-                  <span className={`font-bold ${(inspectingMessage.aiModerationReport?.toxicityScore || 0) > 30 ? "text-amber-400" : "text-emerald-400"}`}>
-                    {inspectingMessage.aiModerationReport?.toxicityScore || 0}%
-                  </span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${(inspectingMessage.aiModerationReport?.toxicityScore || 0) > 30 ? "bg-amber-500" : "bg-emerald-500"}`}
-                    style={{ width: `${Math.max(4, inspectingMessage.aiModerationReport?.toxicityScore || 0)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Safety & Threat Score</span>
-                  <span className="text-emerald-400 font-bold">
-                    {inspectingMessage.aiModerationReport?.threatScore || 0}% Threat
-                  </span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: "4%" }} />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Regulated Firearm Commerce Compliance</span>
-                  <span className="text-emerald-400 font-bold">100% Policy Compliant</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: "100%" }} />
-                </div>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5 text-[11px] text-slate-300 space-y-1 font-mono">
-              <div className="text-amber-400 font-bold">STATUS: {inspectingMessage.moderationStatus}</div>
-              <div>Engine: <strong className="text-cyan-300">{inspectingMessage.aiModerationReport?.aiEngine || "Google Gemini 2.5 Flash"}</strong></div>
-              <div>Sentiment: {inspectingMessage.aiModerationReport?.sentiment || "NEUTRAL"}</div>
-              {inspectingMessage.aiModerationReport?.flagReason && (
-                <div className="text-amber-300 mt-1">Notice: {inspectingMessage.aiModerationReport.flagReason}</div>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setInspectingMessage(null)}
-              className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
-            >
-              Close Inspector
-            </button>
           </div>
         </div>
       )}
