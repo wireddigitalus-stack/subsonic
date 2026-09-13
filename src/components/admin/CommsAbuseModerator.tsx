@@ -292,18 +292,21 @@ export function CommsAbuseModerator() {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => {
                 setSoundEnabled(!soundEnabled);
                 if (!soundEnabled) playTacticalAbuseAlertSound("MEDIUM");
               }}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+              className={`h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] font-mono font-semibold flex items-center gap-1.5 transition-all ${
                 soundEnabled 
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]" 
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)] hover:bg-amber-500/30" 
+                  : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
               }`}
+              title={soundEnabled ? "Abuse Alert Siren: ON (Click to mute)" : "Abuse Alert Siren: OFF (Click to unmute)"}
+              aria-label="Toggle Siren Audio"
             >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-              <span>{soundEnabled ? "Alert Siren ON" : "Siren Muted"}</span>
+              {soundEnabled ? <Volume2 className="w-3 h-3 text-amber-400 shrink-0" /> : <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />}
+              <span>{soundEnabled ? "Siren ON" : "Siren OFF"}</span>
             </button>
           </div>
         </div>

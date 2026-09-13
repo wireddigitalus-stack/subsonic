@@ -628,19 +628,25 @@ export default function ChatPage() {
               <span className="hidden sm:inline">Fullscreen</span>
             </button>
 
-            {/* Audio Chirp Toggle */}
+            {/* Audio Chirp Toggle (Compact Micro-Button) */}
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`px-2 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono transition-colors ${
+              className={`h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
                 soundEnabled
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
               }`}
-              title="Toggle Tactical Radio Chirp"
+              title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
+              aria-label="Toggle Tactical Radio Audio"
             >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-              <span className="hidden md:inline">{soundEnabled ? "Audio ON" : "Muted"}</span>
+              {soundEnabled ? (
+                <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
+              ) : (
+                <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
+              )}
+              <span className="hidden sm:inline text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
+              <span>{soundEnabled ? "ON" : "OFF"}</span>
             </button>
 
             {/* AI Sentinel Pill (Compact Badge) */}
@@ -696,6 +702,26 @@ export default function ChatPage() {
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
               <span>Gemini 2.5</span>
             </div>
+
+            {/* Audio Chirp Toggle (Compact Micro-Button) */}
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`h-6 px-2 rounded-lg border text-[10px] flex items-center gap-1 font-mono font-semibold transition-all ${
+                soundEnabled
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+              }`}
+              title={soundEnabled ? "Audio Chirps: ON" : "Audio Chirps: OFF"}
+              aria-label="Toggle Tactical Radio Audio"
+            >
+              {soundEnabled ? (
+                <Volume2 className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+              ) : (
+                <VolumeX className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+              )}
+              <span>{soundEnabled ? "ON" : "OFF"}</span>
+            </button>
 
             {/* Exit Fullscreen Button */}
             <button
