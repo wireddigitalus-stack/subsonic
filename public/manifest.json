@@ -1,0 +1,23 @@
+{
+  "name": "Subsonic Society | Precision Rimfire",
+  "short_name": "Subsonic",
+  "description": "Precision Is In Our DNA. Competition, Testing, Education, and Community for precision rimfire athletes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090E",
+  "theme_color": "#07090E",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
