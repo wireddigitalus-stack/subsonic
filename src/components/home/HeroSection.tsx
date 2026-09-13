@@ -13,7 +13,6 @@ import {
   Compass,
   Play,
   Film,
-  Sparkles,
   Users,
   Microscope,
   Volume2,
@@ -41,13 +40,8 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Pillar Badges Line */}
+        {/* Core Pillars Badge */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>SUBSONIC SOCIETY</span>
-          </div>
-
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-mono">
             <span className="text-amber-400 font-bold">COMPETITION</span>
             <span>•</span>
