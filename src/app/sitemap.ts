@@ -12,12 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: `${baseUrl}/society`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/matches`,
       lastModified,
       changeFrequency: "daily",
@@ -30,16 +24,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
-      url: `${baseUrl}/shooters`,
+      url: `${baseUrl}/bristol-pro`,
       lastModified,
-      changeFrequency: "weekly",
-      priority: 0.85,
+      changeFrequency: "daily",
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/the-hideout`,
       lastModified,
       changeFrequency: "weekly",
-      priority: 0.85,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/society`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/shooters`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/watch`,
@@ -48,16 +54,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/shop`,
+      url: `${baseUrl}/register`,
       lastModified,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
-    {
-      url: `${baseUrl}/partners`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.8,
+      changeFrequency: "daily",
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/join`,
@@ -66,28 +66,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
-      url: `${baseUrl}/bristol-pro`,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
       url: `${baseUrl}/calendar`,
       lastModified,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/partners`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/shop`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
       url: `${baseUrl}/chat`,
       lastModified,
       changeFrequency: "hourly",
       priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/register`,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 0.95,
     },
   ];
 }

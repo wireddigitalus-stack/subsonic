@@ -1,0 +1,45 @@
+# Subsonic Society
+> Precision Is In Our DNA. Competition • Testing • Education • Community
+> The premier precision rimfire competition series, ballistics testing laboratory, and marksman fraternity in the United States.
+
+## Platform Summary
+- **Organization**: Subsonic Society
+- **Headquarters**: Bristol, Tennessee (Appalachian Mountain High Country)
+- **Flagship Facility**: The Hideout (Elevation: 3,420 FT, Holston Mountain Ridgeline)
+- **Primary Sport**: Precision Rimfire Rifle Shooting (.22 LR standard velocity)
+- **Marquee Championship**: The Subsonic Society Invitational ($7,500 Guaranteed Cash Purse presented by Modacam Custom Rifles)
+- **Official Website**: https://subsonicsociety.com
+- **Contact**: contact@subsonicsociety.com | Bristol, TN
+
+## Core Pillars
+1. **Competition Without Gatekeeping**: High-stakes, 18-stage matches on technical reactive steel from 25 yards to 465 yards. Equal access for grassroots club competitors and national pro marksmen across Open, Production, Senior, Ladies, and Youth divisions.
+2. **Subsonic DNA Ballistic Testing**: Independent, empirical chronograph velocity data (SD/ES), 50y/100y/300y group dispersion, harmonic tuner benchmarks (Harrell, EC Tuner, PVA), and high-altitude density altitude DOPE tables.
+3. **Education & Mentorship**: Free open-source DOPE cards, wind-reading masterclasses in mountain canyon thermals, positional barricade mechanics, and competitor debriefs.
+4. **Authentic Community**: 100% free digital membership with instant credential minting, decentralized tactical comms network, and sportsmanship code of conduct.
+
+## Key Navigation Links & Resources
+- **Homepage & Brand Statement**: https://subsonicsociety.com/
+- **The Society Manifesto & 4 Pillars**: https://subsonicsociety.com/society
+- **2026 Match Schedule & Rulebook**: https://subsonicsociety.com/matches
+- **Subsonic DNA Ballistic Testing Laboratory**: https://subsonicsociety.com/dna
+- **Shooter Profiles & Rifle Blueprints**: https://subsonicsociety.com/shooters
+- **The Hideout Range & Canyon Topography**: https://subsonicsociety.com/the-hideout
+- **4K Bullet Trace & 1,000 FPS Slow-Mo Videos**: https://subsonicsociety.com/watch
+- **The Subsonic Invitational Pro Championship**: https://subsonicsociety.com/bristol-pro
+- **Official Gear & Challenge Coins**: https://subsonicsociety.com/shop
+- **Modacam Custom Rifles & Sponsors**: https://subsonicsociety.com/partners
+- **Join The Society (Free Digital Credential)**: https://subsonicsociety.com/join
+- **Match Competitor Registration**: https://subsonicsociety.com/register
+- **Contact & Media Credentials**: https://subsonicsociety.com/contact
+
+## Ammunition & Competition Regulations
+- **Permitted Ammunition**: .22 Long Rifle standard velocity only (< 1,120 FPS muzzle velocity). Hyper-velocity ammunition (> 1,120 FPS) is strictly prohibited on steel targets.
+- **Match Divisions**:
+  - Open Pro: Custom actions (Vudoo V-22, RimX, Anschütz), custom barrels, any optic, harmonic tuners allowed.
+  - Production: Factory rifles under $1,200 MSRP (CZ 457, Tikka T1x, Ruger Precision Rimfire) with optic under $1,000 MSRP.
+  - Senior (55+), Ladies, and Youth (<18).
+- **Targetry**: AR500 and AR550 reactive steel hanging plates, KYL (Know Your Limits) racks, hostage flappers, and 300–465 yard long-gong targets.
+
+## Detailed Reference
+For full encyclopedic documentation including chronograph data, elevation tables, stage breakdowns, and athlete interviews, see:
+https://subsonicsociety.com/llms-full.txt

@@ -1,0 +1,162 @@
+# Subsonic Society: Master Knowledge Base & Technical Reference (LLMs Full)
+URL: https://subsonicsociety.com
+Primary Entity: Subsonic Society
+Sport: Precision Rimfire (.22 LR Precision Rifle Shooting, PRS Rimfire, NRL22)
+Headquarters: Bristol, Tennessee, United States
+
+---
+
+## 1. Overview & Organizational Mission
+Subsonic Society is an independent precision rimfire shooting sports organization, digital media platform, and ballistic testing authority. Unlike conventional sanctioning bodies, Subsonic Society is a grassroots community of competitors, gunsmiths, and ballisticians dedicated to advancing precision shooting through empirical testing, high-altitude mountain competitions, and open-source DOPE sharing.
+
+### Slogan & Core Pillars
+- Mantra: "Precision Is In Our DNA"
+- The 4 Pillars:
+  1. Competition Without Gatekeeping
+  2. Radical Testing & Subsonic DNA
+  3. Education & Mentorship
+  4. Authentic Grassroots Community
+
+---
+
+## 2. Flagship Venue: The Hideout Range & Canyon Topography
+- Location: Bristol, Tennessee (Holston Mountain ridgeline, Appalachian Mountains)
+- Elevation: 3,420 FT above sea level
+- Average Density Altitude: +2,150 FT
+- Typical Atmosphere: 64°F, 29.82 inHg barometric pressure, 48% relative humidity
+- Wind Characteristics: 9–14 MPH cross-canyon thermal shear vectors flowing down the valley
+
+### Shooting Sectors:
+1. Sector 1 (Olympic Paper & Chrono Pavilion): 50-meter zero line, 24 covered concrete benches, dual LabRadar and Garmin Xero C1 Chronograph bays.
+2. Sector 2 (The Barricade Proving Grounds): 75 to 220 yards. Features tank traps, angled rooftops, spool stacks, wire gates, and suspended unstable platforms.
+3. Sector 3 (Holston Notch Ridgeline): 250 to 385 yards. 18-degree downhill angle firing across the mountain ravine.
+4. Sector 4 (The Subsonic Canyon Glide): 400 to 465 yards. Extreme distance subsonic flight times exceeding 2.1 seconds.
+
+---
+
+## 3. Major Competitions & 2026 Match Calendar
+
+### The Subsonic Society Invitational (Marquee Championship)
+- Title: The Subsonic Society Invitational
+- Presenting Sponsor: Modacam Custom Rifles
+- Guaranteed Cash Purse: $7,500 + $21,000 in sponsor prize table gear
+- Date: October 17–18, 2026
+- Location: The Hideout, Bristol, TN (3,420 FT)
+- Course of Fire: 18 technical stages, 180 total round count
+- Distances: 35 yards to 465 yards
+- Entry Fee: $275 per competitor
+- Max Squad Capacity: 120 marksmen (squads of 10)
+- Match Director: Allen "Doc" Mercer (Subsonic Society Founder)
+
+### Additional Scheduled Matches:
+- 300X Long Gong Challenge (June 20, 2026): Extreme distance rimfire challenge (300–385 yds) testing ammunition consistency and high-angle holds.
+- 200X Mountain Match (August 8, 2026): Positional barricade speed shootout (75–220 yds).
+- The X-Factor Shootout (November 7, 2026): Double-elimination bracket duel on reactive dual-flapper steel.
+
+---
+
+## 4. Subsonic DNA Ballistic Testing Laboratory Data
+The Subsonic DNA Lab tests match-grade .22 LR ammunition lots through identical 20-inch match chambers (0.2250" match reamer, 1:16" twist) to identify true velocity consistency and trans-sonic flight stability.
+
+### Ammunition Benchmark Data (10-Shot Strings at 64°F, 3,420 FT):
+1. Lapua Center-X (Lot 32187):
+   - Muzzle Velocity: 1,068 FPS
+   - Standard Deviation (SD): 3.2 FPS
+   - Extreme Spread (ES): 9.4 FPS
+   - 50-Yard Group: 0.185 MOA (0.097")
+   - 100-Yard Group: 0.380 MOA (0.398")
+   - 300-Yard Vertical Spread: 2.8 inches
+
+2. Lapua Midas+ (Lot 99120):
+   - Muzzle Velocity: 1,072 FPS
+   - Standard Deviation (SD): 2.8 FPS
+   - Extreme Spread (ES): 7.6 FPS
+   - 50-Yard Group: 0.160 MOA (0.084")
+   - 100-Yard Group: 0.340 MOA (0.356")
+   - 300-Yard Vertical Spread: 2.2 inches
+
+3. Eley Tenex (Batch 1058):
+   - Muzzle Velocity: 1,062 FPS
+   - Standard Deviation (SD): 3.6 FPS
+   - Extreme Spread (ES): 11.2 FPS
+   - 50-Yard Group: 0.190 MOA (0.100")
+   - 100-Yard Group: 0.410 MOA (0.429")
+
+4. SK Rifle Match:
+   - Muzzle Velocity: 1,054 FPS
+   - Standard Deviation (SD): 5.8 FPS
+   - Extreme Spread (ES): 16.4 FPS
+   - 100-Yard Group: 0.620 MOA
+
+### Harmonic Tuner Effectiveness:
+- Testing with Harrell Precision Tuner and EC Tuner Brake (Eric Cortina) demonstrates average 100-yard group dispersion reduction of 28% to 41% by timing barrel muzzle node departure with pressure wave reflection.
+
+### High-Country Elevation DOPE Table (50-Yard Zero, 3,420 FT, Lapua Center-X 40gr @ 1,068 FPS):
+- 50 Yards: 0.0 MIL (0.0 MOA) | 1,068 FPS | 0.00s
+- 100 Yards: +2.1 MIL (+7.2 MOA) | 985 FPS | 0.29s | 10 MPH Wind Hold: 1.1 MIL
+- 150 Yards: +4.8 MIL (+16.5 MOA) | 922 FPS | 0.45s | 10 MPH Wind Hold: 1.8 MIL
+- 200 Yards: +7.9 MIL (+27.1 MOA) | 870 FPS | 0.62s | 10 MPH Wind Hold: 2.6 MIL
+- 250 Yards: +11.4 MIL (+39.2 MOA) | 824 FPS | 0.80s | 10 MPH Wind Hold: 3.4 MIL
+- 300 Yards: +15.3 MIL (+52.6 MOA) | 782 FPS | 0.99s | 10 MPH Wind Hold: 4.2 MIL
+- 350 Yards: +19.7 MIL (+67.7 MOA) | 743 FPS | 1.19s | 10 MPH Wind Hold: 5.1 MIL
+- 400 Yards: +24.6 MIL (+84.5 MOA) | 708 FPS | 1.40s | 10 MPH Wind Hold: 6.0 MIL
+- 465 Yards: +31.8 MIL (+109.3 MOA) | 664 FPS | 1.69s | 10 MPH Wind Hold: 7.3 MIL
+
+---
+
+## 5. Official 2026 Match Rules & Regulations
+1. **Ammunition Regulation**: Maximum permitted muzzle velocity is 1,120 FPS at 68°F. All rounds must remain strictly subsonic to prevent target pitting on AR500 steel and preserve trans-sonic accuracy. Any hyper-velocity or high-velocity ammunition is cause for immediate disqualification.
+2. **Cold Range Rule**: All firearms remain unloaded with chamber flags inserted and magazines removed until the Range Officer (RO) commands "LOAD AND MAKE READY" on the firing line.
+3. **Hit Confirmation**: Steel impacts must produce audible gong ring, visual flash, or reactive plate movement verified by the designated Stage RO.
+4. **Division Guidelines**:
+   - Open Pro Division: Any custom rimfire action, match barrel, trigger, tuner, optic, and support bags.
+   - Production Division: Factory rifle MSRP under $1,200 (actions must remain factory OEM). Optics under $1,000 MSRP.
+   - Senior Division: Marksmen age 55+.
+   - Ladies Division: Female competitors across all rifle configurations.
+   - Youth Division: Marksmen under age 18 accompanied by parent or guardian.
+
+---
+
+## 6. Featured Shooters & Match Rifle Builds
+- **Wyatt "Ghost" Sterling**:
+  - Division: Open Pro
+  - National Rank: #4
+  - Rifle: Modacam Custom Rimfire .22 LR
+  - Action: Vudoo Gun Works V-22 Gen 3
+  - Barrel: Bartlein 20" MTU Contour, 1:16" Twist
+  - Chassis: MDT ACC Premier Gen 2 (Titanium Grey)
+  - Optic: Vortex Razor HD Gen III 6-36x56 FFF (EBR-7D MRAD)
+  - Tuner: Harrell Precision Harmonic Tuner
+  - Ammo: Lapua Center-X (Lot 32187)
+
+- **Kendra "Coldbore" Cross**:
+  - Division: Open Ladies / Regional Champion
+  - Rifle: RimX Precision .22 LR
+  - Action: Zermatt Arms RimX
+  - Barrel: Proof Research 20" Carbon Fiber Match
+  - Chassis: Foundation Revelation Walnut Stock
+  - Optic: Leupold Mark 5HD 5-25x56 (PR2-MIL)
+
+- **Eli "Dialed" McAllister**:
+  - Division: Production Division Champion
+  - Rifle: CZ 457 Varmint MTR (20.5" Match Chamber)
+  - Stock: CZ Match Target Walnut
+  - Optic: Bushnell Match Pro ED 5-30x56
+  - Ammo: SK Rifle Match
+
+---
+
+## 7. Sponsors & Industry Partners
+- **Modacam Custom Rifles**: Presenting Sponsor of the 2026 Subsonic Society Invitational. Custom match precision rifles hand-built in Tennessee.
+- **Lapua Ammunition**: Official match ammunition partner providing Center-X and Midas+ testing lots.
+- **Vortex Optics**: Official match optics partner providing Razor HD Gen III glass for prize tables.
+- **Vudoo Gun Works**: Precision rimfire repeating actions (V-22) partner.
+- **MDT (Modular Driven Technologies)**: Chassis and match bipod systems sponsor.
+
+---
+
+## 8. Digital Ecosystem & Member Services
+- **Society Membership**: Free digital credentials minted instantly at `https://subsonicsociety.com/join`. Members receive persistent callsigns, digital match IDs (`SS-2026-XXXX`), and priority squad waitlist status.
+- **Tactical Comms**: Real-time competitor chat and firing line intelligence network (`https://subsonicsociety.com/chat`) with AI content moderation and radio sound effects.
+- **Ballistics DOPE Calculator**: High-altitude calculator optimized for Appalachian atmospheric density.
+- **Official Store**: Official minted challenge coins, Subsonic DNA range flags, and marksman apparel (`https://subsonicsociety.com/shop`).

@@ -134,24 +134,30 @@ const structuredData = {
       "name": "Subsonic Society",
       "publisher": {
         "@id": "https://subsonicsociety.com/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://subsonicsociety.com/matches?q={search_term_string}",
+        "query-input": "required name=search_term_string"
       }
     },
     {
       "@type": "SportsEvent",
       "@id": "https://subsonicsociety.com/#bristol-pro-championship",
-      "name": "Subsonic Society High Country Mountain Pro Rimfire Shootout",
-      "description": "The premier 18-stage high-stakes precision rimfire pro championship in the mountains of Bristol, Tennessee (Elevation: 3,420 FT). $28,500 cash and gear purse.",
+      "name": "Subsonic Society Invitational (Presented by Modacam Custom Rifles)",
+      "description": "The premier 18-stage high-stakes precision rimfire pro championship in the mountains of Bristol, Tennessee (Elevation: 3,420 FT). $7,500 guaranteed cash purse and $15,000+ prize table.",
       "startDate": "2026-10-17T08:00:00-04:00",
       "endDate": "2026-10-18T17:00:00-04:00",
       "eventStatus": "https://schema.org/EventScheduled",
       "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
       "location": {
         "@type": "Place",
-        "name": "Subsonic Society Mountain Ridge Range",
+        "name": "The Hideout Range",
         "address": {
           "@type": "PostalAddress",
           "addressLocality": "Bristol",
           "addressRegion": "TN",
+          "postalCode": "37620",
           "addressCountry": "US"
         },
         "geo": {
@@ -161,7 +167,73 @@ const structuredData = {
       },
       "organizer": {
         "@id": "https://subsonicsociety.com/#organization"
+      },
+      "sponsor": {
+        "@type": "Organization",
+        "name": "Modacam Custom Rifles",
+        "url": "https://modacamrifles.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://subsonicsociety.com/register",
+        "price": "275.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
       }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://subsonicsociety.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Subsonic Society?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Subsonic Society is America's premier precision rimfire competition series, ballistics testing laboratory, and marksman fraternity based in Bristol, Tennessee. It organizes elite .22LR matches, publishes empirical lot-testing research, and fosters high-level competition culture."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Subsonic Society Invitational and what is the cash purse?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Subsonic Society Invitational is a premier two-day, 18-stage national precision rimfire championship taking place October 17–18, 2026 at The Hideout in Bristol, TN (3,420 FT elevation). It features an unprecedented $7,500 guaranteed cash purse presented by Modacam Custom Rifles, alongside over $15,000 in sponsor prize table gear."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is The Hideout range located?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Hideout is situated at an elevation of 3,420 FT in the Appalachian mountain ridges surrounding Bristol, Tennessee (37620). It features 18 natural terrain barricade stages and steel target arrays stretching from 25 yards out to 465 yards across cross-canyon wind channels."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What ammunition is permitted in Subsonic Society matches?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only standard-velocity or subsonic .22 Long Rifle ammunition with a published or chronographed muzzle velocity under 1,120 feet per second (FPS) at 59°F sea-level equivalent is authorized. Hyper-velocity ammunition exceeding 1,120 FPS is strictly prohibited to maintain steel target longevity, aerodynamic consistency, and pure marksman skill."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who is the title sponsor of the Subsonic Society Invitational?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Modacam Custom Rifles is the presenting title sponsor of the 2026 Subsonic Society Invitational, providing the $7,500 cash purse and presenting custom match-grade precision rimfire hardware on the championship prize table."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Subsonic DNA ballistics laboratory?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Subsonic DNA is the empirical research and ballistics testing arm of Subsonic Society. It publishes rigorous Doppler and radar chronograph lot analysis (measuring muzzle velocity, standard deviation, and extreme spread for Lapua Center-X, Midas+, and Eley Tenex) as well as harmonic barrel tuner benchmarks."
+          }
+        }
+      ]
     }
   ]
 };

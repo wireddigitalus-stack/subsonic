@@ -1,11 +1,14 @@
 {
   "name": "Subsonic Society | Precision Rimfire",
   "short_name": "Subsonic",
-  "description": "Precision Is In Our DNA. Competition, Testing, Education, and Community for precision rimfire athletes.",
+  "description": "America's premier precision rimfire competition series, ballistics testing laboratory, and marksman fraternity. Home of the $7,500 Subsonic Invitational at The Hideout (Bristol, TN • 3,420 FT).",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#07090E",
   "theme_color": "#07090E",
+  "categories": ["sports", "news", "utilities"],
   "icons": [
     {
       "src": "/apple-touch-icon.png",
@@ -18,6 +21,36 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Matches",
+      "short_name": "Matches",
+      "description": "View 2026 Precision Rimfire Match Schedule & Rules",
+      "url": "/matches",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "DNA Lab",
+      "short_name": "DNA",
+      "description": "View .22LR Ammunition Lot Testing & Tuner Data",
+      "url": "/dna",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "The Hideout",
+      "short_name": "Hideout",
+      "description": "View 3,420 FT Mountain Range Topography in Bristol, TN",
+      "url": "/the-hideout",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Invitational",
+      "short_name": "Invitational",
+      "description": "Register for the $7,500 Subsonic Society Invitational",
+      "url": "/bristol-pro",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
     }
   ]
 }

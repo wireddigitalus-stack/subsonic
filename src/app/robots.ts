@@ -16,15 +16,21 @@ export default function robots(): MetadataRoute.Robots {
           "ChatGPT-User",
           "OAI-SearchBot",
           "ClaudeBot",
+          "anthropic-ai",
           "PerplexityBot",
           "Google-Extended",
-          "Applebot",
+          "Googlebot",
           "Bingbot",
+          "Applebot",
+          "CCBot",
+          "cohere-ai",
+          "Meta-ExternalAgent"
         ],
-        allow: "/",
+        allow: ["/", "/llms.txt", "/llms-full.txt"],
         disallow: ["/api/", "/admin"],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }
