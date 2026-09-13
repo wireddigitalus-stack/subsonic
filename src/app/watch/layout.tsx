@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        url: "/assets/subsonic-social-share-clean.jpg?v=3",
         width: 1200,
         height: 630,
         alt: "Subsonic Society 4K High-Speed Media",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Watch High-Speed Bullet Trace | Subsonic Society",
     description: "1,000 FPS Phantom footage revealing rimfire aerodynamics in flight.",
-    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
   },
 };
 

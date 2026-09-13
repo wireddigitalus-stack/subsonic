@@ -5,8 +5,13 @@ import { MobileTabs } from "@/components/layout/MobileTabs";
 import { Footer } from "@/components/layout/Footer";
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://subsonic-omega.vercel.app");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://subsonicsociety.com"),
+  metadataBase: new URL(siteUrl),
   title: "Subsonic Society | Precision Rimfire Media & Bristol TN Mountain Championships",
   description:
     "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
@@ -34,7 +39,7 @@ export const metadata: Metadata = {
     title: "Subsonic",
   },
   alternates: {
-    canonical: "https://subsonicsociety.com",
+    canonical: siteUrl,
   },
   robots: {
     index: true,
@@ -51,36 +56,16 @@ export const metadata: Metadata = {
     title: "Subsonic Society | Precision Rimfire Competition & Media Platform",
     description:
       "Premier precision rimfire shootout in the mountains of Bristol, Tennessee. Follow stage briefings, match results, community chat, and gear breakdowns.",
-    url: "https://subsonicsociety.com",
+    url: siteUrl,
     siteName: "Subsonic Society",
     images: [
       {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
-        secureUrl: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        url: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
+        secureUrl: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
         width: 1200,
         height: 630,
         type: "image/jpeg",
         alt: "Subsonic Society - Precision Is In Our DNA | Competition • Testing • Education • Community",
-      },
-      {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
-        secureUrl: "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
-        width: 1200,
-        height: 630,
-        type: "image/jpeg",
-        alt: "Subsonic Society Symmetrical Coin Share Card",
-      },
-      {
-        url: "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
-        width: 2172,
-        height: 724,
-        alt: "Subsonic Society Official Brand Logo",
-      },
-      {
-        url: "https://subsonicsociety.com/assets/subsonic-coin.jpg",
-        width: 600,
-        height: 600,
-        alt: "Subsonic Society Official Crest Emblem",
       },
     ],
     locale: "en_US",
@@ -91,7 +76,7 @@ export const metadata: Metadata = {
     title: "Subsonic Society | Precision Rimfire Media & Mountain Pro Championship",
     description:
       "High-stakes precision rimfire shooting media, pro competitions in Bristol, TN mountains, and tactical community.",
-    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
+    images: [`${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`],
   },
 };
 
@@ -110,10 +95,10 @@ const structuredData = {
         "caption": "Subsonic Society Official Logo"
       },
       "image": [
-        "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
-        "https://subsonicsociety.com/assets/subsonic-social-share-coin.jpg",
-        "https://subsonicsociety.com/assets/subsonic-banner-wide.png",
-        "https://subsonicsociety.com/assets/subsonic-coin.jpg"
+        `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
+        `${siteUrl}/assets/subsonic-social-share-coin.jpg`,
+        `${siteUrl}/assets/subsonic-banner-wide.png`,
+        `${siteUrl}/assets/subsonic-coin.jpg`
       ],
       "description": "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
       "sameAs": [

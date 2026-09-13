@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        url: "/assets/subsonic-social-share-clean.jpg?v=3",
         width: 1200,
         height: 630,
         alt: "Subsonic DNA Precision Ballistics Lab",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "Subsonic DNA | .22LR Ballistics & Tuner Lab",
     description:
       "Empirical chronograph data, SD/ES lot testing, harmonic tuner dispersion matrices.",
-    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
   },
 };
 

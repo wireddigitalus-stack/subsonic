@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        url: "/assets/subsonic-social-share-clean.jpg?v=3",
         width: 1200,
         height: 630,
         alt: "Join Subsonic Society",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Join Subsonic Society | Marksman Membership",
     description: "Get verified shooter credentials and early match slot access.",
-    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
   },
 };
 

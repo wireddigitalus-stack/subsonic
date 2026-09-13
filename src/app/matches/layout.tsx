@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg",
+        url: "/assets/subsonic-social-share-clean.jpg?v=3",
         width: 1200,
         height: 630,
         alt: "Subsonic Society Precision Rimfire Matches",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: "2026 Precision Rimfire Match Schedule | Subsonic Society",
     description:
       "18 stages, 3,420 FT elevation, $7,500 guaranteed cash purse. Official Subsonic Society Invitational.",
-    images: ["https://subsonicsociety.com/assets/subsonic-social-share-clean.jpg"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
   },
 };
 
