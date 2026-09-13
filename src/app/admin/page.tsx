@@ -33,7 +33,9 @@ import {
   getLocalTelemetryEvents, 
   computeTelemetryAnalytics, 
   clearLocalTelemetry,
-  recordTelemetryEvent
+  recordTelemetryEvent,
+  fetchServerTelemetry,
+  downloadTelemetryExport
 } from "@/lib/telemetry";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { TelemetryEvent, MatchEvent, ChatMessage, CommsAbuseAlert } from "@/lib/types";
@@ -55,38 +57,57 @@ export default function AdminDashboardPage() {
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
 
-  // Load telemetry events and comms abuse alerts
-  const loadData = () => {
-    const evts = getLocalTelemetryEvents();
-    setEvents(evts);
+  // Load telemetry events from persistent server storage, Supabase, and local client buffer
+  const loadData = async () => {
+    const localEvts = getLocalTelemetryEvents();
+    
+    // 1. Fetch server-persisted telemetry (data/telemetry-events.jsonl)
+    const serverResult = await fetchServerTelemetry(2000);
+    const serverEvts = serverResult?.events || [];
 
-    // If Supabase is connected, hydrate with cloud database events
+    // 2. Merge local + server events uniquely by ID
+    const eventMap = new Map<string, TelemetryEvent>();
+    for (const e of serverEvts) eventMap.set(e.id, e);
+    for (const e of localEvts) if (!eventMap.has(e.id)) eventMap.set(e.id, e);
+
+    // 3. If Supabase is connected, hydrate with cloud database events
     if (isSupabaseConfigured && supabase) {
-      supabase
-        .from("telemetry_events")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(250)
-        .then((res: { data: any; error: any }) => {
-          if (!res.error && res.data && res.data.length > 0) {
-            const cloudEvts: TelemetryEvent[] = res.data.map((d: any) => ({
-              id: d.id,
-              eventType: d.event_type,
-              targetElement: d.target_element,
-              targetText: d.target_text,
-              targetCategory: d.target_category,
-              pageRoute: d.page_route,
-              dwellSeconds: d.dwell_seconds,
-              scrollDepth: d.scroll_depth,
-              timestamp: d.created_at,
-              device: d.device_data || { isMobile: false, isIOS: false, screenWidth: 1280, screenHeight: 800, userAgent: "" },
-              sessionId: d.session_id,
-              visitorId: d.visitor_id,
-            }));
-            setEvents(cloudEvts);
+      try {
+        const res = await supabase
+          .from("telemetry_events")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(500);
+
+        if (!res.error && res.data && res.data.length > 0) {
+          for (const d of res.data) {
+            if (!eventMap.has(d.id)) {
+              eventMap.set(d.id, {
+                id: d.id,
+                eventType: d.event_type,
+                targetElement: d.target_element,
+                targetText: d.target_text,
+                targetCategory: d.target_category,
+                pageRoute: d.page_route,
+                dwellSeconds: d.dwell_seconds,
+                scrollDepth: d.scroll_depth,
+                timestamp: d.created_at,
+                device: d.device_data || { isMobile: false, isIOS: false, screenWidth: 1280, screenHeight: 800, userAgent: "" },
+                sessionId: d.session_id,
+                visitorId: d.visitor_id,
+              });
+            }
           }
-        });
+        }
+      } catch (err) {
+        console.warn("Supabase telemetry fetch failed:", err);
+      }
     }
+
+    const mergedList = Array.from(eventMap.values()).sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    setEvents(mergedList);
 
     const alerts = getCommsAbuseAlerts();
     setAbuseAlerts(alerts);
@@ -98,6 +119,11 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     loadData();
+
+    // Poll server for new telemetry events every 8 seconds while dashboard is open
+    const pollInterval = setInterval(() => {
+      loadData();
+    }, 8000);
 
     // Listen for live new telemetry events fired by TelemetryProvider
     const handleNewEvent = () => {
@@ -112,6 +138,7 @@ export default function AdminDashboardPage() {
     window.addEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
     window.addEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener("subsonic-telemetry-new-event", handleNewEvent);
       window.removeEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
       window.removeEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
@@ -128,9 +155,12 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleClearTelemetry = () => {
-    if (confirm("Reset local telemetry event logs?")) {
+  const handleClearTelemetry = async () => {
+    if (confirm("Reset telemetry event logs on both server storage and local buffer?")) {
       clearLocalTelemetry();
+      try {
+        await fetch("/api/telemetry?passkey=subsonic2026", { method: "DELETE" });
+      } catch {}
       setEvents([]);
     }
   };
@@ -315,19 +345,22 @@ export default function AdminDashboardPage() {
               <Activity className="w-3.5 h-3.5 animate-pulse" />
               Live Site Intelligence & Admin Hub
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">
-              Live Clickstream Active
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>Durable Storage: data/telemetry-events.jsonl ({events.length} Recorded)</span>
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono flex items-center gap-1">
-              <Database className="w-3 h-3 text-blue-400" />
-              <span>{isSupabaseConfigured ? "Supabase Cloud Online" : "Local Telemetry Engine"}</span>
-            </span>
+            {isSupabaseConfigured && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono flex items-center gap-1">
+                <Database className="w-3 h-3 text-blue-400" />
+                <span>Supabase Cloud Sync Active</span>
+              </span>
+            )}
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
             ADMIN TELEMETRY & <span className="amber-gradient-text">ENGAGEMENT</span>
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            Real-time tracking of visitor clicks, target elements, session duration, dwell times, and AI moderation defense.
+            Real-time tracking of visitor clicks, target elements, session duration, dwell times, and AI moderation defense. All events recorded persistently to server storage.
           </p>
         </div>
 
@@ -353,11 +386,21 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
-            onClick={handleExportJSON}
-            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5"
+            onClick={() => downloadTelemetryExport("csv")}
+            className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
+            title="Download CSV for Excel / Sheets"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Logs (JSON)</span>
+            <span>Export CSV</span>
+          </button>
+
+          <button
+            onClick={handleExportJSON}
+            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5"
+            title="Download full JSON event dump"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export JSON</span>
           </button>
 
           <button

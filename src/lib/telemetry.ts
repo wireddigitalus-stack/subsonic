@@ -51,6 +51,38 @@ export function getDeviceDetails() {
   };
 }
 
+const TELEMETRY_QUEUE_KEY = "subsonic_telemetry_offline_queue";
+
+// Flush queued events when internet connectivity is active
+export async function flushOfflineQueue() {
+  if (typeof window === "undefined" || !navigator.onLine) return;
+  try {
+    const raw = localStorage.getItem(TELEMETRY_QUEUE_KEY);
+    if (!raw) return;
+    const queue: TelemetryEvent[] = JSON.parse(raw);
+    if (queue.length === 0) return;
+
+    const res = await fetch("/api/telemetry", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ events: queue }),
+      keepalive: true,
+    });
+
+    if (res.ok) {
+      localStorage.removeItem(TELEMETRY_QUEUE_KEY);
+    }
+  } catch (err) {
+    // Keep in queue for next retry
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => {
+    flushOfflineQueue();
+  });
+}
+
 export function recordTelemetryEvent(event: Omit<TelemetryEvent, "id" | "timestamp" | "device" | "sessionId" | "visitorId">) {
   if (typeof window === "undefined") return;
 
@@ -63,7 +95,7 @@ export function recordTelemetryEvent(event: Omit<TelemetryEvent, "id" | "timesta
     ...event,
   };
 
-  // Save to LocalStorage ring buffer (last 500 events)
+  // 1. Save to LocalStorage ring buffer (last 500 events)
   try {
     const raw = localStorage.getItem(TELEMETRY_STORAGE_KEY);
     const list: TelemetryEvent[] = raw ? JSON.parse(raw) : [];
@@ -74,17 +106,25 @@ export function recordTelemetryEvent(event: Omit<TelemetryEvent, "id" | "timesta
     console.error("Failed to persist telemetry event locally", err);
   }
 
-  // Dispatch custom window event so Admin dashboard updates in real-time
+  // 2. Dispatch custom window event so Admin dashboard updates in real-time
   window.dispatchEvent(new CustomEvent("subsonic-telemetry-new-event", { detail: fullEvent }));
 
-  // Fire and forget send to API
+  // 3. Reliable send to API with keepalive
   try {
     fetch("/api/telemetry", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fullEvent),
+      keepalive: true,
     }).catch(() => {
-      // Ignored if offline/demo
+      // If network fails, queue into offline queue for retry
+      try {
+        const queueRaw = localStorage.getItem(TELEMETRY_QUEUE_KEY);
+        const queue: TelemetryEvent[] = queueRaw ? JSON.parse(queueRaw) : [];
+        queue.push(fullEvent);
+        if (queue.length > 200) queue.shift();
+        localStorage.setItem(TELEMETRY_QUEUE_KEY, JSON.stringify(queue));
+      } catch {}
     });
   } catch {
     // Silent
@@ -99,6 +139,24 @@ export function getLocalTelemetryEvents(): TelemetryEvent[] {
   } catch {
     return [];
   }
+}
+
+// Fetch all telemetry recorded and saved on the server
+export async function fetchServerTelemetry(limit = 1000): Promise<{ events: TelemetryEvent[]; totalRecorded: number; analytics: any } | null> {
+  try {
+    const res = await fetch(`/api/telemetry?limit=${limit}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to fetch server telemetry:", err);
+    return null;
+  }
+}
+
+// Download raw CSV or JSON file from server
+export function downloadTelemetryExport(format: "csv" | "json") {
+  if (typeof window === "undefined") return;
+  window.open(`/api/telemetry?export=${format}`, "_blank");
 }
 
 export function clearLocalTelemetry() {
