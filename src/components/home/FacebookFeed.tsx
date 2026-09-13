@@ -195,7 +195,7 @@ export function FacebookFeed() {
               <button 
                 onClick={() => setIsExpanded(!isExpanded)} 
                 className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] hover:opacity-80 transition-opacity" 
-                title={isExpanded ? "Collapse Window" : "Expand Window"}
+                title={isExpanded ? "Restore Split View" : "Maximize Feed within Window"}
               />
 
               <div className="hidden sm:flex items-center gap-2 ml-3 pl-3 border-l border-white/10 text-xs font-mono text-slate-400">
@@ -263,13 +263,27 @@ export function FacebookFeed() {
                 </button>
               </div>
 
-              {/* Maximize Toggle */}
+              {/* Maximize within Window Toggle */}
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all hidden sm:block"
-                title={isExpanded ? "Restore Normal Height" : "Maximize Window"}
+                className={`px-2.5 py-1 rounded-xl border text-xs font-mono flex items-center gap-1.5 transition-all hidden sm:flex ${
+                  isExpanded
+                    ? "bg-blue-600/30 border-blue-500/50 text-blue-200 hover:bg-blue-600/50 hover:text-white"
+                    : "bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+                title={isExpanded ? "Restore Split View" : "Maximize Feed within Window"}
               >
-                {isExpanded ? <Minimize2 className="w-3.5 h-3.5 text-amber-400" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                {isExpanded ? (
+                  <>
+                    <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-[11px] font-semibold">Split View</span>
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-[11px] font-semibold">Maximize Feed</span>
+                  </>
+                )}
               </button>
 
               {/* Direct Facebook Link */}
@@ -285,14 +299,15 @@ export function FacebookFeed() {
             </div>
           </div>
 
-          {/* 2. DUAL-PANE WINDOW CONTENT */}
-          <div className="grid grid-cols-1 lg:grid-cols-12">
+          {/* 2. DUAL-PANE / MAXIMIZED WINDOW CONTENT */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch min-h-[640px] sm:min-h-[720px]">
             
-            {/* LEFT SIDEBAR: Official Profile & Filter Controls (4 Columns on LG) */}
-            <div className="lg:col-span-4 p-5 sm:p-6 border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 space-y-5">
-              
-              {/* Profile Card */}
-              <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-b from-[#131B2E] to-[#0A0E17] p-4 space-y-4">
+            {/* LEFT SIDEBAR: Official Profile & Filter Controls (4 Columns on LG, Hidden when Maximized) */}
+            {!isExpanded && (
+              <div className="lg:col-span-4 p-5 sm:p-6 border-b lg:border-b-0 lg:border-r border-white/10 bg-black/40 space-y-5 animate-fadeIn flex flex-col justify-between">
+                
+                {/* Profile Card */}
+                <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-gradient-to-b from-[#131B2E] to-[#0A0E17] p-4 space-y-4">
                 {/* Mini Cover Header */}
                 <div className="relative h-20 -mx-4 -mt-4 overflow-hidden">
                   <Image
@@ -403,32 +418,82 @@ export function FacebookFeed() {
                 </p>
               </div>
             </div>
+          )}
 
-            {/* RIGHT MAIN STREAM: Scrollable Social Cards (8 Columns on LG) */}
-            <div className="lg:col-span-8 relative">
-              {/* Custom UI Tactile Rail (No Browser Default) */}
-              <div
-                onClick={handleRailClick}
-                className="hidden sm:block absolute top-4 bottom-4 right-1.5 w-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.14] transition-all cursor-pointer z-20 group/rail"
-                title="Custom Scroll Track - Click to Navigate"
-              >
-                <div
-                  className="w-full rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.8)] transition-all duration-100 group-hover/rail:brightness-125"
-                  style={{
-                    height: "36px",
-                    marginTop: `calc(${scrollProgress}% - ${(scrollProgress / 100) * 36}px)`,
-                  }}
-                />
+          {/* RIGHT MAIN STREAM: Scrollable Social Cards (8 Cols in Split, 12 Cols when Maximized within Window) */}
+          <div className={`${isExpanded ? "lg:col-span-12" : "lg:col-span-8"} relative flex flex-col h-full transition-all duration-300`}>
+            
+            {/* In-Window Maximized Feed Header Bar */}
+            {isExpanded && (
+              <div className="px-5 py-3.5 border-b border-white/10 bg-white/[0.02] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn select-none">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-bold flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Maximized Social Feed
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-mono">
+                    Full Window View
+                  </span>
+                </div>
+
+                {/* Horizontal Stream Filter Pills */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {[
+                    { id: "ALL", label: "All Dispatches" },
+                    { id: "MATCHES", label: "Bristol Pro" },
+                    { id: "BALLISTICS", label: "Ballistics & DOPE" },
+                    { id: "MEDIA", label: "Coins & Gear" },
+                  ].map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id as any)}
+                      className={`px-3 py-1 rounded-xl text-xs font-mono transition-all ${
+                        activeCategory === cat.id
+                          ? "bg-blue-600/40 text-white border border-blue-500/50 shadow-sm font-bold"
+                          : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setIsExpanded(false)}
+                    className="ml-2 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs font-mono flex items-center gap-1.5 border border-white/10 transition-all active:scale-95"
+                    title="Return to Split View"
+                  >
+                    <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Split View</span>
+                  </button>
+                </div>
               </div>
+            )}
 
-              {/* Scroll Container with no browser default scrollbar */}
+            {/* Custom UI Tactile Rail (No Browser Default - Full Top to Bottom) */}
+            <div
+              onClick={handleRailClick}
+              className="hidden sm:block absolute top-2 bottom-2 right-1.5 w-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.14] transition-all cursor-pointer z-20 group/rail"
+              title="Custom Scroll Track - Click to Navigate"
+            >
               <div
-                ref={feedScrollRef}
-                onScroll={handleFeedScroll}
-                className={`p-5 sm:p-6 pr-6 sm:pr-8 overflow-y-auto no-scrollbar scroll-smooth ${
-                  isExpanded ? "max-h-[850px]" : "max-h-[580px]"
-                } space-y-5`}
-              >
+                className="w-full rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.8)] transition-all duration-100 group-hover/rail:brightness-125"
+                style={{
+                  height: "36px",
+                  marginTop: `calc(${scrollProgress}% - ${(scrollProgress / 100) * 36}px)`,
+                }}
+              />
+            </div>
+
+            {/* Scroll Container with zero browser default scrollbar - Extends flush to the bottom */}
+            <div
+              ref={feedScrollRef}
+              onScroll={handleFeedScroll}
+              className={`flex-1 p-5 sm:p-6 pr-6 sm:pr-8 overflow-y-auto no-scrollbar scroll-smooth h-full ${
+                isExpanded
+                  ? "min-h-[780px] lg:min-h-[880px] max-h-[1050px]"
+                  : "min-h-[640px] sm:min-h-[720px] lg:min-h-[760px] max-h-[820px]"
+              } space-y-5`}
+            >
               
               {/* Share Toast */}
               {shareNotice && (
