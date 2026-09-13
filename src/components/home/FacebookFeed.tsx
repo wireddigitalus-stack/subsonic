@@ -42,8 +42,26 @@ export function FacebookFeed() {
   const [activeLightboxPost, setActiveLightboxPost] = useState<FacebookPostItem | null>(null);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
 
-  // Live Sync with Supabase social_posts table
+  // Live Sync with /api/facebook/feed (Direct RSS Engine) & Supabase
   const fetchLivePosts = async () => {
+    try {
+      const res = await fetch("/api/facebook/feed");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.posts && json.posts.length > 0) {
+          setPosts((prev) => {
+            const liveIds = new Set(json.posts.map((p: FacebookPostItem) => p.id));
+            const remaining = INITIAL_FACEBOOK_POSTS.filter((p) => !liveIds.has(p.id));
+            return [...json.posts, ...remaining];
+          });
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("[FacebookFeed] Could not reach /api/facebook/feed, checking Supabase...", err);
+    }
+
+    // Direct Supabase fallback
     if (!supabase) return;
     try {
       const { data, error } = await supabase

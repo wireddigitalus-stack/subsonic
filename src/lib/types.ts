@@ -114,6 +114,7 @@ export interface FacebookPostItem {
   videoUrl?: string;
   externalUrl: string;
   tags: string[];
+  category?: "ALL" | "MATCHES" | "BALLISTICS" | "MEDIA";
 }
 
 export interface AthleteProfile {
