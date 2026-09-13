@@ -21,6 +21,7 @@ import {
   Target, 
   Radio, 
   Eye,
+  Compass,
   Sliders,
   Database,
   Play,
@@ -72,11 +73,16 @@ export default function AdminDashboardPage() {
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<
-    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION"
+    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION"
   >("MEMBERS");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
+
+  // Telemetry filter state (strictly page landings, items clicked, and members)
+  const [telemetryTypeFilter, setTelemetryTypeFilter] = useState<"ALL" | "PAGE_LANDED" | "CLICK">("ALL");
+  const [telemetryAudienceFilter, setTelemetryAudienceFilter] = useState<"ALL" | "MEMBER" | "GUEST">("ALL");
+  const [telemetrySearch, setTelemetrySearch] = useState("");
 
   // Members, Registrations & Leads state
   const [members, setMembers] = useState<SocietyMember[]>([]);
@@ -126,6 +132,11 @@ export default function AdminDashboardPage() {
                 targetText: d.target_text,
                 targetCategory: d.target_category,
                 pageRoute: d.page_route,
+                isMember: Boolean(d.is_member ?? d.isMember),
+                memberType: d.member_type || d.memberType,
+                memberId: d.member_id || d.memberId,
+                memberCallsign: d.member_callsign || d.memberCallsign,
+                memberName: d.member_name || d.memberName,
                 dwellSeconds: d.dwell_seconds,
                 scrollDepth: d.scroll_depth,
                 timestamp: d.created_at,
@@ -274,59 +285,53 @@ export default function AdminDashboardPage() {
 
   const handleSimulateTraffic = () => {
     setSimulating(true);
-    const mockClicks = [
-      { targetElement: "button_register_bristol_pro", targetText: "Register Squad ($275)", targetCategory: "Bristol Pro Portal", pageRoute: "/bristol-pro" },
-      { targetElement: "tab_ballistics_solver", targetText: "Mountain DOPE Solver", targetCategory: "Ballistics", pageRoute: "/bristol-pro" },
-      { targetElement: "fb_like_click_fb-post-01", targetText: "Like Post", targetCategory: "Facebook Feed", pageRoute: "/" },
-      { targetElement: "chat_switch_channel_ballistics-and-gear", targetText: "#ballistics-and-gear", targetCategory: "Chat", pageRoute: "/chat" },
-      { targetElement: "export_ics_bristol-pro-invitational-2026", targetText: "Add to Calendar (.ics)", targetCategory: "Event Calendar", pageRoute: "/calendar" },
+    const mockEvents = [
+      { eventType: "page_landed" as const, targetElement: "Page: /bristol-pro", targetText: "Landed on /bristol-pro", targetCategory: "Page Landing", pageRoute: "/bristol-pro", isMember: true, memberId: "SS-2026-1044", memberCallsign: "GHOST_RIDER", memberName: "Wyatt Sterling" },
+      { eventType: "click" as const, targetElement: "button_register_bristol_pro", targetText: "Register Squad ($275)", targetCategory: "Bristol Pro Portal", pageRoute: "/bristol-pro", isMember: true, memberId: "SS-2026-1044", memberCallsign: "GHOST_RIDER", memberName: "Wyatt Sterling" },
+      { eventType: "page_landed" as const, targetElement: "Page: /dna", targetText: "Landed on /dna", targetCategory: "Page Landing", pageRoute: "/dna", isMember: false },
+      { eventType: "click" as const, targetElement: "tab_ballistics_solver", targetText: "Mountain DOPE Solver", targetCategory: "Subsonic DNA Lab", pageRoute: "/dna", isMember: false },
+      { eventType: "click" as const, targetElement: "button_join_society", targetText: "Join The Society", targetCategory: "Membership & Registration", pageRoute: "/join", isMember: false },
     ];
-    mockClicks.forEach((item, idx) => {
+    mockEvents.forEach((item, idx) => {
       setTimeout(() => {
-        recordTelemetryEvent({
-          eventType: "click",
-          targetElement: item.targetElement,
-          targetText: item.targetText,
-          targetCategory: item.targetCategory,
-          pageRoute: item.pageRoute,
-        });
-      }, idx * 100);
+        recordTelemetryEvent(item);
+      }, idx * 120);
     });
     setTimeout(() => {
-      recordTelemetryEvent({
-        eventType: "dwell",
-        targetElement: "page:/bristol-pro",
-        targetText: "Stayed 84s on /bristol-pro",
-        targetCategory: "Engagement",
-        pageRoute: "/bristol-pro",
-        dwellSeconds: 84,
-      });
       loadData();
       setSimulating(false);
-    }, 800);
+    }, 750);
   };
 
-  const visitorJourneys = React.useMemo(() => {
-    const map: Record<string, { visitorId: string; sessionId: string; device: any; events: TelemetryEvent[]; startTime: string; totalDwell: number }> = {};
-    events.forEach((e) => {
-      const key = e.sessionId || e.visitorId;
-      if (!map[key]) {
-        map[key] = {
-          visitorId: e.visitorId,
-          sessionId: e.sessionId,
-          device: e.device,
-          events: [],
-          startTime: e.timestamp,
-          totalDwell: 0,
-        };
-      }
-      map[key].events.push(e);
-      if (e.dwellSeconds) map[key].totalDwell += e.dwellSeconds;
-    });
-    return Object.values(map).slice(0, 20);
-  }, [events]);
-
   const stats = computeTelemetryAnalytics(events);
+
+  // Filtered telemetry events for Live Telemetry table
+  const filteredTelemetryEvents = React.useMemo(() => {
+    return events.filter((e) => {
+      const isPageLanded = e.eventType === "page_landed" || e.eventType === "pageview";
+      const isClick = e.eventType === "click";
+
+      if (telemetryTypeFilter === "PAGE_LANDED" && !isPageLanded) return false;
+      if (telemetryTypeFilter === "CLICK" && !isClick) return false;
+
+      if (telemetryAudienceFilter === "MEMBER" && !e.isMember) return false;
+      if (telemetryAudienceFilter === "GUEST" && e.isMember) return false;
+
+      if (telemetrySearch) {
+        const q = telemetrySearch.toLowerCase();
+        const matchesTarget = (e.targetElement || "").toLowerCase().includes(q);
+        const matchesText = (e.targetText || "").toLowerCase().includes(q);
+        const matchesCategory = (e.targetCategory || "").toLowerCase().includes(q);
+        const matchesRoute = (e.pageRoute || "").toLowerCase().includes(q);
+        const matchesMember = (e.memberId || "").toLowerCase().includes(q) ||
+                              (e.memberCallsign || "").toLowerCase().includes(q) ||
+                              (e.memberName || "").toLowerCase().includes(q);
+        return matchesTarget || matchesText || matchesCategory || matchesRoute || matchesMember;
+      }
+
+      return true;
+    });
+  }, [events, telemetryTypeFilter, telemetryAudienceFilter, telemetrySearch]);
 
   // If not authenticated, show modern iOS passkey lock screen
   if (!isAuthenticated) {
@@ -555,59 +560,57 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
+      {/* KPI Stats Grid: Strictly Page Landings, Items Clicked, and Member Tracking */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="ios-glass-card rounded-2xl p-5 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Total Clicks Logged</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Pages Landed On</span>
+            <Compass className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-mono font-black text-white">
+            {stats.totalPageLandings}
+          </div>
+          <div className="text-[11px] text-cyan-400/90 font-mono mt-1">
+            {stats.memberLandings} by Members • {stats.guestLandings} by Guests
+          </div>
+        </div>
+
+        <div className="ios-glass-card rounded-2xl p-5 border border-white/10">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-[10px] font-mono uppercase tracking-wider">Items Clicked On</span>
             <MousePointerClick className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-black text-white">
-            {stats.totalClicks}
+            {stats.totalItemsClicked}
           </div>
           <div className="text-[11px] text-amber-400/90 font-mono mt-1">
-            Across {stats.uniqueSessions} user sessions
+            {stats.memberClicks} by Members • {stats.guestClicks} by Guests
           </div>
         </div>
 
         <div className="ios-glass-card rounded-2xl p-5 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Avg Page Dwell Time</span>
-            <Clock className="w-4 h-4 text-blue-400" />
+            <span className="text-[10px] font-mono uppercase tracking-wider">Member Activity</span>
+            <UserCheck className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-black text-white">
-            {stats.avgDwellSeconds}s
+            {stats.memberEventsCount} <span className="text-sm font-normal text-emerald-400">({stats.memberPercentage}%)</span>
           </div>
-          <div className="text-[11px] text-blue-400/90 font-mono mt-1">
-            Dwell duration per visitor
+          <div className="text-[11px] text-emerald-400/90 font-mono mt-1">
+            {stats.uniqueMembers} Unique Society Members
           </div>
         </div>
 
         <div className="ios-glass-card rounded-2xl p-5 border border-white/10">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Unique Marksmens</span>
-            <Users className="w-4 h-4 text-emerald-400" />
+            <span className="text-[10px] font-mono uppercase tracking-wider">Unique Audience</span>
+            <Users className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-2xl sm:text-3xl font-mono font-black text-white">
             {stats.uniqueVisitors}
           </div>
-          <div className="text-[11px] text-emerald-400/90 font-mono mt-1">
-            {stats.totalPageViews} Total page hits
-          </div>
-        </div>
-
-        <div className="ios-glass-card rounded-2xl p-5 border border-white/10">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider">Device Split</span>
-            <Smartphone className="w-4 h-4 text-purple-400" />
-          </div>
-          <div className="flex items-center gap-3 text-sm font-mono font-bold text-white mt-1">
-            <span className="text-purple-400">{stats.deviceBreakdown.mobilePercentage}% Mobile</span>
-            <span className="text-slate-400">•</span>
-            <span>{stats.deviceBreakdown.desktopPercentage}% Desktop</span>
-          </div>
-          <div className="text-[11px] text-slate-400 font-mono mt-1">
-            {stats.deviceBreakdown.iosPercentage}% iOS Native
+          <div className="text-[11px] text-slate-300 font-mono mt-1">
+            {stats.deviceBreakdown.mobilePercentage}% Mobile • {stats.deviceBreakdown.desktopPercentage}% Desktop
           </div>
         </div>
       </div>
@@ -625,10 +628,8 @@ export default function AdminDashboardPage() {
             isAlert: leads.filter((l) => l.status === "NEW").length > 0
           },
           { id: "EVENTS", label: "Match Schedule", icon: Calendar },
-          { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick },
-          { id: "DWELL_TIME", label: "Dwell Time & Visits", icon: Clock },
-          { id: "HEATMAP", label: "Most Clicked Elements", icon: Flame },
-          { id: "SESSIONS", label: "Visitor Journeys", icon: Route, badge: visitorJourneys.length },
+          { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
+          { id: "PAGES_AND_CLICKS", label: "Pages & Click Heatmap", icon: Flame },
           { 
             id: "AI_MODERATION", 
             label: "AI Comms Abuse Defense", 
@@ -1238,19 +1239,107 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 1: Live Clickstream Stream */}
+      {/* TAB: Live Telemetry Stream (Page Landings & Items Clicked, Tracking Members & Guests) */}
       {activeAdminTab === "CLICKSTREAM" && (
         <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
-          <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MousePointerClick className="w-4 h-4 text-amber-400" />
-              <h3 className="font-bold text-sm text-white">
-                Live Visitor Click Events ({events.filter((e) => e.eventType === "click").length} Clicks Captured)
-              </h3>
+          {/* Header & Filter Controls */}
+          <div className="p-4 border-b border-white/10 bg-black/40 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <MousePointerClick className="w-4 h-4 text-amber-400" />
+                <h3 className="font-bold text-sm text-white">
+                  Live Telemetry: Page Landings & Items Clicked
+                </h3>
+              </div>
+              <div className="text-[11px] font-mono text-slate-400">
+                Tracking {stats.memberEventsCount} Member &amp; {stats.guestEventsCount} Guest Events
+              </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-400">
-              Click any element on the site to see it log here in real-time
-            </span>
+
+            {/* Filter Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Event Type Filter */}
+                <div className="flex items-center p-0.5 rounded-xl bg-black/50 border border-white/10 text-[11px] font-mono">
+                  <button
+                    onClick={() => setTelemetryTypeFilter("ALL")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryTypeFilter === "ALL"
+                        ? "bg-amber-500 text-black font-bold"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    All Events ({events.length})
+                  </button>
+                  <button
+                    onClick={() => setTelemetryTypeFilter("PAGE_LANDED")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryTypeFilter === "PAGE_LANDED"
+                        ? "bg-cyan-500 text-black font-bold"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    📍 Pages Landed ({stats.totalPageLandings})
+                  </button>
+                  <button
+                    onClick={() => setTelemetryTypeFilter("CLICK")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryTypeFilter === "CLICK"
+                        ? "bg-amber-500 text-black font-bold"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    👆 Items Clicked ({stats.totalItemsClicked})
+                  </button>
+                </div>
+
+                {/* Audience Filter (Members vs Guests) */}
+                <div className="flex items-center p-0.5 rounded-xl bg-black/50 border border-white/10 text-[11px] font-mono">
+                  <button
+                    onClick={() => setTelemetryAudienceFilter("ALL")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryAudienceFilter === "ALL"
+                        ? "bg-white/20 text-white font-bold"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    All Visitors
+                  </button>
+                  <button
+                    onClick={() => setTelemetryAudienceFilter("MEMBER")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryAudienceFilter === "MEMBER"
+                        ? "bg-emerald-500 text-black font-bold"
+                        : "text-emerald-400 hover:text-emerald-300"
+                    }`}
+                  >
+                    🎖️ Members Only ({stats.memberEventsCount})
+                  </button>
+                  <button
+                    onClick={() => setTelemetryAudienceFilter("GUEST")}
+                    className={`px-2.5 py-1 rounded-lg transition-all ${
+                      telemetryAudienceFilter === "GUEST"
+                        ? "bg-slate-700 text-white font-bold"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Guests Only ({stats.guestEventsCount})
+                  </button>
+                </div>
+              </div>
+
+              {/* Search input */}
+              <div className="relative w-full sm:w-64">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={telemetrySearch}
+                  onChange={(e) => setTelemetrySearch(e.target.value)}
+                  placeholder="Search item, route, member..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 font-mono"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -1258,7 +1347,9 @@ export default function AdminDashboardPage() {
               <thead className="bg-black/60 text-slate-400 font-mono border-b border-white/5">
                 <tr>
                   <th className="p-3.5">Timestamp</th>
-                  <th className="p-3.5">Target Element</th>
+                  <th className="p-3.5">Audience Status</th>
+                  <th className="p-3.5">Event Type</th>
+                  <th className="p-3.5">Target Element / Action</th>
                   <th className="p-3.5">Text / Identifier</th>
                   <th className="p-3.5">Category</th>
                   <th className="p-3.5">Page Route</th>
@@ -1266,22 +1357,56 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-mono">
-                {events.filter((e) => e.eventType === "click").length === 0 ? (
+                {filteredTelemetryEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-slate-500">
-                      No clicks recorded yet. Browse the site and click buttons/links to see telemetry stream in!
+                    <td colSpan={8} className="p-8 text-center text-slate-500">
+                      No telemetry events matching the selected filters.
                     </td>
                   </tr>
                 ) : (
-                  events
-                    .filter((e) => e.eventType === "click")
-                    .slice(0, 50)
-                    .map((evt) => (
+                  filteredTelemetryEvents.slice(0, 100).map((evt) => {
+                    const isPageLanded = evt.eventType === "page_landed" || evt.eventType === "pageview";
+                    return (
                       <tr key={evt.id} className="hover:bg-white/[0.02] transition-colors">
                         <td className="p-3.5 text-slate-400 whitespace-nowrap">
                           {new Date(evt.timestamp).toLocaleTimeString()}
                         </td>
-                        <td className="p-3.5 text-amber-400 font-bold whitespace-nowrap">
+
+                        {/* Audience Status: Member vs Guest */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          {evt.isMember ? (
+                            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                              <UserCheck className="w-3 h-3 text-amber-400 shrink-0" />
+                              <span>MEMBER</span>
+                              {(evt.memberCallsign || evt.memberId) && (
+                                <span className="text-amber-200/70 font-normal">
+                                  ({evt.memberCallsign || evt.memberId})
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md bg-white/5 text-slate-400 border border-white/10 text-[10px]">
+                              Guest Visitor
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Event Type: Page Landed vs Item Clicked */}
+                        <td className="p-3.5 whitespace-nowrap">
+                          {isPageLanded ? (
+                            <span className="px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold inline-flex items-center gap-1">
+                              <Compass className="w-3 h-3 text-cyan-400" />
+                              Page Landed
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-950/60 text-amber-300 border border-amber-500/30 text-[10px] font-bold inline-flex items-center gap-1">
+                              <MousePointerClick className="w-3 h-3 text-amber-400" />
+                              Item Clicked
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-3.5 text-white font-bold whitespace-nowrap">
                           {evt.targetElement}
                         </td>
                         <td className="p-3.5 text-slate-200 max-w-xs truncate">
@@ -1292,14 +1417,15 @@ export default function AdminDashboardPage() {
                             {evt.targetCategory || "General"}
                           </span>
                         </td>
-                        <td className="p-3.5 text-blue-400 font-medium">
+                        <td className="p-3.5 text-blue-400 font-medium whitespace-nowrap">
                           {evt.pageRoute}
                         </td>
                         <td className="p-3.5 text-slate-400 whitespace-nowrap">
-                          {evt.device.isIOS ? "🍎 iOS" : evt.device.isMobile ? "📱 Mobile" : "💻 Desktop"}
+                          {evt.device?.isIOS ? "🍎 iOS" : evt.device?.isMobile ? "📱 Mobile" : "💻 Desktop"}
                         </td>
                       </tr>
-                    ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -1307,183 +1433,115 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB 2: Dwell Time & Engagement */}
-      {activeAdminTab === "DWELL_TIME" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* TAB: Pages Landed On & Most Clicked Items (Breakdown by Members vs Guests) */}
+      {activeAdminTab === "PAGES_AND_CLICKS" && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 1. Pages Landed On */}
           <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-4">
-            <h3 className="font-bold text-sm text-white flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-400" />
-              Page Dwell Time Breakdown
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                <Compass className="w-4 h-4 text-cyan-400" />
+                Pages Landed On ({stats.totalPageLandings} Landings)
+              </h3>
+              <span className="text-[10px] font-mono text-slate-400">
+                Ranked by landing volume
+              </span>
+            </div>
             <p className="text-xs text-slate-300">
-              Time spent on each specific page before navigating or exiting.
+              Breakdown of user traffic landings and Member vs. Guest engagement per route.
             </p>
 
             <div className="space-y-3 pt-2">
-              {Object.entries(stats.pageViewMap).map(([route, count]) => (
-                <div key={route} className="p-3.5 rounded-2xl bg-black/40 border border-white/5 space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-amber-400 font-bold">{route}</span>
-                    <span className="text-slate-300">{count} Views</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
-                      style={{ width: `${Math.min(100, count * 15)}%` }}
-                    />
-                  </div>
+              {stats.topLandedPages.length === 0 ? (
+                <div className="text-slate-500 text-center py-6 font-mono text-xs">
+                  No page landings recorded yet.
                 </div>
-              ))}
-            </div>
-          </div>
+              ) : (
+                stats.topLandedPages.map((item) => (
+                  <div key={item.route} className="p-3.5 rounded-2xl bg-black/40 border border-white/5 space-y-2 font-mono">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-cyan-400 font-bold">{item.route}</span>
+                      <span className="text-white font-bold">{item.total} Landings</span>
+                    </div>
+                    
+                    {/* Visual Bar */}
+                    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+                        style={{ width: `${Math.min(100, Math.round((item.total / (stats.totalPageLandings || 1)) * 100))}%` }}
+                      />
+                    </div>
 
-          <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-4">
-            <h3 className="font-bold text-sm text-white flex items-center gap-2">
-              <Eye className="w-4 h-4 text-emerald-400" />
-              Recent Dwell Records
-            </h3>
-            <div className="space-y-2 font-mono text-xs max-h-96 overflow-y-auto">
-              {events
-                .filter((e) => e.eventType === "dwell")
-                .slice(0, 15)
-                .map((d) => (
-                  <div key={d.id} className="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between">
-                    <div>
-                      <div className="text-white font-bold">{d.pageRoute}</div>
-                      <div className="text-[10px] text-slate-400">{d.targetText}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-emerald-400 font-bold">{d.dwellSeconds || 0}s</div>
-                      <div className="text-[10px] text-slate-500">{new Date(d.timestamp).toLocaleTimeString()}</div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-400">
+                      <span className="text-emerald-400 font-medium">
+                        🎖️ {item.memberLandings} Member landings ({item.total > 0 ? Math.round((item.memberLandings / item.total) * 100) : 0}%)
+                      </span>
+                      <span className="text-slate-400">
+                        {item.guestLandings} Guest landings
+                      </span>
                     </div>
                   </div>
-                ))}
-              {events.filter((e) => e.eventType === "dwell").length === 0 && (
-                <div className="text-slate-500 text-center py-6">
-                  Dwell times will record as visitors switch pages.
-                </div>
+                ))
               )}
             </div>
           </div>
-        </div>
-      )}
 
-      {/* TAB 3: Heatmap / Most Clicked Elements */}
-      {activeAdminTab === "HEATMAP" && (
-        <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-6">
-          <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Flame className="w-5 h-5 text-amber-400" />
-              Top Clicked Buttons, Tabs & CTAs
-            </h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Hierarchical rank of what visitors interact with most across the Subsonic Society platform.
+          {/* 2. Top Clicked Items */}
+          <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-sm text-white flex items-center gap-2">
+                <Flame className="w-4 h-4 text-amber-400" />
+                Top Clicked Buttons &amp; Links ({stats.totalItemsClicked} Clicks)
+              </h3>
+              <span className="text-[10px] font-mono text-slate-400">
+                Ranked by click volume
+              </span>
+            </div>
+            <p className="text-xs text-slate-300">
+              Interactive elements clicked by users with Member vs. Guest interaction splits.
             </p>
-          </div>
 
-          <div className="space-y-3">
-            {stats.topClickedElements.length === 0 ? (
-              <div className="text-slate-500 text-center py-8">
-                Click around the site to generate click rankings!
-              </div>
-            ) : (
-              stats.topClickedElements.map((item, idx) => (
-                <div
-                  key={item.element}
-                  className="p-4 rounded-2xl bg-black/40 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-lg bg-white/10 text-amber-400 font-bold flex items-center justify-center text-xs">
-                      #{idx + 1}
-                    </span>
-                    <div>
-                      <div className="text-sm font-bold text-white">{item.text || item.element}</div>
-                      <div className="text-[10px] text-slate-400">Target: {item.element} • Category: {item.category}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 self-end sm:self-auto">
-                    <div className="text-right">
-                      <div className="text-base font-black text-amber-400">{item.count} Clicks</div>
-                      <div className="text-[10px] text-slate-400">
-                        {Math.round((item.count / (stats.totalClicks || 1)) * 100)}% of total
-                      </div>
-                    </div>
-                  </div>
+            <div className="space-y-3 pt-2">
+              {stats.topClickedElements.length === 0 ? (
+                <div className="text-slate-500 text-center py-6 font-mono text-xs">
+                  No items clicked yet.
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB: VISITOR JOURNEYS & SESSION REPLAY */}
-      {activeAdminTab === "SESSIONS" && (
-        <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-6">
-          <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Route className="w-5 h-5 text-purple-400" />
-              Visitor Journeys & Multi-Touch Click Paths
-            </h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Step-by-step audit of individual marksman sessions: what pages they entered, what they clicked, and where they spent their time.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {visitorJourneys.length === 0 ? (
-              <div className="text-slate-500 text-center py-8">
-                No visitor sessions recorded yet. Click &quot;Simulate Clicks&quot; above or browse the site to view live session logs.
-              </div>
-            ) : (
-              visitorJourneys.map((journey, idx) => (
-                <div
-                  key={journey.sessionId || idx}
-                  className="p-5 rounded-2xl bg-black/50 border border-white/5 space-y-3 font-mono"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/5 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="text-amber-400 font-bold">Session #{idx + 1}</span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-slate-300 font-mono text-[11px]">{journey.sessionId}</span>
-                      <span className="px-2 py-0.5 rounded bg-white/10 text-[10px] text-purple-300">
-                        {journey.device?.isIOS ? "🍎 iOS Mobile" : journey.device?.isMobile ? "📱 Mobile" : "💻 Desktop"}
-                      </span>
-                    </div>
-
-                    <div className="text-slate-400 text-[11px]">
-                      Dwell Total: <strong className="text-emerald-400">{journey.totalDwell}s</strong> • {journey.events.length} Interactions
-                    </div>
-                  </div>
-
-                  {/* Step by step timeline */}
-                  <div className="space-y-2 pt-1">
-                    {journey.events.slice(0, 8).map((evt, eIdx) => (
-                      <div key={evt.id || eIdx} className="flex items-start gap-3 text-xs">
-                        <span className="text-slate-500 text-[10px] w-14 shrink-0 pt-0.5">
-                          {new Date(evt.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+              ) : (
+                stats.topClickedElements.map((item, idx) => (
+                  <div
+                    key={item.element}
+                    className="p-3.5 rounded-2xl bg-black/40 border border-white/5 space-y-2 font-mono"
+                  >
+                    <div className="flex items-start justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded bg-white/10 text-amber-400 font-bold flex items-center justify-center text-[10px] shrink-0">
+                          #{idx + 1}
                         </span>
-                        <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0 mt-1.5" />
-                        <div className="flex-1 text-slate-300">
-                          <span className="text-white font-bold">{evt.eventType.toUpperCase()}: </span>
-                          <span className="text-amber-300">{evt.targetElement}</span>
-                          {evt.targetText && <span className="text-slate-400"> (&ldquo;{evt.targetText}&rdquo;)</span>}
-                          <span className="text-blue-400 text-[10px] ml-2">on {evt.pageRoute}</span>
-                          {evt.dwellSeconds && (
-                            <span className="text-emerald-400 text-[10px] ml-2 font-bold">[{evt.dwellSeconds}s dwell]</span>
-                          )}
+                        <div>
+                          <div className="text-white font-bold truncate max-w-xs">{item.text || item.element}</div>
+                          <div className="text-[10px] text-slate-400">{item.element} • {item.category}</div>
                         </div>
                       </div>
-                    ))}
-                    {journey.events.length > 8 && (
-                      <div className="text-[11px] text-slate-500 pl-16">
-                        + {journey.events.length - 8} more interaction steps in this session...
+                      <div className="text-right shrink-0">
+                        <div className="text-amber-400 font-bold">{item.count} Clicks</div>
+                        <div className="text-[10px] text-slate-400">
+                          {Math.round((item.count / (stats.totalItemsClicked || 1)) * 100)}% of total
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/5">
+                      <span className="text-emerald-400 font-medium">
+                        🎖️ {item.memberClicks} Member clicks
+                      </span>
+                      <span className="text-slate-400">
+                        {item.guestClicks} Guest clicks
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}

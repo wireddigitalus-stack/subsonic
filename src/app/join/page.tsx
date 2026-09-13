@@ -77,12 +77,16 @@ export default function JoinSocietyPage() {
         throw new Error(data.error || "Failed to register membership.");
       }
 
-      setMemberData(data.member);
+      let finalMember = data.member;
+      setMemberData(finalMember);
+      try {
+        localStorage.setItem("subsonic_member_profile", JSON.stringify(finalMember));
+      } catch {}
     } catch (err: any) {
       console.warn("Membership API fallback:", err.message);
       // Fallback client generation so user experience is 100% uninterrupted
       const randomNum = Math.floor(1000 + Math.random() * 9000);
-      setMemberData({
+      const fallbackMember = {
         member_id: `SS-2026-${randomNum}`,
         full_name: fullName,
         email: email,
@@ -90,7 +94,11 @@ export default function JoinSocietyPage() {
         experience_level: experienceLevel,
         rifle_setup: rifleSetup || "Custom Precision .22LR",
         created_at: new Date().toISOString(),
-      });
+      };
+      setMemberData(fallbackMember);
+      try {
+        localStorage.setItem("subsonic_member_profile", JSON.stringify(fallbackMember));
+      } catch {}
     } finally {
       setLoading(false);
     }

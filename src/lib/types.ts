@@ -1,12 +1,17 @@
+export type TelemetryEventType = "click" | "page_landed" | "pageview" | "dwell" | "scroll" | "modal_open" | "action";
+
 export interface TelemetryEvent {
   id: string;
-  eventType: "click" | "pageview" | "dwell" | "scroll" | "modal_open" | "action";
+  eventType: TelemetryEventType;
   targetElement: string;
   targetText?: string;
   targetCategory?: string;
   pageRoute: string;
-  dwellSeconds?: number;
-  scrollDepth?: number;
+  isMember: boolean;
+  memberType?: "SOCIETY_MEMBER" | "COMPETITOR" | "SHOOTER_PROFILE" | "GUEST";
+  memberId?: string;
+  memberCallsign?: string;
+  memberName?: string;
   timestamp: string;
   device: {
     isMobile: boolean;
@@ -17,6 +22,8 @@ export interface TelemetryEvent {
   };
   sessionId: string;
   visitorId: string;
+  dwellSeconds?: number;
+  scrollDepth?: number;
 }
 
 export interface MatchEvent {

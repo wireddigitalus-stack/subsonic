@@ -54,6 +54,11 @@ export async function POST(request: Request) {
         targetText: e.targetText,
         targetCategory: e.targetCategory || "General",
         pageRoute: e.pageRoute || "/",
+        isMember: Boolean(e.isMember),
+        memberType: e.memberType || (e.isMember ? "SOCIETY_MEMBER" : "GUEST"),
+        memberId: e.memberId,
+        memberCallsign: e.memberCallsign,
+        memberName: e.memberName,
         dwellSeconds: typeof e.dwellSeconds === "number" ? e.dwellSeconds : undefined,
         scrollDepth: typeof e.scrollDepth === "number" ? e.scrollDepth : undefined,
         timestamp: e.timestamp || new Date().toISOString(),
@@ -81,6 +86,11 @@ export async function POST(request: Request) {
           target_text: event.targetText,
           target_category: event.targetCategory,
           page_route: event.pageRoute,
+          is_member: event.isMember,
+          member_type: event.memberType,
+          member_id: event.memberId,
+          member_callsign: event.memberCallsign,
+          member_name: event.memberName,
           dwell_seconds: event.dwellSeconds,
           scroll_depth: event.scrollDepth,
           session_id: event.sessionId,
@@ -136,6 +146,11 @@ export async function GET(request: Request) {
           targetText: d.target_text,
           targetCategory: d.target_category,
           pageRoute: d.page_route,
+          isMember: Boolean(d.is_member),
+          memberType: d.member_type,
+          memberId: d.member_id,
+          memberCallsign: d.member_callsign,
+          memberName: d.member_name,
           dwellSeconds: d.dwell_seconds,
           scrollDepth: d.scroll_depth,
           timestamp: d.created_at,
@@ -151,33 +166,40 @@ export async function GET(request: Request) {
       const headers = [
         "Timestamp",
         "Event Type",
+        "User Type",
+        "Member Type",
+        "Member ID",
+        "Name or Callsign",
         "Target Element",
         "Target Text",
         "Category",
         "Page Route",
-        "Dwell (s)",
-        "Scroll Depth (%)",
-        "Is Mobile",
-        "Is iOS",
-        "Screen Resolution",
+        "Device",
         "Visitor ID",
         "Session ID"
       ];
 
       const csvRows = [headers.join(",")];
       for (const e of events) {
+        const userType = e.isMember ? "Member" : "Guest";
+        const memberType = e.memberType || (e.isMember ? "Society Member" : "Guest Visitor");
+        const memberId = e.memberId || "";
+        const memberName = e.memberCallsign || e.memberName || "";
+        const eventLabel = e.eventType === "page_landed" || e.eventType === "pageview" ? "Page Landed" : "Item Clicked";
+        const deviceStr = e.device?.isIOS ? "iOS" : e.device?.isMobile ? "Mobile" : "Desktop";
+
         const row = [
           `"${e.timestamp}"`,
-          `"${e.eventType}"`,
+          `"${eventLabel}"`,
+          `"${userType}"`,
+          `"${memberType}"`,
+          `"${memberId.replace(/"/g, '""')}"`,
+          `"${memberName.replace(/"/g, '""')}"`,
           `"${(e.targetElement || "").replace(/"/g, '""')}"`,
           `"${(e.targetText || "").replace(/"/g, '""')}"`,
           `"${(e.targetCategory || "").replace(/"/g, '""')}"`,
           `"${e.pageRoute || ""}"`,
-          e.dwellSeconds ?? "",
-          e.scrollDepth ?? "",
-          e.device?.isMobile ? "Yes" : "No",
-          e.device?.isIOS ? "Yes" : "No",
-          `"${e.device?.screenWidth}x${e.device?.screenHeight}"`,
+          `"${deviceStr}"`,
           `"${e.visitorId}"`,
           `"${e.sessionId}"`
         ];
@@ -208,12 +230,24 @@ export async function GET(request: Request) {
       });
     }
 
-    // Standard JSON response with precomputed analytics
+    // Standard JSON response with precomputed analytics focusing on Page Landings, Items Clicked, and Members
     const totalEvents = events.length;
     const totalClicks = events.filter((e) => e.eventType === "click").length;
-    const totalPageViews = events.filter((e) => e.eventType === "pageview").length;
+    const totalPageLandings = events.filter((e) => e.eventType === "page_landed" || e.eventType === "pageview").length;
+    
+    const memberEvents = events.filter((e) => e.isMember);
+    const guestEvents = events.filter((e) => !e.isMember);
+    
+    const memberClicks = memberEvents.filter((e) => e.eventType === "click").length;
+    const guestClicks = guestEvents.filter((e) => e.eventType === "click").length;
+    const memberLandings = memberEvents.filter((e) => e.eventType === "page_landed" || e.eventType === "pageview").length;
+    const guestLandings = guestEvents.filter((e) => e.eventType === "page_landed" || e.eventType === "pageview").length;
+
     const uniqueVisitors = new Set(events.map((e) => e.visitorId)).size;
     const uniqueSessions = new Set(events.map((e) => e.sessionId)).size;
+    const uniqueMembers = new Set(
+      memberEvents.map((e) => e.memberId || e.memberCallsign || e.visitorId)
+    ).size;
 
     return NextResponse.json({
       success: true,
@@ -222,9 +256,19 @@ export async function GET(request: Request) {
       analytics: {
         totalEvents,
         totalClicks,
-        totalPageViews,
+        totalPageViews: totalPageLandings,
+        totalPageLandings,
+        totalItemsClicked: totalClicks,
+        memberEventsCount: memberEvents.length,
+        guestEventsCount: guestEvents.length,
+        memberClicks,
+        guestClicks,
+        memberLandings,
+        guestLandings,
+        memberPercentage: totalEvents > 0 ? Math.round((memberEvents.length / totalEvents) * 100) : 0,
         uniqueVisitors: Math.max(uniqueVisitors, 1),
         uniqueSessions: Math.max(uniqueSessions, 1),
+        uniqueMembers,
       },
       events: events.slice(0, limit),
     });
