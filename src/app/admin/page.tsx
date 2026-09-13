@@ -39,6 +39,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { TelemetryEvent, MatchEvent, ChatMessage, CommsAbuseAlert } from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
+import { FacebookDispatchManager } from "@/components/admin/FacebookDispatchManager";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 
 export default function AdminDashboardPage() {
@@ -49,7 +50,7 @@ export default function AdminDashboardPage() {
   const [events, setEvents] = useState<TelemetryEvent[]>([]);
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION" | "EVENTS">("CLICKSTREAM");
+  const [activeAdminTab, setActiveAdminTab] = useState<"CLICKSTREAM" | "DWELL_TIME" | "HEATMAP" | "SESSIONS" | "AI_MODERATION" | "EVENTS" | "DISPATCHES">("CLICKSTREAM");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
@@ -448,6 +449,7 @@ export default function AdminDashboardPage() {
             isAlert: activeAbuseCount > 0
           },
           { id: "EVENTS", label: "Match Director Hub", icon: Calendar },
+          { id: "DISPATCHES", label: "Facebook Dispatches", icon: Radio, badge: "LIVE" },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeAdminTab === tab.id;
@@ -786,6 +788,11 @@ export default function AdminDashboardPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB 7: LIVE FACEBOOK DISPATCH STATION */}
+      {activeAdminTab === "DISPATCHES" && (
+        <FacebookDispatchManager />
       )}
     </div>
   );
