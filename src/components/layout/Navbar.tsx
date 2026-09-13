@@ -69,7 +69,7 @@ export function Navbar() {
             >
               <Image
                 src="/assets/subsonic-coin.jpg"
-                alt="Subsonic Society Official Minted Challenge Coin"
+                alt="Subsonic Society Official Emblem"
                 width={48}
                 height={48}
                 className="w-full h-full object-cover rounded-full transform group-hover:rotate-6 group-hover:scale-105 transition-all duration-300"
@@ -324,10 +324,10 @@ export function Navbar() {
                     <div>
                       <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
                         <span>Community Shop</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Coins & Gear</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Gear & Apparel</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Serialized challenge coins & jerseys
+                        Official match jerseys, hats & gear
                       </p>
                     </div>
                   </Link>
@@ -461,7 +461,7 @@ export function Navbar() {
                 className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
               >
                 <ShoppingBag className="w-4 h-4 text-amber-400" />
-                <span>Shop Challenge Coins & Gear</span>
+                <span>Shop Official Gear & Apparel</span>
               </Link>
               <Link
                 href="/chat"

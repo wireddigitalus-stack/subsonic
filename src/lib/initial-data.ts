@@ -28,7 +28,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
       phone: "(423) 555-0198",
     },
     description:
-      "Perched high on the ridgeline overlooking the East Tennessee mountains, the Appalachian Mountain Pro Invitational tests competitors against drastic elevation changes, variable thermal mountain drafts, and steel targets stretched out to a staggering 465 yards. Pro shooters and top regional marksmen will battle across two grueling days for the coveted Subsonic Society Championship Cup and challenge coin.",
+      "Perched high on the ridgeline overlooking the East Tennessee mountains, the Appalachian Mountain Pro Invitational tests competitors against drastic elevation changes, variable thermal mountain drafts, and steel targets stretched out to a staggering 465 yards. Pro shooters and top regional marksmen will battle across two grueling days for the coveted Subsonic Society Championship Cup and cash purse.",
     stageBriefs: [
       {
         stageNumber: 1,
@@ -131,7 +131,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
     maxCompetitors: 30,
     registeredCount: 28,
     entryFee: 85,
-    prizePool: "Certificates, Match Ammo & Subsonic Coins",
+    prizePool: "Certificates, Match Ammo & Sponsor Gear",
     matchDirector: {
       name: "Marcus Vance",
       callsign: "COACH-01",
@@ -172,14 +172,14 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-02",
     content:
-      "🏆 Official 2026 Subsonic Society Challenge Coins have arrived from minting! Every competitor taking on the 18 stages at the Bristol Mountain Invitational will receive the official coin, with special gold-plated editions reserved for top podium finishers in Open, Production, and Senior divisions.",
+      "🏆 Official 2026 Subsonic Society Invitational awards are finalized! Competitors taking on the 18 stages at The Hideout in Bristol, TN will battle for a guaranteed $7,500 cash purse presented by Modacam Custom Rifles across Open, Production, and Senior divisions.",
     publishedAt: "3 days ago",
     likesCount: 312,
     commentsCount: 56,
     sharesCount: 41,
     imageUrl: "/assets/subsonic-coin.jpg",
     externalUrl: "https://www.facebook.com/p/Subsonic-Society-61578052196057/",
-    tags: ["#SubsonicChallengeCoin", "#RimfireElite", "#PrecisionShooting", "#TennesseeRifle"],
+    tags: ["#SubsonicSociety", "#ModacamCustomRifles", "#PrecisionRimfire", "#CashPurse"],
   },
   {
     id: "fb-post-03",

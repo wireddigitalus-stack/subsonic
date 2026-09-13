@@ -29,7 +29,7 @@ export function Footer() {
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black/60 flex items-center justify-center shrink-0">
                 <Image
                   src="/assets/subsonic-coin.jpg"
-                  alt="Subsonic Society Coin"
+                  alt="Subsonic Society Emblem"
                   width={40}
                   height={40}
                   className="object-cover w-full h-full"
@@ -94,7 +94,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/shop" className="hover:text-amber-400 transition-colors flex items-center gap-1">
-                  <span>Serialized Coins & Gear</span>
+                  <span>Official Gear & Apparel</span>
                 </Link>
               </li>
               <li>

@@ -19,7 +19,7 @@ import {
 interface Product {
   id: string;
   name: string;
-  category: "APPAREL" | "COINS" | "GEAR" | "DECALS";
+  category: "APPAREL" | "GEAR" | "DECALS";
   price: number;
   badge?: string;
   image: string;
@@ -29,17 +29,6 @@ interface Product {
 }
 
 const PRODUCTS_DATA: Product[] = [
-  {
-    id: "coin-brass-2026",
-    name: "Official Subsonic Society Serialized Challenge Coin",
-    category: "COINS",
-    price: 35.0,
-    badge: "Limited Edition Mint",
-    image: "/assets/subsonic-coin.jpg",
-    description: "Heavy 1.75-inch solid antique brass challenge coin with deep-relief 3D Subsonic Society crosshairs on the obverse and Holston Mountain ridgeline on the reverse. Individually laser-serialized on the edge.",
-    specs: ["1.75\" Solid Brass Casting", "Laser-Serialized Edge", "Velvet Presentation Box", "Includes Digital Authenticity Certificate"],
-    stock: "IN_STOCK",
-  },
   {
     id: "shirt-tech-match-2026",
     name: "Subsonic Society Pro Technical Match Jersey",
@@ -125,27 +114,27 @@ export default function ShopPage() {
 
           <div className="space-y-2 max-w-3xl">
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              COMMUNITY GEAR & CHALLENGE COINS. <br />
+              COMMUNITY GEAR & APPAREL. <br />
               <span className="amber-gradient-text">BUILT FOR THE FIRING LINE.</span>
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Equip yourself with the official Subsonic Society serialized challenge coin, moisture-wicking match jerseys, low-profile hats, and ballistic range tools.
+              Equip yourself with official Subsonic Society moisture-wicking match jerseys, low-profile hats, weatherproof DOPE armbands, and precision range tools.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Featured Challenge Coin Spotlight */}
+      {/* Featured Match Jersey Spotlight */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="ios-glass rounded-3xl p-6 sm:p-10 border-2 border-amber-500/40 shadow-tactical-glow relative overflow-hidden bg-gradient-to-r from-amber-500/10 via-black/40 to-black/60">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             <div className="md:col-span-4 flex justify-center">
-              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden border-4 border-amber-400/80 shadow-[0_0_40px_rgba(245,158,11,0.5)] bg-black relative">
+              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-2xl overflow-hidden border border-white/10 bg-black/60 relative p-4 flex items-center justify-center">
                 <Image
-                  src="/assets/subsonic-coin.jpg"
-                  alt="Official Subsonic Society Serialized Challenge Coin"
+                  src="/assets/subsonic-banner-trimmed.png"
+                  alt="Subsonic Society Pro Technical Match Jersey"
                   fill
-                  className="object-cover"
+                  className="object-contain p-4"
                   priority
                 />
               </div>
@@ -154,21 +143,21 @@ export default function ShopPage() {
             <div className="md:col-span-8 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-amber-500 text-black font-mono text-xs font-black uppercase tracking-wider">
-                  COLLECTORS PIECE
+                  OFFICIAL MATCH APPAREL
                 </span>
-                <span className="text-xs font-mono text-slate-400">Strictly 500 Minted</span>
+                <span className="text-xs font-mono text-slate-400">Pre-Order Open</span>
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Official Serialized Solid Brass Challenge Coin
+                Subsonic Society Pro Technical Match Jersey
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-                The ultimate badge of brotherhood. Heavy 1.75-inch solid antique brass with deeply engraved crosshairs, rimfire cartridge motif, and individual laser edge serial numbering. Hand-delivered to podium finishers and available to Society members.
+                High-performance moisture-wicking competition jersey built for grueling Appalachian matches. Features antimicrobial stretch weave, Subsonic Society crest, and Modacam Custom Rifles presenting sponsor sleeve imprint.
               </p>
 
               <div className="text-2xl font-mono font-black text-amber-400">
-                $35.00 <span className="text-xs text-slate-400 font-normal">/ Includes Velvet Case</span>
+                $48.00 <span className="text-xs text-slate-400 font-normal">/ Sizes S to 3XL</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -179,12 +168,12 @@ export default function ShopPage() {
                   }}
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-extrabold flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
                 >
-                  <Coins className="w-4 h-4 fill-black" />
-                  <span>Order Serialized Coin</span>
+                  <ShoppingBag className="w-4 h-4 fill-black" />
+                  <span>Pre-Order Match Jersey</span>
                 </button>
 
                 <div className="text-xs font-mono text-slate-400">
-                  ⚡ Only 42 Coins Remain in 2026 Batch
+                  ⚡ Pre-order reserve for match day pickup or direct shipping
                 </div>
               </div>
             </div>
@@ -197,10 +186,9 @@ export default function ShopPage() {
         <div className="flex items-center gap-2 p-1.5 ios-glass rounded-2xl border border-white/10 overflow-x-auto">
           {[
             { id: "ALL", label: "All Gear" },
-            { id: "COINS", label: "Challenge Coins" },
             { id: "APPAREL", label: "Apparel & Jerseys" },
             { id: "GEAR", label: "Ballistic Range Gear" },
-            { id: "DECALS", label: "Decals & Kits" },
+            { id: "DECALS", label: "Decals & Accessories" },
           ].map((cat) => (
             <button
               key={cat.id}

@@ -300,7 +300,7 @@ export default function CalendarPage() {
                   <div className="text-xs">
                     <span className="text-slate-400">Prize Table: </span>
                     <strong className="text-emerald-400">{selectedMatch.prizePool}</strong>
-                    <div className="text-[11px] text-slate-500">Includes Subsonic Challenge Coins</div>
+                    <div className="text-[11px] text-slate-500">Cash Payouts & Sponsor Awards</div>
                   </div>
                 </div>
               </div>

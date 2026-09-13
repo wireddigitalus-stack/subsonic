@@ -61,7 +61,7 @@ export const metadata: Metadata = {
         url: "/assets/subsonic-coin.jpg",
         width: 600,
         height: 600,
-        alt: "Subsonic Society .22 Rimfire Official Challenge Coin",
+        alt: "Subsonic Society Official Crest Emblem",
       },
     ],
     locale: "en_US",

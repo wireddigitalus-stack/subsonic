@@ -41,7 +41,7 @@ const ALL_18_STAGES = [
   { num: 15, name: "Support-Side Weak Hand Transition", dist: "90 YDS", rounds: 10, time: "90s", prop: "Standard PRS 2x4 Barricade", notes: "Shoot 5 strong side, 5 weak side. Zero support hand cant." },
   { num: 16, name: "Iron Maiden Flasher Matrix", dist: "160 – 250 YDS", rounds: 12, time: "90s", prop: "Low Window Prop", notes: "Engage 4 reactive steel flashers in left-to-right sequence." },
   { num: 17, name: "Steep Gully Prone Drop", dist: "380 YDS", rounds: 10, time: "90s", prop: "Down-Angle Prone Berm (-24° drop)", notes: "Calculate cosine angle reduction on your Kestrel ballistic profile." },
-  { num: 18, name: "The Subsonic Society Cup Finale", dist: "465 YDS", rounds: 10, time: "100s", prop: "Championship Finalist Platform", notes: "The ultimate proving ground. The round that rings this steel earns the Subsonic Society Gold Challenge Coin." },
+  { num: 18, name: "The Subsonic Society Cup Finale", dist: "465 YDS", rounds: 10, time: "100s", prop: "Championship Finalist Platform", notes: "The ultimate proving ground. The round that rings this steel clinches the Subsonic Society Championship Cup." },
 ];
 
 const MOCK_LEADERBOARD = [
@@ -98,7 +98,7 @@ export default function BristolProPortalPage() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
-              18 grueling high-angle stages stretching from 35 yards to an extreme 465-yard mountain valley glide. Compete for $28,500 in cash, custom rimfire hardware, and the coveted minted Subsonic Society Challenge Coin.
+              18 grueling high-angle stages stretching from 35 yards to an extreme 465-yard mountain valley glide. Compete for cash purses, custom rimfire hardware, and the coveted Subsonic Society Championship Cup.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -416,7 +416,7 @@ export default function BristolProPortalPage() {
                 { time: "SATURDAY 07:00 AM", title: "Shooter Safety Briefing", desc: "Mandatory safety meeting at the main pavilion. Squad assignments finalized." },
                 { time: "SATURDAY 08:00 AM", title: "Stages 1 through 10 Firing", desc: "High-angle mountain canyon stages commence. Lunch provided on the ridge." },
                 { time: "SUNDAY 08:00 AM", title: "Stages 11 through 18 Firing", desc: "Final 8 stages and the 465-yard Subsonic Society Cup finale." },
-                { time: "SUNDAY 03:30 PM", title: "Awards Ceremony & Coin Presentation", desc: "Presentation of cash purse, division trophies, and minted Challenge Coins." },
+                { time: "SUNDAY 03:30 PM", title: "Awards Ceremony & Trophy Presentation", desc: "Presentation of guaranteed cash purse, division trophies, and champion awards." },
               ].map((item) => (
                 <div key={item.time} className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1 font-mono">
                   <div className="flex items-center justify-between">

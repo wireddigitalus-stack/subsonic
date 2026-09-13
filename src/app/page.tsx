@@ -97,16 +97,16 @@ export default function HomePage() {
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto">
                   <Image
                     src="/assets/subsonic-coin.jpg"
-                    alt="Official Subsonic Society Coin"
+                    alt="Subsonic Society Official Emblem"
                     width={64}
                     height={64}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">CHAMPIONSHIP COIN</h3>
+                  <h3 className="text-lg font-bold text-white">THE INVITATIONAL CUP</h3>
                   <p className="text-xs text-slate-300 mt-1">
-                    Every competitor takes home the serialized 2026 brass challenge coin. Top podium receives solid gold-plated editions.
+                    Guaranteed $7,500 cash purse payouts across Open, Production, and Senior divisions, presented by Modacam Custom Rifles.
                   </p>
                 </div>
               </div>

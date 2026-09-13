@@ -83,28 +83,28 @@ export function MediaSpotlight() {
               })}
             </div>
 
-            {/* Subsonic Challenge Coin Spotlight Box */}
+            {/* Subsonic Precision Creed & Emblem Box */}
             <div className="ios-glass-card rounded-2xl p-5 border border-amber-500/30 space-y-3 mt-6">
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-amber-400/40 shadow-tactical-glow shrink-0">
                   <Image
                     src="/assets/subsonic-coin.jpg"
-                    alt="Subsonic Society Challenge Coin"
+                    alt="Subsonic Society Emblem"
                     fill
                     className="object-cover"
                   />
                 </div>
                 <div>
                   <span className="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider">
-                    Official Mint
+                    Precision Is In Our DNA
                   </span>
                   <h4 className="text-sm font-extrabold text-white">
-                    Subsonic Society Challenge Coin
+                    Subsonic Society Crest
                   </h4>
                 </div>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Awarded exclusively to marksmen who conquer all 18 stages at the Bristol Mountain Invitational. Solid minted brass with serialized rim engraving.
+                Symbol of our grassroots commitment to unvarnished ballistic data, mechanical discipline, and high-altitude mountain precision.
               </p>
             </div>
           </div>

@@ -83,10 +83,10 @@ const DIVISIONS = [
 
 const ADDONS = [
   {
-    id: "coin",
-    title: "Official 2026 Subsonic Challenge Coin",
-    desc: "Solid brass, gold-plated minted challenge coin engraved with your shooter callsign.",
-    price: 35,
+    id: "logbook",
+    title: "Weatherproof DOPE & Match Logbook",
+    desc: "Rite-in-the-Rain all-weather match journal with pre-formatted 50-400 yard DOPE grids.",
+    price: 22,
   },
   {
     id: "jersey",
@@ -124,7 +124,7 @@ function RegisterContent() {
 
   // Form State
   const [selectedDivision, setSelectedDivision] = useState(DIVISIONS[0].id);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(["coin"]);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
 
   // Shooter Info
   const [name, setName] = useState("");
@@ -598,7 +598,7 @@ function RegisterContent() {
                   </div>
                 </div>
 
-                {/* Add-ons & Challenge Coin */}
+                {/* Match Merchandise & Chrono Add-ons */}
                 <div className="space-y-3 pt-2">
                   <label className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold block">
                     Optional Match Merchandise & Chrono Add-ons

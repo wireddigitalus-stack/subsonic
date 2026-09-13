@@ -201,9 +201,9 @@ export function FacebookFeed() {
 
   // Filter posts based on category and search
   const filteredPosts = posts.filter((post) => {
-    if (activeCategory === "MATCHES" && !post.tags.some(t => t.toLowerCase().includes("bristol") || t.toLowerCase().includes("rimfire"))) return false;
-    if (activeCategory === "BALLISTICS" && !post.tags.some(t => t.toLowerCase().includes("ballistics") || t.toLowerCase().includes("rifle") || t.toLowerCase().includes("optics"))) return false;
-    if (activeCategory === "MEDIA" && !post.tags.some(t => t.toLowerCase().includes("coin") || t.toLowerCase().includes("challenge"))) return false;
+    if (activeCategory === "MATCHES" && !post.tags.some(t => t.toLowerCase().includes("bristol") || t.toLowerCase().includes("match") || t.toLowerCase().includes("stage") || t.toLowerCase().includes("invitational"))) return false;
+    if (activeCategory === "BALLISTICS" && !post.tags.some(t => t.toLowerCase().includes("ballistic") || t.toLowerCase().includes("dope") || t.toLowerCase().includes("kestrel") || t.toLowerCase().includes("wind"))) return false;
+    if (activeCategory === "MEDIA" && !post.tags.some(t => t.toLowerCase().includes("gear") || t.toLowerCase().includes("shirt") || t.toLowerCase().includes("coin") || t.toLowerCase().includes("rifle") || t.toLowerCase().includes("vudoo") || t.toLowerCase().includes("modacam"))) return false;
     
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -458,7 +458,7 @@ export function FacebookFeed() {
                     { id: "ALL", label: "All Dispatches", icon: Layers, count: posts.length },
                     { id: "MATCHES", label: "Bristol Pro Shootout", icon: Flame, count: 2 },
                     { id: "BALLISTICS", label: "Ballistics & DOPE", icon: Sliders, count: 2 },
-                    { id: "MEDIA", label: "Challenge Coins & Gear", icon: ShieldCheck, count: 1 },
+                    { id: "MEDIA", label: "Apparel & Gear", icon: ShieldCheck, count: 1 },
                   ].map((cat) => {
                     const Icon = cat.icon;
                     const active = activeCategory === cat.id;
@@ -520,7 +520,7 @@ export function FacebookFeed() {
                     { id: "ALL", label: "All Dispatches" },
                     { id: "MATCHES", label: "Bristol Pro" },
                     { id: "BALLISTICS", label: "Ballistics & DOPE" },
-                    { id: "MEDIA", label: "Coins & Gear" },
+                    { id: "MEDIA", label: "Apparel & Gear" },
                   ].map((cat) => (
                     <button
                       key={cat.id}

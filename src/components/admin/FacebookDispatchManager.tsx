@@ -85,9 +85,9 @@ export function FacebookDispatchManager() {
       setSharesCount(7);
     } else if (type === "COIN") {
       setContent(
-        "🪙 CHALLENGE COIN MINTING COMPLETE: The 2026 Bristol Pro commemorative solid-brass serialized coins have arrived from the mint. Every competitor registered in Open Pro and Production will receive their custom coin in their match packet. #SubsonicSociety #ChallengeCoin #AppalachianRimfire"
+        "👕 OFFICIAL MATCH APPAREL: The 2026 Subsonic Society technical competition jerseys featuring breathable moisture-wicking weave and Modacam Custom Rifles sleeve imprint are now available for competitor pre-order! #SubsonicSociety #ModacamCustomRifles #AppalachianRimfire"
       );
-      setImageUrl("/assets/subsonic-coin.jpg");
+      setImageUrl("/assets/subsonic-banner-trimmed.png");
       setCategory("MEDIA");
       setLikesCount(56);
       setCommentsCount(15);
