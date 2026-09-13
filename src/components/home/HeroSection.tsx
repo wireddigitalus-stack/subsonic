@@ -41,14 +41,14 @@ export function HeroSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Core Pillars Badge */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-mono">
+        <div className="flex items-center max-w-full">
+          <div className="inline-flex flex-wrap items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[10px] sm:text-xs font-mono max-w-full tracking-tight sm:tracking-normal">
             <span className="text-amber-400 font-bold">COMPETITION</span>
-            <span>•</span>
+            <span className="text-slate-500">•</span>
             <span className="text-blue-400 font-bold">TESTING</span>
-            <span>•</span>
+            <span className="text-slate-500">•</span>
             <span className="text-emerald-400 font-bold">EDUCATION</span>
-            <span>•</span>
+            <span className="text-slate-500">•</span>
             <span className="text-purple-400 font-bold">COMMUNITY</span>
           </div>
         </div>
