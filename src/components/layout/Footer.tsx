@@ -82,6 +82,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/chat" className="hover:text-emerald-400 transition-colors flex items-center gap-1 font-semibold text-emerald-400/90">
+                  <span>Competitor Comms (Live)</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/the-hideout" className="hover:text-amber-400 transition-colors flex items-center gap-1">
                   <span>The Hideout Range</span>
                   <span className="text-[9px] px-1 rounded bg-blue-500/20 text-blue-300 font-mono">3,420&apos;</span>

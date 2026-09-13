@@ -150,7 +150,7 @@ export function Navbar() {
                 onClick={() => setActiveDropdown(activeDropdown === "society" ? null : "society")}
                 data-telemetry="nav_dropdown_society"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  pathname.startsWith("/society") || pathname.startsWith("/the-hideout") || pathname.startsWith("/partners") || activeDropdown === "society"
+                  pathname.startsWith("/society") || pathname.startsWith("/chat") || pathname.startsWith("/the-hideout") || pathname.startsWith("/partners") || pathname.startsWith("/contact") || activeDropdown === "society"
                     ? "bg-white/15 text-white shadow-sm"
                     : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
@@ -179,6 +179,24 @@ export function Navbar() {
                   </Link>
 
                   <Link
+                    href="/chat"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
+                        <span>Competitor Comms</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        DOPE drops & squad chat
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
                     href="/the-hideout"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
@@ -200,11 +218,11 @@ export function Navbar() {
                     href="/partners"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
                       <Award className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-emerald-400">
+                      <div className="text-xs font-bold text-white group-hover:text-purple-400">
                         Modacam & Partners
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
@@ -336,7 +354,7 @@ export function Navbar() {
                 onClick={() => setActiveDropdown(activeDropdown === "media" ? null : "media")}
                 data-telemetry="nav_dropdown_media"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  pathname.startsWith("/watch") || pathname.startsWith("/shop") || pathname.startsWith("/chat") || activeDropdown === "media"
+                  pathname.startsWith("/watch") || pathname.startsWith("/shop") || activeDropdown === "media"
                     ? "bg-white/15 text-white shadow-sm"
                     : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
@@ -379,24 +397,6 @@ export function Navbar() {
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
                         Official match jerseys, hats & gear
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/chat"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
-                      <MessageSquare className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
-                        <span>Competitor Comms</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        DOPE drops & squad chat
                       </p>
                     </div>
                   </Link>
@@ -458,6 +458,14 @@ export function Navbar() {
                 <span>The Story & Philosophy</span>
               </Link>
               <Link
+                href="/chat"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-400" />
+                <span>Competitor Comms (Live)</span>
+              </Link>
+              <Link
                 href="/the-hideout"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
@@ -470,7 +478,7 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
               >
-                <Award className="w-4 h-4 text-emerald-400" />
+                <Award className="w-4 h-4 text-purple-400" />
                 <span>Modacam & Sponsors</span>
               </Link>
               <Link
@@ -534,14 +542,6 @@ export function Navbar() {
               >
                 <ShoppingBag className="w-4 h-4 text-amber-400" />
                 <span>Shop Official Gear & Apparel</span>
-              </Link>
-              <Link
-                href="/chat"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-              >
-                <MessageSquare className="w-4 h-4 text-emerald-400" />
-                <span>Competitor Comms</span>
               </Link>
             </div>
 
