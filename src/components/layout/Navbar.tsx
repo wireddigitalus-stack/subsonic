@@ -35,11 +35,44 @@ export function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Close dropdown on route change
+  // Close dropdown and mobile menu on route change
   useEffect(() => {
     setActiveDropdown(null);
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  // Prevent background page from scrolling when mobile menu is open (iOS & Android safe)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (mobileMenuOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setMobileMenuOpen(false);
+      };
+      window.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+        const top = document.body.style.top;
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
+        const parsedY = top ? Math.abs(parseInt(top, 10)) : scrollY;
+        window.scrollTo(0, parsedY);
+      };
+    }
+  }, [mobileMenuOpen]);
 
   const handleMouseEnter = (menuKey: string) => {
     if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
@@ -395,9 +428,22 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Backdrop to prevent background interactions & close on tap */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 ios-glass rounded-2xl p-4 border border-white/10 shadow-2xl space-y-4 animate-fadeIn">
+          <div
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm -z-10 lg:hidden animate-fadeIn"
+            onClick={() => setMobileMenuOpen(false)}
+            onTouchMove={(e) => e.preventDefault()}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile Dropdown Menu with dedicated internal scroll container */}
+        {mobileMenuOpen && (
+          <div 
+            className="lg:hidden mt-2 ios-glass rounded-2xl p-4 sm:p-5 border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.85)] space-y-4 animate-fadeIn max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain ios-scrollbar touch-pan-y"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {/* Group 1: The Society & Facility */}
             <div className="space-y-1">
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
