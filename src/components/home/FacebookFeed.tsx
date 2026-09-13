@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { 
   Radio, 
@@ -21,7 +21,10 @@ import {
   Flame,
   ShieldCheck,
   Eye,
-  Sliders
+  Sliders,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp
 } from "lucide-react";
 import { INITIAL_FACEBOOK_POSTS } from "@/lib/initial-data";
 import { FacebookPostItem } from "@/lib/types";
@@ -37,6 +40,55 @@ export function FacebookFeed() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeLightboxPost, setActiveLightboxPost] = useState<FacebookPostItem | null>(null);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
+
+  // Custom UI Scroll Controller State (Replacing Browser Default)
+  const feedScrollRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(true);
+
+  const handleFeedScroll = () => {
+    if (!feedScrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = feedScrollRef.current;
+    const maxScroll = scrollHeight - clientHeight;
+    if (maxScroll <= 0) {
+      setScrollProgress(0);
+      setCanScrollUp(false);
+      setCanScrollDown(false);
+      return;
+    }
+    const progress = Math.min(100, Math.max(0, (scrollTop / maxScroll) * 100));
+    setScrollProgress(progress);
+    setCanScrollUp(scrollTop > 15);
+    setCanScrollDown(scrollTop < maxScroll - 15);
+  };
+
+  const scrollFeed = (direction: "up" | "down" | "top") => {
+    if (!feedScrollRef.current) return;
+    if (direction === "top") {
+      feedScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const offset = direction === "up" ? -350 : 350;
+      feedScrollRef.current.scrollBy({ top: offset, behavior: "smooth" });
+    }
+  };
+
+  const handleRailClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!feedScrollRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickY = e.clientY - rect.top;
+    const ratio = Math.max(0, Math.min(1, clickY / rect.height));
+    const maxScroll = feedScrollRef.current.scrollHeight - feedScrollRef.current.clientHeight;
+    feedScrollRef.current.scrollTo({ top: ratio * maxScroll, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    // Recompute scroll limits when posts or expansion toggle change
+    const timer = setTimeout(() => {
+      handleFeedScroll();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [posts, activeCategory, searchQuery, isExpanded]);
 
   const handleLike = (id: string) => {
     const isLiked = likedPosts[id];
@@ -148,7 +200,7 @@ export function FacebookFeed() {
 
               <div className="hidden sm:flex items-center gap-2 ml-3 pl-3 border-l border-white/10 text-xs font-mono text-slate-400">
                 <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
-                <span className="text-white font-semibold">Subsonic Social iWindow</span>
+                <span className="text-white font-semibold">Subsonic Social</span>
                 <span className="text-slate-500">•</span>
                 <span className="text-blue-300 text-[11px]">ID: 61578052196057</span>
               </div>
@@ -184,6 +236,32 @@ export function FacebookFeed() {
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-blue-400" : ""}`} />
               </button>
+
+              {/* Titlebar Custom UI Scroll Stepper */}
+              <div className="hidden sm:flex items-center gap-0.5 bg-black/40 border border-white/10 rounded-xl p-0.5" title="Custom Feed Scroll Controls">
+                <button
+                  onClick={() => scrollFeed("up")}
+                  disabled={!canScrollUp}
+                  className={`p-1 rounded-lg transition-all ${
+                    canScrollUp ? "text-slate-300 hover:text-white hover:bg-white/10 active:scale-95" : "text-slate-600 cursor-not-allowed"
+                  }`}
+                  title="Scroll Up"
+                  aria-label="Scroll Up"
+                >
+                  <ChevronUp className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => scrollFeed("down")}
+                  disabled={!canScrollDown}
+                  className={`p-1 rounded-lg transition-all ${
+                    canScrollDown ? "text-slate-300 hover:text-white hover:bg-white/10 active:scale-95" : "text-slate-600 cursor-not-allowed"
+                  }`}
+                  title="Scroll Down"
+                  aria-label="Scroll Down"
+                >
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
               {/* Maximize Toggle */}
               <button
@@ -327,7 +405,30 @@ export function FacebookFeed() {
             </div>
 
             {/* RIGHT MAIN STREAM: Scrollable Social Cards (8 Columns on LG) */}
-            <div className={`lg:col-span-8 p-5 sm:p-6 overflow-y-auto ${isExpanded ? "max-h-[850px]" : "max-h-[580px]"} space-y-5 custom-scrollbar`}>
+            <div className="lg:col-span-8 relative">
+              {/* Custom UI Tactile Rail (No Browser Default) */}
+              <div
+                onClick={handleRailClick}
+                className="hidden sm:block absolute top-4 bottom-4 right-1.5 w-1.5 rounded-full bg-white/[0.06] hover:bg-white/[0.14] transition-all cursor-pointer z-20 group/rail"
+                title="Custom Scroll Track - Click to Navigate"
+              >
+                <div
+                  className="w-full rounded-full bg-gradient-to-b from-blue-400 to-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.8)] transition-all duration-100 group-hover/rail:brightness-125"
+                  style={{
+                    height: "36px",
+                    marginTop: `calc(${scrollProgress}% - ${(scrollProgress / 100) * 36}px)`,
+                  }}
+                />
+              </div>
+
+              {/* Scroll Container with no browser default scrollbar */}
+              <div
+                ref={feedScrollRef}
+                onScroll={handleFeedScroll}
+                className={`p-5 sm:p-6 pr-6 sm:pr-8 overflow-y-auto no-scrollbar scroll-smooth ${
+                  isExpanded ? "max-h-[850px]" : "max-h-[580px]"
+                } space-y-5`}
+              >
               
               {/* Share Toast */}
               {shareNotice && (
@@ -480,6 +581,47 @@ export function FacebookFeed() {
                   );
                 })
               )}
+              </div>
+
+              {/* Custom UI Floating Scroll Controller */}
+              <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl ios-glass border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl animate-fadeIn">
+                <button
+                  onClick={() => scrollFeed("up")}
+                  disabled={!canScrollUp}
+                  className={`p-2 rounded-xl transition-all ${
+                    canScrollUp
+                      ? "bg-white/10 hover:bg-white/20 text-white active:scale-90"
+                      : "bg-white/5 text-slate-600 cursor-not-allowed opacity-40"
+                  }`}
+                  title="Scroll Up (Previous Dispatches)"
+                  aria-label="Scroll Up"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={() => scrollFeed("top")}
+                  className="px-2.5 py-1.5 rounded-xl bg-black/60 hover:bg-black/90 border border-white/10 text-[10px] font-mono text-slate-300 hover:text-white flex items-center gap-1.5 transition-all group"
+                  title="Jump to Latest / Top"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 group-hover:animate-ping" />
+                  <span>{Math.round(scrollProgress)}%</span>
+                </button>
+
+                <button
+                  onClick={() => scrollFeed("down")}
+                  disabled={!canScrollDown}
+                  className={`p-2 rounded-xl transition-all ${
+                    canScrollDown
+                      ? "bg-blue-600/40 hover:bg-blue-600/60 text-blue-200 hover:text-white border border-blue-500/40 active:scale-90 shadow-tactical-glow"
+                      : "bg-white/5 text-slate-600 cursor-not-allowed opacity-40"
+                  }`}
+                  title="Scroll Down (Next Dispatches)"
+                  aria-label="Scroll Down"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
