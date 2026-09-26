@@ -370,7 +370,7 @@ export default function HomePage() {
               href="/join"
               className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold text-slate-300"
             >
-              <span>Need an Access Pass? Request Free Membership</span>
+              <span>Need an Access Pass? Register for Private Chat Access</span>
               <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
             </Link>
 

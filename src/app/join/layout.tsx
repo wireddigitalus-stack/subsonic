@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Join The Society | Official Marksman Membership & Credentials",
+  title: "Join The Society | Private Chat Room Access & Member Callsign",
   description:
-    "Apply for free Subsonic Society membership. Unlock verified shooter credentials, early match registration windows, ballistics lab data drops, and exclusive community comms.",
+    "Register for free Subsonic Society membership. Unlock verified shooter credentials, a unique marksman callsign, and immediate access to the Subsonic Private Chat Room.",
   keywords: [
     "Join Subsonic Society",
     "Rimfire shooter membership",
     "Precision rifle membership",
     "Subsonic credentials",
-    "Free shooting membership",
+    "Private chat room access",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/join",
   },
   openGraph: {
-    title: "Join The Society | Official Marksman Credentials",
+    title: "Join The Society | Private Chat Room Access",
     description:
-      "Claim your callsign and member ID. Access priority match registration and private ballistic data drops.",
+      "Claim your callsign and member ID for immediate entry into the Subsonic Private Chat Room.",
     url: "https://subsonicsociety.com/join",
     siteName: "Subsonic Society",
     images: [
