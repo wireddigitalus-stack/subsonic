@@ -712,101 +712,10 @@ export default function ChatPage() {
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
-        <div className="ios-glass rounded-2xl p-3 sm:p-4 border border-amber-500/20 shadow-tactical-glow flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
-          {/* Left: Weather & Elevation Telemetry */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-white font-bold tracking-wider hidden sm:inline">HOLSTON RIDGE:</span>
-              <span className="text-white font-bold tracking-wider sm:hidden">RIDGE:</span>
-            </div>
-
-            <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-              <Compass className="w-3 h-3 text-amber-400" />
-              <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
-            </div>
-
-            <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-              <Wind className="w-3 h-3 text-cyan-400" />
-              <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
-            </div>
-
-            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-              <Thermometer className="w-3.5 h-3.5 text-orange-400" />
-              <span>TEMP: <strong className="text-white">64°F</strong></span>
-            </div>
-
-            <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-              <Target className="w-3.5 h-3.5 text-emerald-400" />
-              <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
-            </div>
-          </div>
-
-          {/* Right: Quick Controls & Profile Pill */}
-          <div className="flex items-center justify-between lg:justify-end gap-2 sm:gap-3 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-white/10">
-            {/* Fullscreen Button */}
-            <button
-              type="button"
-              onClick={() => setIsFullscreen(true)}
-              data-telemetry="chat_enter_fullscreen"
-              className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
-              title="Expand to Fullscreen Fill Hand Mode"
-            >
-              <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Fullscreen</span>
-            </button>
-
-            {/* Audio Chirp Toggle (Compact Micro-Button) */}
-            <button
-              type="button"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
-                soundEnabled
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                  : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
-              }`}
-              title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
-              aria-label="Toggle Tactical Radio Audio"
-            >
-              {soundEnabled ? (
-                <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
-              ) : (
-                <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
-              )}
-              <span className="hidden sm:inline text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
-              <span>{soundEnabled ? "ON" : "OFF"}</span>
-            </button>
-
-            {/* Staff / Admin Moderation Dashboard Link */}
-            <Link
-              href="/admin"
-              target="_blank"
-              title="Open Staff Admin & Comms Moderation Dashboard"
-              className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
-            >
-              <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-              <span className="hidden sm:inline">Admin / Moderation</span>
-              <span className="sm:hidden">Admin</span>
-            </Link>
-
-            {/* Lock Private Room Button */}
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("subsonic_chat_authenticated");
-                }
-                setIsAuthenticated(false);
-                playTacticalChirp(400);
-              }}
-              title="Lock Private Chat Room"
-              className="h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
-            >
-              <Lock className="w-3 h-3 text-red-400 shrink-0" />
-              <span className="hidden sm:inline">Lock</span>
-            </button>
-
-            {/* Shooter Digital Member Pass / QR Button */}
+        <div className="ios-glass rounded-2xl p-2.5 sm:p-4 border border-amber-500/20 shadow-tactical-glow">
+          {/* Mobile Top Bar: Single clean, zero-clutter row */}
+          <div className="flex sm:hidden items-center justify-between gap-2">
+            {/* Shooter Callsign & Pass Pill */}
             <button
               type="button"
               onClick={() => {
@@ -814,33 +723,195 @@ export default function ChatPage() {
                 setProfileActiveTab("PASS");
                 setIsProfileModalOpen(true);
               }}
-              title="View Digital Member Pass & Scannable QR Code"
-              data-telemetry="chat_view_digital_pass"
-              className="h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-mono font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/35 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+              data-telemetry="chat_mobile_view_pass"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/60 border border-amber-500/40 text-xs"
             >
-              <QrCode className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Pass</span>
-            </button>
-
-            {/* Shooter Profile Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setProfileForm(shooterProfile);
-                setProfileActiveTab("EDIT");
-                setIsProfileModalOpen(true);
-              }}
-              data-telemetry="chat_edit_shooter_profile"
-              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
-            >
-              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] sm:text-[10px]">
+              <div className="w-5 h-5 rounded-md bg-amber-500 text-black font-bold flex items-center justify-center text-[10px]">
                 {shooterProfile.callsign.slice(0, 2)}
               </div>
-              <span className="font-mono font-bold text-amber-300 group-hover:text-amber-200 text-[11px] sm:text-xs">
+              <span className="font-mono font-bold text-amber-300 text-xs">
                 {shooterProfile.callsign}
               </span>
-              <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
+              <QrCode className="w-3.5 h-3.5 text-emerald-400" />
             </button>
+
+            {/* Mobile Actions: Audio, Fullscreen, Admin, Lock */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`h-7 w-7 rounded-lg border flex items-center justify-center transition-all ${
+                  soundEnabled
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    : "bg-white/5 text-slate-400 border-white/10"
+                }`}
+                title={soundEnabled ? "Audio ON" : "Audio OFF"}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                ) : (
+                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(true)}
+                className="h-7 w-7 rounded-lg bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center"
+                title="Fullscreen"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+              </button>
+
+              <Link
+                href="/admin"
+                target="_blank"
+                title="Admin Dashboard"
+                className="h-7 w-7 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 flex items-center justify-center"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("subsonic_chat_authenticated");
+                  }
+                  setIsAuthenticated(false);
+                  playTacticalChirp(400);
+                }}
+                title="Lock Chat"
+                className="h-7 w-7 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 flex items-center justify-center"
+              >
+                <Lock className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Top Bar: Rich Weather & Expanded Controls */}
+          <div className="hidden sm:flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
+            {/* Left: Weather & Elevation Telemetry */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
+              </div>
+
+              <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                <Compass className="w-3 h-3 text-amber-400" />
+                <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
+              </div>
+
+              <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                <Wind className="w-3 h-3 text-cyan-400" />
+                <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
+              </div>
+
+              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                <Thermometer className="w-3.5 h-3.5 text-orange-400" />
+                <span>TEMP: <strong className="text-white">64°F</strong></span>
+              </div>
+
+              <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                <Target className="w-3.5 h-3.5 text-emerald-400" />
+                <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
+              </div>
+            </div>
+
+            {/* Right: Controls & Profile Pill */}
+            <div className="flex items-center justify-between lg:justify-end gap-2 sm:gap-3 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-white/10">
+              <button
+                type="button"
+                onClick={() => setIsFullscreen(true)}
+                data-telemetry="chat_enter_fullscreen"
+                className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
+                title="Expand to Fullscreen Fill Hand Mode"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                <span>Fullscreen</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
+                  soundEnabled
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                    : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
+                }`}
+                title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
+                aria-label="Toggle Tactical Radio Audio"
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
+                ) : (
+                  <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
+                )}
+                <span className="text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
+                <span>{soundEnabled ? "ON" : "OFF"}</span>
+              </button>
+
+              <Link
+                href="/admin"
+                target="_blank"
+                title="Open Staff Admin & Comms Moderation Dashboard"
+                className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
+              >
+                <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+                <span>Admin / Moderation</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.removeItem("subsonic_chat_authenticated");
+                  }
+                  setIsAuthenticated(false);
+                  playTacticalChirp(400);
+                }}
+                title="Lock Private Chat Room"
+                className="h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
+              >
+                <Lock className="w-3 h-3 text-red-400 shrink-0" />
+                <span>Lock</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileForm(shooterProfile);
+                  setProfileActiveTab("PASS");
+                  setIsProfileModalOpen(true);
+                }}
+                title="View Digital Member Pass & Scannable QR Code"
+                data-telemetry="chat_view_digital_pass"
+                className="h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-mono font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/35 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+              >
+                <QrCode className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Pass</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileForm(shooterProfile);
+                  setProfileActiveTab("EDIT");
+                  setIsProfileModalOpen(true);
+                }}
+                data-telemetry="chat_edit_shooter_profile"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
+              >
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] sm:text-[10px]">
+                  {shooterProfile.callsign.slice(0, 2)}
+                </div>
+                <span className="font-mono font-bold text-amber-300 group-hover:text-amber-200 text-[11px] sm:text-xs">
+                  {shooterProfile.callsign}
+                </span>
+                <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -1065,7 +1136,7 @@ export default function ChatPage() {
         {/* MAIN CHAT STREAM & TRANSMITTER (Fills handheld screen seamlessly) */}
         <div
           className={`${
-            !isFullscreen ? "lg:col-span-8 h-[calc(100dvh-13.5rem)] sm:h-[620px]" : "h-full"
+            !isFullscreen ? "lg:col-span-8 h-[calc(100dvh-10rem)] sm:h-[640px]" : "h-full"
           } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden shadow-2xl relative`}
         >
           {/* Messages Stream: Native iOS momentum scrollbar, NO outer page bounce */}
@@ -1325,7 +1396,7 @@ export default function ChatPage() {
                 placeholder={`Broadcast to #${currentChannelData.name}...`}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
+                className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-base sm:text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
               />
 
               <button
@@ -1404,7 +1475,7 @@ export default function ChatPage() {
                     value={dopeFormData.targetDistance}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, targetDistance: e.target.value })}
                     placeholder="e.g. 340 YDS"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1415,7 +1486,7 @@ export default function ChatPage() {
                     value={dopeFormData.targetDescription}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, targetDescription: e.target.value })}
                     placeholder="e.g. Stage 4 Diamond KYL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1429,7 +1500,7 @@ export default function ChatPage() {
                     value={dopeFormData.elevationMils}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, elevationMils: e.target.value })}
                     placeholder="e.g. 8.4 MIL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-base sm:text-xs font-bold focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1440,7 +1511,7 @@ export default function ChatPage() {
                     value={dopeFormData.windHoldMils}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, windHoldMils: e.target.value })}
                     placeholder="e.g. L 0.6 MIL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold focus:border-cyan-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-base sm:text-xs font-bold focus:border-cyan-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1455,7 +1526,7 @@ export default function ChatPage() {
                     value={dopeFormData.windVelocity}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, windVelocity: e.target.value })}
                     placeholder="e.g. 9 MPH @ 260° WNW"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -1465,7 +1536,7 @@ export default function ChatPage() {
                     value={dopeFormData.ammo}
                     onChange={(e) => setDopeFormData({ ...dopeFormData, ammo: e.target.value })}
                     placeholder="e.g. Lapua Center-X (1,062 FPS)"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1478,7 +1549,7 @@ export default function ChatPage() {
                   value={dopeFormData.notes}
                   onChange={(e) => setDopeFormData({ ...dopeFormData, notes: e.target.value })}
                   placeholder="e.g. Watch for downdraft in canyon draw..."
-                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none resize-none"
                 />
               </div>
 
@@ -1593,7 +1664,7 @@ export default function ChatPage() {
                     type="text"
                     value={profileForm.name}
                     onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1605,7 +1676,7 @@ export default function ChatPage() {
                     value={profileForm.callsign}
                     onChange={(e) => setProfileForm({ ...profileForm, callsign: e.target.value.toUpperCase() })}
                     placeholder="e.g. APEX-22"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-base sm:text-xs font-bold focus:border-amber-400 focus:outline-none"
                     required
                   />
                 </div>
@@ -1615,7 +1686,7 @@ export default function ChatPage() {
                   <select
                     value={profileForm.division}
                     onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   >
                     <option value="Open Division Pro">Open Division Pro</option>
                     <option value="Production Division">Production Division</option>
@@ -1632,7 +1703,7 @@ export default function ChatPage() {
                     value={profileForm.rifleSetup}
                     onChange={(e) => setProfileForm({ ...profileForm, rifleSetup: e.target.value })}
                     placeholder="e.g. Vudoo V-22 / Bartlein MTU / ZCO 527"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                   />
                 </div>
 

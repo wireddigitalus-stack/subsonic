@@ -881,7 +881,7 @@ export default function AdminDashboardPage() {
                   placeholder="Search by shooter name, email, member ID, or rifle rig..."
                   value={memberSearch}
                   onChange={(e) => setMemberSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
                 />
               </div>
 
@@ -890,7 +890,7 @@ export default function AdminDashboardPage() {
                 <select
                   value={memberStateFilter}
                   onChange={(e) => setMemberStateFilter(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs font-mono text-white focus:outline-none focus:border-amber-400 w-full sm:w-auto"
+                  className="px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-base sm:text-xs font-mono text-white focus:outline-none focus:border-amber-400 w-full sm:w-auto"
                 >
                   <option value="ALL">All States</option>
                   {Array.from(new Set(members.map((m) => m.state)))
@@ -1988,7 +1988,7 @@ export default function AdminDashboardPage() {
                       required
                       value={memberForm.full_name || ""}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, full_name: e.target.value }))}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-400"
                     />
                   </div>
 
@@ -2001,7 +2001,7 @@ export default function AdminDashboardPage() {
                       required
                       value={memberForm.callsign || ""}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, callsign: e.target.value.toUpperCase() }))}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono font-bold text-base sm:text-xs focus:outline-none focus:border-amber-400"
                     />
                   </div>
                 </div>
@@ -2017,7 +2017,7 @@ export default function AdminDashboardPage() {
                       required
                       value={memberForm.email || ""}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, email: e.target.value }))}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-400"
                     />
                   </div>
 
@@ -2028,7 +2028,7 @@ export default function AdminDashboardPage() {
                     <select
                       value={memberForm.state || "TN"}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, state: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs font-mono focus:outline-none focus:border-amber-400"
                     >
                       {["TN", "VA", "NC", "KY", "WV", "GA", "SC", "AL", "FL", "PA", "OH", "TX", "OTHER"].map((st) => (
                         <option key={st} value={st} className="bg-[#0e131d]">
@@ -2050,7 +2050,7 @@ export default function AdminDashboardPage() {
                       value={memberForm.experience_level || ""}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, experience_level: e.target.value }))}
                       placeholder="e.g. Master / Pro Series"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-400"
                     />
                   </div>
 
@@ -2063,7 +2063,7 @@ export default function AdminDashboardPage() {
                       value={memberForm.rifle_setup || ""}
                       onChange={(e) => setMemberForm((prev) => ({ ...prev, rifle_setup: e.target.value }))}
                       placeholder="e.g. Vudoo V-22 / Bartlein / ZCO 527"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-400"
                     />
                   </div>
                 </div>
@@ -2078,7 +2078,7 @@ export default function AdminDashboardPage() {
                     value={memberForm.notes || ""}
                     onChange={(e) => setMemberForm((prev) => ({ ...prev, notes: e.target.value }))}
                     placeholder="Staff notes, squad placement, or range safety notes..."
-                    className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                    className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>
 

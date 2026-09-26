@@ -76,11 +76,11 @@ export function MemberCredentialCard({
   };
 
   return (
-    <div className="space-y-4 max-w-md mx-auto">
+    <div className="space-y-4 w-full max-w-md mx-auto overflow-hidden">
       {/* Apple Wallet Style Glassmorphic Pass */}
       <div 
         data-credential-card="true"
-        className="ios-glass-card rounded-3xl p-6 sm:p-7 border-2 border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.22)] relative overflow-hidden bg-gradient-to-br from-[#07090e] via-[#0d141e] to-black space-y-5 text-left"
+        className="ios-glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-7 border-2 border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.22)] relative overflow-hidden bg-gradient-to-br from-[#07090e] via-[#0d141e] to-black space-y-4 sm:space-y-5 text-left"
       >
         {/* Glow Accent */}
         <div className="absolute -top-16 -right-16 w-44 h-44 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -175,7 +175,7 @@ export function MemberCredentialCard({
         <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3 relative z-10">
           {/* Functional 1D Barcode */}
           <div className="space-y-1 flex-1 overflow-hidden">
-            <div className="h-10 flex items-center justify-start max-w-[190px] sm:max-w-[210px] overflow-hidden">
+            <div className="h-10 flex items-center justify-start max-w-[140px] sm:max-w-[210px] overflow-hidden">
               <svg ref={barcodeRef} className="w-full h-full" />
             </div>
             <div className="text-[8px] font-mono text-slate-400 flex items-center gap-1">
