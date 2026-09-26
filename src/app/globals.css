@@ -130,3 +130,54 @@ body {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 1rem));
 }
 
+/* ─── CHAT PAGE VIEWPORT LOCK ─────────────────────────────────────────────
+   body.chat-active: prevents outer page scroll. Chat manages its own scroll.
+   ─────────────────────────────────────────────────────────────────────────── */
+body.chat-active {
+  overflow: hidden;
+  height: 100dvh;
+}
+
+body.chat-active main {
+  overflow: hidden !important;
+  height: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── CHAT MESSAGES — Polished Custom Scrollbar ───────────────────────────
+   Slim amber-accent thumb on desktop, invisible momentum scroll on mobile.
+   ─────────────────────────────────────────────────────────────────────────── */
+.chat-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.3) transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.25);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.6);
+}
+
+@media (max-width: 640px) {
+  .chat-scroll::-webkit-scrollbar { display: none; }
+  .chat-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+}
+

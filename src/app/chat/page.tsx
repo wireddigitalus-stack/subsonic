@@ -269,6 +269,12 @@ export default function ChatPage() {
     }
   }, []);
 
+  // Lock body scroll for viewport-pinned chat layout
+  useEffect(() => {
+    document.body.classList.add("chat-active");
+    return () => document.body.classList.remove("chat-active");
+  }, []);
+
   // Handle ESC key to exit fullscreen
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -280,17 +286,19 @@ export default function ChatPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen]);
 
-  // iOS visual viewport keyboard avoidance
+  // iOS visual viewport keyboard avoidance (only affects message container flex)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const vv = (window as any).visualViewport;
     if (!vv) return;
     const handleResize = () => {
+      // No explicit height needed — the flex layout handles it
+      // But we store the available height for any fallback needs
       const vh = vv.height;
       const windowH = window.innerHeight;
       if (vh < windowH * 0.85) {
-        // keyboard is open — shrink chat container
-        setChatHeight(`${vh - 160}px`);
+        setChatHeight(`${vh}px`);
+
       } else {
         setChatHeight("calc(100dvh - 10rem)");
       }
@@ -841,12 +849,13 @@ export default function ChatPage() {
       className={
         isFullscreen
           ? "fixed inset-0 z-[60] bg-[#07090E] p-2 sm:p-4 flex flex-col h-[100dvh] w-full overflow-hidden animate-fadeIn"
-          : "max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-5"
+          : "flex flex-col h-full w-full overflow-hidden pt-20 sm:pt-24 bg-[#07090E]"
       }
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
-        <div className="ios-glass rounded-2xl p-2.5 sm:p-4 border border-amber-500/20 shadow-tactical-glow">
+        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 sm:pt-3">
+        <div className="ios-glass rounded-2xl p-2.5 sm:p-3 border border-amber-500/20 shadow-tactical-glow">
           {/* Mobile Top Bar: Single clean, zero-clutter row */}
           <div className="flex sm:hidden items-center justify-between gap-2">
             {/* Shooter Callsign & Pass Pill */}
@@ -1048,6 +1057,7 @@ export default function ChatPage() {
             </div>
           </div>
         </div>
+        </div>
       ) : (
         /* Fullscreen Minimal Top Navigation Bar */
         <div className="ios-glass rounded-2xl px-4 py-2.5 border border-white/10 flex items-center justify-between gap-3 mb-2 shrink-0">
@@ -1106,8 +1116,9 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 2. MOBILE-FIRST SWIPEABLE CHANNEL SELECTOR (Zero-scroll horizontal pills on mobile) */}
-      <div className="space-y-2">
+      {/* 2. MOBILE-FIRST SWIPEABLE CHANNEL SELECTOR */}
+      <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 pb-1">
+      <div className="space-y-1.5">
         {/* Network Mode Selector Tabs */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
@@ -1200,10 +1211,12 @@ export default function ChatPage() {
           })}
         </div>
       </div>
+      </div>
 
 
-      {/* 3. MAIN COMMS MATRIX ("Fill Hand" Mobile Architecture) */}
-      <div className={`grid grid-cols-1 ${!isFullscreen ? "lg:grid-cols-12" : ""} gap-4 flex-1 overflow-hidden min-h-0`}>
+      {/* 3. MAIN COMMS MATRIX — fills all remaining viewport height */}
+      <div className={`flex-1 min-h-0 overflow-hidden px-2 sm:px-4 lg:px-6 pb-2 sm:pb-3 grid grid-cols-1 ${!isFullscreen ? "lg:grid-cols-12" : ""} gap-3`}>
+
         {/* DESKTOP-ONLY Channels Sidebar (Hidden in Fullscreen or Mobile) */}
         {!isFullscreen && (
           <div className="hidden lg:block lg:col-span-4 space-y-4">
@@ -1275,12 +1288,11 @@ export default function ChatPage() {
           </div>
         )}
 
-        {/* MAIN CHAT STREAM & TRANSMITTER (Fills handheld screen seamlessly) */}
+        {/* MAIN CHAT STREAM & TRANSMITTER */}
         <div
           className={`${
-            !isFullscreen ? `lg:col-span-8 sm:h-[640px]` : "h-full"
-          } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden shadow-2xl relative`}
-          style={!isFullscreen ? { height: chatHeight } : undefined}
+            !isFullscreen ? "lg:col-span-8" : ""
+          } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col overflow-hidden shadow-2xl relative h-full min-h-0`}
         >
           {/* Pinned Match Director Announcement */}
           {pinnedAnnouncement && (
@@ -1304,12 +1316,13 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Messages Stream: Native iOS momentum scrollbar, NO outer page bounce */}
+          {/* Messages Stream — flex-1 fills all available space, scrolls internally */}
           <div
             ref={messagesContainerRef}
             onScroll={handleContainerScroll}
-            className="p-3 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto ios-scrollbar overscroll-contain min-h-0"
+            className="p-3 sm:p-5 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0"
           >
+
             {filteredMessages.length === 0 ? (
               <div className="text-center py-16 space-y-3">
                 <MessageSquare className="w-10 h-10 text-slate-600 mx-auto" />
