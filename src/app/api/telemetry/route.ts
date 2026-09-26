@@ -283,7 +283,7 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const passkey = searchParams.get("passkey") || request.headers.get("x-admin-passkey");
 
-    if (passkey !== "subsonic2026") {
+    if (passkey !== "subsonic2026" && passkey !== "2468") {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 

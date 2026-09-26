@@ -478,6 +478,12 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem("subsonic_admin_authenticated") === "true") {
+        setIsAuthenticated(true);
+      }
+    } catch {}
+
     loadData();
 
     // Poll server for new telemetry events every 8 seconds while dashboard is open
@@ -507,9 +513,14 @@ export default function AdminDashboardPage() {
 
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passkeyInput.trim() === "subsonic2026" || passkeyInput.trim().toLowerCase() === "admin") {
+    const clean = passkeyInput.trim().toLowerCase();
+    const VALID_ADMIN_KEYS = ["2468", "subsonic2026", "admin"];
+    if (VALID_ADMIN_KEYS.includes(clean)) {
       setIsAuthenticated(true);
       setPasskeyError(false);
+      try {
+        localStorage.setItem("subsonic_admin_authenticated", "true");
+      } catch {}
     } else {
       setPasskeyError(true);
     }
@@ -610,7 +621,7 @@ export default function AdminDashboardPage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter passkey..."
+                placeholder="Enter passkey or PIN (e.g. 2468)..."
                 value={passkeyInput}
                 onChange={(e) => {
                   setPasskeyInput(e.target.value);
@@ -620,7 +631,7 @@ export default function AdminDashboardPage() {
               />
               {passkeyError && (
                 <div className="text-[11px] text-red-400 font-mono mt-1">
-                  Invalid security passkey. Try &quot;subsonic2026&quot; or use demo unlock.
+                  Invalid security passkey. Try PIN &quot;2468&quot; or &quot;subsonic2026&quot;.
                 </div>
               )}
             </div>
