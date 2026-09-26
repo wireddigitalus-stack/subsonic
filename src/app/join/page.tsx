@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Radio
 } from "lucide-react";
+import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 
 interface MemberResult {
   member_id: string;
@@ -206,102 +207,17 @@ export default function JoinSocietyPage() {
               </p>
             </div>
 
-            {/* Apple Wallet Style Glassmorphic Pass */}
-            <div className="max-w-md mx-auto relative">
-              <div className="ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.25)] relative overflow-hidden bg-gradient-to-br from-black via-[#0d141e] to-black space-y-6">
-                {/* Emerald Glow Accent */}
-                <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none" />
-
-                {/* Card Top: Brand & Coin */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border border-amber-400/80 shadow-sm relative">
-                      <Image
-                        src="/assets/subsonic-coin.jpg"
-                        alt="Subsonic Society Emblem"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <div className="font-mono text-[10px] text-amber-400 font-bold uppercase tracking-wider">
-                        PRIVATE COMMS CREDENTIAL
-                      </div>
-                      <div className="font-black text-sm text-white tracking-wider">
-                        SUBSONIC SOCIETY
-                      </div>
-                    </div>
-                  </div>
-
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
-                    VERIFIED
-                  </span>
-                </div>
-
-                {/* Member ID & Callsign */}
-                <div className="space-y-4">
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block">
-                      CALLSIGN / HANDLE
-                    </span>
-                    <div className="text-2xl font-black font-mono text-emerald-400 tracking-wider">
-                      [{memberData.callsign}]
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">SERIALIZED ID</span>
-                      <span className="font-bold text-amber-400">{memberData.member_id}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">MARKSMAN</span>
-                      <span className="font-bold text-white truncate block">{memberData.full_name}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">REGION / STATE</span>
-                      <span className="font-bold text-white">{memberData.state}</span>
-                    </div>
-
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">ACCESS LEVEL</span>
-                      <span className="font-bold text-emerald-400">CHAT ACCESS</span>
-                    </div>
-                  </div>
-
-                  {memberData.rifle_setup && (
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-[11px] font-mono">
-                      <span className="text-slate-400 block text-[9px] uppercase">REGISTERED RIG</span>
-                      <span className="text-white truncate block font-bold">{memberData.rifle_setup}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Simulated Barcode / QR Bottom */}
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex gap-1 h-8 items-center">
-                      {[1, 3, 2, 4, 1, 2, 4, 2, 1, 3, 2, 4, 1, 3, 2, 1].map((w, i) => (
-                        <div
-                          key={i}
-                          className="h-full bg-slate-300 rounded-sm"
-                          style={{ width: `${w * 2}px` }}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[9px] font-mono text-slate-500 block">
-                      COMMS GATE PASS
-                    </span>
-                  </div>
-
-                  <div className="p-2 rounded-xl bg-white/10 text-slate-300">
-                    <QrCode className="w-8 h-8 text-emerald-400" />
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Functional Apple Wallet Style Glassmorphic Pass with Real Barcode & QR */}
+            <MemberCredentialCard
+              memberId={memberData.member_id}
+              fullName={memberData.full_name}
+              callsign={memberData.callsign}
+              state={memberData.state}
+              experienceLevel={memberData.experience_level}
+              rifleSetup={memberData.rifle_setup}
+              accessLevel="CHAT ACCESS"
+              showDownload={false}
+            />
 
             {/* Phased Rollout Notification Banner */}
             <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-slate-300 text-center space-y-1">

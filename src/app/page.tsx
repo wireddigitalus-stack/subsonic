@@ -20,10 +20,13 @@ import {
   Eye,
   EyeOff,
   Flame,
-  LayoutGrid
+  LayoutGrid,
+  QrCode,
+  X
 } from "lucide-react";
 import { FullHomePage } from "@/components/home/FullHomePage";
 import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
+import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 
 interface ShooterPreset {
   name: string;
@@ -94,16 +97,56 @@ export default function HomePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Digital Pass Modal State
+  const [showPassModal, setShowPassModal] = useState(false);
+  const [savedMemberData, setSavedMemberData] = useState<{
+    memberId: string;
+    fullName: string;
+    callsign: string;
+    state?: string;
+    division?: string;
+    rifleSetup?: string;
+  } | null>(null);
+
   // Preload existing shooter profile if saved
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedProfile = localStorage.getItem("subsonic_shooter_profile");
+      const savedMember = localStorage.getItem("subsonic_member_profile");
+
+      if (savedMember) {
+        try {
+          const parsed = JSON.parse(savedMember);
+          setSavedMemberData({
+            memberId: parsed.member_id || "SS-2026-0814",
+            fullName: parsed.full_name || "Verified Marksman",
+            callsign: parsed.callsign || "APEX-22",
+            state: parsed.state || "TN",
+            division: parsed.experience_level || "Open Division Pro",
+            rifleSetup: parsed.rifle_setup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+          });
+        } catch {
+          // ignore
+        }
+      }
+
       if (savedProfile) {
         try {
           const parsed = JSON.parse(savedProfile);
           if (parsed.callsign) setCallsign(parsed.callsign);
           if (parsed.name) setShooterName(parsed.name);
           if (parsed.division) setDivision(parsed.division);
+
+          if (!savedMember) {
+            setSavedMemberData({
+              memberId: parsed.member_id || "SS-2026-0814",
+              fullName: parsed.name || "Wyatt Sterling",
+              callsign: parsed.callsign || "APEX-22",
+              state: "TN",
+              division: parsed.division || "Open Division Pro",
+              rifleSetup: parsed.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+            });
+          }
         } catch {
           // ignore
         }
@@ -364,6 +407,23 @@ export default function HomePage() {
             </button>
           </form>
 
+          {/* Direct Access to Scannable Digital Member Pass & Barcode */}
+          {savedMemberData && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  playTacticalChirp(1050);
+                  setShowPassModal(true);
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all group"
+              >
+                <QrCode className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                <span>VIEW MY DIGITAL MEMBER PASS &amp; QR CODE</span>
+              </button>
+            </div>
+          )}
+
           {/* Card Footer Notes & Request Access */}
           <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
             <Link
@@ -398,6 +458,40 @@ export default function HomePage() {
           </p>
         </div>
       </div>
+
+      {/* Digital Member Pass Modal */}
+      {showPassModal && savedMemberData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto ios-glass-card rounded-3xl p-5 sm:p-7 border border-amber-500/40 shadow-tactical-glow relative space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <QrCode className="w-5 h-5 text-amber-400" />
+                <h3 className="text-sm sm:text-base font-black text-white">
+                  OFFICIAL DIGITAL MEMBER CREDENTIAL
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPassModal(false)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <MemberCredentialCard
+              memberId={savedMemberData.memberId}
+              fullName={savedMemberData.fullName}
+              callsign={savedMemberData.callsign}
+              state={savedMemberData.state || "TN"}
+              experienceLevel={savedMemberData.division || "Open Division Pro"}
+              rifleSetup={savedMemberData.rifleSetup}
+              accessLevel="CHAT ACCESS"
+              showDownload={true}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
