@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ShieldCheck,
   Send,
@@ -776,15 +777,17 @@ export default function ChatPage() {
               <span>{soundEnabled ? "ON" : "OFF"}</span>
             </button>
 
-            {/* Range Safety / Staff Moderated Badge */}
-            <div
-              title="Staff Moderated Comms Network"
-              className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] font-mono text-emerald-300"
+            {/* Staff / Admin Moderation Dashboard Link */}
+            <Link
+              href="/admin"
+              target="_blank"
+              title="Open Staff Admin & Comms Moderation Dashboard"
+              className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
             >
               <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-              <span className="hidden sm:inline">Staff Moderated</span>
-              <span className="sm:hidden">Staff</span>
-            </div>
+              <span className="hidden sm:inline">Admin / Moderation</span>
+              <span className="sm:hidden">Admin</span>
+            </Link>
 
             {/* Lock Private Room Button */}
             <button
