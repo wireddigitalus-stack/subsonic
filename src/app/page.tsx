@@ -183,14 +183,22 @@ export default function HomePage() {
       return;
     }
 
-    const VALID_PASSCODES = ["SUBSONIC2026", "subsonic2026"];
-    if (!VALID_PASSCODES.includes(passcode.trim())) {
-      triggerFormError("Invalid Member Key. Contact your Range Marshal for the access passcode.");
+    const cleanCallsign = callsign.trim().toUpperCase();
+    const cleanPass = passcode.trim();
+
+    // Specific PIN for Founding Member ROB: "2468" (also accepts SUBSONIC2026)
+    const isRobValid = cleanCallsign === "ROB" && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
+    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468"].includes(cleanPass);
+
+    if (!isRobValid && !isGeneralValid) {
+      triggerFormError("Invalid Member Key or PIN. Contact your Range Marshal for access.");
       return;
     }
 
     setIsSubmitting(true);
     playTacticalChirp(1200);
+
+    const isRob = cleanCallsign === "ROB";
 
     // Merge with saved member profile — never overwrite member_id or full_name with demo data
     const existingMember = (() => {
@@ -208,11 +216,11 @@ export default function HomePage() {
     })();
 
     const activeProfile = {
-      // Preserve existing member ID — never generate a new one on re-login
-      member_id: existingMember?.member_id || existingProfile?.member_id || null,
-      // Name: prefer typed name > existing saved name > callsign (never use demo preset)
-      name: shooterName.trim() || existingMember?.full_name || existingProfile?.name || callsign.trim().toUpperCase(),
-      callsign: callsign.trim().toUpperCase(),
+      // Preserve existing member ID — for ROB, always official Founding Member ID SS-2026-0001
+      member_id: isRob ? "SS-2026-0001" : (existingMember?.member_id || existingProfile?.member_id || null),
+      // Name: for ROB always Rob Neilson, otherwise prefer typed > existing > callsign
+      name: isRob ? "Rob Neilson" : (shooterName.trim() || existingMember?.full_name || existingProfile?.name || cleanCallsign),
+      callsign: cleanCallsign,
       role: existingProfile?.role || "PRO_COMPETITOR",
       division: division || existingProfile?.division || "Open Division Pro",
       // Preserve existing rifle setup if user hasn't changed it
@@ -223,6 +231,17 @@ export default function HomePage() {
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("subsonic_shooter_profile", JSON.stringify(activeProfile));
+        if (isRob) {
+          localStorage.setItem("subsonic_member_profile", JSON.stringify({
+            member_id: "SS-2026-0001",
+            full_name: "Rob Neilson",
+            callsign: "ROB",
+            state: "TN",
+            experience_level: "Open Division Pro",
+            rifle_setup: activeProfile.rifleSetup,
+            created_at: existingMember?.created_at || "2026-01-01T00:00:00.000Z"
+          }));
+        }
         localStorage.setItem("subsonic_chat_authenticated", "true");
         localStorage.setItem("subsonic_last_login", new Date().toISOString());
       } catch {
@@ -372,11 +391,11 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Access Key / Passcode */}
+            {/* Access Key / Passcode / 4-Digit PIN */}
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
-                <span>Member Access Passcode</span>
-                <span className="text-[10px] text-slate-500 font-normal">Provided by Range Marshal</span>
+                <span>Member Key or 4-Digit PIN</span>
+                <span className="text-[10px] text-amber-400/80 font-normal">PIN 2468 for ROB</span>
               </label>
               <div className="relative">
                 <Key className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -384,7 +403,7 @@ export default function HomePage() {
                   type={showPassword ? "text" : "password"}
                   value={passcode}
                   onChange={(e) => setPasscode(e.target.value)}
-                  placeholder="Enter Member Key..."
+                  placeholder="Enter Member Key or 4-digit PIN (e.g. 2468)..."
                   autoComplete="current-password"
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
                 />

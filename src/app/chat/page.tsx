@@ -888,32 +888,58 @@ export default function ChatPage() {
     setTimeout(() => setAuthShake(false), 600);
     playTacticalChirp(300);
   };
-
   const handleUnlockRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginCallsign.trim()) {
       triggerAuthError("Callsign required to access the private net.");
       return;
     }
-    const VALID_PASSCODES = ["SUBSONIC2026", "subsonic2026"];
-    if (!VALID_PASSCODES.includes(loginPasscode.trim())) {
-      triggerAuthError("Invalid Member Key. Contact your Range Marshal for access.");
+
+    const cleanCallsign = loginCallsign.trim().toUpperCase();
+    const cleanPass = loginPasscode.trim();
+
+    // Check specific member PIN: ROB uses 2468 (or standard SUBSONIC2026)
+    const isRobValid = cleanCallsign === "ROB" && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
+    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468"].includes(cleanPass);
+
+    if (!isRobValid && !isGeneralValid) {
+      triggerAuthError("Invalid Member Key or PIN. Contact your Range Marshal for access.");
       return;
     }
+
+    const isRob = cleanCallsign === "ROB";
+
     const profile: ShooterProfile = {
-      name: shooterProfile.name || loginCallsign.trim(),
-      callsign: loginCallsign.trim().toUpperCase(),
+      name: isRob ? "Rob Neilson" : (shooterProfile.name || cleanCallsign),
+      callsign: cleanCallsign,
       role: "PRO_COMPETITOR",
-      division: shooterProfile.division || "Open Division Pro",
-      rifleSetup: shooterProfile.rifleSetup || "Custom Precision Rimfire",
+      division: isRob ? "Open Division Pro" : (shooterProfile.division || "Open Division Pro"),
+      rifleSetup: isRob ? (shooterProfile.rifleSetup || "Custom Precision Rimfire") : (shooterProfile.rifleSetup || "Custom Precision Rimfire"),
       badgeText: "PRO SHOOTER",
     };
+
+    if (isRob) {
+      setMemberId("SS-2026-0001");
+      setMemberState("TN");
+    }
+
     setShooterProfile(profile);
     setProfileForm(profile);
     setAuthError(null);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("subsonic_shooter_profile", JSON.stringify(profile));
+        if (isRob) {
+          localStorage.setItem("subsonic_member_profile", JSON.stringify({
+            member_id: "SS-2026-0001",
+            full_name: "Rob Neilson",
+            callsign: "ROB",
+            state: "TN",
+            experience_level: "Open Division Pro",
+            rifle_setup: profile.rifleSetup,
+            created_at: "2026-01-01T00:00:00.000Z"
+          }));
+        }
         localStorage.setItem("subsonic_chat_authenticated", "true");
       } catch {
         // Fallback
@@ -974,14 +1000,14 @@ export default function ChatPage() {
 
             <div className="space-y-1">
               <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
-                <span>Member Key</span>
-                <span className="text-[10px] text-slate-500 font-normal normal-case">Provided by Range Marshal</span>
+                <span>Member Key or 4-Digit PIN</span>
+                <span className="text-[10px] text-amber-400/80 font-normal normal-case">PIN 2468 for ROB</span>
               </label>
               <input
                 type="password"
                 value={loginPasscode}
                 onChange={(e) => setLoginPasscode(e.target.value)}
-                placeholder="Enter your member key..."
+                placeholder="Enter member key or 4-digit PIN (e.g. 2468)..."
                 autoComplete="current-password"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400 transition-colors"
               />
