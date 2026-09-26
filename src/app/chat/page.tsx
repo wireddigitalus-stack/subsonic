@@ -127,7 +127,7 @@ const ALL_CHANNELS: ChannelConfig[] = [
 interface ShooterProfile {
   name: string;
   callsign: string;
-  role: "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "MEMBER";
+  role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER";
   division: string;
   rifleSetup: string;
   badgeText: string;
@@ -829,7 +829,11 @@ export default function ChatPage() {
     const updated = {
       ...profileForm,
       badgeText:
-        profileForm.role === "MATCH_DIRECTOR"
+        profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN"
+          ? "MASTER OWNER"
+          : profileForm.role === "OWNER_ADMIN"
+          ? "OWNER ADMIN"
+          : profileForm.role === "MATCH_DIRECTOR"
           ? "MATCH DIRECTOR"
           : profileForm.role === "PRO_COMPETITOR"
           ? profileForm.division.toUpperCase().includes("PRO") ? "OPEN PRO" : "PRO SHOOTER"
@@ -898,28 +902,55 @@ export default function ChatPage() {
     const cleanCallsign = loginCallsign.trim().toUpperCase();
     const cleanPass = loginPasscode.trim();
 
-    // Check specific member PIN: ROB uses 2468 (or standard SUBSONIC2026)
-    const isRobValid = cleanCallsign === "ROB" && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
-    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468"].includes(cleanPass);
+    // Specific Executive PINs:
+    // Rob Neilson: "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
+    const isRob = cleanCallsign === "ROB";
+    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY";
 
-    if (!isRobValid && !isGeneralValid) {
+    const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
+    const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026");
+    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
+
+    if (!isRobValid && !isAllenValid && !isGeneralValid) {
       triggerAuthError("Invalid Member Key or PIN. Contact your Range Marshal for access.");
       return;
     }
 
-    const isRob = cleanCallsign === "ROB";
-
     const profile: ShooterProfile = {
-      name: isRob ? "Rob Neilson" : (shooterProfile.name || cleanCallsign),
-      callsign: cleanCallsign,
-      role: "PRO_COMPETITOR",
-      division: isRob ? "Open Division Pro" : (shooterProfile.division || "Open Division Pro"),
-      rifleSetup: isRob ? (shooterProfile.rifleSetup || "Custom Precision Rimfire") : (shooterProfile.rifleSetup || "Custom Precision Rimfire"),
-      badgeText: "PRO SHOOTER",
+      name: isRob 
+        ? "Rob Neilson" 
+        : isAllen 
+        ? "Allen Hurley" 
+        : (shooterProfile.name || cleanCallsign),
+      callsign: isAllen ? "ALLEN" : cleanCallsign,
+      role: isRob 
+        ? ("MASTER_OWNER" as const)
+        : isAllen 
+        ? ("OWNER_ADMIN" as const)
+        : (shooterProfile.role || "PRO_COMPETITOR"),
+      division: isRob 
+        ? "Master Owner / Dev Admin" 
+        : isAllen 
+        ? "Owner Admin / Executive" 
+        : (shooterProfile.division || "Open Division Pro"),
+      rifleSetup: isRob 
+        ? (shooterProfile.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527") 
+        : isAllen 
+        ? (shooterProfile.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527") 
+        : (shooterProfile.rifleSetup || "Custom Precision Rimfire"),
+      badgeText: isRob 
+        ? "MASTER OWNER" 
+        : isAllen 
+        ? "OWNER ADMIN" 
+        : "PRO SHOOTER",
     };
 
     if (isRob) {
       setMemberId("SS-2026-0001");
+      setMemberState("TN");
+    } else if (isAllen) {
+      setMemberId("SS-2026-0002");
       setMemberState("TN");
     }
 
@@ -935,9 +966,19 @@ export default function ChatPage() {
             full_name: "Rob Neilson",
             callsign: "ROB",
             state: "TN",
-            experience_level: "Open Division Pro",
+            experience_level: "Master Owner / Dev Admin",
             rifle_setup: profile.rifleSetup,
-            created_at: "2026-01-01T00:00:00.000Z"
+            created_at: "2026-07-04T12:00:00Z"
+          }));
+        } else if (isAllen) {
+          localStorage.setItem("subsonic_member_profile", JSON.stringify({
+            member_id: "SS-2026-0002",
+            full_name: "Allen Hurley",
+            callsign: "ALLEN",
+            state: "TN",
+            experience_level: "Owner Admin / Executive",
+            rifle_setup: profile.rifleSetup,
+            created_at: "2026-07-04T12:00:00Z"
           }));
         }
         localStorage.setItem("subsonic_chat_authenticated", "true");
@@ -1583,6 +1624,8 @@ export default function ChatPage() {
               </div>
             ) : (
               filteredMessages.map((msg) => {
+                const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB";
+                const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
                 const isMD = msg.author.role === "MATCH_DIRECTOR" || msg.type === "MATCH_ALERT";
                 const isPro = msg.author.role === "PRO_COMPETITOR";
                 const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
@@ -1606,6 +1649,10 @@ export default function ChatPage() {
                           : plinkSeverity === "warn"
                           ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
                           : "bg-gradient-to-r from-cyan-950/40 to-black/80 border-cyan-500/25"
+                        : isMasterOwner
+                        ? "bg-gradient-to-r from-amber-950/60 via-black/80 to-yellow-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+                        : isOwnerAdmin
+                        ? "bg-gradient-to-r from-emerald-950/60 via-black/80 to-teal-950/40 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
                         : isMD
                         ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
                         : isDopeDrop
@@ -1621,17 +1668,21 @@ export default function ChatPage() {
                         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs border shrink-0 ${
                           isPlink
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/50"
+                            : isMasterOwner
+                            ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                            : isOwnerAdmin
+                            ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                             : isMD
                             ? "bg-amber-500 text-black border-amber-400"
                             : isDopeDrop
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
                             : "bg-black/60 text-amber-400 border-white/10"
                         }`}>
-                          {isPlink ? "🤖" : (msg.author.callsign?.slice(0, 2) || "SS")}
+                          {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : "text-white"}`}>
+                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : "text-white"}`}>
                               {msg.author.name}
                             </span>
                             {msg.author.callsign && !isPlink && (
@@ -1643,6 +1694,10 @@ export default function ChatPage() {
                               className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
                                 isPlink
                                   ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                                  : isMasterOwner
+                                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                                  : isOwnerAdmin
+                                  ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                                   : isMD
                                   ? "bg-amber-500 text-black font-extrabold"
                                   : isPro
@@ -1650,7 +1705,7 @@ export default function ChatPage() {
                                   : "bg-white/10 text-slate-300"
                               }`}
                             >
-                              {msg.author.badgeText || msg.author.role}
+                              {isMasterOwner ? "👑 MASTER OWNER" : isOwnerAdmin ? "🎖️ OWNER ADMIN" : (msg.author.badgeText || msg.author.role)}
                             </span>
                           </div>
                           {msg.author.rifleSetup && (
@@ -2249,22 +2304,40 @@ export default function ChatPage() {
 
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-slate-300">System Role</label>
-                  <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                    {(["PRO_COMPETITOR", "MATCH_DIRECTOR", "MEMBER"] as const).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setProfileForm({ ...profileForm, role: r })}
-                        className={`py-1.5 px-2 rounded-xl border text-center transition-all text-xs ${
-                          profileForm.role === r
-                            ? "bg-amber-500 text-black font-bold border-amber-400"
-                            : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        {r === "PRO_COMPETITOR" ? "PRO" : r === "MATCH_DIRECTOR" ? "DIRECTOR" : "MEMBER"}
-                      </button>
-                    ))}
-                  </div>
+                  {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN") ? (
+                    <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2.5 ${
+                      profileForm.role === "OWNER_ADMIN"
+                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                        : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                    }`}>
+                      <span className="text-xl shrink-0">{profileForm.role === "OWNER_ADMIN" ? "🎖️" : "👑"}</span>
+                      <div>
+                        <div className="font-extrabold text-xs">
+                          {profileForm.role === "OWNER_ADMIN" ? "OWNER ADMIN (EXECUTIVE CLEARANCE)" : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
+                        </div>
+                        <div className="text-[10px] text-slate-400">
+                          {profileForm.role === "OWNER_ADMIN" ? "Verified Society Leadership Authority" : "Full Administrative & Security Authority"}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+                      {(["PRO_COMPETITOR", "MATCH_DIRECTOR", "MEMBER"] as const).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => setProfileForm({ ...profileForm, role: r })}
+                          className={`py-1.5 px-2 rounded-xl border text-center transition-all text-xs ${
+                            profileForm.role === r
+                              ? "bg-amber-500 text-black font-bold border-amber-400"
+                              : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          {r === "PRO_COMPETITOR" ? "PRO" : r === "MATCH_DIRECTOR" ? "DIRECTOR" : "MEMBER"}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-2">

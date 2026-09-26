@@ -96,7 +96,7 @@ export interface ChatMessage {
     name: string;
     callsign?: string;
     avatarUrl?: string;
-    role: "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER" | "AI_MODERATOR";
+    role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER" | "AI_MODERATOR";
     badgeText?: string;
     division?: string;
     rifleSetup?: string;
@@ -181,6 +181,7 @@ export interface SocietyMember {
   interests: string[];
   created_at: string;
   status?: "ACTIVE" | "PROVISIONAL" | "HONORARY" | "PAUSED" | "BANNED";
+  role?: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "MATCH_DIRECTOR" | "OFFICIAL" | "PRO_COMPETITOR" | "MEMBER";
   notes?: string;
 }
 

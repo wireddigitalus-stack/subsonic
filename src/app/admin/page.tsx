@@ -82,15 +82,30 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "APEX-VIP",
+    callsign: "ROB",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Founding Member / Master Series",
+    experience_level: "Master Owner / Dev Admin",
     rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Ballistics Lab"],
+    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Dev Operations"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
-    notes: "Founding Member - Full Executive, VIP Comms & Match Directorship",
+    role: "MASTER_OWNER",
+    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468)",
+  },
+  {
+    member_id: "SS-2026-0002",
+    full_name: "Allen Hurley",
+    callsign: "ALLEN",
+    email: "allen@subsonicsociety.com",
+    state: "TN",
+    experience_level: "Owner Admin / Executive",
+    rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
+    interests: ["Society Leadership", "Executive Comms", "Match Operations", "The Hideout Bristol"],
+    created_at: "2026-07-04T12:00:00Z",
+    status: "ACTIVE",
+    role: "OWNER_ADMIN",
+    notes: "Owner Admin & Executive — Full Management Authority (PIN: 620620)",
   },
   {
     member_id: "SS-2026-1001",
@@ -192,6 +207,12 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
 
 export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminSession, setAdminSession] = useState<{
+    name: string;
+    callsign: string;
+    role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN";
+    memberId: string;
+  } | null>(null);
   const [passkeyInput, setPasskeyInput] = useState("");
   const [passkeyError, setPasskeyError] = useState(false);
 
@@ -230,6 +251,7 @@ export default function AdminDashboardPage() {
     experience_level: string;
     rifle_setup: string;
     status: "ACTIVE" | "PAUSED" | "BANNED" | "PROVISIONAL" | "HONORARY";
+    role?: SocietyMember["role"];
     notes: string;
   }>({
     member_id: "",
@@ -383,6 +405,7 @@ export default function AdminDashboardPage() {
       experience_level: member.experience_level,
       rifle_setup: member.rifle_setup || "",
       status: member.status || "ACTIVE",
+      role: member.role,
       notes: member.notes || "",
     });
     setMemberModalTab("DETAILS");
@@ -481,6 +504,20 @@ export default function AdminDashboardPage() {
     try {
       if (typeof window !== "undefined" && localStorage.getItem("subsonic_admin_authenticated") === "true") {
         setIsAuthenticated(true);
+        const savedSession = localStorage.getItem("subsonic_admin_session");
+        if (savedSession) {
+          try {
+            setAdminSession(JSON.parse(savedSession));
+          } catch {}
+        } else {
+          // Default to Master Owner Rob Neilson if previously authenticated
+          setAdminSession({
+            name: "Rob Neilson",
+            callsign: "ROB",
+            role: "MASTER_OWNER",
+            memberId: "SS-2026-0001",
+          });
+        }
       }
     } catch {}
 
@@ -514,16 +551,57 @@ export default function AdminDashboardPage() {
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = passkeyInput.trim().toLowerCase();
-    const VALID_ADMIN_KEYS = ["2468", "subsonic2026", "admin"];
+    const VALID_ADMIN_KEYS = ["2468", "620620", "subsonic2026", "admin"];
     if (VALID_ADMIN_KEYS.includes(clean)) {
       setIsAuthenticated(true);
       setPasskeyError(false);
+
+      let session: {
+        name: string;
+        callsign: string;
+        role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN";
+        memberId: string;
+      } = {
+        name: "Rob Neilson",
+        callsign: "ROB",
+        role: "MASTER_OWNER",
+        memberId: "SS-2026-0001",
+      };
+
+      if (clean === "620620") {
+        session = {
+          name: "Allen Hurley",
+          callsign: "ALLEN",
+          role: "OWNER_ADMIN",
+          memberId: "SS-2026-0002",
+        };
+      } else if (clean === "subsonic2026" || clean === "admin") {
+        session = {
+          name: "System Administrator",
+          callsign: "ADMIN",
+          role: "ADMIN",
+          memberId: "SS-ADMIN-SYS",
+        };
+      }
+
+      setAdminSession(session);
+
       try {
         localStorage.setItem("subsonic_admin_authenticated", "true");
+        localStorage.setItem("subsonic_admin_session", JSON.stringify(session));
       } catch {}
     } else {
       setPasskeyError(true);
     }
+  };
+
+  const handleLock = () => {
+    setIsAuthenticated(false);
+    setAdminSession(null);
+    try {
+      localStorage.removeItem("subsonic_admin_authenticated");
+      localStorage.removeItem("subsonic_admin_session");
+    } catch {}
   };
 
   const handleClearTelemetry = async () => {
@@ -621,7 +699,7 @@ export default function AdminDashboardPage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter passkey or PIN (e.g. 2468)..."
+                placeholder="Enter passkey or PIN (e.g. 2468 or 620620)..."
                 value={passkeyInput}
                 onChange={(e) => {
                   setPasskeyInput(e.target.value);
@@ -631,7 +709,7 @@ export default function AdminDashboardPage() {
               />
               {passkeyError && (
                 <div className="text-[11px] text-red-400 font-mono mt-1">
-                  Invalid security passkey. Try PIN &quot;2468&quot; or &quot;subsonic2026&quot;.
+                  Invalid security passkey. Try PIN &quot;2468&quot;, &quot;620620&quot;, or &quot;subsonic2026&quot;.
                 </div>
               )}
             </div>
@@ -647,7 +725,20 @@ export default function AdminDashboardPage() {
             {/* Instant Demo Access Button */}
             <button
               type="button"
-              onClick={() => setIsAuthenticated(true)}
+              onClick={() => {
+                const session = {
+                  name: "Rob Neilson",
+                  callsign: "ROB",
+                  role: "MASTER_OWNER" as const,
+                  memberId: "SS-2026-0001",
+                };
+                setAdminSession(session);
+                setIsAuthenticated(true);
+                try {
+                  localStorage.setItem("subsonic_admin_authenticated", "true");
+                  localStorage.setItem("subsonic_admin_session", JSON.stringify(session));
+                } catch {}
+              }}
               className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-medium text-xs border border-white/10 transition-all"
             >
               Demo One-Click Access (Subsonic Admin)
@@ -766,6 +857,19 @@ export default function AdminDashboardPage() {
               <Activity className="w-3.5 h-3.5 animate-pulse" />
               Live Site Intelligence & Admin Hub
             </span>
+            {adminSession && (
+              <span className={`text-[11px] px-3 py-1 rounded-full font-mono font-bold flex items-center gap-1.5 border shadow-sm ${
+                adminSession.role === "MASTER_OWNER"
+                  ? "bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                  : adminSession.role === "OWNER_ADMIN"
+                  ? "bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+                  : "bg-white/10 text-slate-300 border-white/20"
+              }`}>
+                <span>{adminSession.role === "MASTER_OWNER" ? "👑 MASTER OWNER:" : adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "🛡️ ADMIN:"}</span>
+                <span className="text-white font-extrabold">{adminSession.name} [{adminSession.callsign}]</span>
+                <span className="text-[9px] opacity-75 font-normal">({adminSession.memberId})</span>
+              </span>
+            )}
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               <span>Durable Storage: data/telemetry-events.jsonl ({events.length} Recorded)</span>
@@ -833,7 +937,7 @@ export default function AdminDashboardPage() {
           </button>
 
           <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={handleLock}
             className="px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-400 hover:text-white"
           >
             Lock
@@ -1066,6 +1170,10 @@ export default function AdminDashboardPage() {
                         ? "border-red-500/50 bg-red-950/20"
                         : isPaused
                         ? "border-amber-500/50 bg-amber-950/20"
+                        : m.role === "MASTER_OWNER"
+                        ? "border-amber-400/60 bg-gradient-to-b from-amber-950/25 to-black/50 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+                        : m.role === "OWNER_ADMIN"
+                        ? "border-emerald-400/60 bg-gradient-to-b from-emerald-950/25 to-black/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
                         : "border-white/10 hover:border-amber-400/60 bg-white/[0.02] hover:bg-white/[0.04]"
                     }`}
                   >
@@ -1083,6 +1191,16 @@ export default function AdminDashboardPage() {
                             <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
                               [{displayCallsign}]
                             </span>
+                            {m.role === "MASTER_OWNER" && (
+                              <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-500 text-black border border-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.5)] shrink-0">
+                                👑 MASTER OWNER
+                              </span>
+                            )}
+                            {m.role === "OWNER_ADMIN" && (
+                              <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0">
+                                🎖️ OWNER ADMIN
+                              </span>
+                            )}
                           </div>
                           <div className="text-xs font-mono font-bold text-amber-400">
                             {m.member_id}

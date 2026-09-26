@@ -186,19 +186,23 @@ export default function HomePage() {
     const cleanCallsign = callsign.trim().toUpperCase();
     const cleanPass = passcode.trim();
 
-    // Specific PIN for Founding Member ROB: "2468" (also accepts SUBSONIC2026)
-    const isRobValid = cleanCallsign === "ROB" && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
-    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468"].includes(cleanPass);
+    // Specific Executive PINs:
+    // Rob Neilson: "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
+    const isRob = cleanCallsign === "ROB";
+    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY";
 
-    if (!isRobValid && !isGeneralValid) {
+    const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
+    const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026");
+    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
+
+    if (!isRobValid && !isAllenValid && !isGeneralValid) {
       triggerFormError("Invalid Member Key or PIN. Contact your Range Marshal for access.");
       return;
     }
 
     setIsSubmitting(true);
     playTacticalChirp(1200);
-
-    const isRob = cleanCallsign === "ROB";
 
     // Merge with saved member profile — never overwrite member_id or full_name with demo data
     const existingMember = (() => {
@@ -216,16 +220,39 @@ export default function HomePage() {
     })();
 
     const activeProfile = {
-      // Preserve existing member ID — for ROB, always official Founding Member ID SS-2026-0001
-      member_id: isRob ? "SS-2026-0001" : (existingMember?.member_id || existingProfile?.member_id || null),
-      // Name: for ROB always Rob Neilson, otherwise prefer typed > existing > callsign
-      name: isRob ? "Rob Neilson" : (shooterName.trim() || existingMember?.full_name || existingProfile?.name || cleanCallsign),
-      callsign: cleanCallsign,
-      role: existingProfile?.role || "PRO_COMPETITOR",
-      division: division || existingProfile?.division || "Open Division Pro",
-      // Preserve existing rifle setup if user hasn't changed it
-      rifleSetup: existingProfile?.rifleSetup || existingMember?.rifle_setup || "Custom Precision Rimfire",
-      badgeText: division.includes("Production") ? "PRODUCTION" : "PRO SHOOTER",
+      // Official Member IDs
+      member_id: isRob 
+        ? "SS-2026-0001" 
+        : isAllen 
+        ? "SS-2026-0002" 
+        : (existingMember?.member_id || existingProfile?.member_id || null),
+      // Official Names
+      name: isRob 
+        ? "Rob Neilson" 
+        : isAllen 
+        ? "Allen Hurley" 
+        : (shooterName.trim() || existingMember?.full_name || existingProfile?.name || cleanCallsign),
+      callsign: isAllen ? "ALLEN" : cleanCallsign,
+      role: isRob 
+        ? ("MASTER_OWNER" as const)
+        : isAllen 
+        ? ("OWNER_ADMIN" as const)
+        : (existingProfile?.role || "PRO_COMPETITOR"),
+      division: isRob 
+        ? "Master Owner / Dev Admin" 
+        : isAllen 
+        ? "Owner Admin / Executive" 
+        : (division || existingProfile?.division || "Open Division Pro"),
+      rifleSetup: isRob 
+        ? (existingProfile?.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527") 
+        : isAllen 
+        ? (existingProfile?.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527") 
+        : (existingProfile?.rifleSetup || existingMember?.rifle_setup || "Custom Precision Rimfire"),
+      badgeText: isRob 
+        ? "MASTER OWNER" 
+        : isAllen 
+        ? "OWNER ADMIN" 
+        : (division.includes("Production") ? "PRODUCTION" : "PRO SHOOTER"),
     };
 
     if (typeof window !== "undefined") {
@@ -237,9 +264,19 @@ export default function HomePage() {
             full_name: "Rob Neilson",
             callsign: "ROB",
             state: "TN",
-            experience_level: "Open Division Pro",
+            experience_level: "Master Owner / Dev Admin",
             rifle_setup: activeProfile.rifleSetup,
-            created_at: existingMember?.created_at || "2026-01-01T00:00:00.000Z"
+            created_at: existingMember?.created_at || "2026-07-04T12:00:00Z"
+          }));
+        } else if (isAllen) {
+          localStorage.setItem("subsonic_member_profile", JSON.stringify({
+            member_id: "SS-2026-0002",
+            full_name: "Allen Hurley",
+            callsign: "ALLEN",
+            state: "TN",
+            experience_level: "Owner Admin / Executive",
+            rifle_setup: activeProfile.rifleSetup,
+            created_at: existingMember?.created_at || "2026-07-04T12:00:00Z"
           }));
         }
         localStorage.setItem("subsonic_chat_authenticated", "true");
