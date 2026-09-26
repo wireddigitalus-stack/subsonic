@@ -37,7 +37,8 @@ import {
   QrCode,
   Pin,
   ChevronUp,
-  Bell
+  Bell,
+  CheckCircle2
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData } from "@/lib/types";
@@ -660,6 +661,8 @@ export default function ChatPage() {
     setIsDopeModalOpen(false);
   };
 
+  const [profileSaved, setProfileSaved] = useState(false);
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     const updated = {
@@ -675,8 +678,15 @@ export default function ChatPage() {
     if (typeof window !== "undefined") {
       localStorage.setItem("subsonic_shooter_profile", JSON.stringify(updated));
     }
-    setIsProfileModalOpen(false);
+    // Show saved confirmation then close
+    setProfileSaved(true);
+    playTacticalChirp(1200);
+    setTimeout(() => {
+      setProfileSaved(false);
+      setIsProfileModalOpen(false);
+    }, 1500);
   };
+
 
   const handleAddReaction = (messageId: string, emoji: string) => {
     setMessages((prev) =>
@@ -1934,18 +1944,30 @@ export default function ChatPage() {
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-2">
+                  {profileSaved && (
+                    <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 animate-fadeIn">
+                      <CheckCircle2 className="w-4 h-4" />
+                      PROFILE SAVED!
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => setIsProfileModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
+                    disabled={profileSaved}
+                    className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold disabled:opacity-40"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow"
+                    disabled={profileSaved}
+                    className={`px-5 py-2 rounded-xl font-mono font-bold text-xs shadow-tactical-glow transition-all ${
+                      profileSaved
+                        ? "bg-emerald-500 text-white scale-105"
+                        : "bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110"
+                    }`}
                   >
-                    SAVE PROFILE
+                    {profileSaved ? "✓ SAVED!" : "SAVE PROFILE"}
                   </button>
                 </div>
               </form>
@@ -1956,3 +1978,4 @@ export default function ChatPage() {
     </div>
   );
 }
+
