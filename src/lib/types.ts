@@ -26,6 +26,15 @@ export interface TelemetryEvent {
   scrollDepth?: number;
 }
 
+export interface ChannelConfig {
+  id: string;
+  name: string;
+  badge: string;
+  desc: string;
+  netType: "PUBLIC" | "PRO";
+  activeUsers: number;
+}
+
 export interface MatchEvent {
   id: string;
   title: string;

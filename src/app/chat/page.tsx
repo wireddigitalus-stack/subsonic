@@ -50,6 +50,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
+import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -245,6 +246,8 @@ export default function ChatPage() {
 
   // Interactive Guided Chat Tour state
   const [isTourOpen, setIsTourOpen] = useState(false);
+  // Tactile Channel Picker Drawer state
+  const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
 
   // Auto-launch Tour for first-time users once authenticated
   useEffect(() => {
@@ -1016,8 +1019,8 @@ export default function ChatPage() {
       data-section="chat"
       className={
         isFullscreen
-          ? "fixed inset-0 z-[60] bg-[#07090E] p-2 sm:p-4 flex flex-col h-[100dvh] w-full overflow-hidden animate-fadeIn"
-          : "flex flex-col h-full w-full overflow-hidden pt-20 sm:pt-24 bg-[#07090E]"
+          ? "fixed inset-0 z-[60] bg-[#07090E] p-2 sm:p-4 flex flex-col h-[100dvh] w-full max-w-full overflow-hidden overflow-x-hidden animate-fadeIn"
+          : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden pt-20 sm:pt-24 bg-[#07090E]"
       }
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
@@ -1047,8 +1050,8 @@ export default function ChatPage() {
               <QrCode className="w-3.5 h-3.5 text-emerald-400" />
             </button>
 
-            {/* Mobile Actions: Tour, Audio, Fullscreen, Admin, Lock */}
-            <div className="flex items-center gap-1.5">
+            {/* Mobile Actions: Tour, Audio, Lock (Essential Comms Only) */}
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -1078,24 +1081,6 @@ export default function ChatPage() {
                   <VolumeX className="w-3.5 h-3.5 text-slate-400" />
                 )}
               </button>
-
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(true)}
-                className="h-7 w-7 rounded-lg bg-white/5 border border-white/10 text-slate-300 flex items-center justify-center"
-                title="Fullscreen"
-              >
-                <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
-              </button>
-
-              <Link
-                href="/admin"
-                target="_blank"
-                title="Admin Dashboard"
-                className="h-7 w-7 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 flex items-center justify-center"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-              </Link>
 
               <button
                 type="button"
@@ -1313,101 +1298,143 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 2. MOBILE-FIRST SWIPEABLE CHANNEL SELECTOR */}
-      <div id="tour-step-channels" className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 pb-1">
-      <div className="space-y-1.5">
-        {/* Network Mode Selector Tabs */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveNetTab("PRO");
-                if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
-                  setCurrentChannel("bristol-pro-shootout");
-                }
-              }}
-              className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
-                activeNetTab === "PRO"
-                  ? "bg-amber-500 text-black shadow-tactical-glow"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <Lock className="w-3 h-3" />
-              <span>PRO NET</span>
-            </button>
+      {/* 2. CHANNEL SELECTOR — ZERO HORIZONTAL OVERFLOW ON MOBILE */}
+      <div id="tour-step-channels" className="shrink-0 px-2 sm:px-4 lg:px-6 pt-1.5 pb-1">
+        {/* MOBILE TACTICAL FREQUENCY DIAL BUTTON (Fits 100% width, no side-scroll, voice & text searchable) */}
+        <div className="sm:hidden">
+          <button
+            type="button"
+            onClick={() => {
+              setIsChannelModalOpen(true);
+              playTacticalChirp(1100);
+            }}
+            className="w-full p-2.5 px-3 rounded-2xl bg-black/70 border border-amber-500/40 hover:border-amber-400 shadow-tactical-glow flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-xl bg-amber-500 text-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(245,158,11,0.4)]">
+                #
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-white text-xs truncate">
+                    {currentChannelData.name}
+                  </span>
+                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 shrink-0">
+                    {currentChannelData.badge}
+                  </span>
+                </div>
+                <p className="text-[10px] font-mono text-slate-400 truncate max-w-[200px]">
+                  {currentChannelData.desc}
+                </p>
+              </div>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setActiveNetTab("PUBLIC");
-                if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
-                  setCurrentChannel("general-society");
-                }
-              }}
-              className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
-                activeNetTab === "PUBLIC"
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <Users className="w-3 h-3" />
-              <span>PUBLIC NET</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!isFullscreen && (
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(true)}
-                className="lg:hidden p-1.5 px-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-mono flex items-center gap-1"
-                title="Expand to Fullscreen"
-              >
-                <Maximize2 className="w-3 h-3" />
-                <span>Full App</span>
-              </button>
-            )}
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hidden sm:inline">
-              {activeNetTab === "PRO" ? "VERIFIED SQUAD COMMS" : "OPEN SOCIETY"}
-            </span>
-          </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] font-mono text-slate-400">{currentChannelData.activeUsers} online</span>
+              <div className="px-2 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 font-mono text-[10px] font-bold text-amber-300 flex items-center gap-1">
+                <span>ROOMS</span>
+                <ChevronDown className="w-3.5 h-3.5 text-amber-400" />
+              </div>
+            </div>
+          </button>
         </div>
 
-        {/* Horizontal Swipeable Channel Pills (Native iOS Swipe Strip) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
-          {visibleChannels.map((ch) => {
-            const isActive = currentChannel === ch.id;
-            const unread = unreadCounts[ch.id] || 0;
-            return (
+        {/* DESKTOP CHANNEL SELECTOR BAR (Hidden on mobile) */}
+        <div className="hidden sm:block space-y-1.5">
+          {/* Network Mode Selector Tabs */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
               <button
-                key={ch.id}
                 type="button"
-                onClick={() => setCurrentChannel(ch.id)}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
-                  isActive
-                    ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
-                    : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                onClick={() => {
+                  setActiveNetTab("PRO");
+                  if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
+                    setCurrentChannel("bristol-pro-shootout");
+                  }
+                }}
+                className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  activeNetTab === "PRO"
+                    ? "bg-amber-500 text-black shadow-tactical-glow"
+                    : "text-slate-400 hover:text-white"
                 }`}
               >
-                <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
-                <span>{ch.name}</span>
-                {unread > 0 && !isActive ? (
-                  <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
-                    {unread > 9 ? "9+" : unread}
-                  </span>
-                ) : (
-                  <span className={`text-[9px] px-1 rounded ${
-                    isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
-                  }`}>
-                    {ch.activeUsers}
-                  </span>
-                )}
+                <Lock className="w-3 h-3" />
+                <span>PRO NET</span>
               </button>
-            );
-          })}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNetTab("PUBLIC");
+                  if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
+                    setCurrentChannel("general-society");
+                  }
+                }}
+                className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  activeNetTab === "PUBLIC"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <Users className="w-3 h-3" />
+                <span>PUBLIC NET</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsChannelModalOpen(true);
+                  playTacticalChirp(1100);
+                }}
+                className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-all"
+                title="Search and switch rooms"
+              >
+                <Radio className="w-3.5 h-3.5 text-amber-400" />
+                <span>Browse All Rooms</span>
+              </button>
+
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hidden sm:inline">
+                {activeNetTab === "PRO" ? "VERIFIED SQUAD COMMS" : "OPEN SOCIETY"}
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Channel Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+            {visibleChannels.map((ch) => {
+              const isActive = currentChannel === ch.id;
+              const unread = unreadCounts[ch.id] || 0;
+              return (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => setCurrentChannel(ch.id)}
+                  className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
+                    isActive
+                      ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
+                      : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
+                  <span>{ch.name}</span>
+                  {unread > 0 && !isActive ? (
+                    <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  ) : (
+                    <span className={`text-[9px] px-1 rounded ${
+                      isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
+                    }`}>
+                      {ch.activeUsers}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
       </div>
 
 
@@ -1786,47 +1813,60 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Quick Push-To-Talk Radio Chips above input */}
-          <div id="tour-step-plink" className="px-3 pt-2 bg-black/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-white/10 shrink-0">
-            <Radio className="w-3 h-3 text-cyan-400 shrink-0 ml-1" />
+          {/* Quick Push-To-Talk Radio Chips above input — zero overflow on mobile */}
+          <div id="tour-step-plink" className="px-3 pt-2 pb-1 bg-black/70 flex items-center justify-between gap-1.5 border-t border-white/10 shrink-0">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Radio className="w-3 h-3 text-cyan-400 shrink-0 hidden sm:inline" />
+              <button
+                type="button"
+                onClick={() => {
+                  setInputText("hey plink");
+                  playTacticalChirp(1100);
+                }}
+                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold shrink-0"
+                title="Chat with Plink AI Range Marshal"
+              >
+                🤖 &ldquo;Hey Plink&rdquo;
+              </button>
+              <button
+                type="button"
+                onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
+                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/5 transition-all shrink-0"
+              >
+                🎯 &ldquo;Impact!&rdquo;
+              </button>
+              <button
+                type="button"
+                onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
+                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/5 transition-all shrink-0"
+              >
+                🛑 &ldquo;Cold&rdquo;
+              </button>
+              <button
+                type="button"
+                onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
+                className="hidden sm:inline-block whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-white/5 transition-all"
+              >
+                💨 &ldquo;Wind switch 12mph&rdquo;
+              </button>
+              <button
+                type="button"
+                onClick={() => quickBroadcast("DOPE verified out to 465 yards.")}
+                className="hidden md:inline-block whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all"
+              >
+                📋 &ldquo;DOPE verified&rdquo;
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={() => {
-                setInputText("hey plink");
-                playTacticalChirp(1100);
+                setIsChannelModalOpen(true);
+                playTacticalChirp(1000);
               }}
-              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold"
-              title="Chat with Plink AI Range Marshal"
+              className="text-[10px] font-mono text-amber-400/80 hover:text-amber-300 flex items-center gap-0.5 shrink-0 px-1 py-0.5"
             >
-              🤖 &ldquo;Hey Plink&rdquo;
-            </button>
-            <button
-              type="button"
-              onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
-              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/5 transition-all"
-            >
-              🎯 &ldquo;Impact!&rdquo;
-            </button>
-            <button
-              type="button"
-              onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
-              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-white/5 transition-all"
-            >
-              💨 &ldquo;Wind switch 12mph&rdquo;
-            </button>
-            <button
-              type="button"
-              onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
-              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/5 transition-all"
-            >
-              🛑 &ldquo;Cold range&rdquo;
-            </button>
-            <button
-              type="button"
-              onClick={() => quickBroadcast("DOPE verified out to 465 yards.")}
-              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all"
-            >
-              📋 &ldquo;DOPE verified&rdquo;
+              <span className="truncate max-w-[100px] sm:max-w-none">#{currentChannelData.name}</span>
             </button>
           </div>
 
@@ -2238,6 +2278,17 @@ export default function ChatPage() {
       <ChatTour
         isOpen={isTourOpen}
         onClose={() => setIsTourOpen(false)}
+        onPlayChirp={playTacticalChirp}
+      />
+
+      {/* 6. TACTILE CHANNEL SELECTOR DRAWER (VOICE & TEXT SEARCH) */}
+      <ChannelPickerModal
+        isOpen={isChannelModalOpen}
+        onClose={() => setIsChannelModalOpen(false)}
+        channels={ALL_CHANNELS}
+        currentChannel={currentChannel}
+        onSelectChannel={(chId) => setCurrentChannel(chId)}
+        unreadCounts={unreadCounts}
         onPlayChirp={playTacticalChirp}
       />
     </div>
