@@ -287,16 +287,16 @@ export default function ChatPage() {
           const cloudMsgs: ChatMessage[] = data.map((d: any) => ({
             id: d.id,
             channelId: d.channel_id,
-            type: d.message_type || (d.dope_card ? "DOPE_DROP" : "STANDARD"),
+            type: d.content?.startsWith("[DOPE DROP]") ? "DOPE_DROP" : (d.message_type || "STANDARD"),
             dopeCard: d.dope_card || undefined,
             author: {
               id: d.author_id,
-              name: d.author_name,
-              callsign: d.author_callsign,
-              role: d.author_role,
-              badgeText: d.author_badge,
-              division: d.author_division,
-              rifleSetup: d.author_rifle,
+              name: d.author_name || "Verified Marksman",
+              callsign: d.author_callsign || "MARKSMAN",
+              role: d.author_role || "MEMBER",
+              badgeText: d.author_badge || "MEMBER",
+              division: d.author_division || "Open Division Pro",
+              rifleSetup: d.author_rifle || "Custom Precision Rimfire",
             },
             content: d.content,
             timestamp: new Date(d.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -332,16 +332,16 @@ export default function ChatPage() {
           const incoming: ChatMessage = {
             id: row.id,
             channelId: row.channel_id,
-            type: row.message_type || (row.dope_card ? "DOPE_DROP" : "STANDARD"),
+            type: row.content?.startsWith("[DOPE DROP]") ? "DOPE_DROP" : (row.message_type || "STANDARD"),
             dopeCard: row.dope_card || undefined,
             author: {
               id: row.author_id,
-              name: row.author_name,
-              callsign: row.author_callsign,
-              role: row.author_role,
-              badgeText: row.author_badge,
-              division: row.author_division,
-              rifleSetup: row.author_rifle,
+              name: row.author_name || "Verified Marksman",
+              callsign: row.author_callsign || "MARKSMAN",
+              role: row.author_role || "MEMBER",
+              badgeText: row.author_badge || "MEMBER",
+              division: row.author_division || "Open Division Pro",
+              rifleSetup: row.author_rifle || "Custom Precision Rimfire",
             },
             content: row.content,
             timestamp: new Date(row.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -499,37 +499,40 @@ export default function ChatPage() {
     // Smoothly scroll only within the container for user's own sent message
     setTimeout(() => scrollContainerToBottom(true), 50);
 
-    // Persist to Supabase Cloud Database
+    // Persist to Supabase Cloud Database (Strictly Schema-Aligned)
     if (isSupabaseConfigured && supabase) {
+      const payloadContent = newMsg.dopeCard
+        ? `[DOPE DROP] 🎯 Target: ${newMsg.dopeCard.targetDistance} (${newMsg.dopeCard.targetDescription || ""}) | Elev: ${newMsg.dopeCard.elevationMils} | Wind: ${newMsg.dopeCard.windHoldMils} (${newMsg.dopeCard.windVelocity || ""}) | Ammo: ${newMsg.dopeCard.ammo || ""}\n${newMsg.content || ""}`.trim()
+        : newMsg.content;
+
       supabase
         .from("chat_messages")
         .insert([
           {
             id: newMsg.id,
             channel_id: newMsg.channelId,
-            message_type: newMsg.type,
-            dope_card: newMsg.dopeCard,
             author_id: newMsg.author.id,
             author_name: newMsg.author.name,
             author_callsign: newMsg.author.callsign,
             author_role: newMsg.author.role,
             author_badge: newMsg.author.badgeText,
-            author_division: newMsg.author.division,
-            author_rifle: newMsg.author.rifleSetup,
-            content: newMsg.content,
+            content: payloadContent,
             moderation_status: newMsg.moderationStatus,
-            ai_toxicity_score: newMsg.aiModerationReport?.toxicityScore || 0,
-            ai_threat_score: newMsg.aiModerationReport?.threatScore || 0,
-            ai_policy_score: newMsg.aiModerationReport?.policyScore || 0,
+            ai_toxicity_score: Math.round((newMsg.aiModerationReport?.toxicityScore || 0) * 100),
+            ai_threat_score: Math.round((newMsg.aiModerationReport?.threatScore || 0) * 100),
+            ai_policy_score: Math.round((newMsg.aiModerationReport?.policyScore || 0) * 100),
             ai_flag_reason: newMsg.aiModerationReport?.flagReason || null,
             ai_sentiment: newMsg.aiModerationReport?.sentiment || "NEUTRAL",
-            ai_engine: aiEngine,
-            reactions: newMsg.reactions,
+            reactions: newMsg.reactions || [],
             created_at: new Date().toISOString(),
           },
         ])
         .then(({ error }) => {
-          if (error) console.warn("Supabase persistence note:", error.message);
+          if (error) {
+            console.error("Supabase live chat persistence error:", error.message);
+          } else {
+            console.log("Supabase: chat message saved live to cloud database.");
+          }
         });
     }
 
