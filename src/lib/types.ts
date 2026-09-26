@@ -164,13 +164,15 @@ export interface CommsAbuseAlert {
 export interface SocietyMember {
   member_id: string;
   full_name: string;
+  callsign?: string;
   email: string;
   state: string;
   experience_level: string;
   rifle_setup: string;
   interests: string[];
   created_at: string;
-  status?: "ACTIVE" | "PROVISIONAL" | "HONORARY";
+  status?: "ACTIVE" | "PROVISIONAL" | "HONORARY" | "PAUSED" | "BANNED";
+  notes?: string;
 }
 
 export interface MatchRegistration {

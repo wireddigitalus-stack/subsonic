@@ -40,7 +40,16 @@ import {
   Building2,
   Phone,
   Sparkles,
-  Tag
+  Tag,
+  Pause,
+  Ban,
+  Edit3,
+  Save,
+  AlertTriangle,
+  QrCode,
+  Crosshair,
+  UserX,
+  ShieldCheck
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -63,6 +72,7 @@ import {
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
+import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 
 export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -91,6 +101,35 @@ export default function AdminDashboardPage() {
 
   const [memberSearch, setMemberSearch] = useState("");
   const [memberStateFilter, setMemberStateFilter] = useState("ALL");
+
+  // Member Profile Management Modal State
+  const [selectedMember, setSelectedMember] = useState<SocietyMember | null>(null);
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
+  const [memberForm, setMemberForm] = useState<{
+    member_id: string;
+    full_name: string;
+    callsign: string;
+    email: string;
+    state: string;
+    experience_level: string;
+    rifle_setup: string;
+    status: "ACTIVE" | "PAUSED" | "BANNED" | "PROVISIONAL" | "HONORARY";
+    notes: string;
+  }>({
+    member_id: "",
+    full_name: "",
+    callsign: "",
+    email: "",
+    state: "TN",
+    experience_level: "Competitor",
+    rifle_setup: "",
+    status: "ACTIVE",
+    notes: "",
+  });
+  const [memberModalTab, setMemberModalTab] = useState<"DETAILS" | "PASS">("DETAILS");
+  const [isSavingMember, setIsSavingMember] = useState(false);
+  const [memberActionNotice, setMemberActionNotice] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const [regSearch, setRegSearch] = useState("");
   const [regMatchFilter, setRegMatchFilter] = useState("ALL");
@@ -215,6 +254,103 @@ export default function AdminDashboardPage() {
 
   const downloadMembersExport = () => {
     window.open("/api/join?export=csv", "_blank");
+  };
+
+  const handleOpenMemberModal = (member: SocietyMember) => {
+    setSelectedMember(member);
+    setMemberForm({
+      member_id: member.member_id,
+      full_name: member.full_name,
+      callsign: member.callsign || (member.full_name ? member.full_name.split(" ")[0].toUpperCase() : "MARKSMAN"),
+      email: member.email,
+      state: member.state,
+      experience_level: member.experience_level,
+      rifle_setup: member.rifle_setup || "",
+      status: member.status || "ACTIVE",
+      notes: member.notes || "",
+    });
+    setMemberModalTab("DETAILS");
+    setShowDeleteConfirm(false);
+    setMemberActionNotice(null);
+    setIsMemberModalOpen(true);
+  };
+
+  const handleSaveMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!memberForm.member_id) return;
+    setIsSavingMember(true);
+    setMemberActionNotice(null);
+
+    try {
+      const res = await fetch("/api/join", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(memberForm),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.member) {
+        setMembers((prev) =>
+          prev.map((m) => (m.member_id === memberForm.member_id ? data.member : m))
+        );
+        setSelectedMember(data.member);
+        setMemberActionNotice(`Member ${memberForm.member_id} updated successfully.`);
+      } else {
+        setMemberActionNotice(data.error || "Failed to update member.");
+      }
+    } catch (err: any) {
+      setMemberActionNotice("Network error updating member: " + err.message);
+    } finally {
+      setIsSavingMember(false);
+      setTimeout(() => setMemberActionNotice(null), 4000);
+    }
+  };
+
+  const handleQuickStatusChange = async (
+    memberId: string,
+    newStatus: "ACTIVE" | "PAUSED" | "BANNED"
+  ) => {
+    try {
+      const res = await fetch("/api/join", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ member_id: memberId, status: newStatus }),
+      });
+      const data = await res.json();
+      if (res.ok && data.member) {
+        setMembers((prev) =>
+          prev.map((m) => (m.member_id === memberId ? data.member : m))
+        );
+        if (selectedMember && selectedMember.member_id === memberId) {
+          setSelectedMember(data.member);
+          setMemberForm((prev) => ({ ...prev, status: newStatus }));
+        }
+        setMemberActionNotice(`Member status updated to ${newStatus}.`);
+      }
+    } catch (err: any) {
+      setMemberActionNotice("Error updating status: " + err.message);
+    } finally {
+      setTimeout(() => setMemberActionNotice(null), 4000);
+    }
+  };
+
+  const handleDeleteMember = async (memberId: string) => {
+    try {
+      const res = await fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMembers((prev) => prev.filter((m) => m.member_id !== memberId));
+        setIsMemberModalOpen(false);
+        setSelectedMember(null);
+        setShowDeleteConfirm(false);
+        setMemberActionNotice(`Member ${memberId} has been permanently deleted.`);
+      }
+    } catch (err: any) {
+      setMemberActionNotice("Error deleting member: " + err.message);
+    } finally {
+      setTimeout(() => setMemberActionNotice(null), 5000);
+    }
   };
 
   const downloadRegistrationsExport = () => {
@@ -437,7 +573,20 @@ export default function AdminDashboardPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 space-y-8 max-w-full overflow-x-hidden">
+      {/* Member Management Toast Notice */}
+      {memberActionNotice && (
+        <div className="rounded-2xl bg-amber-500/20 border border-amber-500/40 p-3 sm:p-4 text-amber-300 text-xs sm:text-sm font-mono font-bold flex items-center justify-between shadow-tactical-glow animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>{memberActionNotice}</span>
+          </div>
+          <button onClick={() => setMemberActionNotice(null)} className="text-slate-400 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Top Persistent Comms Abuse Alert Banner */}
       {activeAbuseCount > 0 && !globalBannerDismissed && activeAdminTab !== "AI_MODERATION" && (
         <div className="rounded-2xl bg-gradient-to-r from-red-950/90 via-black to-red-950/90 border-2 border-red-500/70 p-4 sm:p-5 shadow-[0_0_25px_rgba(239,68,68,0.35)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse">
@@ -756,76 +905,187 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          {/* Members Table */}
-          <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-white/10 bg-black/50 text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                    <th className="p-4">Member ID</th>
-                    <th className="p-4">Marksman Name</th>
-                    <th className="p-4">Email</th>
-                    <th className="p-4">State</th>
-                    <th className="p-4">Classification</th>
-                    <th className="p-4">Primary Rifle Rig</th>
-                    <th className="p-4">Interests</th>
-                    <th className="p-4">Date Joined</th>
-                    <th className="p-4 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5 font-mono">
-                  {filteredMembers.map((m) => (
-                    <tr key={m.member_id} className="hover:bg-white/5 transition-colors">
-                      <td className="p-4 font-bold text-amber-400">
-                        {m.member_id}
-                      </td>
-                      <td className="p-4 font-sans font-bold text-white">
-                        {m.full_name}
-                      </td>
-                      <td className="p-4 text-slate-300">
-                        <a href={`mailto:${m.email}`} className="hover:text-amber-400 hover:underline">
-                          {m.email}
-                        </a>
-                      </td>
-                      <td className="p-4">
-                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-bold">
-                          {m.state}
-                        </span>
-                      </td>
-                      <td className="p-4 font-sans text-slate-200">
-                        {m.experience_level}
-                      </td>
-                      <td className="p-4 font-sans text-xs text-slate-300 max-w-xs truncate">
-                        {m.rifle_setup || "Custom Rimfire"}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex flex-wrap gap-1 max-w-xs">
-                          {(m.interests || []).map((int, i) => (
-                            <span key={i} className="text-[9px] px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-sans">
-                              {int}
+          {/* Members Zero-Side-Scroll Responsive Directory */}
+          <div className="space-y-3 w-full max-w-full overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-1 text-xs font-mono text-slate-400">
+              <span>Showing {filteredMembers.length} Verified Members</span>
+              <span className="text-[11px] text-amber-400 font-bold">
+                💡 Click any member card to Edit, Pause, Ban, Delete, or View Pass
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 w-full max-w-full">
+              {filteredMembers.map((m) => {
+                const isBanned = m.status === "BANNED";
+                const isPaused = m.status === "PAUSED";
+                const displayCallsign = m.callsign || (m.full_name ? m.full_name.split(" ")[0].toUpperCase() : "MARKSMAN");
+
+                return (
+                  <div
+                    key={m.member_id}
+                    className={`ios-glass-card rounded-2xl p-4 sm:p-5 border transition-all shadow-lg relative overflow-hidden flex flex-col justify-between gap-3 w-full max-w-full ${
+                      isBanned
+                        ? "border-red-500/50 bg-red-950/20"
+                        : isPaused
+                        ? "border-amber-500/50 bg-amber-950/20"
+                        : "border-white/10 hover:border-amber-400/60 bg-white/[0.02] hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    {/* Top Row: Callsign Badge, Serialized ID, and Status */}
+                    <div 
+                      onClick={() => handleOpenMemberModal(m)}
+                      className="cursor-pointer space-y-2 group"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="space-y-0.5 min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-sans font-bold text-sm sm:text-base text-white group-hover:text-amber-300 transition-colors break-words">
+                              {m.full_name}
                             </span>
-                          ))}
+                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                              [{displayCallsign}]
+                            </span>
+                          </div>
+                          <div className="text-xs font-mono font-bold text-amber-400">
+                            {m.member_id}
+                          </div>
                         </div>
-                      </td>
-                      <td className="p-4 text-slate-400 text-[11px]">
-                        {new Date(m.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="p-4 text-right">
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+
+                        {/* Status Badge */}
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border shrink-0 ${
+                            isBanned
+                              ? "bg-red-500/20 text-red-300 border-red-500/40"
+                              : isPaused
+                              ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                              : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                          }`}
+                        >
                           {m.status || "ACTIVE"}
                         </span>
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredMembers.length === 0 && (
-                    <tr>
-                      <td colSpan={9} className="p-8 text-center text-slate-400 font-sans">
-                        No members matching current search criteria.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                      </div>
+
+                      {/* Info Chips */}
+                      <div className="flex items-center gap-2 flex-wrap text-[11px] pt-1">
+                        <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono font-bold">
+                          {m.state}
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-white/10 text-slate-200 font-sans truncate max-w-[200px]">
+                          {m.experience_level}
+                        </span>
+                      </div>
+
+                      {/* Email & Rig Details (Guaranteed no overflow) */}
+                      <div className="space-y-1 text-xs text-slate-300 pt-1">
+                        <div className="text-[11px] text-slate-300 break-all">
+                          <span className="text-slate-500 font-mono mr-1">EMAIL:</span>
+                          <span className="text-slate-300">{m.email}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-300 break-words">
+                          <span className="text-slate-500 font-mono mr-1">RIG:</span>
+                          <span className="text-slate-200">{m.rifle_setup || "Custom Precision Rimfire"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Action Footer with Quick Controls */}
+                    <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* Quick Pause / Activate */}
+                        {isPaused ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuickStatusChange(m.member_id, "ACTIVE");
+                            }}
+                            className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                            title="Unpause & Restore Member Access"
+                          >
+                            <Play className="w-3 h-3" />
+                            <span>Unpause</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuickStatusChange(m.member_id, "PAUSED");
+                            }}
+                            className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                            title="Temporarily Pause Member Access"
+                          >
+                            <Pause className="w-3 h-3" />
+                            <span>Pause</span>
+                          </button>
+                        )}
+
+                        {/* Quick Ban / Unban */}
+                        {isBanned ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuickStatusChange(m.member_id, "ACTIVE");
+                            }}
+                            className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                            title="Revoke Ban & Restore Access"
+                          >
+                            <ShieldCheck className="w-3 h-3" />
+                            <span>Unban</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuickStatusChange(m.member_id, "BANNED");
+                            }}
+                            className="px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                            title="Ban Member & Revoke Comms"
+                          >
+                            <Ban className="w-3 h-3" />
+                            <span>Ban</span>
+                          </button>
+                        )}
+
+                        {/* View Pass in Modal */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenMemberModal(m);
+                            setMemberModalTab("PASS");
+                          }}
+                          className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-[10px] font-mono flex items-center gap-1 transition-all"
+                          title="View Digital Pass & QR Code"
+                        >
+                          <QrCode className="w-3 h-3 text-amber-400" />
+                          <span>Pass</span>
+                        </button>
+                      </div>
+
+                      {/* Primary Manage Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleOpenMemberModal(m)}
+                        className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-mono font-bold flex items-center gap-1 transition-all ml-auto"
+                      >
+                        <Edit3 className="w-3 h-3 text-amber-400" />
+                        <span>Manage Profile</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {filteredMembers.length === 0 && (
+                <div className="col-span-full ios-glass rounded-2xl p-12 text-center text-slate-400 space-y-2">
+                  <UserCheck className="w-8 h-8 text-slate-600 mx-auto" />
+                  <p className="text-sm font-semibold text-white">No members found</p>
+                  <p className="text-xs text-slate-500">No member matches the current search or state filter.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1601,6 +1861,294 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* MEMBER PROFILE MANAGEMENT MODAL (EDIT, PAUSE, BAN, DELETE, PASS)    */}
+      {/* ==================================================================== */}
+      {isMemberModalOpen && selectedMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto ios-glass-card rounded-3xl p-5 sm:p-7 border border-amber-500/40 shadow-tactical-glow relative space-y-5 my-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <UserCheck className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-base sm:text-lg font-black text-white">
+                    MEMBER PROFILE &amp; ACCESS CONTROL
+                  </h3>
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    {memberForm.member_id}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Manage marksman credentials, competition classification, comms privileges, or purge record.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsMemberModalOpen(false)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Tabs: Edit Details vs Digital Pass Preview */}
+            <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+              <button
+                type="button"
+                onClick={() => setMemberModalTab("DETAILS")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                  memberModalTab === "DETAILS"
+                    ? "bg-amber-500 text-black shadow-tactical-glow"
+                    : "bg-white/5 text-slate-400 hover:text-white"
+                }`}
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>Edit Profile &amp; Access Controls</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMemberModalTab("PASS")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                  memberModalTab === "PASS"
+                    ? "bg-amber-500 text-black shadow-tactical-glow"
+                    : "bg-white/5 text-slate-400 hover:text-white"
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Live Digital Pass (QR / Barcode)</span>
+              </button>
+            </div>
+
+            {/* Tab 1: Form & Access Controls */}
+            {memberModalTab === "DETAILS" ? (
+              <form onSubmit={handleSaveMember} className="space-y-4 pt-1">
+                {/* Account Status Switcher Strip */}
+                <div className="space-y-1.5 p-3 rounded-2xl bg-black/40 border border-white/10">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase tracking-wider font-bold flex items-center justify-between">
+                    <span>Account Status &amp; Comms Privileges</span>
+                    <span className="text-amber-400 font-normal">Controls Chat Access</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMemberForm((prev) => ({ ...prev, status: "ACTIVE" }))}
+                      className={`p-2.5 rounded-xl border text-center transition-all ${
+                        memberForm.status === "ACTIVE" || !memberForm.status
+                          ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                          : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                      }`}
+                    >
+                      <div className="text-xs font-bold font-mono">🟢 ACTIVE</div>
+                      <div className="text-[10px] text-slate-400">Full Access</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMemberForm((prev) => ({ ...prev, status: "PAUSED" }))}
+                      className={`p-2.5 rounded-xl border text-center transition-all ${
+                        memberForm.status === "PAUSED"
+                          ? "bg-amber-500/25 border-amber-400 text-amber-300 font-bold shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                          : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                      }`}
+                    >
+                      <div className="text-xs font-bold font-mono">⏸️ PAUSED</div>
+                      <div className="text-[10px] text-slate-400">Temp Freeze</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMemberForm((prev) => ({ ...prev, status: "BANNED" }))}
+                      className={`p-2.5 rounded-xl border text-center transition-all ${
+                        memberForm.status === "BANNED"
+                          ? "bg-red-600/30 border-red-500 text-red-300 font-bold shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                          : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                      }`}
+                    >
+                      <div className="text-xs font-bold font-mono">🚫 BANNED</div>
+                      <div className="text-[10px] text-slate-400">Revoked</div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Grid Inputs: Full Name & Callsign */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Marksman Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={memberForm.full_name || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, full_name: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Tactical Callsign / Handle *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={memberForm.callsign || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, callsign: e.target.value.toUpperCase() }))}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono font-bold text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Email & Home State */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2 space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={memberForm.email || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Home State
+                    </label>
+                    <select
+                      value={memberForm.state || "TN"}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, state: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-amber-400"
+                    >
+                      {["TN", "VA", "NC", "KY", "WV", "GA", "SC", "AL", "FL", "PA", "OH", "TX", "OTHER"].map((st) => (
+                        <option key={st} value={st} className="bg-[#0e131d]">
+                          {st}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Classification / Division & Rifle Rig */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Competition Classification
+                    </label>
+                    <input
+                      type="text"
+                      value={memberForm.experience_level || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, experience_level: e.target.value }))}
+                      placeholder="e.g. Master / Pro Series"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Primary Rifle &amp; Optic Rig
+                    </label>
+                    <input
+                      type="text"
+                      value={memberForm.rifle_setup || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, rifle_setup: e.target.value }))}
+                      placeholder="e.g. Vudoo V-22 / Bartlein / ZCO 527"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Admin Internal Notes */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase">
+                    Admin / Staff Internal Notes
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={memberForm.notes || ""}
+                    onChange={(e) => setMemberForm((prev) => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Staff notes, squad placement, or range safety notes..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-black/40 border border-white/10 text-white text-xs focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                {/* Primary Action Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      type="submit"
+                      disabled={isSavingMember}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow transition-all"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>{isSavingMember ? "Saving Changes..." : "Save Member Changes"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsMemberModalOpen(false)}
+                      className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+
+                  {/* Danger Zone: Delete Permanently */}
+                  {!showDeleteConfirm ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-red-600/10 hover:bg-red-600/25 border border-red-500/30 text-red-400 text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete Member</span>
+                    </button>
+                  ) : (
+                    <div className="p-2.5 rounded-xl bg-red-950/80 border border-red-500/60 flex items-center gap-2 w-full sm:w-auto animate-fadeIn">
+                      <span className="text-[11px] font-mono text-red-300 font-bold">Permanently delete?</span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMember(memberForm.member_id)}
+                        className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all"
+                      >
+                        Confirm Delete
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </form>
+            ) : (
+              /* Tab 2: Live Digital Member Pass Preview (QR & Barcode) */
+              <div className="space-y-4 pt-1">
+                <MemberCredentialCard
+                  memberId={memberForm.member_id}
+                  fullName={memberForm.full_name || "Verified Marksman"}
+                  callsign={memberForm.callsign || "MARKSMAN"}
+                  state={memberForm.state || "TN"}
+                  experienceLevel={memberForm.experience_level || "Competitor"}
+                  rifleSetup={memberForm.rifle_setup || "Custom Rimfire"}
+                  accessLevel={memberForm.status === "BANNED" ? "REVOKED / BANNED" : memberForm.status === "PAUSED" ? "PAUSED" : "ACTIVE CHAT ACCESS"}
+                  showDownload={true}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

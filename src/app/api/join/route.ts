@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { fullName, email, state, experienceLevel, rifleSetup, interests } = body;
+    const { fullName, email, state, experienceLevel, rifleSetup, interests, callsign } = body;
 
     if (!fullName || !email) {
       return NextResponse.json(
@@ -215,6 +215,7 @@ export async function POST(req: NextRequest) {
     const newMember: SocietyMember = {
       member_id: memberId,
       full_name: fullName.trim(),
+      callsign: callsign ? callsign.trim().toUpperCase() : fullName.trim().split(" ")[0].toUpperCase(),
       email: email.trim().toLowerCase(),
       state: state || "TN",
       experience_level: experienceLevel || "Competitor",
@@ -254,5 +255,102 @@ export async function POST(req: NextRequest) {
       { error: "Internal server error during registration." },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { member_id, full_name, callsign, email, state, experience_level, rifle_setup, status, notes } = body;
+
+    if (!member_id) {
+      return NextResponse.json({ error: "member_id is required." }, { status: 400 });
+    }
+
+    const currentMembers = ensureStorageInitialized();
+    const index = currentMembers.findIndex((m) => m.member_id === member_id);
+
+    if (index === -1) {
+      return NextResponse.json({ error: "Member not found." }, { status: 404 });
+    }
+
+    const updatedMember: SocietyMember = {
+      ...currentMembers[index],
+      ...(full_name !== undefined && { full_name: full_name.trim() }),
+      ...(callsign !== undefined && { callsign: callsign.trim().toUpperCase() }),
+      ...(email !== undefined && { email: email.trim().toLowerCase() }),
+      ...(state !== undefined && { state }),
+      ...(experience_level !== undefined && { experience_level }),
+      ...(rifle_setup !== undefined && { rifle_setup }),
+      ...(status !== undefined && { status }),
+      ...(notes !== undefined && { notes }),
+    };
+
+    currentMembers[index] = updatedMember;
+
+    // Persist full array back to data/society-members.jsonl
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      const fileData = currentMembers.map((m) => JSON.stringify(m)).join("\n") + "\n";
+      fs.writeFileSync(MEMBERS_FILE, fileData, "utf-8");
+    } catch (fsErr) {
+      console.warn("File write error updating society member:", fsErr);
+    }
+
+    return NextResponse.json({
+      success: true,
+      member: updatedMember,
+      message: `Member ${member_id} updated successfully.`,
+    });
+  } catch (error) {
+    console.error("Error updating society member:", error);
+    return NextResponse.json({ error: "Failed to update member." }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    let member_id = searchParams.get("member_id");
+
+    if (!member_id) {
+      try {
+        const body = await req.json();
+        member_id = body.member_id;
+      } catch {}
+    }
+
+    if (!member_id) {
+      return NextResponse.json({ error: "member_id is required." }, { status: 400 });
+    }
+
+    const currentMembers = ensureStorageInitialized();
+    const filtered = currentMembers.filter((m) => m.member_id !== member_id);
+
+    if (filtered.length === currentMembers.length) {
+      return NextResponse.json({ error: "Member not found." }, { status: 404 });
+    }
+
+    // Persist filtered array back to data/society-members.jsonl
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      const fileData = filtered.map((m) => JSON.stringify(m)).join("\n") + "\n";
+      fs.writeFileSync(MEMBERS_FILE, fileData, "utf-8");
+    } catch (fsErr) {
+      console.warn("File write error deleting society member:", fsErr);
+    }
+
+    return NextResponse.json({
+      success: true,
+      deleted_id: member_id,
+      message: `Member ${member_id} permanently deleted.`,
+    });
+  } catch (error) {
+    console.error("Error deleting society member:", error);
+    return NextResponse.json({ error: "Failed to delete member." }, { status: 500 });
   }
 }
