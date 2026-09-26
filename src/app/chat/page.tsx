@@ -1698,15 +1698,19 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* Scroll-to-bottom FAB — floats in bottom-right of messages area, above transmitter */}
+          {/* New Messages Notification Strip — elegant in-flow, never overlaps */}
           {showScrollFab && (
             <button
               type="button"
               onClick={() => { scrollContainerToBottom(true); setShowScrollFab(false); }}
-              className="absolute bottom-4 right-4 z-20 w-11 h-11 rounded-full bg-amber-500 text-black shadow-tactical-glow flex items-center justify-center hover:bg-amber-400 active:scale-95 transition-all animate-fadeIn border-2 border-amber-300"
+              className="w-full shrink-0 flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent border-t border-amber-500/20 text-amber-400 hover:text-amber-300 hover:via-amber-500/20 transition-all animate-fadeIn group"
               title="Jump to latest messages"
             >
-              <ChevronDown className="w-6 h-6" />
+              <span className="flex items-center gap-2 px-4 py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold group-hover:border-amber-400/50 transition-all">
+                <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
+                New transmissions — tap to jump down
+                <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
+              </span>
             </button>
           )}
 
