@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -34,7 +34,10 @@ import {
   MessageSquare,
   Maximize2,
   Minimize2,
-  QrCode
+  QrCode,
+  Pin,
+  ChevronUp,
+  Bell
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData } from "@/lib/types";
@@ -200,13 +203,36 @@ export default function ChatPage() {
   // Private Chat Room Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [loginCallsign, setLoginCallsign] = useState("APEX-22");
-  const [loginPasscode, setLoginPasscode] = useState("SUBSONIC2026");
+  const [loginCallsign, setLoginCallsign] = useState("");
+  const [loginPasscode, setLoginPasscode] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authShake, setAuthShake] = useState(false);
 
   // Member Credential & Digital Pass State
   const [profileActiveTab, setProfileActiveTab] = useState<"PASS" | "EDIT">("PASS");
   const [memberId, setMemberId] = useState<string>("SS-2026-1042");
   const [memberState, setMemberState] = useState<string>("TN");
+
+  // Typing indicator — simulated composer pulse
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Scroll-to-bottom FAB
+  const [showScrollFab, setShowScrollFab] = useState(false);
+
+  // Pinned announcement banner
+  const [pinnedAnnouncement] = useState<string | null>(
+    "🔴 MATCH DAY ACTIVE — Holston Ridge Stage 1 now open. Range COLD until 08:00. Chamber flags in."
+  );
+  const [announcementCollapsed, setAnnouncementCollapsed] = useState(false);
+
+  // Unread counts per channel (channelId -> count)
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const prevChannelRef = useRef(currentChannel);
+
+  // iOS visual viewport height for keyboard avoidance
+  const [chatHeight, setChatHeight] = useState<string>("calc(100dvh - 10rem)");
+
 
   // Load profile, member credential, and auth state from localStorage on mount
   useEffect(() => {
@@ -254,6 +280,25 @@ export default function ChatPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen]);
 
+  // iOS visual viewport keyboard avoidance
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const vv = (window as any).visualViewport;
+    if (!vv) return;
+    const handleResize = () => {
+      const vh = vv.height;
+      const windowH = window.innerHeight;
+      if (vh < windowH * 0.85) {
+        // keyboard is open — shrink chat container
+        setChatHeight(`${vh - 160}px`);
+      } else {
+        setChatHeight("calc(100dvh - 10rem)");
+      }
+    };
+    vv.addEventListener("resize", handleResize);
+    return () => vv.removeEventListener("resize", handleResize);
+  }, []);
+
   // Dedicated container-only scroll that NEVER scrolls the outer window or jumps to footer
   const scrollContainerToBottom = (smooth = true) => {
     if (!messagesContainerRef.current) return;
@@ -268,10 +313,30 @@ export default function ChatPage() {
     }
   };
 
-  // Scroll inner container to bottom only when switching channels
+  // Scroll FAB — show when user scrolls up, hide when at bottom
+  const handleContainerScroll = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    setShowScrollFab(distanceFromBottom > 120);
+  };
+
+  // Clear unread when switching to a channel; track prev channel for unread
+  useEffect(() => {
+    if (prevChannelRef.current !== currentChannel) {
+      setUnreadCounts((prev) => ({ ...prev, [currentChannel]: 0 }));
+      prevChannelRef.current = currentChannel;
+      scrollContainerToBottom(false);
+    }
+  }, [currentChannel]);
+
+  // Scroll inner container to bottom only when switching channels (initial)
   useEffect(() => {
     scrollContainerToBottom(false);
-  }, [currentChannel]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
 
   // Supabase Hydration & Realtime Subscription
   useEffect(() => {
@@ -363,8 +428,22 @@ export default function ChatPage() {
             return [...prev, incoming];
           });
 
-          // Scroll down inside container for new incoming message
-          setTimeout(() => scrollContainerToBottom(true), 50);
+          // Track unread count for channels user isn't currently viewing
+          const container = messagesContainerRef.current;
+          const distanceFromBottom = container
+            ? container.scrollHeight - container.scrollTop - container.clientHeight
+            : 0;
+          const isAtBottom = distanceFromBottom < 120;
+
+          if (isAtBottom) {
+            setTimeout(() => scrollContainerToBottom(true), 50);
+          } else {
+            // Increment unread badge for the incoming channel if not active
+            setUnreadCounts((prev) => ({
+              ...prev,
+              [incoming.channelId]: (prev[incoming.channelId] || 0) + 1,
+            }));
+          }
 
           if (soundEnabled) {
             playTacticalChirp(1120);
@@ -540,11 +619,29 @@ export default function ChatPage() {
     if (soundEnabled) {
       playTacticalChirp(940);
     }
+    // Haptic feedback on send (Android/PWA)
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate(30);
+    }
+  };
+
+  const handleInputChange = (val: string) => {
+    setInputText(val);
+    if (val.trim()) {
+      setIsTyping(true);
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = setTimeout(() => setIsTyping(false), 3000);
+    } else {
+      setIsTyping(false);
+      if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+    }
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
+    setIsTyping(false);
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     handleTransmit(inputText, "STANDARD");
   };
 
@@ -606,19 +703,35 @@ export default function ChatPage() {
     setInputText(text);
   };
 
+  const triggerAuthError = (msg: string) => {
+    setAuthError(msg);
+    setAuthShake(true);
+    setTimeout(() => setAuthShake(false), 600);
+    playTacticalChirp(300);
+  };
+
   const handleUnlockRoom = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginCallsign.trim()) return;
+    if (!loginCallsign.trim()) {
+      triggerAuthError("Callsign required to access the private net.");
+      return;
+    }
+    const VALID_PASSCODES = ["SUBSONIC2026", "subsonic2026"];
+    if (!VALID_PASSCODES.includes(loginPasscode.trim())) {
+      triggerAuthError("Invalid Member Key. Contact your Range Marshal for access.");
+      return;
+    }
     const profile: ShooterProfile = {
       name: shooterProfile.name || loginCallsign.trim(),
       callsign: loginCallsign.trim().toUpperCase(),
       role: "PRO_COMPETITOR",
       division: shooterProfile.division || "Open Division Pro",
-      rifleSetup: shooterProfile.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+      rifleSetup: shooterProfile.rifleSetup || "Custom Precision Rimfire",
       badgeText: "PRO SHOOTER",
     };
     setShooterProfile(profile);
     setProfileForm(profile);
+    setAuthError(null);
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("subsonic_shooter_profile", JSON.stringify(profile));
@@ -631,11 +744,12 @@ export default function ChatPage() {
     playTacticalChirp(1200);
   };
 
+
   // If not authenticated, render the Private Chat Room Gate
   if (authChecked && !isAuthenticated) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn">
+        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
             <Image
               src="/assets/subsonic-coin.jpg"
@@ -648,15 +762,22 @@ export default function ChatPage() {
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono font-bold uppercase tracking-wider">
               <Lock className="w-3 h-3" />
-              <span>Restricted Network • Passcode Required</span>
+              <span>Restricted Network • Member Key Required</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-white">
-              PRIVATE CHAT ROOM LOCKED
+              PRIVATE CHAT ROOM
             </h2>
             <p className="text-xs text-slate-300">
-              Enter your marksman callsign and passcode to unlock live stage briefings and squad comms.
+              Enter your callsign and member key to access live squad comms and DOPE drops.
             </p>
           </div>
+
+          {authError && (
+            <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-mono text-left flex items-start gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-red-400" />
+              <span>{authError}</span>
+            </div>
+          )}
 
           <form onSubmit={handleUnlockRoom} className="space-y-4 text-left">
             <div className="space-y-1">
@@ -666,19 +787,24 @@ export default function ChatPage() {
                 required
                 value={loginCallsign}
                 onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
-                placeholder="e.g. APEX-22 or GHOST"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400"
+                placeholder="e.g. APEX-22 or ROB"
+                autoComplete="username"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400 transition-colors"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 font-bold">Member Key</label>
+              <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
+                <span>Member Key</span>
+                <span className="text-[10px] text-slate-500 font-normal normal-case">Provided by Range Marshal</span>
+              </label>
               <input
                 type="password"
                 value={loginPasscode}
                 onChange={(e) => setLoginPasscode(e.target.value)}
-                placeholder="Passcode..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400"
+                placeholder="Enter your member key..."
+                autoComplete="current-password"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400 transition-colors"
               />
             </div>
 
@@ -691,8 +817,15 @@ export default function ChatPage() {
             </button>
           </form>
 
-          <div className="pt-2 border-t border-white/10 text-xs text-slate-400">
-            <a href="/" className="hover:text-amber-400 transition-colors">
+          <div className="pt-2 border-t border-white/10 space-y-2">
+            <Link
+              href="/join"
+              className="flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>New here? Register for free chat access →</span>
+            </Link>
+            <a href="/" className="block text-xs text-slate-500 hover:text-slate-300 transition-colors">
               ← Return to Main Portal
             </a>
           </div>
@@ -700,6 +833,7 @@ export default function ChatPage() {
       </div>
     );
   }
+
 
   return (
     <div
@@ -1036,12 +1170,13 @@ export default function ChatPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
           {visibleChannels.map((ch) => {
             const isActive = currentChannel === ch.id;
+            const unread = unreadCounts[ch.id] || 0;
             return (
               <button
                 key={ch.id}
                 type="button"
                 onClick={() => setCurrentChannel(ch.id)}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border ${
+                className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
                   isActive
                     ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
                     : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
@@ -1049,16 +1184,23 @@ export default function ChatPage() {
               >
                 <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
                 <span>{ch.name}</span>
-                <span className={`text-[9px] px-1 rounded ${
-                  isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
-                }`}>
-                  {ch.activeUsers}
-                </span>
+                {unread > 0 && !isActive ? (
+                  <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                    {unread > 9 ? "9+" : unread}
+                  </span>
+                ) : (
+                  <span className={`text-[9px] px-1 rounded ${
+                    isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
+                  }`}>
+                    {ch.activeUsers}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
+
 
       {/* 3. MAIN COMMS MATRIX ("Fill Hand" Mobile Architecture) */}
       <div className={`grid grid-cols-1 ${!isFullscreen ? "lg:grid-cols-12" : ""} gap-4 flex-1 overflow-hidden min-h-0`}>
@@ -1136,12 +1278,36 @@ export default function ChatPage() {
         {/* MAIN CHAT STREAM & TRANSMITTER (Fills handheld screen seamlessly) */}
         <div
           className={`${
-            !isFullscreen ? "lg:col-span-8 h-[calc(100dvh-10rem)] sm:h-[640px]" : "h-full"
+            !isFullscreen ? `lg:col-span-8 sm:h-[640px]` : "h-full"
           } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col justify-between overflow-hidden shadow-2xl relative`}
+          style={!isFullscreen ? { height: chatHeight } : undefined}
         >
+          {/* Pinned Match Director Announcement */}
+          {pinnedAnnouncement && (
+            <div
+              className={`shrink-0 border-b border-amber-500/30 transition-all ${announcementCollapsed ? "py-1.5" : "py-2.5"} px-3 sm:px-4 bg-amber-950/60 flex items-center justify-between gap-2 cursor-pointer`}
+              onClick={() => setAnnouncementCollapsed(!announcementCollapsed)}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Pin className="w-3 h-3 text-amber-400 shrink-0" />
+                {!announcementCollapsed && (
+                  <span className="text-[11px] text-amber-200 font-mono truncate">{pinnedAnnouncement}</span>
+                )}
+                {announcementCollapsed && (
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">PINNED ANNOUNCEMENT</span>
+                )}
+              </div>
+              {announcementCollapsed
+                ? <ChevronDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                : <ChevronUp className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              }
+            </div>
+          )}
+
           {/* Messages Stream: Native iOS momentum scrollbar, NO outer page bounce */}
           <div
             ref={messagesContainerRef}
+            onScroll={handleContainerScroll}
             className="p-3 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto ios-scrollbar overscroll-contain min-h-0"
           >
             {filteredMessages.length === 0 ? (
@@ -1166,6 +1332,7 @@ export default function ChatPage() {
                       isMD
                         ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
                         : isDopeDrop
+
                         ? "bg-black/70 border-cyan-500/30 shadow-lg"
                         : isFlagged
                         ? "bg-amber-500/5 border-amber-500/20"
@@ -1326,14 +1493,14 @@ export default function ChatPage() {
                         </button>
                       ))}
 
-                      {/* Quick Reactions Palette */}
+                      {/* Quick Reactions Palette — larger tap targets on mobile */}
                       <div className="flex items-center gap-0.5 sm:gap-1 pl-1.5 sm:pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
                         {["🎯", "🔥", "⛰️", "💡", "👏", "🏆"].map((emoji) => (
                           <button
                             key={emoji}
                             type="button"
                             onClick={() => handleAddReaction(msg.id, emoji)}
-                            className="p-1 text-xs hover:scale-125 transition-transform"
+                            className="p-2 sm:p-1 text-sm sm:text-xs hover:scale-125 transition-transform active:scale-95"
                             title={`React with ${emoji}`}
                           >
                             {emoji}
@@ -1347,6 +1514,18 @@ export default function ChatPage() {
             )}
           </div>
 
+          {/* Scroll-to-bottom FAB */}
+          {showScrollFab && (
+            <button
+              type="button"
+              onClick={() => { scrollContainerToBottom(true); setShowScrollFab(false); }}
+              className="absolute bottom-[120px] right-4 z-10 w-9 h-9 rounded-full bg-amber-500 text-black shadow-tactical-glow flex items-center justify-center hover:bg-amber-400 active:scale-95 transition-all animate-fadeIn"
+              title="Scroll to latest messages"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </button>
+          )}
+
           {/* Blocked Transmission Notice Banner */}
           {aiBlockedNotice && (
             <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake shrink-0">
@@ -1355,8 +1534,21 @@ export default function ChatPage() {
             </div>
           )}
 
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="px-4 py-1.5 bg-black/60 border-t border-white/5 shrink-0 flex items-center gap-2">
+              <div className="flex gap-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">[{shooterProfile.callsign}] composing...</span>
+            </div>
+          )}
+
           {/* Quick Push-To-Talk Radio Chips above input */}
           <div className="px-3 pt-2 bg-black/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-white/10 shrink-0">
+
             <Radio className="w-3 h-3 text-cyan-400 shrink-0 ml-1" />
             <button
               type="button"
@@ -1388,14 +1580,15 @@ export default function ChatPage() {
             </button>
           </div>
 
-          {/* TRANSMITTER INPUT BAR (Pinned at bottom of handheld view) */}
-          <form onSubmit={handleSendMessage} className="p-3 sm:p-4 bg-black/85 space-y-1.5 shrink-0">
+          {/* TRANSMITTER INPUT BAR (Pinned at bottom of handheld view, safe-area aware) */}
+          <form onSubmit={handleSendMessage} className="p-3 sm:p-4 bg-black/85 space-y-1.5 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <input
                 type="text"
                 placeholder={`Broadcast to #${currentChannelData.name}...`}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
+
                 className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-base sm:text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
               />
 

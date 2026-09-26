@@ -91,11 +91,12 @@ export default function HomePage() {
   // Form State
   const [callsign, setCallsign] = useState("APEX-22");
   const [shooterName, setShooterName] = useState("Wyatt Sterling");
-  const [passcode, setPasscode] = useState("SUBSONIC2026");
+  const [passcode, setPasscode] = useState("");
   const [division, setDivision] = useState("Open Division Pro");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formShake, setFormShake] = useState(false);
 
   // Digital Pass Modal State
   const [showPassModal, setShowPassModal] = useState(false);
@@ -123,7 +124,7 @@ export default function HomePage() {
             callsign: parsed.callsign || "APEX-22",
             state: parsed.state || "TN",
             division: parsed.experience_level || "Open Division Pro",
-            rifleSetup: parsed.rifle_setup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+            rifleSetup: parsed.rifle_setup || "Custom Precision Rimfire",
           });
         } catch {
           // ignore
@@ -144,7 +145,7 @@ export default function HomePage() {
               callsign: parsed.callsign || "APEX-22",
               state: "TN",
               division: parsed.division || "Open Division Pro",
-              rifleSetup: parsed.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+              rifleSetup: parsed.rifleSetup || "Custom Precision Rimfire",
             });
           }
         } catch {
@@ -161,12 +162,25 @@ export default function HomePage() {
     playTacticalChirp(1100);
   };
 
+  const triggerFormError = (msg: string) => {
+    setErrorMessage(msg);
+    setFormShake(true);
+    setTimeout(() => setFormShake(false), 600);
+    playTacticalChirp(300);
+  };
+
   const handleLoginToChat = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
     if (!callsign.trim()) {
-      setErrorMessage("Please enter your tactical callsign or marksman handle.");
+      triggerFormError("Please enter your tactical callsign or marksman handle.");
+      return;
+    }
+
+    const VALID_PASSCODES = ["SUBSONIC2026", "subsonic2026"];
+    if (!VALID_PASSCODES.includes(passcode.trim())) {
+      triggerFormError("Invalid Member Key. Contact your Range Marshal for the access passcode.");
       return;
     }
 
@@ -178,7 +192,7 @@ export default function HomePage() {
       callsign: callsign.trim().toUpperCase(),
       role: "PRO_COMPETITOR",
       division,
-      rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+      rifleSetup: "Custom Precision Rimfire",
       badgeText: division.includes("Production") ? "PRODUCTION" : "PRO SHOOTER",
     };
 
@@ -196,6 +210,7 @@ export default function HomePage() {
       router.push("/chat");
     }, 300);
   };
+
 
   // If Allen or team toggled full site preview
   if (isDirectorMode) {
@@ -267,7 +282,7 @@ export default function HomePage() {
         </div>
 
         {/* Private Chat Room Login Card */}
-        <div className="ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 relative overflow-hidden">
+        <div className={`ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 relative overflow-hidden transition-all ${formShake ? "animate-shake" : ""}`}>
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
@@ -332,7 +347,7 @@ export default function HomePage() {
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
                 <span>Member Access Passcode</span>
-                <span className="text-[10px] text-slate-400 font-normal">Default: SUBSONIC2026</span>
+                <span className="text-[10px] text-slate-500 font-normal">Provided by Range Marshal</span>
               </label>
               <div className="relative">
                 <Key className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -341,6 +356,7 @@ export default function HomePage() {
                   value={passcode}
                   onChange={(e) => setPasscode(e.target.value)}
                   placeholder="Enter Member Key..."
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono text-base sm:text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
                 />
                 <button
@@ -425,23 +441,27 @@ export default function HomePage() {
           )}
 
           {/* Card Footer Notes & Request Access */}
-          <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="pt-3 border-t border-white/10 space-y-3">
+            {/* Prominent Join CTA */}
             <Link
               href="/join"
-              className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold text-slate-300"
+              className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 font-semibold text-xs transition-all"
             >
-              <span>Need an Access Pass? Register for Private Chat Access</span>
-              <ChevronRight className="w-3.5 h-3.5 text-amber-400" />
+              <Users className="w-3.5 h-3.5" />
+              <span>New here? Register for FREE Private Chat Access →</span>
             </Link>
 
-            <Link
-              href="/contact"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              Range Marshal Assistance
-            </Link>
+            <div className="flex items-center justify-center text-xs text-slate-500">
+              <Link
+                href="/contact"
+                className="hover:text-white transition-colors"
+              >
+                Range Marshal Assistance
+              </Link>
+            </div>
           </div>
         </div>
+
 
         {/* Discreet Director Mode Toggle for Allen's Laptop Review Tomorrow */}
         <div className="text-center pt-4 space-y-2">

@@ -49,7 +49,11 @@ import {
   QrCode,
   Crosshair,
   UserX,
-  ShieldCheck
+  ShieldCheck,
+  MessageSquare,
+  Pin,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -195,7 +199,7 @@ export default function AdminDashboardPage() {
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<
-    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION"
+    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION" | "CHAT"
   >("MEMBERS");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
@@ -881,58 +885,64 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Admin Navigation Tabs */}
-      <div className="bg-black/60 p-1.5 rounded-2xl border border-white/10 flex flex-wrap gap-1">
-        {[
-          { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
-          { id: "REGISTRATIONS", label: "Registered Shooters", icon: Trophy, badge: `${registrations.length}` },
-          { 
-            id: "LEADS", 
-            label: "Leads & Inquiries", 
-            icon: Mail, 
-            badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
-            isAlert: leads.filter((l) => l.status === "NEW").length > 0
-          },
-          { id: "EVENTS", label: "Match Schedule", icon: Calendar },
-          { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
-          { id: "PAGES_AND_CLICKS", label: "Pages & Click Heatmap", icon: Flame },
-          { 
-            id: "AI_MODERATION", 
-            label: "AI Comms Abuse Defense", 
-            icon: ShieldAlert, 
-            badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
-            isAlert: activeAbuseCount > 0
-          },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeAdminTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveAdminTab(tab.id as any)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all ${
-                isActive
-                  ? tab.isAlert 
-                    ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-bold" 
-                    : "bg-amber-500 text-black shadow-tactical-glow font-bold"
-                  : tab.isAlert
-                  ? "text-red-400 bg-red-950/40 hover:bg-red-900/50 border border-red-500/30"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <Icon className={`w-3.5 h-3.5 ${tab.isAlert ? "text-red-300 animate-pulse" : ""}`} />
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${
-                  tab.isAlert ? "bg-red-600 text-white animate-pulse" : "bg-white/20 text-white"
-                }`}>
-                  {tab.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      {/* Admin Navigation Tabs — Sticky, horizontal scroll, no wrap */}
+      <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2 bg-[#07090E]/95 backdrop-blur-md border-b border-white/10">
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="flex gap-1 min-w-max">
+            {[
+              { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
+              { id: "REGISTRATIONS", label: "Registered Shooters", icon: Trophy, badge: `${registrations.length}` },
+              { 
+                id: "LEADS", 
+                label: "Leads & Inquiries", 
+                icon: Mail, 
+                badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
+                isAlert: leads.filter((l) => l.status === "NEW").length > 0
+              },
+              { id: "CHAT", label: "Chat Moderation", icon: MessageSquare },
+              { id: "EVENTS", label: "Match Schedule", icon: Calendar },
+              { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
+              { id: "PAGES_AND_CLICKS", label: "Pages & Clicks", icon: Flame },
+              { 
+                id: "AI_MODERATION", 
+                label: "AI Abuse Defense", 
+                icon: ShieldAlert, 
+                badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
+                isAlert: activeAbuseCount > 0
+              },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeAdminTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveAdminTab(tab.id as any)}
+                  className={`whitespace-nowrap px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                    isActive
+                      ? tab.isAlert 
+                        ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-bold" 
+                        : "bg-amber-500 text-black shadow-tactical-glow font-bold"
+                      : tab.isAlert
+                      ? "text-red-400 bg-red-950/40 hover:bg-red-900/50 border border-red-500/30"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${tab.isAlert ? "text-red-300 animate-pulse" : ""}`} />
+                  <span>{tab.label}</span>
+                  {tab.badge && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-black ${
+                      tab.isAlert ? "bg-red-600 text-white animate-pulse" : "bg-white/20 text-white"
+                    }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
 
       {/* TAB: ALL SOCIETY MEMBERS DIRECTORY */}
       {activeAdminTab === "MEMBERS" && (
@@ -1923,10 +1933,104 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* TAB: CHAT MODERATION */}
+      {activeAdminTab === "CHAT" && (
+        <div className="space-y-6">
+          <div className="ios-glass rounded-3xl p-6 border border-white/10 space-y-4">
+            <div className="flex items-center gap-3">
+              <MessageSquare className="w-5 h-5 text-amber-400" />
+              <div>
+                <h3 className="text-xl font-black text-white">Chat Moderation Center</h3>
+                <p className="text-xs text-slate-400">Review and moderate messages across all channels. Direct action on any transmission.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <div className="text-2xl font-black text-amber-400">{members.length}</div>
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Active Chatters</div>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <div className="text-2xl font-black text-emerald-400">7</div>
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Active Channels</div>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <div className="text-2xl font-black text-red-400">{flaggedMessages.length}</div>
+                <div className="text-[10px] font-mono text-slate-400 uppercase">Flagged Messages</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <span className="text-sm font-bold text-white">Recent Transmissions — All Channels</span>
+              <span className="text-[10px] font-mono text-slate-400">Last 50 messages</span>
+            </div>
+
+            {flaggedMessages.length === 0 ? (
+              <div className="p-8 text-center space-y-3">
+                <ShieldCheck className="w-10 h-10 text-emerald-400 mx-auto opacity-60" />
+                <p className="text-sm text-slate-400 font-mono">All channels clear — no flagged messages.</p>
+                <p className="text-xs text-slate-500">Messages that require action will appear here.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-white/5">
+                {flaggedMessages.slice(0, 50).map((msg) => (
+                  <div key={msg.id} className="p-4 hover:bg-white/[0.02] transition-colors">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-[10px] font-bold text-amber-400">[{msg.author.callsign}]</span>
+                          <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">#{msg.channelId}</span>
+                          {msg.moderationStatus === "FLAGGED" && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse">FLAGGED</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-300 break-words">{msg.content}</p>
+                        {msg.aiModerationReport?.flagReason && (
+                          <p className="text-[10px] text-red-300 font-mono">⚠ {msg.aiModerationReport.flagReason}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id))}
+                          className="px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span>Delete</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                        >
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>Warn</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleQuickStatusChange(msg.author.id, "BANNED")}
+                          className="px-2 py-1 rounded-lg bg-red-950/60 hover:bg-red-950/80 text-red-200 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                        >
+                          <Ban className="w-3 h-3" />
+                          <span>Ban</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* TAB 4: AI Comms Abuse Defense & Moderation Command Center */}
       {activeAdminTab === "AI_MODERATION" && (
         <CommsAbuseModerator />
       )}
+
 
       {/* TAB 5: Match Director Hub */}
       {activeAdminTab === "EVENTS" && (
