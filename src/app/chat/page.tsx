@@ -127,7 +127,7 @@ const ALL_CHANNELS: ChannelConfig[] = [
 interface ShooterProfile {
   name: string;
   callsign: string;
-  role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER";
+  role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN" | "MODERATOR" | "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER";
   division: string;
   rifleSetup: string;
   badgeText: string;
@@ -833,8 +833,14 @@ export default function ChatPage() {
           ? "MASTER OWNER"
           : profileForm.role === "OWNER_ADMIN"
           ? "OWNER ADMIN"
+          : profileForm.role === "ADMIN"
+          ? "ADMIN"
+          : profileForm.role === "MODERATOR"
+          ? "MODERATOR"
           : profileForm.role === "MATCH_DIRECTOR"
           ? "MATCH DIRECTOR"
+          : profileForm.role === "OFFICIAL"
+          ? "OFFICIAL"
           : profileForm.role === "PRO_COMPETITOR"
           ? profileForm.division.toUpperCase().includes("PRO") ? "OPEN PRO" : "PRO SHOOTER"
           : "MEMBER",
@@ -1626,6 +1632,8 @@ export default function ChatPage() {
               filteredMessages.map((msg) => {
                 const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB";
                 const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
+                const isAdmin = msg.author.role === "ADMIN";
+                const isMod = msg.author.role === "MODERATOR";
                 const isMD = msg.author.role === "MATCH_DIRECTOR" || msg.type === "MATCH_ALERT";
                 const isPro = msg.author.role === "PRO_COMPETITOR";
                 const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
@@ -1653,6 +1661,10 @@ export default function ChatPage() {
                         ? "bg-gradient-to-r from-amber-950/60 via-black/80 to-yellow-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
                         : isOwnerAdmin
                         ? "bg-gradient-to-r from-emerald-950/60 via-black/80 to-teal-950/40 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+                        : isAdmin
+                        ? "bg-gradient-to-r from-cyan-950/60 via-black/80 to-blue-950/40 border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                        : isMod
+                        ? "bg-gradient-to-r from-purple-950/60 via-black/80 to-indigo-950/40 border-purple-400/60 shadow-[0_0_20px_rgba(168,85,247,0.25)]"
                         : isMD
                         ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
                         : isDopeDrop
@@ -1672,17 +1684,21 @@ export default function ChatPage() {
                             ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                             : isOwnerAdmin
                             ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                            : isAdmin
+                            ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-black border-cyan-300 font-black shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                            : isMod
+                            ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white border-purple-300 font-black shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                             : isMD
                             ? "bg-amber-500 text-black border-amber-400"
                             : isDopeDrop
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
                             : "bg-black/60 text-amber-400 border-white/10"
                         }`}>
-                          {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
+                          {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : "text-white"}`}>
+                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
                               {msg.author.name}
                             </span>
                             {msg.author.callsign && !isPlink && (
@@ -1698,6 +1714,10 @@ export default function ChatPage() {
                                   ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                                   : isOwnerAdmin
                                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                                  : isAdmin
+                                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black border border-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                                  : isMod
+                                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black border border-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]"
                                   : isMD
                                   ? "bg-amber-500 text-black font-extrabold"
                                   : isPro
@@ -1705,7 +1725,7 @@ export default function ChatPage() {
                                   : "bg-white/10 text-slate-300"
                               }`}
                             >
-                              {isMasterOwner ? "👑 MASTER OWNER" : isOwnerAdmin ? "🎖️ OWNER ADMIN" : (msg.author.badgeText || msg.author.role)}
+                              {isMasterOwner ? "👑 MASTER OWNER" : isOwnerAdmin ? "🎖️ OWNER ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MODERATOR" : (msg.author.badgeText || msg.author.role)}
                             </span>
                           </div>
                           {msg.author.rifleSetup && (
@@ -2304,19 +2324,37 @@ export default function ChatPage() {
 
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-slate-300">System Role</label>
-                  {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN") ? (
+                  {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN" || profileForm.role === "ADMIN" || profileForm.role === "MODERATOR") ? (
                     <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2.5 ${
                       profileForm.role === "OWNER_ADMIN"
                         ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                        : profileForm.role === "ADMIN"
+                        ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
+                        : profileForm.role === "MODERATOR"
+                        ? "bg-purple-500/10 border-purple-500/30 text-purple-300"
                         : "bg-amber-500/10 border-amber-500/30 text-amber-300"
                     }`}>
-                      <span className="text-xl shrink-0">{profileForm.role === "OWNER_ADMIN" ? "🎖️" : "👑"}</span>
+                      <span className="text-xl shrink-0">
+                        {profileForm.role === "OWNER_ADMIN" ? "🎖️" : profileForm.role === "ADMIN" ? "🛡️" : profileForm.role === "MODERATOR" ? "⚖️" : "👑"}
+                      </span>
                       <div>
                         <div className="font-extrabold text-xs">
-                          {profileForm.role === "OWNER_ADMIN" ? "OWNER ADMIN (EXECUTIVE CLEARANCE)" : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
+                          {profileForm.role === "OWNER_ADMIN"
+                            ? "OWNER ADMIN (EXECUTIVE CLEARANCE)"
+                            : profileForm.role === "ADMIN"
+                            ? "SYSTEM ADMINISTRATOR (COMMAND)"
+                            : profileForm.role === "MODERATOR"
+                            ? "COMMS MODERATOR (CHAT DEFENSE)"
+                            : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
                         </div>
                         <div className="text-[10px] text-slate-400">
-                          {profileForm.role === "OWNER_ADMIN" ? "Verified Society Leadership Authority" : "Full Administrative & Security Authority"}
+                          {profileForm.role === "OWNER_ADMIN"
+                            ? "Verified Society Leadership Authority"
+                            : profileForm.role === "ADMIN"
+                            ? "Full Operations & Management Clearance"
+                            : profileForm.role === "MODERATOR"
+                            ? "Authorized Comms Moderation & Safety Clearance"
+                            : "Full Administrative & Security Authority"}
                         </div>
                       </div>
                     </div>

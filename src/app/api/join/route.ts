@@ -13,15 +13,30 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "APEX-VIP",
+    callsign: "ROB",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Founding Member / Master Series",
+    experience_level: "Master Owner / Dev Admin",
     rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Ballistics Lab"],
+    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Dev Operations"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
-    notes: "Founding Member - Full Executive, VIP Comms & Match Directorship",
+    role: "MASTER_OWNER",
+    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468)",
+  },
+  {
+    member_id: "SS-2026-0002",
+    full_name: "Allen Hurley",
+    callsign: "ALLEN",
+    email: "allen@subsonicsociety.com",
+    state: "TN",
+    experience_level: "Owner Admin / Executive",
+    rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
+    interests: ["Society Leadership", "Executive Comms", "Match Operations", "The Hideout Bristol"],
+    created_at: "2026-07-04T12:00:00Z",
+    status: "ACTIVE",
+    role: "OWNER_ADMIN",
+    notes: "Owner Admin & Executive — Full Management Authority (PIN: 620620)",
   },
   {
     member_id: "SS-2026-1001",
@@ -156,14 +171,31 @@ function ensureStorageInitialized(): SocietyMember[] {
       if (fm.email) memberMap.set(fm.email.toLowerCase(), fm);
     }
 
-    // 3. Guarantee Rob Neilson is explicitly registered
-    const robExists = Array.from(memberMap.values()).some(
+    // 3. Guarantee Rob Neilson and Allen Hurley are explicitly registered
+    const rob = Array.from(memberMap.values()).find(
       (m) =>
         m.full_name.toLowerCase().includes("rob") &&
         m.full_name.toLowerCase().includes("neilson")
     );
-    if (!robExists) {
+    if (!rob) {
       memberMap.set(SEED_MEMBERS[0].member_id, SEED_MEMBERS[0]);
+    } else {
+      rob.role = "MASTER_OWNER";
+      rob.callsign = "ROB";
+      memberMap.set(rob.member_id, rob);
+    }
+
+    const allen = Array.from(memberMap.values()).find(
+      (m) =>
+        m.full_name.toLowerCase().includes("allen") &&
+        m.full_name.toLowerCase().includes("hurley")
+    );
+    if (!allen) {
+      memberMap.set(SEED_MEMBERS[1].member_id, SEED_MEMBERS[1]);
+    } else {
+      allen.role = "OWNER_ADMIN";
+      allen.callsign = "ALLEN";
+      memberMap.set(allen.member_id, allen);
     }
 
     const uniqueMembers = Array.from(new Set(memberMap.values()));
@@ -309,7 +341,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { member_id, full_name, callsign, email, state, experience_level, rifle_setup, status, notes } = body;
+    const { member_id, full_name, callsign, email, state, experience_level, rifle_setup, status, role, notes } = body;
 
     if (!member_id) {
       return NextResponse.json({ error: "member_id is required." }, { status: 400 });
@@ -331,6 +363,7 @@ export async function PATCH(req: NextRequest) {
       ...(experience_level !== undefined && { experience_level }),
       ...(rifle_setup !== undefined && { rifle_setup }),
       ...(status !== undefined && { status }),
+      ...(role !== undefined && { role }),
       ...(notes !== undefined && { notes }),
     };
 
