@@ -407,6 +407,13 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "member_id is required." }, { status: 400 });
     }
 
+    if (member_id === "SS-2026-0001" || member_id === "SS-2026-0002") {
+      return NextResponse.json(
+        { error: "Root Executive accounts (Master Owner & Owner Admin) cannot be deleted." },
+        { status: 403 }
+      );
+    }
+
     const currentMembers = ensureStorageInitialized();
     const filtered = currentMembers.filter((m) => m.member_id !== member_id);
 

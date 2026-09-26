@@ -247,6 +247,10 @@ export default function AdminDashboardPage() {
   const [appointRole, setAppointRole] = useState<SocietyMember["role"]>("MODERATOR");
   const [isAppointing, setIsAppointing] = useState(false);
 
+  // 2-Step Card Delete Confirmation State
+  const [cardDeleteConfirmId, setCardDeleteConfirmId] = useState<string | null>(null);
+  const [isDeletingMember, setIsDeletingMember] = useState(false);
+
   // Member Profile Management Modal State
   const [selectedMember, setSelectedMember] = useState<SocietyMember | null>(null);
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
@@ -515,6 +519,12 @@ export default function AdminDashboardPage() {
   };
 
   const handleDeleteMember = async (memberId: string) => {
+    if (memberId === "SS-2026-0001" || memberId === "SS-2026-0002") {
+      setMemberActionNotice("Root executive accounts (Master Owner & Owner Admin) are protected and cannot be deleted.");
+      setCardDeleteConfirmId(null);
+      return;
+    }
+    setIsDeletingMember(true);
     try {
       const res = await fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
         method: "DELETE",
@@ -524,11 +534,16 @@ export default function AdminDashboardPage() {
         setIsMemberModalOpen(false);
         setSelectedMember(null);
         setShowDeleteConfirm(false);
+        setCardDeleteConfirmId(null);
         setMemberActionNotice(`Member ${memberId} has been permanently deleted.`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setMemberActionNotice(data.error || `Failed to delete member ${memberId}.`);
       }
     } catch (err: any) {
       setMemberActionNotice("Error deleting member: " + err.message);
     } finally {
+      setIsDeletingMember(false);
       setTimeout(() => setMemberActionNotice(null), 5000);
     }
   };
@@ -1442,6 +1457,7 @@ export default function AdminDashboardPage() {
               {filteredMembers.map((m) => {
                 const isBanned = m.status === "BANNED";
                 const isPaused = m.status === "PAUSED";
+                const isRoot = m.member_id === "SS-2026-0001" || m.member_id === "SS-2026-0002";
                 const displayCallsign = m.callsign || (m.full_name ? m.full_name.split(" ")[0].toUpperCase() : "MARKSMAN");
 
                 return (
@@ -1641,6 +1657,61 @@ export default function AdminDashboardPage() {
                           <Shield className="w-3 h-3 text-blue-400" />
                           <span>Clearance</span>
                         </button>
+
+                        {/* 2-Step Card Delete Button or Root Protection */}
+                        {isRoot ? (
+                          <span
+                            className="px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-mono flex items-center gap-1 select-none"
+                            title="Root Executive Account (Protected from deletion)"
+                          >
+                            <Lock className="w-3 h-3 text-amber-400" />
+                            <span>Protected</span>
+                          </span>
+                        ) : cardDeleteConfirmId === m.member_id ? (
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-1.5 p-1 rounded-lg bg-red-950/90 border border-red-500/60 shadow-lg animate-fadeIn"
+                          >
+                            <div className="flex items-center gap-1 px-1 text-[10px] font-mono text-red-300 font-bold whitespace-nowrap">
+                              <AlertTriangle className="w-3 h-3 text-red-400 animate-pulse" />
+                              <span>Are you sure?</span>
+                            </div>
+                            <button
+                              type="button"
+                              disabled={isDeletingMember}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteMember(m.member_id);
+                              }}
+                              className="px-2 py-0.5 rounded bg-red-600 hover:bg-red-500 text-white font-mono text-[10px] font-bold transition-all shadow-[0_0_8px_rgba(239,68,68,0.5)] disabled:opacity-50 whitespace-nowrap"
+                            >
+                              {isDeletingMember ? "Deleting..." : "Yes, Delete"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCardDeleteConfirmId(null);
+                              }}
+                              className="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-slate-300 font-mono text-[10px] transition-all whitespace-nowrap"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCardDeleteConfirmId(m.member_id);
+                            }}
+                            className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/25 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                            title="Permanently Delete Member Account"
+                          >
+                            <Trash2 className="w-3 h-3 text-red-400" />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </div>
 
                       {/* Primary Manage Button */}
@@ -2821,7 +2892,12 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Danger Zone: Delete Permanently */}
-                  {!showDeleteConfirm ? (
+                  {memberForm.member_id === "SS-2026-0001" || memberForm.member_id === "SS-2026-0002" ? (
+                    <div className="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold flex items-center justify-center gap-1.5 select-none">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Root Executive Account (Protected)</span>
+                    </div>
+                  ) : !showDeleteConfirm ? (
                     <button
                       type="button"
                       onClick={() => setShowDeleteConfirm(true)}
@@ -2835,10 +2911,11 @@ export default function AdminDashboardPage() {
                       <span className="text-[11px] font-mono text-red-300 font-bold">Permanently delete?</span>
                       <button
                         type="button"
+                        disabled={isDeletingMember}
                         onClick={() => handleDeleteMember(memberForm.member_id)}
-                        className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all"
+                        className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all disabled:opacity-50"
                       >
-                        Confirm Delete
+                        {isDeletingMember ? "Deleting..." : "Confirm Delete"}
                       </button>
                       <button
                         type="button"
