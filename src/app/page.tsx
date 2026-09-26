@@ -88,9 +88,9 @@ export default function HomePage() {
   // Shared Director Mode state (allows Allen to preview full site architecture)
   const { isDirectorMode, enableDirectorMode, disableDirectorMode } = useDirectorMode();
 
-  // Form State
-  const [callsign, setCallsign] = useState("APEX-22");
-  const [shooterName, setShooterName] = useState("Wyatt Sterling");
+  // Form State — start EMPTY, populated from localStorage on mount
+  const [callsign, setCallsign] = useState("");
+  const [shooterName, setShooterName] = useState("");
   const [passcode, setPasscode] = useState("");
   const [division, setDivision] = useState("Open Division Pro");
   const [showPassword, setShowPassword] = useState(false);
@@ -109,7 +109,7 @@ export default function HomePage() {
     rifleSetup?: string;
   } | null>(null);
 
-  // Preload existing shooter profile if saved
+  // Preload existing shooter profile if saved — priority order: member profile > shooter profile > empty
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedProfile = localStorage.getItem("subsonic_shooter_profile");
@@ -118,14 +118,19 @@ export default function HomePage() {
       if (savedMember) {
         try {
           const parsed = JSON.parse(savedMember);
-          setSavedMemberData({
-            memberId: parsed.member_id || "SS-2026-0814",
-            fullName: parsed.full_name || "Verified Marksman",
-            callsign: parsed.callsign || "APEX-22",
+          const memberData = {
+            memberId: parsed.member_id || "SS-2026-0001",
+            fullName: parsed.full_name || "",
+            callsign: parsed.callsign || "",
             state: parsed.state || "TN",
             division: parsed.experience_level || "Open Division Pro",
             rifleSetup: parsed.rifle_setup || "Custom Precision Rimfire",
-          });
+          };
+          setSavedMemberData(memberData);
+          // Pre-fill form from member profile (authoritative source)
+          if (parsed.callsign) setCallsign(parsed.callsign);
+          if (parsed.full_name) setShooterName(parsed.full_name);
+          if (parsed.experience_level) setDivision(parsed.experience_level);
         } catch {
           // ignore
         }
@@ -134,15 +139,15 @@ export default function HomePage() {
       if (savedProfile) {
         try {
           const parsed = JSON.parse(savedProfile);
-          if (parsed.callsign) setCallsign(parsed.callsign);
-          if (parsed.name) setShooterName(parsed.name);
-          if (parsed.division) setDivision(parsed.division);
-
+          // Only use shooter profile data if member profile didn't already fill the fields
           if (!savedMember) {
+            if (parsed.callsign) setCallsign(parsed.callsign);
+            if (parsed.name) setShooterName(parsed.name);
+            if (parsed.division) setDivision(parsed.division);
             setSavedMemberData({
-              memberId: parsed.member_id || "SS-2026-0814",
-              fullName: parsed.name || "Wyatt Sterling",
-              callsign: parsed.callsign || "APEX-22",
+              memberId: parsed.member_id || "SS-2026-0001",
+              fullName: parsed.name || "",
+              callsign: parsed.callsign || "",
               state: "TN",
               division: parsed.division || "Open Division Pro",
               rifleSetup: parsed.rifleSetup || "Custom Precision Rimfire",
@@ -187,12 +192,31 @@ export default function HomePage() {
     setIsSubmitting(true);
     playTacticalChirp(1200);
 
+    // Merge with saved member profile — never overwrite member_id or full_name with demo data
+    const existingMember = (() => {
+      try {
+        const raw = localStorage.getItem("subsonic_member_profile");
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    })();
+
+    const existingProfile = (() => {
+      try {
+        const raw = localStorage.getItem("subsonic_shooter_profile");
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    })();
+
     const activeProfile = {
-      name: shooterName.trim() || callsign.trim(),
+      // Preserve existing member ID — never generate a new one on re-login
+      member_id: existingMember?.member_id || existingProfile?.member_id || null,
+      // Name: prefer typed name > existing saved name > callsign (never use demo preset)
+      name: shooterName.trim() || existingMember?.full_name || existingProfile?.name || callsign.trim().toUpperCase(),
       callsign: callsign.trim().toUpperCase(),
-      role: "PRO_COMPETITOR",
-      division,
-      rifleSetup: "Custom Precision Rimfire",
+      role: existingProfile?.role || "PRO_COMPETITOR",
+      division: division || existingProfile?.division || "Open Division Pro",
+      // Preserve existing rifle setup if user hasn't changed it
+      rifleSetup: existingProfile?.rifleSetup || existingMember?.rifle_setup || "Custom Precision Rimfire",
       badgeText: division.includes("Production") ? "PRODUCTION" : "PRO SHOOTER",
     };
 
@@ -210,6 +234,7 @@ export default function HomePage() {
       router.push("/chat");
     }, 300);
   };
+
 
   // Safety net: strip any lingering chat-active class from a prior chat session
   useEffect(() => {
