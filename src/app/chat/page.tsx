@@ -277,11 +277,62 @@ export default function ChatPage() {
         setAuthChecked(true);
 
         const saved = localStorage.getItem("subsonic_shooter_profile");
+        let parsedShooter: any = null;
         if (saved) {
-          const parsed = JSON.parse(saved);
-          setShooterProfile(parsed);
-          setProfileForm(parsed);
-          if (parsed.callsign) setLoginCallsign(parsed.callsign);
+          try {
+            parsedShooter = JSON.parse(saved);
+            // Reconcile Rob Neilson (LTDAN or ROB)
+            if (
+              parsedShooter.callsign === "LTDAN" ||
+              parsedShooter.callsign === "ROB" ||
+              (parsedShooter.name && parsedShooter.name.toLowerCase().includes("neilson"))
+            ) {
+              parsedShooter.member_id = "SS-2026-0001";
+              parsedShooter.name = "Rob Neilson";
+              parsedShooter.role = "MASTER_OWNER";
+              parsedShooter.division = "Master Owner / Dev Admin";
+              parsedShooter.badgeText = "MASTER OWNER";
+              if (!parsedShooter.callsign) parsedShooter.callsign = "LTDAN";
+              try {
+                localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
+                localStorage.setItem("subsonic_member_profile", JSON.stringify({
+                  member_id: "SS-2026-0001",
+                  full_name: "Rob Neilson",
+                  callsign: parsedShooter.callsign,
+                  state: "TN",
+                  experience_level: "Master Owner / Dev Admin",
+                  rifle_setup: parsedShooter.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+                  created_at: "2026-07-04T12:00:00Z"
+                }));
+              } catch {}
+            } else if (
+              parsedShooter.callsign === "ALLEN" ||
+              parsedShooter.callsign === "AHURLEY" ||
+              (parsedShooter.name && parsedShooter.name.toLowerCase().includes("hurley"))
+            ) {
+              parsedShooter.member_id = "SS-2026-0002";
+              parsedShooter.name = "Allen Hurley";
+              parsedShooter.role = "OWNER_ADMIN";
+              parsedShooter.division = "Owner Admin / Executive";
+              parsedShooter.badgeText = "OWNER ADMIN";
+              parsedShooter.callsign = "ALLEN";
+              try {
+                localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
+                localStorage.setItem("subsonic_member_profile", JSON.stringify({
+                  member_id: "SS-2026-0002",
+                  full_name: "Allen Hurley",
+                  callsign: "ALLEN",
+                  state: "TN",
+                  experience_level: "Owner Admin / Executive",
+                  rifle_setup: parsedShooter.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527",
+                  created_at: "2026-07-04T12:00:00Z"
+                }));
+              } catch {}
+            }
+            setShooterProfile(parsedShooter);
+            setProfileForm(parsedShooter);
+            if (parsedShooter.callsign) setLoginCallsign(parsedShooter.callsign);
+          } catch {}
         }
 
         const savedMember = localStorage.getItem("subsonic_member_profile");
@@ -289,12 +340,15 @@ export default function ChatPage() {
           const parsedMem = JSON.parse(savedMember);
           if (parsedMem.member_id) setMemberId(parsedMem.member_id);
           if (parsedMem.state) setMemberState(parsedMem.state);
-        } else if (saved) {
-          const parsed = JSON.parse(saved);
-          const hash = parsed.callsign
-            ? Math.abs(parsed.callsign.split("").reduce((acc: number, c: string) => acc + c.charCodeAt(0), 1000))
-            : 1042;
-          setMemberId(`SS-2026-${(hash % 8999) + 1000}`);
+        } else if (parsedShooter) {
+          if (parsedShooter.member_id) {
+            setMemberId(parsedShooter.member_id);
+          } else {
+            const hash = parsedShooter.callsign
+              ? Math.abs(parsedShooter.callsign.split("").reduce((acc: number, c: string) => acc + c.charCodeAt(0), 1000))
+              : 1042;
+            setMemberId(`SS-2026-${(hash % 8999) + 1000}`);
+          }
         }
       } catch {
         setIsAuthenticated(true);
@@ -909,10 +963,10 @@ export default function ChatPage() {
     const cleanPass = loginPasscode.trim();
 
     // Specific Executive PINs:
-    // Rob Neilson: "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Rob Neilson: "LTDAN" or "ROB" with PIN "2468" (Master Owner / Dev Admin)
     // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
-    const isRob = cleanCallsign === "ROB";
-    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY";
+    const isRob = cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
+    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY" || cleanPass === "620620";
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
     const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026");
@@ -929,7 +983,7 @@ export default function ChatPage() {
         : isAllen 
         ? "Allen Hurley" 
         : (shooterProfile.name || cleanCallsign),
-      callsign: isAllen ? "ALLEN" : cleanCallsign,
+      callsign: isAllen ? "ALLEN" : isRob ? (cleanCallsign === "ROB" ? "ROB" : "LTDAN") : cleanCallsign,
       role: isRob 
         ? ("MASTER_OWNER" as const)
         : isAllen 
@@ -970,7 +1024,7 @@ export default function ChatPage() {
           localStorage.setItem("subsonic_member_profile", JSON.stringify({
             member_id: "SS-2026-0001",
             full_name: "Rob Neilson",
-            callsign: "ROB",
+            callsign: cleanCallsign === "ROB" ? "ROB" : "LTDAN",
             state: "TN",
             experience_level: "Master Owner / Dev Admin",
             rifle_setup: profile.rifleSetup,

@@ -86,7 +86,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "ROB",
+    callsign: "LTDAN",
     email: "rob@subsonicsociety.com",
     state: "TN",
     experience_level: "Master Owner / Dev Admin",
@@ -95,7 +95,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468)",
+    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468 | Callsign: LTDAN / ROB)",
   },
   {
     member_id: "SS-2026-0002",
@@ -619,7 +619,7 @@ export default function AdminDashboardPage() {
         memberId: string;
       } = {
         name: "Rob Neilson",
-        callsign: "ROB",
+        callsign: "LTDAN",
         role: "MASTER_OWNER",
         memberId: "SS-2026-0001",
       };
@@ -784,7 +784,7 @@ export default function AdminDashboardPage() {
               onClick={() => {
                 const session = {
                   name: "Rob Neilson",
-                  callsign: "ROB",
+                  callsign: "LTDAN",
                   role: "MASTER_OWNER" as const,
                   memberId: "SS-2026-0001",
                 };
@@ -836,8 +836,7 @@ export default function AdminDashboardPage() {
       m.member_id.toLowerCase().includes(q) ||
       (m.rifle_setup && m.rifle_setup.toLowerCase().includes(q)) ||
       (m.notes && m.notes.toLowerCase().includes(q)) ||
-      (q === "rob" && m.full_name.toLowerCase().includes("robert")) ||
-      (q === "robert" && m.full_name.toLowerCase().includes("rob"));
+      ((q === "ltdan" || q === "dan" || q === "rob" || q === "robert") && m.member_id === "SS-2026-0001");
     return matchesState && matchesRole && matchesSearch;
   });
 

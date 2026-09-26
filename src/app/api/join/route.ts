@@ -13,7 +13,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "ROB",
+    callsign: "LTDAN",
     email: "rob@subsonicsociety.com",
     state: "TN",
     experience_level: "Master Owner / Dev Admin",
@@ -22,7 +22,7 @@ const SEED_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468)",
+    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468 | Callsign: LTDAN / ROB)",
   },
   {
     member_id: "SS-2026-0002",
@@ -174,14 +174,19 @@ function ensureStorageInitialized(): SocietyMember[] {
     // 3. Guarantee Rob Neilson and Allen Hurley are explicitly registered
     const rob = Array.from(memberMap.values()).find(
       (m) =>
-        m.full_name.toLowerCase().includes("rob") &&
-        m.full_name.toLowerCase().includes("neilson")
+        m.member_id === "SS-2026-0001" ||
+        (m.full_name.toLowerCase().includes("rob") &&
+         m.full_name.toLowerCase().includes("neilson")) ||
+        m.callsign === "LTDAN" ||
+        m.callsign === "ROB"
     );
     if (!rob) {
       memberMap.set(SEED_MEMBERS[0].member_id, SEED_MEMBERS[0]);
     } else {
+      rob.member_id = "SS-2026-0001";
+      rob.full_name = "Rob Neilson";
       rob.role = "MASTER_OWNER";
-      rob.callsign = "ROB";
+      rob.callsign = "LTDAN";
       memberMap.set(rob.member_id, rob);
     }
 

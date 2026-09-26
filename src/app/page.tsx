@@ -139,6 +139,21 @@ export default function HomePage() {
       if (savedProfile) {
         try {
           const parsed = JSON.parse(savedProfile);
+          if (
+            parsed.callsign === "LTDAN" ||
+            parsed.callsign === "ROB" ||
+            (parsed.name && parsed.name.toLowerCase().includes("neilson"))
+          ) {
+            parsed.member_id = "SS-2026-0001";
+            parsed.name = "Rob Neilson";
+            parsed.role = "MASTER_OWNER";
+            parsed.division = "Master Owner / Dev Admin";
+            parsed.badgeText = "MASTER OWNER";
+            if (!parsed.callsign) parsed.callsign = "LTDAN";
+            try {
+              localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
+            } catch {}
+          }
           // Only use shooter profile data if member profile didn't already fill the fields
           if (!savedMember) {
             if (parsed.callsign) setCallsign(parsed.callsign);
@@ -146,11 +161,11 @@ export default function HomePage() {
             if (parsed.division) setDivision(parsed.division);
             setSavedMemberData({
               memberId: parsed.member_id || "SS-2026-0001",
-              fullName: parsed.name || "",
-              callsign: parsed.callsign || "",
+              fullName: parsed.name || "Rob Neilson",
+              callsign: parsed.callsign || "LTDAN",
               state: "TN",
-              division: parsed.division || "Open Division Pro",
-              rifleSetup: parsed.rifleSetup || "Custom Precision Rimfire",
+              division: parsed.division || "Master Owner / Dev Admin",
+              rifleSetup: parsed.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
             });
           }
         } catch {
@@ -187,10 +202,10 @@ export default function HomePage() {
     const cleanPass = passcode.trim();
 
     // Specific Executive PINs:
-    // Rob Neilson: "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Rob Neilson: "LTDAN" or "ROB" with PIN "2468" (Master Owner / Dev Admin)
     // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
-    const isRob = cleanCallsign === "ROB";
-    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY";
+    const isRob = cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
+    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY" || cleanPass === "620620";
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
     const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026");
@@ -232,7 +247,7 @@ export default function HomePage() {
         : isAllen 
         ? "Allen Hurley" 
         : (shooterName.trim() || existingMember?.full_name || existingProfile?.name || cleanCallsign),
-      callsign: isAllen ? "ALLEN" : cleanCallsign,
+      callsign: isAllen ? "ALLEN" : isRob ? (cleanCallsign === "ROB" ? "ROB" : "LTDAN") : cleanCallsign,
       role: isRob 
         ? ("MASTER_OWNER" as const)
         : isAllen 
@@ -262,7 +277,7 @@ export default function HomePage() {
           localStorage.setItem("subsonic_member_profile", JSON.stringify({
             member_id: "SS-2026-0001",
             full_name: "Rob Neilson",
-            callsign: "ROB",
+            callsign: cleanCallsign === "ROB" ? "ROB" : "LTDAN",
             state: "TN",
             experience_level: "Master Owner / Dev Admin",
             rifle_setup: activeProfile.rifleSetup,
