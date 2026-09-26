@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -173,6 +173,11 @@ export default function JoinSocietyPage() {
       setLoading(false);
     }
   };
+
+  // Strip any lingering chat-active class from body
+  useEffect(() => {
+    document.body.classList.remove("chat-active");
+  }, []);
 
   return (
     <div className="space-y-10 pb-32 sm:pb-20">

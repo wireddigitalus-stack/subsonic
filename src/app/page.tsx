@@ -211,6 +211,10 @@ export default function HomePage() {
     }, 300);
   };
 
+  // Safety net: strip any lingering chat-active class from a prior chat session
+  useEffect(() => {
+    document.body.classList.remove("chat-active");
+  }, []);
 
   // If Allen or team toggled full site preview
   if (isDirectorMode) {
@@ -241,7 +245,7 @@ export default function HomePage() {
 
   // FOCUSED EXPERIENCE: Clean Subsonic Landing with Login to Private Chat Room
   return (
-    <div className="min-h-[82vh] flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-6 sm:py-12 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-12 relative overflow-hidden">
       {/* Subtle Atmospheric Mountain Grid Background Glow */}
       <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center">
         <div className="w-[600px] h-[600px] bg-gradient-to-tr from-amber-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl opacity-60" />
