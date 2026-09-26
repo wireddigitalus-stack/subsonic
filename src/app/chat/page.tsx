@@ -194,18 +194,30 @@ export default function ChatPage() {
   const currentChannelData = ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
   const filteredMessages = messages.filter((m) => m.channelId === currentChannel);
 
-  // Load profile from localStorage on mount
+  // Private Chat Room Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loginCallsign, setLoginCallsign] = useState("APEX-22");
+  const [loginPasscode, setLoginPasscode] = useState("SUBSONIC2026");
+
+  // Load profile and auth state from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
+        const savedAuth = localStorage.getItem("subsonic_chat_authenticated");
+        setIsAuthenticated(savedAuth === "true");
+        setAuthChecked(true);
+
         const saved = localStorage.getItem("subsonic_shooter_profile");
         if (saved) {
           const parsed = JSON.parse(saved);
           setShooterProfile(parsed);
           setProfileForm(parsed);
+          if (parsed.callsign) setLoginCallsign(parsed.callsign);
         }
       } catch {
-        // Fallback to default
+        setIsAuthenticated(true);
+        setAuthChecked(true);
       }
     }
   }, []);
@@ -570,6 +582,101 @@ export default function ChatPage() {
     setInputText(text);
   };
 
+  const handleUnlockRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginCallsign.trim()) return;
+    const profile: ShooterProfile = {
+      name: shooterProfile.name || loginCallsign.trim(),
+      callsign: loginCallsign.trim().toUpperCase(),
+      role: "PRO_COMPETITOR",
+      division: shooterProfile.division || "Open Division Pro",
+      rifleSetup: shooterProfile.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+      badgeText: "PRO SHOOTER",
+    };
+    setShooterProfile(profile);
+    setProfileForm(profile);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("subsonic_shooter_profile", JSON.stringify(profile));
+        localStorage.setItem("subsonic_chat_authenticated", "true");
+      } catch {
+        // Fallback
+      }
+    }
+    setIsAuthenticated(true);
+    playTacticalChirp(1200);
+  };
+
+  // If not authenticated, render the Private Chat Room Gate
+  if (authChecked && !isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn">
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
+            <Image
+              src="/assets/subsonic-coin.jpg"
+              alt="Subsonic Emblem"
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono font-bold uppercase tracking-wider">
+              <Lock className="w-3 h-3" />
+              <span>Restricted Network • Passcode Required</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white">
+              PRIVATE CHAT ROOM LOCKED
+            </h2>
+            <p className="text-xs text-slate-300">
+              Enter your marksman callsign and passcode to unlock live stage briefings and squad comms.
+            </p>
+          </div>
+
+          <form onSubmit={handleUnlockRoom} className="space-y-4 text-left">
+            <div className="space-y-1">
+              <label className="text-xs font-mono text-slate-300 font-bold">Callsign *</label>
+              <input
+                type="text"
+                required
+                value={loginCallsign}
+                onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
+                placeholder="e.g. APEX-22 or GHOST"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-mono text-slate-300 font-bold">Member Key</label>
+              <input
+                type="password"
+                value={loginPasscode}
+                onChange={(e) => setLoginPasscode(e.target.value)}
+                placeholder="Passcode..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
+            >
+              <Unlock className="w-4 h-4 fill-black" />
+              <span>UNLOCK PRIVATE CHAT ROOM</span>
+            </button>
+          </form>
+
+          <div className="pt-2 border-t border-white/10 text-xs text-slate-400">
+            <a href="/" className="hover:text-amber-400 transition-colors">
+              ← Return to Main Portal
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       data-section="chat"
@@ -655,6 +762,23 @@ export default function ChatPage() {
               <span className="hidden sm:inline">Staff Moderated</span>
               <span className="sm:hidden">Staff</span>
             </div>
+
+            {/* Lock Private Room Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("subsonic_chat_authenticated");
+                }
+                setIsAuthenticated(false);
+                playTacticalChirp(400);
+              }}
+              title="Lock Private Chat Room"
+              className="h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
+            >
+              <Lock className="w-3 h-3 text-red-400 shrink-0" />
+              <span className="hidden sm:inline">Lock</span>
+            </button>
 
             {/* Shooter Profile Button */}
             <button
