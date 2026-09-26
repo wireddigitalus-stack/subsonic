@@ -23,6 +23,7 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { FullHomePage } from "@/components/home/FullHomePage";
+import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
 
 interface ShooterPreset {
   name: string;
@@ -81,8 +82,8 @@ function playTacticalChirp(frequency = 940) {
 export default function HomePage() {
   const router = useRouter();
 
-  // Full site preview toggle for Allen's laptop review tomorrow
-  const [showFullSite, setShowFullSite] = useState(false);
+  // Shared Director Mode state (allows Allen to preview full site architecture)
+  const { isDirectorMode, enableDirectorMode, disableDirectorMode } = useDirectorMode();
 
   // Form State
   const [callsign, setCallsign] = useState("APEX-22");
@@ -93,15 +94,9 @@ export default function HomePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Check URL query parameters (e.g. ?full=true for Allen)
+  // Preload existing shooter profile if saved
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("full") === "true" || urlParams.get("preview") === "full") {
-        setShowFullSite(true);
-      }
-
-      // Preload existing shooter profile if saved
       const savedProfile = localStorage.getItem("subsonic_shooter_profile");
       if (savedProfile) {
         try {
@@ -160,7 +155,7 @@ export default function HomePage() {
   };
 
   // If Allen or team toggled full site preview
-  if (showFullSite) {
+  if (isDirectorMode) {
     return (
       <div className="space-y-6">
         {/* Top Control Bar to switch back to focused view */}
@@ -172,7 +167,7 @@ export default function HomePage() {
               <span className="text-white hidden sm:inline">Viewing Full Public Site Architecture</span>
             </div>
             <button
-              onClick={() => setShowFullSite(false)}
+              onClick={() => disableDirectorMode()}
               className="px-3 py-1.5 rounded-xl bg-amber-500 text-black font-extrabold hover:brightness-110 transition-all flex items-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5 fill-black" />
@@ -392,7 +387,7 @@ export default function HomePage() {
         <div className="text-center pt-4 space-y-2">
           <button
             type="button"
-            onClick={() => setShowFullSite(true)}
+            onClick={() => enableDirectorMode()}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white text-xs font-mono transition-all"
           >
             <LayoutGrid className="w-3.5 h-3.5 text-amber-400" />

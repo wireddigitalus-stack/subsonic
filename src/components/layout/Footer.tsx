@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -15,10 +17,53 @@ import {
   Film,
   ShoppingBag,
   Award,
-  Sparkles
+  Sparkles,
+  LayoutGrid,
+  Lock
 } from "lucide-react";
+import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
 
 export function Footer() {
+  const { isDirectorMode, enableDirectorMode, disableDirectorMode } = useDirectorMode();
+
+  // Minimal Tactical Footer when focused on Private Comms
+  if (!isDirectorMode) {
+    return (
+      <footer className="relative border-t border-white/10 bg-black/60 backdrop-blur-xl mt-12 py-8 text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-amber-400/60 bg-black shrink-0">
+              <Image
+                src="/assets/subsonic-coin.jpg"
+                alt="Subsonic Emblem"
+                width={32}
+                height={32}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            <div>
+              <span className="font-extrabold text-slate-200 tracking-wider">SUBSONIC SOCIETY</span>
+              <span className="text-[10px] font-mono text-amber-400 font-bold block">
+                PRECISION IS IN OUR DNA • BRISTOL, TN (ELEV 3,420 FT)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-slate-400">
+            <button
+              type="button"
+              onClick={enableDirectorMode}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white font-mono text-[11px] transition-all"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-amber-400" />
+              <span>Director Preview: View Full Public Site</span>
+            </button>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="relative border-t border-white/10 bg-black/80 backdrop-blur-xl mt-24 pb-20 md:pb-12 pt-16 text-slate-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -215,11 +260,19 @@ export function Footer() {
           <div>
             © {new Date().getFullYear()} Subsonic Society. All rights reserved. Precision Is In Our DNA.
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex flex-wrap items-center gap-4 text-slate-400">
             <span className="flex items-center gap-1 font-mono text-[10px]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               TELEMETRY & RSS SYNC ACTIVE
             </span>
+            <button
+              type="button"
+              onClick={disableDirectorMode}
+              className="text-amber-400 hover:text-amber-300 font-mono text-[11px] flex items-center gap-1 transition-colors"
+            >
+              <Lock className="w-3 h-3 text-amber-400" />
+              <span>Exit Director Preview</span>
+            </button>
             <Link href="/admin" className="hover:text-slate-200">
               Admin Portal
             </Link>

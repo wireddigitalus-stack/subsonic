@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { MobileTabs } from "@/components/layout/MobileTabs";
 import { Footer } from "@/components/layout/Footer";
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
+import { DirectorModeProvider } from "@/components/providers/DirectorModeProvider";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -246,12 +247,14 @@ export default function RootLayout({
       </head>
       <body className="bg-[#07090E] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
         <TelemetryProvider>
-          <Navbar />
-          <main className="flex-1 safe-bottom-padding pt-20 sm:pt-24">
-            {children}
-          </main>
-          <Footer />
-          <MobileTabs />
+          <DirectorModeProvider>
+            <Navbar />
+            <main className="flex-1 safe-bottom-padding pt-20 sm:pt-24">
+              {children}
+            </main>
+            <Footer />
+            <MobileTabs />
+          </DirectorModeProvider>
         </TelemetryProvider>
       </body>
     </html>
