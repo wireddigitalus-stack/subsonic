@@ -49,6 +49,7 @@ import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
+import { ChatTour } from "@/components/chat/ChatTour";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -241,6 +242,28 @@ export default function ChatPage() {
   const [plinkVisitedChannels, setPlinkVisitedChannels] = useState<Set<string>>(new Set());
   // track last non-Plink message content per user for spam detection
   const lastUserMessageRef = useRef<Record<string, string>>({});
+
+  // Interactive Guided Chat Tour state
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Auto-launch Tour for first-time users once authenticated
+  useEffect(() => {
+    if (isAuthenticated && authChecked) {
+      if (typeof window !== "undefined") {
+        try {
+          const completed = localStorage.getItem("subsonic_chat_tour_completed");
+          if (!completed) {
+            const timer = setTimeout(() => {
+              setIsTourOpen(true);
+            }, 1200);
+            return () => clearTimeout(timer);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+  }, [isAuthenticated, authChecked]);
 
   // Load profile, member credential, and auth state from localStorage on mount
   useEffect(() => {
@@ -1005,6 +1028,7 @@ export default function ChatPage() {
           <div className="flex sm:hidden items-center justify-between gap-2">
             {/* Shooter Callsign & Pass Pill */}
             <button
+              id="tour-step-pass"
               type="button"
               onClick={() => {
                 setProfileForm(shooterProfile);
@@ -1023,8 +1047,21 @@ export default function ChatPage() {
               <QrCode className="w-3.5 h-3.5 text-emerald-400" />
             </button>
 
-            {/* Mobile Actions: Audio, Fullscreen, Admin, Lock */}
+            {/* Mobile Actions: Tour, Audio, Fullscreen, Admin, Lock */}
             <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsTourOpen(true);
+                  playTacticalChirp(1100);
+                }}
+                className="h-7 px-2 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-300 font-mono text-[10px] font-black flex items-center gap-1 transition-all shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                title="Start Interactive Chat Tour"
+              >
+                <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+                <span>TOUR</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setSoundEnabled(!soundEnabled)}
@@ -1111,6 +1148,20 @@ export default function ChatPage() {
             <div className="flex items-center justify-between lg:justify-end gap-2 sm:gap-3 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-white/10">
               <button
                 type="button"
+                onClick={() => {
+                  setIsTourOpen(true);
+                  playTacticalChirp(1100);
+                }}
+                data-telemetry="chat_start_tour"
+                className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white border-amber-500/40 transition-all font-bold shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                title="Start Interactive Chat Tour"
+              >
+                <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+                <span>TOUR GUIDE</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setIsFullscreen(true)}
                 data-telemetry="chat_enter_fullscreen"
                 className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
@@ -1167,6 +1218,7 @@ export default function ChatPage() {
               </button>
 
               <button
+                id="tour-step-pass"
                 type="button"
                 onClick={() => {
                   setProfileForm(shooterProfile);
@@ -1262,7 +1314,7 @@ export default function ChatPage() {
       )}
 
       {/* 2. MOBILE-FIRST SWIPEABLE CHANNEL SELECTOR */}
-      <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 pb-1">
+      <div id="tour-step-channels" className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 pb-1">
       <div className="space-y-1.5">
         {/* Network Mode Selector Tabs */}
         <div className="flex items-center justify-between gap-2">
@@ -1735,9 +1787,19 @@ export default function ChatPage() {
           )}
 
           {/* Quick Push-To-Talk Radio Chips above input */}
-          <div className="px-3 pt-2 bg-black/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-white/10 shrink-0">
-
+          <div id="tour-step-plink" className="px-3 pt-2 bg-black/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-t border-white/10 shrink-0">
             <Radio className="w-3 h-3 text-cyan-400 shrink-0 ml-1" />
+            <button
+              type="button"
+              onClick={() => {
+                setInputText("hey plink");
+                playTacticalChirp(1100);
+              }}
+              className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold"
+              title="Chat with Plink AI Range Marshal"
+            >
+              🤖 &ldquo;Hey Plink&rdquo;
+            </button>
             <button
               type="button"
               onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
@@ -1769,7 +1831,7 @@ export default function ChatPage() {
           </div>
 
           {/* TRANSMITTER INPUT BAR */}
-          <form onSubmit={handleSendMessage} className="p-3 sm:p-4 bg-black/85 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] space-y-2">
+          <form id="tour-step-ptt" onSubmit={handleSendMessage} className="p-3 sm:p-4 bg-black/85 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] space-y-2">
             <div className="flex items-center gap-2">
               {/* Main text input — spellcheck + autocorrect on */}
               <input
@@ -1800,6 +1862,7 @@ export default function ChatPage() {
 
               {/* DOPE card button */}
               <button
+                id="tour-step-dope"
                 type="button"
                 onClick={() => setIsDopeModalOpen(true)}
                 className="p-3 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all flex items-center gap-1.5 text-sm font-mono shrink-0"
@@ -2170,6 +2233,13 @@ export default function ChatPage() {
           </div>
         </div>
       )}
+
+      {/* 5. INTERACTIVE GUIDED CHAT TOUR */}
+      <ChatTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onPlayChirp={playTacticalChirp}
+      />
     </div>
   );
 }
