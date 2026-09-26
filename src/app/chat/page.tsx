@@ -47,6 +47,7 @@ import { recordTelemetryEvent } from "@/lib/telemetry";
 import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
+import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -234,6 +235,11 @@ export default function ChatPage() {
   // iOS visual viewport height for keyboard avoidance
   const [chatHeight, setChatHeight] = useState<string>("calc(100dvh - 10rem)");
 
+  // Plink AI Moderator state
+  const [plinkWarningHistory, setPlinkWarningHistory] = useState<Record<string, number>>({});
+  const [plinkVisitedChannels, setPlinkVisitedChannels] = useState<Set<string>>(new Set());
+  // track last non-Plink message content per user for spam detection
+  const lastUserMessageRef = useRef<Record<string, string>>({});
 
   // Load profile, member credential, and auth state from localStorage on mount
   useEffect(() => {
@@ -275,6 +281,93 @@ export default function ChatPage() {
     document.body.classList.add("chat-active");
     return () => document.body.classList.remove("chat-active");
   }, []);
+
+  // ── Plink: Channel Welcome ────────────────────────────────────────────────
+  // Fires once per channel — greets the user when they enter a new channel.
+  useEffect(() => {
+    if (!isAuthenticated || !shooterProfile.callsign) return;
+    if (plinkVisitedChannels.has(currentChannel)) return;
+
+    setPlinkVisitedChannels((prev) => new Set(Array.from(prev).concat(currentChannel)));
+
+    const welcomeMsg = getChannelWelcome(currentChannel, shooterProfile.callsign);
+    const timer = setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        buildPlinkMessage(welcomeMsg, currentChannel, 0),
+      ]);
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentChannel, isAuthenticated]);
+
+  // ── Plink: Message Watcher ────────────────────────────────────────────────
+  // Fires on every new message. Analyzes the last message for violations.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg) return;
+    // Never react to our own messages
+    if (lastMsg.author.id === "plink_ai_moderator") return;
+    // Only respond to messages in the currently viewed channel
+    if (lastMsg.channelId !== currentChannel) return;
+
+    const lastContent = lastUserMessageRef.current[lastMsg.author.id];
+    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, lastContent);
+
+    // Update the last message ref for spam detection
+    lastUserMessageRef.current[lastMsg.author.id] = lastMsg.content;
+
+    if (!response) return;
+
+    // Natural delay — feels like Plink is reading and thinking
+    const delay = 1500 + Math.random() * 1000;
+    const timer = setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        buildPlinkMessage(response.content, currentChannel, response.warningTier),
+      ]);
+
+      // Update warning count for this user
+      if (response.warningTier > 0) {
+        setPlinkWarningHistory((prev) => ({
+          ...prev,
+          [lastMsg.author.id]: (prev[lastMsg.author.id] || 0) + 1,
+        }));
+      }
+
+      // Escalate to admin abuse log if needed
+      if (response.shouldEscalate) {
+        recordCommsAbuseAlert({
+            severity: response.warningTier >= 3 ? "CRITICAL" : "HIGH",
+            category:
+              response.violationType === "FIREARM_SALE"
+                ? "ILLEGAL_COMMERCE"
+                : response.violationType === "HARASSMENT"
+                ? "PHYSICAL_THREAT"
+                : response.violationType === "COMMERCIAL"
+                ? "SPAM_SOLICITATION"
+                : "UNSPORTSMANLIKE",
+            shooterName: lastMsg.author.name,
+            shooterCallsign: lastMsg.author.callsign || lastMsg.author.name,
+            shooterRole: lastMsg.author.role,
+            squad: lastMsg.channelId,
+            channel: lastMsg.channelId,
+            messageContent: lastMsg.content,
+            toxicityScore: response.warningTier * 30,
+            threatScore: response.violationType === "HARASSMENT" ? 85 : 20,
+            policyScore: 90,
+            status: "ACTIVE",
+            aiRationale: `Plink detected: ${response.violationType}`,
+            autoActionTaken: `Tier ${response.warningTier} warning issued in chat`,
+          });
+      }
+    }, delay);
+
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length, isAuthenticated]);
 
   // Handle ESC key to exit fullscreen
   useEffect(() => {
@@ -1347,15 +1440,28 @@ export default function ChatPage() {
                 const isPro = msg.author.role === "PRO_COMPETITOR";
                 const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
                 const isFlagged = msg.moderationStatus === "FLAGGED";
+                const isPlink = msg.author.id === "plink_ai_moderator";
+                // Plink warning tier from aiEngine field
+                // Derive Plink warning severity: toxicityScore encodes tier * 30
+                const plinkSeverity: "warn" | "alert" | "info" = isPlink
+                  ? msg.aiModerationReport
+                    ? (msg.aiModerationReport.toxicityScore >= 60 ? "alert" : "warn")
+                    : "info"
+                  : "info";
 
                 return (
                   <div
                     key={msg.id}
                     className={`p-3.5 sm:p-5 rounded-2xl border transition-all space-y-2.5 sm:space-y-3 ${
-                      isMD
+                      isPlink
+                        ? plinkSeverity === "alert"
+                          ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
+                          : plinkSeverity === "warn"
+                          ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
+                          : "bg-gradient-to-r from-cyan-950/40 to-black/80 border-cyan-500/25"
+                        : isMD
                         ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
                         : isDopeDrop
-
                         ? "bg-black/70 border-cyan-500/30 shadow-lg"
                         : isFlagged
                         ? "bg-amber-500/5 border-amber-500/20"
@@ -1366,27 +1472,31 @@ export default function ChatPage() {
                     <div className="flex flex-wrap items-center justify-between gap-1.5">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs border shrink-0 ${
-                          isMD
+                          isPlink
+                            ? "bg-cyan-950 text-cyan-300 border-cyan-500/50"
+                            : isMD
                             ? "bg-amber-500 text-black border-amber-400"
                             : isDopeDrop
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
                             : "bg-black/60 text-amber-400 border-white/10"
                         }`}>
-                          {msg.author.callsign?.slice(0, 2) || "SS"}
+                          {isPlink ? "🤖" : (msg.author.callsign?.slice(0, 2) || "SS")}
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <span className="text-xs sm:text-sm font-bold text-white">
+                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : "text-white"}`}>
                               {msg.author.name}
                             </span>
-                            {msg.author.callsign && (
+                            {msg.author.callsign && !isPlink && (
                               <span className="text-[11px] sm:text-xs font-mono text-amber-400 font-bold">
                                 [{msg.author.callsign}]
                               </span>
                             )}
                             <span
-                              className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.2 rounded uppercase font-bold ${
-                                isMD
+                              className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                                isPlink
+                                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                                  : isMD
                                   ? "bg-amber-500 text-black font-extrabold"
                                   : isPro
                                   ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
@@ -1401,10 +1511,16 @@ export default function ChatPage() {
                               Rig: {msg.author.rifleSetup}
                             </div>
                           )}
+                          {isPlink && (
+                            <div className="text-[10px] font-mono text-cyan-500 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
+                              AI-powered · All channels monitored
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Right Meta: Timestamp & Verification Status */}
+                      {/* Right Meta: Timestamp & Status */}
                       <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 font-mono">
                         <span>{msg.timestamp}</span>
                         {isFlagged ? (
@@ -1412,11 +1528,14 @@ export default function ChatPage() {
                             <AlertTriangle className="w-2.5 h-2.5" />
                             REVIEW
                           </span>
+                        ) : isPlink ? (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 font-bold">AI</span>
                         ) : (
                           <Check className="w-3.5 h-3.5 text-emerald-400" />
                         )}
                       </div>
                     </div>
+
 
                     {/* Standard Content */}
                     {msg.content && (

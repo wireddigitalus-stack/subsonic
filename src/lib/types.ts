@@ -87,7 +87,7 @@ export interface ChatMessage {
     name: string;
     callsign?: string;
     avatarUrl?: string;
-    role: "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER";
+    role: "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER" | "AI_MODERATOR";
     badgeText?: string;
     division?: string;
     rifleSetup?: string;
