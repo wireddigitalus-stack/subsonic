@@ -74,6 +74,118 @@ import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 
+const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
+  {
+    member_id: "SS-2026-0001",
+    full_name: "Rob Neilson",
+    callsign: "APEX-VIP",
+    email: "rob@subsonicsociety.com",
+    state: "TN",
+    experience_level: "Founding Member / Master Series",
+    rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Ballistics Lab"],
+    created_at: "2026-07-04T12:00:00Z",
+    status: "ACTIVE",
+    notes: "Founding Member - Full Executive, VIP Comms & Match Directorship",
+  },
+  {
+    member_id: "SS-2026-1001",
+    full_name: "Wyatt 'Ghost' Sterling",
+    callsign: "GHOST",
+    email: "wyatt.sterling@precisionappalachia.com",
+    state: "TN",
+    experience_level: "Master / Pro Series",
+    rifle_setup: "Vudoo V-22 / Bartlein 1:16 / MDT ACC Elite",
+    interests: ["Competition", "Subsonic DNA", "Barricade Training"],
+    created_at: "2026-08-01T14:22:10Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1042",
+    full_name: "Kendra 'Coldbore' Cross",
+    callsign: "COLDBORE",
+    email: "kendra.cross@southeastrimfire.org",
+    state: "VA",
+    experience_level: "Master / Pro Series",
+    rifle_setup: "RimX / Proof Carbon 20\" / Foundation Centurion",
+    interests: ["Competition", "Subsonic DNA", "Youth Mentorship"],
+    created_at: "2026-08-05T09:14:30Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1118",
+    full_name: "Eli McAllister",
+    callsign: "DIALED",
+    email: "eli.mcallister@blueridgeprs.com",
+    state: "NC",
+    experience_level: "Production Champion",
+    rifle_setup: "CZ 457 MTR / Area 419 Rail / Vortex Venom",
+    interests: ["Competition", "Ammunition Testing"],
+    created_at: "2026-08-11T18:45:00Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1205",
+    full_name: "Garrett Vance",
+    callsign: "VANCE-22",
+    email: "garrett.vance@holstonprecision.net",
+    state: "TN",
+    experience_level: "Senior Master",
+    rifle_setup: "Modacam Custom V-22 / Benchmark 22\" / MDT ACC",
+    interests: ["Competition", "Appalachian Matches", "Gunsmithing"],
+    created_at: "2026-08-18T11:30:15Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1330",
+    full_name: "Sarah 'Apex' Jenkins",
+    callsign: "APEX-LADY",
+    email: "sarah.jenkins@precisionrimfire.io",
+    state: "KY",
+    experience_level: "Competitor",
+    rifle_setup: "Vudoo V-22 / March FX 5-42 / KRG Whiskey-3",
+    interests: ["Competition", "Long Range 400Yd", "Subsonic DNA"],
+    created_at: "2026-08-25T16:02:40Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1412",
+    full_name: "Mason Brooks",
+    callsign: "BROOKS-TN",
+    email: "mason.brooks@tennesseerimfire.com",
+    state: "TN",
+    experience_level: "Competitor",
+    rifle_setup: "Tikka T1x / KRG Bravo / Bushnell Match Pro ED",
+    interests: ["Competition", "Ballistics"],
+    created_at: "2026-09-01T10:15:00Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1509",
+    full_name: "Colton 'Dope' Reynolds",
+    callsign: "DOPE-COLT",
+    email: "c.reynolds@georgiaprecision.com",
+    state: "GA",
+    experience_level: "Marksman",
+    rifle_setup: "Bergara B14R / Vortex Razor HD Gen III",
+    interests: ["Subsonic DNA", "Ammunition Lot Testing"],
+    created_at: "2026-09-05T13:40:22Z",
+    status: "ACTIVE",
+  },
+  {
+    member_id: "SS-2026-1620",
+    full_name: "Trevor Vance",
+    callsign: "TREV-WV",
+    email: "trevor.vance@appalachianrimfire.com",
+    state: "WV",
+    experience_level: "Intermediate Competitor",
+    rifle_setup: "CZ 457 Varmint / Arken EP5 5-25",
+    interests: ["Competition", "Regional Matches"],
+    created_at: "2026-09-08T08:20:10Z",
+    status: "ACTIVE",
+  },
+];
+
 export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passkeyInput, setPasskeyInput] = useState("");
@@ -95,7 +207,7 @@ export default function AdminDashboardPage() {
   const [telemetrySearch, setTelemetrySearch] = useState("");
 
   // Members, Registrations & Leads state
-  const [members, setMembers] = useState<SocietyMember[]>([]);
+  const [members, setMembers] = useState<SocietyMember[]>(INITIAL_SOCIETY_MEMBERS);
   const [registrations, setRegistrations] = useState<MatchRegistration[]>([]);
   const [leads, setLeads] = useState<ContactLead[]>([]);
 
@@ -536,12 +648,17 @@ export default function AdminDashboardPage() {
 
   const filteredMembers = members.filter((m) => {
     const matchesState = memberStateFilter === "ALL" || m.state === memberStateFilter;
+    const q = memberSearch.trim().toLowerCase();
     const matchesSearch =
-      !memberSearch ||
-      m.full_name.toLowerCase().includes(memberSearch.toLowerCase()) ||
-      m.email.toLowerCase().includes(memberSearch.toLowerCase()) ||
-      m.member_id.toLowerCase().includes(memberSearch.toLowerCase()) ||
-      (m.rifle_setup && m.rifle_setup.toLowerCase().includes(memberSearch.toLowerCase()));
+      !q ||
+      m.full_name.toLowerCase().includes(q) ||
+      (m.callsign && m.callsign.toLowerCase().includes(q)) ||
+      m.email.toLowerCase().includes(q) ||
+      m.member_id.toLowerCase().includes(q) ||
+      (m.rifle_setup && m.rifle_setup.toLowerCase().includes(q)) ||
+      (m.notes && m.notes.toLowerCase().includes(q)) ||
+      (q === "rob" && m.full_name.toLowerCase().includes("robert")) ||
+      (q === "robert" && m.full_name.toLowerCase().includes("rob"));
     return matchesState && matchesSearch;
   });
 

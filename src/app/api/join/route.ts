@@ -11,8 +11,22 @@ const MEMBERS_FILE = path.join(DATA_DIR, "society-members.jsonl");
 
 const SEED_MEMBERS: SocietyMember[] = [
   {
+    member_id: "SS-2026-0001",
+    full_name: "Rob Neilson",
+    callsign: "APEX-VIP",
+    email: "rob@subsonicsociety.com",
+    state: "TN",
+    experience_level: "Founding Member / Master Series",
+    rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Ballistics Lab"],
+    created_at: "2026-07-04T12:00:00Z",
+    status: "ACTIVE",
+    notes: "Founding Member - Full Executive, VIP Comms & Match Directorship",
+  },
+  {
     member_id: "SS-2026-1001",
     full_name: "Wyatt 'Ghost' Sterling",
+    callsign: "GHOST",
     email: "wyatt.sterling@precisionappalachia.com",
     state: "TN",
     experience_level: "Master / Pro Series",
@@ -24,6 +38,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1042",
     full_name: "Kendra 'Coldbore' Cross",
+    callsign: "COLDBORE",
     email: "kendra.cross@southeastrimfire.org",
     state: "VA",
     experience_level: "Master / Pro Series",
@@ -35,6 +50,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1118",
     full_name: "Eli McAllister",
+    callsign: "DIALED",
     email: "eli.mcallister@blueridgeprs.com",
     state: "NC",
     experience_level: "Production Champion",
@@ -46,6 +62,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1205",
     full_name: "Garrett Vance",
+    callsign: "VANCE-22",
     email: "garrett.vance@holstonprecision.net",
     state: "TN",
     experience_level: "Senior Master",
@@ -57,6 +74,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1330",
     full_name: "Sarah 'Apex' Jenkins",
+    callsign: "APEX-LADY",
     email: "sarah.jenkins@precisionrimfire.io",
     state: "KY",
     experience_level: "Competitor",
@@ -68,6 +86,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1412",
     full_name: "Mason Brooks",
+    callsign: "BROOKS-TN",
     email: "mason.brooks@tennesseerimfire.com",
     state: "TN",
     experience_level: "Competitor",
@@ -79,6 +98,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1509",
     full_name: "Colton 'Dope' Reynolds",
+    callsign: "DOPE-COLT",
     email: "c.reynolds@georgiaprecision.com",
     state: "GA",
     experience_level: "Marksman",
@@ -90,6 +110,7 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-1620",
     full_name: "Trevor Vance",
+    callsign: "TREV-WV",
     email: "trevor.vance@appalachianrimfire.com",
     state: "WV",
     experience_level: "Intermediate Competitor",
@@ -106,29 +127,56 @@ function ensureStorageInitialized(): SocietyMember[] {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
 
-    if (!fs.existsSync(MEMBERS_FILE)) {
-      const initialLines = SEED_MEMBERS.map((m) => JSON.stringify(m)).join("\n") + "\n";
-      fs.writeFileSync(MEMBERS_FILE, initialLines, "utf-8");
-      return SEED_MEMBERS;
+    let fileMembers: SocietyMember[] = [];
+    if (fs.existsSync(MEMBERS_FILE)) {
+      const raw = fs.readFileSync(MEMBERS_FILE, "utf-8");
+      const lines = raw.split("\n").filter((l) => l.trim().length > 0);
+      fileMembers = lines
+        .map((l) => {
+          try {
+            return JSON.parse(l) as SocietyMember;
+          } catch {
+            return null;
+          }
+        })
+        .filter((m): m is SocietyMember => m !== null);
     }
 
-    const raw = fs.readFileSync(MEMBERS_FILE, "utf-8");
-    const lines = raw.split("\n").filter((l) => l.trim().length > 0);
-    if (lines.length === 0) {
-      const initialLines = SEED_MEMBERS.map((m) => JSON.stringify(m)).join("\n") + "\n";
-      fs.writeFileSync(MEMBERS_FILE, initialLines, "utf-8");
-      return SEED_MEMBERS;
+    const memberMap = new Map<string, SocietyMember>();
+
+    // 1. Seed baseline members first
+    for (const sm of SEED_MEMBERS) {
+      memberMap.set(sm.member_id, sm);
+      if (sm.email) memberMap.set(sm.email.toLowerCase(), sm);
     }
 
-    return lines
-      .map((l) => {
-        try {
-          return JSON.parse(l) as SocietyMember;
-        } catch {
-          return null;
-        }
-      })
-      .filter((m): m is SocietyMember => m !== null);
+    // 2. Overlay file members (persisting edits & new registrations)
+    for (const fm of fileMembers) {
+      memberMap.set(fm.member_id, fm);
+      if (fm.email) memberMap.set(fm.email.toLowerCase(), fm);
+    }
+
+    // 3. Guarantee Rob Neilson is explicitly registered
+    const robExists = Array.from(memberMap.values()).some(
+      (m) =>
+        m.full_name.toLowerCase().includes("rob") &&
+        m.full_name.toLowerCase().includes("neilson")
+    );
+    if (!robExists) {
+      memberMap.set(SEED_MEMBERS[0].member_id, SEED_MEMBERS[0]);
+    }
+
+    const uniqueMembers = Array.from(new Set(memberMap.values()));
+
+    // Persist full synchronized list to JSONL
+    try {
+      const serialized = uniqueMembers.map((m) => JSON.stringify(m)).join("\n") + "\n";
+      fs.writeFileSync(MEMBERS_FILE, serialized, "utf-8");
+    } catch (writeErr) {
+      console.warn("Storage sync write error for society members:", writeErr);
+    }
+
+    return uniqueMembers;
   } catch (err) {
     console.warn("Storage init error for society members:", err);
     return SEED_MEMBERS;
