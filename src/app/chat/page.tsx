@@ -173,6 +173,7 @@ export default function ChatPage() {
 
   // Fullscreen / Handheld Immersive Mode
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const isMobileRef = useRef(false);
 
   // Shooter Profile State
   const [shooterProfile, setShooterProfile] = useState<ShooterProfile>(DEFAULT_PROFILE);
@@ -249,10 +250,10 @@ export default function ChatPage() {
   // Tactile Channel Picker Drawer state
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
 
-  // Auto-launch Tour for first-time users once authenticated
+  // Auto-launch Tour for first-time users once authenticated (desktop only)
   useEffect(() => {
     if (isAuthenticated && authChecked) {
-      if (typeof window !== "undefined") {
+      if (typeof window !== "undefined" && window.innerWidth >= 768) {
         try {
           const completed = localStorage.getItem("subsonic_chat_tour_completed");
           if (!completed) {
@@ -267,6 +268,17 @@ export default function ChatPage() {
       }
     }
   }, [isAuthenticated, authChecked]);
+
+  // Auto-fullscreen on mobile — messenger-style clean experience
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mobile = window.innerWidth < 768;
+      isMobileRef.current = mobile;
+      if (mobile) {
+        setIsFullscreen(true);
+      }
+    }
+  }, []);
 
   // Load profile, member credential, and auth state from localStorage on mount
   useEffect(() => {
@@ -1148,7 +1160,7 @@ export default function ChatPage() {
       data-section="chat"
       className={
         isFullscreen
-          ? "fixed inset-0 z-[60] bg-[#07090E] p-2 sm:p-4 flex flex-col h-[100dvh] w-full max-w-full overflow-hidden overflow-x-hidden animate-fadeIn"
+          ? "fixed inset-0 z-[60] bg-[#07090E] p-0 md:p-4 flex flex-col h-[100dvh] w-full max-w-full overflow-hidden overflow-x-hidden animate-fadeIn"
           : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden pt-20 sm:pt-24 bg-[#07090E]"
       }
     >
@@ -1367,73 +1379,81 @@ export default function ChatPage() {
         </div>
         </div>
       ) : (
-        /* Fullscreen Minimal Top Navigation Bar */
-        <div className="ios-glass rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 border border-white/10 flex items-center justify-between gap-2 sm:gap-3 mb-1.5 shrink-0">
-          {/* Tappable Room Switcher Button — Zero Hyphen Wrapping */}
+        /* Fullscreen Top Bar — Messenger-clean on mobile, richer on desktop */
+        <div className="bg-black/80 md:ios-glass rounded-none md:rounded-2xl px-3 sm:px-4 py-2.5 md:py-2.5 border-b md:border border-white/10 flex items-center justify-between gap-2 sm:gap-3 md:mb-1.5 shrink-0">
+          {/* Left: Back Button (mobile) */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsFullscreen(false);
+              if (isMobileRef.current && typeof window !== "undefined") {
+                window.location.href = "/";
+              }
+            }}
+            className="w-10 h-10 md:w-7 md:h-7 rounded-xl md:rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0 transition-colors"
+            title="Back"
+          >
+            <ChevronDown className="w-5 h-5 md:w-3.5 md:h-3.5 text-amber-400 -rotate-90" />
+          </button>
+
+          {/* Center: Tappable Room Name */}
           <button
             type="button"
             onClick={() => {
               setIsChannelModalOpen(true);
               playTacticalChirp(1100);
             }}
-            className="flex items-center gap-1.5 font-mono text-left min-w-0 group hover:opacity-90 transition-opacity"
-            title="Switch tactical room"
+            className="flex items-center gap-1.5 font-mono text-left min-w-0 group flex-1 justify-center md:justify-start"
+            title="Switch room"
           >
-            <div className="w-6 h-6 rounded-lg bg-amber-500 text-black font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.4)]">
-              #
-            </div>
-            <div className="min-w-0 flex items-center gap-1.5">
-              <span className="font-mono font-bold text-xs sm:text-sm text-white whitespace-nowrap truncate max-w-[130px] xs:max-w-[170px] sm:max-w-none group-hover:text-amber-300 transition-colors">
-                {currentChannelData.name}
-              </span>
-              <span className="hidden xs:inline-block text-[8px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 shrink-0">
-                {currentChannelData.badge}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-300 shrink-0" />
-            </div>
+            <span className="text-amber-400 font-bold text-sm md:text-base">#</span>
+            <span className="font-mono font-bold text-sm md:text-base text-white whitespace-nowrap truncate max-w-[180px] sm:max-w-[240px] md:max-w-none group-hover:text-amber-300 transition-colors">
+              {currentChannelData.name}
+            </span>
+            <ChevronDown className="w-4 h-4 text-amber-400/70 group-hover:text-amber-300 shrink-0" />
           </button>
 
-          {/* Right Controls: Telemetry, Audio Chirp, Exit Fullscreen */}
-          <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-xs shrink-0">
-            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px]">
+          {/* Right: Controls */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Desktop-only: Weather, Staff Moderated */}
+            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px] font-mono">
               <Wind className="w-3 h-3 text-cyan-400" />
-              <span>9-14 MPH WNW</span>
+              <span>9-14 MPH</span>
             </div>
-
-            <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300" title="Staff Moderated">
+            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300 font-mono" title="Staff Moderated">
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
-              <span>Staff Moderated</span>
+              <span>Moderated</span>
             </div>
 
-            {/* Audio Chirp Toggle */}
+            {/* Audio Toggle — Icon only on mobile */}
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`h-7 px-2 rounded-lg border text-[10px] flex items-center gap-1 font-mono font-semibold transition-all ${
+              className={`w-10 h-10 md:h-7 md:w-auto md:px-2 rounded-xl md:rounded-lg border flex items-center justify-center md:gap-1 font-mono font-semibold transition-all ${
                 soundEnabled
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                  : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                  : "bg-white/5 text-slate-400 border-white/10"
               }`}
-              title={soundEnabled ? "Audio Chirps: ON" : "Audio Chirps: OFF"}
-              aria-label="Toggle Tactical Radio Audio"
+              title={soundEnabled ? "Audio ON" : "Audio OFF"}
+              aria-label="Toggle Audio"
             >
               {soundEnabled ? (
-                <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
+                <Volume2 className="w-5 h-5 md:w-3 md:h-3 text-amber-400" />
               ) : (
-                <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
+                <VolumeX className="w-5 h-5 md:w-3 md:h-3 text-slate-400" />
               )}
-              <span className="hidden sm:inline">{soundEnabled ? "ON" : "OFF"}</span>
+              <span className="hidden md:inline text-[10px]">{soundEnabled ? "ON" : "OFF"}</span>
             </button>
 
-            {/* Exit Fullscreen Button */}
+            {/* Desktop-only: Exit Fullscreen */}
             <button
               type="button"
               onClick={() => setIsFullscreen(false)}
-              className="h-7 px-2 sm:px-2.5 rounded-lg sm:rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-xs flex items-center gap-1 font-mono transition-all"
-              title="Exit Fullscreen (Esc)"
+              className="hidden md:flex h-7 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-xs items-center gap-1 font-mono transition-all"
+              title="Exit Fullscreen"
             >
               <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Exit Full</span>
+              <span>Exit</span>
             </button>
           </div>
         </div>
@@ -1654,12 +1674,12 @@ export default function ChatPage() {
         <div
           className={`${
             !isFullscreen ? "lg:col-span-8" : ""
-          } ios-glass rounded-2xl sm:rounded-3xl border border-white/10 flex flex-col overflow-hidden shadow-2xl relative h-full min-h-0`}
+          } md:ios-glass rounded-none md:rounded-2xl sm:rounded-3xl border-0 md:border border-white/10 flex flex-col overflow-hidden md:shadow-2xl relative h-full min-h-0`}
         >
-          {/* Pinned Match Director Announcement */}
+          {/* Pinned Match Director Announcement — desktop only */}
           {pinnedAnnouncement && (
             <div
-              className={`shrink-0 border-b border-amber-500/30 transition-all ${announcementCollapsed ? "py-1" : "py-2 sm:py-2.5"} px-2.5 sm:px-4 bg-amber-950/60 flex items-center justify-between gap-2 cursor-pointer`}
+              className={`shrink-0 border-b border-amber-500/30 transition-all hidden md:flex ${announcementCollapsed ? "py-1" : "py-2 sm:py-2.5"} px-2.5 sm:px-4 bg-amber-950/60 items-center justify-between gap-2 cursor-pointer`}
               onClick={() => setAnnouncementCollapsed(!announcementCollapsed)}
             >
               <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
@@ -1679,7 +1699,7 @@ export default function ChatPage() {
           <div
             ref={messagesContainerRef}
             onScroll={handleContainerScroll}
-            className="p-3 sm:p-5 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0"
+            className="px-2 py-2 md:p-5 space-y-2 md:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0"
           >
 
             {filteredMessages.length === 0 ? (
@@ -1712,7 +1732,7 @@ export default function ChatPage() {
                 return (
                   <div
                     key={msg.id}
-                    className={`p-3.5 sm:p-5 rounded-2xl border transition-all space-y-2.5 sm:space-y-3 ${
+                    className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 ${
                       isPlink
                         ? plinkSeverity === "alert"
                           ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
@@ -1736,10 +1756,11 @@ export default function ChatPage() {
                         : "bg-white/[0.02] border-white/5 hover:border-white/10"
                     }`}
                   >
-                    {/* Message Header: Author, Badge, Callsign, Timestamp */}
-                    <div className="flex flex-wrap items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-bold text-xs border shrink-0 ${
+                    {/* Message Header: Author, Badge, Timestamp */}
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                        {/* Avatar — desktop only */}
+                        <div className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 ${
                           isPlink
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/50"
                             : isMasterOwner
@@ -1758,28 +1779,29 @@ export default function ChatPage() {
                         }`}>
                           {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                            <span className={`text-xs sm:text-sm font-bold ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className={`text-xs md:text-sm font-bold truncate ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
                               {msg.author.name}
                             </span>
+                            {/* Callsign brackets — desktop only */}
                             {msg.author.callsign && !isPlink && (
-                              <span className="text-[11px] sm:text-xs font-mono text-amber-400 font-bold">
+                              <span className="hidden md:inline text-xs font-mono text-amber-400 font-bold">
                                 [{msg.author.callsign}]
                               </span>
                             )}
                             <span
-                              className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                              className={`text-[8px] md:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
                                 isPlink
                                   ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
                                   : isMasterOwner
-                                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300"
                                   : isOwnerAdmin
-                                  ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                                  ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300"
                                   : isAdmin
-                                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black border border-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black border border-cyan-300"
                                   : isMod
-                                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black border border-purple-300 shadow-[0_0_8px_rgba(168,85,247,0.4)]"
+                                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black border border-purple-300"
                                   : isMD
                                   ? "bg-amber-500 text-black font-extrabold"
                                   : isPro
@@ -1787,16 +1809,20 @@ export default function ChatPage() {
                                   : "bg-white/10 text-slate-300"
                               }`}
                             >
-                              {isMasterOwner ? "👑 MASTER OWNER" : isOwnerAdmin ? "🎖️ OWNER ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MODERATOR" : (msg.author.badgeText || msg.author.role)}
+                              {isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
                             </span>
+                            {/* Timestamp — inline on mobile */}
+                            <span className="text-[10px] md:hidden text-slate-500 font-mono">{msg.timestamp}</span>
                           </div>
+                          {/* Rig line — desktop only */}
                           {msg.author.rifleSetup && (
-                            <div className="text-[10px] font-mono text-slate-400 truncate max-w-[200px] sm:max-w-md">
+                            <div className="hidden md:block text-[10px] font-mono text-slate-400 truncate max-w-md">
                               Rig: {msg.author.rifleSetup}
                             </div>
                           )}
+                          {/* Plink AI label — desktop only */}
                           {isPlink && (
-                            <div className="text-[10px] font-mono text-cyan-500 flex items-center gap-1">
+                            <div className="hidden md:flex text-[10px] font-mono text-cyan-500 items-center gap-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
                               AI-powered · All channels monitored
                             </div>
@@ -1804,8 +1830,8 @@ export default function ChatPage() {
                         </div>
                       </div>
 
-                      {/* Right Meta: Timestamp & Status */}
-                      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400 font-mono">
+                      {/* Right Meta: Timestamp & Status — desktop only (mobile has it inline) */}
+                      <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-400 font-mono shrink-0">
                         <span>{msg.timestamp}</span>
                         {isFlagged ? (
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
@@ -1828,9 +1854,9 @@ export default function ChatPage() {
                       </p>
                     )}
 
-                    {/* DEDICATED TACTICAL DOPE CARD RENDERER — Single Row 4-Col Grid */}
+                    {/* DOPE CARD — compact on mobile */}
                     {msg.dopeCard && (
-                      <div className="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-black/85 border border-cyan-500/40 shadow-tactical-glow space-y-1.5 sm:space-y-2.5">
+                      <div className="p-2 md:p-3.5 rounded-lg md:rounded-2xl bg-black/85 border border-cyan-500/40 shadow-tactical-glow space-y-1 md:space-y-2.5">
                         <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20">
                           <div className="flex items-center gap-1.5 sm:gap-2 font-mono min-w-0">
                             <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
@@ -1881,14 +1907,14 @@ export default function ChatPage() {
                           </div>
                         </div>
 
-                        {/* Ammo & Notes */}
+                        {/* Ammo & Notes — desktop only */}
                         {(msg.dopeCard.ammo || msg.dopeCard.notes) && (
-                          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-slate-400 pt-0.5 gap-2">
+                          <div className="hidden md:flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5 gap-2">
                             {msg.dopeCard.ammo && (
                               <div className="truncate">Ammo: <strong className="text-slate-200">{msg.dopeCard.ammo}</strong></div>
                             )}
                             {msg.dopeCard.notes && (
-                              <div className="text-cyan-300 italic truncate sm:text-right">
+                              <div className="text-cyan-300 italic truncate text-right">
                                 &ldquo;{msg.dopeCard.notes}&rdquo;
                               </div>
                             )}
@@ -1907,28 +1933,28 @@ export default function ChatPage() {
                       </div>
                     )}
 
-                    {/* Reactions Bar */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 pt-0.5">
+                    {/* Reactions Bar — compact on mobile */}
+                    <div className="flex items-center gap-1 md:gap-2 pt-0.5 flex-wrap">
                       {msg.reactions.map((reaction) => (
                         <button
                           key={reaction.emoji}
                           type="button"
                           onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                          className="px-2 sm:px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1 sm:gap-1.5 transition-all active:scale-95"
+                          className="px-1.5 md:px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-[11px] md:text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1 transition-all active:scale-95"
                         >
                           <span>{reaction.emoji}</span>
                           <span className="font-mono text-[10px] font-bold">{reaction.count}</span>
                         </button>
                       ))}
 
-                      {/* Quick Reactions Palette */}
-                      <div className="flex items-center gap-0.5 sm:gap-1 pl-1.5 sm:pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
+                      {/* Quick Reactions Palette — desktop only */}
+                      <div className="hidden md:flex items-center gap-1 pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
                         {["🎯", "🔥", "⛰️", "💡"].map((emoji) => (
                           <button
                             key={emoji}
                             type="button"
                             onClick={() => handleAddReaction(msg.id, emoji)}
-                            className="p-1 sm:p-1 text-xs hover:scale-125 transition-transform active:scale-95"
+                            className="p-1 text-xs hover:scale-125 transition-transform active:scale-95"
                             title={`React with ${emoji}`}
                           >
                             {emoji}
@@ -1942,18 +1968,18 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* New Messages Notification Strip — elegant in-flow, never overlaps */}
+          {/* New Messages — compact pill on mobile, full banner on desktop */}
           {showScrollFab && (
             <button
               type="button"
               onClick={() => { scrollContainerToBottom(true); setShowScrollFab(false); }}
-              className="w-full shrink-0 flex items-center justify-center gap-2 py-2 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent border-t border-amber-500/20 text-amber-400 hover:text-amber-300 hover:via-amber-500/20 transition-all animate-fadeIn group"
-              title="Jump to latest messages"
+              className="w-full shrink-0 flex items-center justify-center gap-2 py-1.5 md:py-2 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent border-t border-amber-500/20 text-amber-400 hover:text-amber-300 transition-all animate-fadeIn group"
+              title="Jump to latest"
             >
-              <span className="flex items-center gap-2 px-4 py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold group-hover:border-amber-400/50 transition-all">
+              <span className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-0.5 md:py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold">
                 <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
-                New transmissions — tap to jump down
-                <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
+                <span className="hidden md:inline">New transmissions — tap to jump down</span>
+                <span className="md:hidden">New messages ↓</span>
               </span>
             </button>
           )}
@@ -2036,68 +2062,68 @@ export default function ChatPage() {
           </div>
 
           {/* TRANSMITTER INPUT BAR */}
-          <form id="tour-step-ptt" onSubmit={handleSendMessage} className="p-2 sm:p-4 bg-black/85 shrink-0 pb-[max(0.6rem,env(safe-area-inset-bottom))] space-y-1 sm:space-y-2">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Main text input — spellcheck + autocorrect on */}
+          <form id="tour-step-ptt" onSubmit={handleSendMessage} className="p-2 md:p-4 bg-black/85 shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:pb-[max(0.6rem,env(safe-area-inset-bottom))]">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              {/* Main text input */}
               <input
                 type="text"
-                placeholder={isListening ? "Listening… speak transmission" : `Broadcast to #${currentChannelData.name}...`}
+                placeholder={isListening ? "Listening…" : (typeof window !== "undefined" && window.innerWidth < 768 ? "Message..." : `Broadcast to #${currentChannelData.name}...`)}
                 value={inputText}
                 onChange={(e) => handleInputChange(e.target.value)}
                 spellCheck={true}
                 autoCorrect="on"
                 autoCapitalize="sentences"
                 autoComplete="off"
-                className="flex-1 min-w-0 px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-sm sm:text-base focus:border-amber-400 focus:outline-none placeholder:text-slate-400 placeholder:text-xs sm:placeholder:text-sm"
+                className="flex-1 min-w-0 px-3 py-2.5 md:px-4 md:py-3 rounded-full md:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-sm md:text-base focus:border-amber-400 focus:outline-none placeholder:text-slate-400 placeholder:text-sm"
               />
 
               {/* Push-to-Talk mic button */}
               <button
                 type="button"
                 onClick={handlePushToTalk}
-                className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
+                className={`p-2.5 md:p-3 rounded-full md:rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
                   isListening
                     ? "bg-red-500 border-red-400 text-white animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.5)]"
                     : "bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white"
                 }`}
-                title={isListening ? "Listening… tap to stop" : "Push to Talk — speak your message"}
+                title={isListening ? "Listening…" : "Voice input"}
               >
-                <Mic className={`w-4 h-4 sm:w-5 sm:h-5 ${isListening ? "text-white" : "text-slate-300"}`} />
+                <Mic className={`w-4 h-4 md:w-5 md:h-5 ${isListening ? "text-white" : "text-slate-300"}`} />
               </button>
 
-              {/* DOPE card button */}
+              {/* DOPE card button — desktop only */}
               <button
                 id="tour-step-dope"
                 type="button"
                 onClick={() => setIsDopeModalOpen(true)}
-                className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all flex items-center gap-1 text-xs sm:text-sm font-mono shrink-0"
+                className="hidden md:flex p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all items-center gap-1 text-sm font-mono shrink-0"
                 title="Drop DOPE Card"
               >
                 <Crosshair className="w-4 h-4" />
-                <span className="hidden sm:inline">DOPE</span>
+                <span>DOPE</span>
               </button>
 
-              {/* Transmit / Send */}
+              {/* Send */}
               <button
                 type="submit"
                 disabled={isAiScanning}
                 data-telemetry="chat_send_button"
-                className="p-2.5 px-3.5 sm:p-3 sm:px-5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-xs sm:text-sm font-mono disabled:opacity-50 shrink-0"
-                title="Transmit message"
+                className="p-2.5 md:p-3 md:px-5 rounded-full md:rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-sm font-mono disabled:opacity-50 shrink-0"
+                title="Send"
               >
                 {isAiScanning ? (
                   <span className="animate-spin text-sm">⏳</span>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    <span className="hidden sm:inline">TRANSMIT</span>
+                    <span className="hidden md:inline">TRANSMIT</span>
                   </>
                 )}
               </button>
             </div>
 
-            {/* Transmitting footer: Hidden on mobile (< sm) */}
-            <div className="hidden sm:flex items-center justify-between text-xs font-mono text-slate-400 px-1">
+            {/* Transmitting footer: Hidden on mobile */}
+            <div className="hidden md:flex items-center justify-between text-xs font-mono text-slate-400 px-1 pt-1">
               <span>
                 Transmitting as: <strong className="text-slate-200">[{shooterProfile.callsign}]</strong>
               </span>
