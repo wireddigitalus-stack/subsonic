@@ -475,22 +475,30 @@ export default function ChatPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isFullscreen]);
 
-  // iOS visual viewport keyboard avoidance (only affects message container flex)
+  // iOS visual viewport keyboard avoidance — scroll messages up when keyboard opens
   useEffect(() => {
     if (typeof window === "undefined") return;
     const vv = (window as any).visualViewport;
     if (!vv) return;
+    let prevHeight = vv.height;
     const handleResize = () => {
-      // No explicit height needed — the flex layout handles it
-      // But we store the available height for any fallback needs
       const vh = vv.height;
       const windowH = window.innerHeight;
-      if (vh < windowH * 0.85) {
+      const keyboardOpen = vh < windowH * 0.85;
+      if (keyboardOpen) {
         setChatHeight(`${vh}px`);
-
+        // Keyboard just opened — scroll messages to bottom so replies are visible
+        if (vh < prevHeight) {
+          requestAnimationFrame(() => {
+            if (messagesContainerRef.current) {
+              messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+            }
+          });
+        }
       } else {
         setChatHeight("calc(100dvh - 10rem)");
       }
+      prevHeight = vh;
     };
     vv.addEventListener("resize", handleResize);
     return () => vv.removeEventListener("resize", handleResize);
@@ -2070,6 +2078,14 @@ export default function ChatPage() {
                 placeholder={isListening ? "Listening…" : (typeof window !== "undefined" && window.innerWidth < 768 ? "Message..." : `Broadcast to #${currentChannelData.name}...`)}
                 value={inputText}
                 onChange={(e) => handleInputChange(e.target.value)}
+                onFocus={() => {
+                  // When keyboard opens on mobile, scroll messages to bottom so replies are visible
+                  setTimeout(() => {
+                    if (messagesContainerRef.current) {
+                      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                    }
+                  }, 300);
+                }}
                 spellCheck={true}
                 autoCorrect="on"
                 autoCapitalize="sentences"
