@@ -39,7 +39,8 @@ import {
   ChevronUp,
   Bell,
   CheckCircle2,
-  Mic
+  Mic,
+  Bot
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData } from "@/lib/types";
@@ -51,7 +52,9 @@ import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
-import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
+import { startBotEngine, BotSpeed, computeBotStats } from "@/lib/chat-bots";
+import { BotRosterCard } from "@/components/chat/BotRosterCard";
+import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp } from "@/lib/chat-audio";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -143,27 +146,6 @@ const DEFAULT_PROFILE: ShooterProfile = {
   badgeText: "PRO SHOOTER",
 };
 
-function playTacticalChirp(frequency = 940) {
-  if (typeof window === "undefined") return;
-  try {
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const audioCtx = new AudioContextClass();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(frequency * 1.8, audioCtx.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.08);
-  } catch {
-    // Silent fallback
-  }
-}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
@@ -251,12 +233,18 @@ export default function ChatPage() {
   // Tactile Channel Picker Drawer state
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
 
-  // Bot Engine State
+  // Bot Engine & Bot Chats Card State
   const [botsEnabled, setBotsEnabled] = useState(false);
   const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
+  const [isBotCardOpen, setIsBotCardOpen] = useState(false);
   const botCleanupRef = useRef<(() => void) | null>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages; // keep ref in sync
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
+
+  // Compute live bot fleet stats (counts and bot names)
+  const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(messages);
 
   // Bot Engine — start/stop based on toggle
   useEffect(() => {
@@ -267,6 +255,10 @@ export default function ChatPage() {
       const cleanup = startBotEngine(botSpeed, {
         addMessage: (msg) => {
           setMessages((prev) => [...prev, msg]);
+          // Distinct tone for bot chats: Digital Cyber Telemetry
+          if (soundEnabledRef.current) {
+            playBotTelemetryChirp();
+          }
           // Auto-scroll if user is near bottom
           setTimeout(() => {
             if (messagesContainerRef.current) {
@@ -701,7 +693,12 @@ export default function ChatPage() {
           }
 
           if (soundEnabled) {
-            playTacticalChirp(1120);
+            const isBot = incoming.author.id.startsWith("bot-") || incoming.author.id.startsWith("bot_") || incoming.author.role === "AI_MODERATOR";
+            if (isBot) {
+              playBotTelemetryChirp();
+            } else {
+              playRealCommsChirp();
+            }
           }
         }
       )
@@ -872,7 +869,7 @@ export default function ChatPage() {
     }
 
     if (soundEnabled) {
-      playTacticalChirp(940);
+      playRealCommsChirp();
     }
     // Haptic feedback on send (Android/PWA)
     if (typeof navigator !== "undefined" && navigator.vibrate) {
@@ -1372,22 +1369,39 @@ export default function ChatPage() {
                 <span>{soundEnabled ? "ON" : "OFF"}</span>
               </button>
 
-              {/* Bot Engine Toggle — Admin only */}
+              {/* Bot Engine Controls & Bot Chats Card Button — Admin only */}
               {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN") && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => setBotsEnabled(!botsEnabled)}
                     className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border text-[10px] font-mono font-semibold transition-all ${
                       botsEnabled
-                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/30"
+                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
                         : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
                     }`}
-                    title={botsEnabled ? "Stop test bots" : "Start test bots"}
+                    title={botsEnabled ? "Pause test bots" : "Start test bots"}
                   >
                     <span>🤖</span>
                     <span>{botsEnabled ? "BOTS ON" : "BOTS"}</span>
                   </button>
+
+                  {/* BOT CHATS CARD WITH COUNTS AND BOT NAMES */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsBotCardOpen(true);
+                      playTacticalChirp(1100);
+                    }}
+                    className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border border-cyan-500/30 bg-cyan-950/40 hover:bg-cyan-900/60 text-[10px] font-mono font-bold text-cyan-300 transition-all shadow-[0_0_8px_rgba(6,182,212,0.15)]"
+                    title="View Bot Chats Card with Counts, Bot Names, and Tone Audition"
+                  >
+                    <span>📊 BOT CARD</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/30 text-cyan-200 text-[9px] font-mono">
+                      {totalBotMessages}
+                    </span>
+                  </button>
+
                   {botsEnabled && (
                     <select
                       value={botSpeed}
@@ -1395,9 +1409,9 @@ export default function ChatPage() {
                       className="h-6 px-1 rounded bg-black/60 border border-white/10 text-[9px] font-mono text-slate-300 focus:outline-none focus:border-cyan-500/40 cursor-pointer"
                       title="Bot message speed"
                     >
-                      <option value="SLOW">SLOW</option>
-                      <option value="NORMAL">NORMAL</option>
                       <option value="FAST">FAST</option>
+                      <option value="NORMAL">NORMAL</option>
+                      <option value="SLOW">SLOW</option>
                     </select>
                   )}
                 </div>
@@ -1513,6 +1527,26 @@ export default function ChatPage() {
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
               <span>Moderated</span>
             </div>
+
+            {/* Bot Card Quick Access Button (shown when admin or when bots active) */}
+            {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN" || botsEnabled) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsBotCardOpen(true);
+                  playTacticalChirp(1100);
+                }}
+                className={`h-10 px-2.5 md:h-7 md:px-2 rounded-xl md:rounded-lg border flex items-center gap-1 font-mono text-xs transition-all ${
+                  botsEnabled
+                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
+                    : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                }`}
+                title="Open Bot Chats Card with Counts & Bot Names"
+              >
+                <Bot className="w-4 h-4 md:w-3.5 md:h-3.5 text-cyan-400" />
+                <span className="text-[10px] font-bold text-cyan-200">{totalBotMessages}</span>
+              </button>
+            )}
 
             {/* Audio Toggle — Icon only on mobile */}
             <button
@@ -1755,6 +1789,46 @@ export default function ChatPage() {
                   <span>DROP VERIFIED DOPE CARD</span>
                 </button>
               </div>
+
+              {/* Bot Comms Fleet Card Widget in Desktop Sidebar */}
+              {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN" || botsEnabled) && (
+                <div className="pt-3 border-t border-white/10 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono uppercase text-cyan-300 font-bold flex items-center gap-1.5">
+                      <Bot className="w-3.5 h-3.5 text-cyan-400" />
+                      Bot Comms Fleet
+                    </span>
+                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                      botsEnabled
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                        : "bg-white/5 text-slate-400 border-white/10"
+                    }`}>
+                      {botsEnabled ? "6 ON NET" : "STANDBY"}
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/25 flex items-center justify-between font-mono text-xs shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase">Chats</span>
+                      <span className="font-bold text-cyan-300 text-sm">{totalBotMessages}</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-slate-400 block uppercase">DOPE</span>
+                      <span className="font-bold text-amber-400 text-sm">{totalDopeDrops}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsBotCardOpen(true);
+                        playTacticalChirp(1100);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] active:scale-95"
+                    >
+                      BOT CARD ↗
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -2615,6 +2689,20 @@ export default function ChatPage() {
         onSelectChannel={(chId) => setCurrentChannel(chId)}
         unreadCounts={unreadCounts}
         onPlayChirp={playTacticalChirp}
+      />
+
+      {/* 7. BOT CHATS CARD WITH COUNTS, BOT NAMES & TONE AUDITION */}
+      <BotRosterCard
+        isOpen={isBotCardOpen}
+        onClose={() => setIsBotCardOpen(false)}
+        messages={messages}
+        botsEnabled={botsEnabled}
+        onToggleBots={() => setBotsEnabled(!botsEnabled)}
+        botSpeed={botSpeed}
+        onChangeSpeed={(speed) => setBotSpeed(speed)}
+        currentChannel={currentChannel}
+        onAddBotMessage={(msg) => setMessages((prev) => [...prev, msg])}
+        soundEnabled={soundEnabled}
       />
     </div>
   );

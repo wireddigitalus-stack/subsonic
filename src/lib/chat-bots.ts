@@ -382,6 +382,35 @@ export interface BotEngineCallbacks {
   getMessages: () => ChatMessage[];
 }
 
+export function createBotMessage(bot: BotPersona, channelId: string, content: string, dopeCard?: DopeCardData): ChatMessage {
+  return {
+    id: `bot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+    channelId,
+    type: dopeCard ? "DOPE_DROP" : "STANDARD",
+    dopeCard,
+    author: {
+      id: bot.id,
+      name: bot.name,
+      callsign: bot.callsign,
+      role: bot.role,
+      badgeText: bot.badgeText,
+      division: bot.division,
+      rifleSetup: bot.rifleSetup,
+    },
+    content,
+    timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    reactions: [],
+    moderationStatus: "APPROVED",
+    aiModerationReport: {
+      toxicityScore: 0,
+      threatScore: 0,
+      policyScore: 0,
+      sentiment: "POSITIVE",
+      aiEngine: "Bot Engine (Simulated)",
+    },
+  };
+}
+
 /**
  * Creates and starts the bot engine. Returns a cleanup function.
  */
@@ -416,35 +445,6 @@ export function startBotEngine(
     const idx = randomItem(available);
     usedMessages[key].add(idx);
     return pool[idx];
-  }
-
-  function createBotMessage(bot: BotPersona, channelId: string, content: string, dopeCard?: DopeCardData): ChatMessage {
-    return {
-      id: `bot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
-      channelId,
-      type: dopeCard ? "DOPE_DROP" : "STANDARD",
-      dopeCard,
-      author: {
-        id: bot.id,
-        name: bot.name,
-        callsign: bot.callsign,
-        role: bot.role,
-        badgeText: bot.badgeText,
-        division: bot.division,
-        rifleSetup: bot.rifleSetup,
-      },
-      content,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      reactions: [],
-      moderationStatus: "APPROVED",
-      aiModerationReport: {
-        toxicityScore: 0,
-        threatScore: 0,
-        policyScore: 0,
-        sentiment: "POSITIVE",
-        aiEngine: "Bot Engine (Simulated)",
-      },
-    };
   }
 
   function scheduleNext() {
@@ -558,3 +558,79 @@ export function startBotEngine(
     timers.forEach(clearTimeout);
   };
 }
+
+// ──────────────────────────────────────────────────────────────────────────────
+// BOT STATS & MANUAL TRIGGER HELPERS
+// ──────────────────────────────────────────────────────────────────────────────
+
+export interface BotActivityStat {
+  bot: BotPersona;
+  messageCount: number;
+  dopeCount: number;
+  reactionCount: number;
+  lastChannel?: string;
+  lastTimestamp?: string;
+}
+
+export function computeBotStats(messages: ChatMessage[]): {
+  totalBotMessages: number;
+  totalDopeDrops: number;
+  botStats: Record<string, BotActivityStat>;
+} {
+  const botStats: Record<string, BotActivityStat> = {};
+  for (const bot of BOT_PERSONAS) {
+    botStats[bot.id] = {
+      bot,
+      messageCount: 0,
+      dopeCount: 0,
+      reactionCount: 0,
+    };
+  }
+
+  let totalBotMessages = 0;
+  let totalDopeDrops = 0;
+
+  for (const msg of messages) {
+    const authorId = msg.author.id;
+    if (botStats[authorId]) {
+      totalBotMessages++;
+      botStats[authorId].messageCount++;
+      if (msg.dopeCard || msg.type === "DOPE_DROP") {
+        totalDopeDrops++;
+        botStats[authorId].dopeCount++;
+      }
+      botStats[authorId].lastChannel = msg.channelId;
+      botStats[authorId].lastTimestamp = msg.timestamp;
+      botStats[authorId].reactionCount += msg.reactions?.reduce((acc, r) => acc + r.count, 0) || 0;
+    }
+  }
+
+  return { totalBotMessages, totalDopeDrops, botStats };
+}
+
+export function triggerSingleBotTransmission(
+  botId: string,
+  channelId: string,
+  callbacks: { addMessage: (msg: ChatMessage) => void },
+  forceDope?: boolean
+): ChatMessage | null {
+  const bot = BOT_PERSONAS.find((b) => b.id === botId);
+  if (!bot) return null;
+
+  const isDope = forceDope ?? (bot.dopeDropRate > 0.25 || Math.random() < bot.dopeDropRate);
+
+  let msg: ChatMessage;
+  if (isDope) {
+    const dope = generateDopeCard();
+    const dopeContent = `[DEMO TRANSMISSION] Verified DOPE for ${dope.targetDistance} on ${dope.targetDescription || "this stage"}. ${dope.ammo?.split(" (")[0] || "Standard ammo"} holding steady. ${dope.notes || ""}`.trim();
+    msg = createBotMessage(bot, channelId, dopeContent, dope);
+  } else {
+    const pool = MESSAGE_POOLS[channelId]?.[bot.id] || MESSAGE_POOLS["bristol-pro-shootout"]?.[bot.id] || ["Radio check, station loud and clear on tactical frequency."];
+    const content = pool[Math.floor(Math.random() * pool.length)];
+    msg = createBotMessage(bot, channelId, content);
+  }
+
+  callbacks.addMessage(msg);
+  return msg;
+}
+
