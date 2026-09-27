@@ -51,6 +51,7 @@ import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
+import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -249,6 +250,72 @@ export default function ChatPage() {
   const [isTourOpen, setIsTourOpen] = useState(false);
   // Tactile Channel Picker Drawer state
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
+
+  // Bot Engine State
+  const [botsEnabled, setBotsEnabled] = useState(false);
+  const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
+  const botCleanupRef = useRef<(() => void) | null>(null);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages; // keep ref in sync
+
+  // Bot Engine — start/stop based on toggle
+  useEffect(() => {
+    if (botsEnabled) {
+      // Clean up previous engine if any
+      if (botCleanupRef.current) botCleanupRef.current();
+
+      const cleanup = startBotEngine(botSpeed, {
+        addMessage: (msg) => {
+          setMessages((prev) => [...prev, msg]);
+          // Auto-scroll if user is near bottom
+          setTimeout(() => {
+            if (messagesContainerRef.current) {
+              const c = messagesContainerRef.current;
+              const nearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 200;
+              if (nearBottom) {
+                c.scrollTo({ top: c.scrollHeight, behavior: "smooth" });
+              }
+            }
+          }, 100);
+        },
+        addReaction: (msgId, emoji) => {
+          setMessages((prev) =>
+            prev.map((m) => {
+              if (m.id !== msgId) return m;
+              const existing = m.reactions.find((r) => r.emoji === emoji);
+              if (existing) {
+                return {
+                  ...m,
+                  reactions: m.reactions.map((r) =>
+                    r.emoji === emoji ? { ...r, count: r.count + 1 } : r
+                  ),
+                };
+              }
+              return {
+                ...m,
+                reactions: [...m.reactions, { emoji, count: 1, users: ["bot"] }],
+              };
+            })
+          );
+        },
+        getMessages: () => messagesRef.current,
+      });
+
+      botCleanupRef.current = cleanup;
+    } else {
+      if (botCleanupRef.current) {
+        botCleanupRef.current();
+        botCleanupRef.current = null;
+      }
+    }
+
+    return () => {
+      if (botCleanupRef.current) {
+        botCleanupRef.current();
+        botCleanupRef.current = null;
+      }
+    };
+  }, [botsEnabled, botSpeed]);
 
   // Auto-launch Tour for first-time users once authenticated (desktop only)
   useEffect(() => {
@@ -1321,6 +1388,37 @@ export default function ChatPage() {
                 <span className="text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
                 <span>{soundEnabled ? "ON" : "OFF"}</span>
               </button>
+
+              {/* Bot Engine Toggle — Admin only */}
+              {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN") && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setBotsEnabled(!botsEnabled)}
+                    className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border text-[10px] font-mono font-semibold transition-all ${
+                      botsEnabled
+                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/30"
+                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                    }`}
+                    title={botsEnabled ? "Stop test bots" : "Start test bots"}
+                  >
+                    <span>🤖</span>
+                    <span>{botsEnabled ? "BOTS ON" : "BOTS"}</span>
+                  </button>
+                  {botsEnabled && (
+                    <select
+                      value={botSpeed}
+                      onChange={(e) => setBotSpeed(e.target.value as BotSpeed)}
+                      className="h-6 px-1 rounded bg-black/60 border border-white/10 text-[9px] font-mono text-slate-300 focus:outline-none focus:border-cyan-500/40 cursor-pointer"
+                      title="Bot message speed"
+                    >
+                      <option value="SLOW">SLOW</option>
+                      <option value="NORMAL">NORMAL</option>
+                      <option value="FAST">FAST</option>
+                    </select>
+                  )}
+                </div>
+              )}
 
               <Link
                 href="/admin"
