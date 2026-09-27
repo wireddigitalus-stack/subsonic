@@ -317,24 +317,7 @@ export default function ChatPage() {
     };
   }, [botsEnabled, botSpeed]);
 
-  // Auto-launch Tour for first-time users once authenticated (desktop only)
-  useEffect(() => {
-    if (isAuthenticated && authChecked) {
-      if (typeof window !== "undefined" && window.innerWidth >= 768) {
-        try {
-          const completed = localStorage.getItem("subsonic_chat_tour_completed");
-          if (!completed) {
-            const timer = setTimeout(() => {
-              setIsTourOpen(true);
-            }, 1200);
-            return () => clearTimeout(timer);
-          }
-        } catch {
-          // ignore
-        }
-      }
-    }
-  }, [isAuthenticated, authChecked]);
+  // Tour is opt-in only — user can launch it via the TOUR button in the desktop toolbar
 
   // Auto-fullscreen on mobile — messenger-style clean experience
   useEffect(() => {
