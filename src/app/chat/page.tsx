@@ -2366,15 +2366,10 @@ export default function ChatPage() {
               <span>
                 Transmitting as: <strong className="text-slate-200">[{shooterProfile.callsign}]</strong>
               </span>
-              {isListening ? (
+              {isListening && (
                 <span className="flex items-center gap-1.5 text-red-400 font-bold animate-pulse">
                   <span className="w-2 h-2 rounded-full bg-red-400" />
                   LISTENING — speak now
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-emerald-400/80">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  Staff Moderated · Spellcheck ON
                 </span>
               )}
             </div>
