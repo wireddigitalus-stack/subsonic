@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -188,6 +188,33 @@ export default function ChatPage() {
   const visibleChannels = ALL_CHANNELS.filter((ch) => ch.netType === activeNetTab);
   const currentChannelData = ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
   const filteredMessages = messages.filter((m) => m.channelId === currentChannel);
+
+  // Channel engagement & post counters map (dynamic per-room transmission & reaction counts)
+  const channelEngagementMap = useMemo(() => {
+    const map: Record<string, { postCount: number; reactionCount: number; dopeCount: number }> = {};
+    for (const ch of ALL_CHANNELS) {
+      map[ch.id] = { postCount: 0, reactionCount: 0, dopeCount: 0 };
+    }
+    for (const m of messages) {
+      if (!map[m.channelId]) {
+        map[m.channelId] = { postCount: 0, reactionCount: 0, dopeCount: 0 };
+      }
+      map[m.channelId].postCount++;
+      if (m.dopeCard || m.type === "DOPE_DROP") {
+        map[m.channelId].dopeCount++;
+      }
+      if (m.reactions && m.reactions.length > 0) {
+        map[m.channelId].reactionCount += m.reactions.reduce((acc, r) => acc + r.count, 0);
+      }
+    }
+    return map;
+  }, [messages]);
+
+  const currentChannelEngagement = channelEngagementMap[currentChannel] || {
+    postCount: filteredMessages.length,
+    reactionCount: 0,
+    dopeCount: 0,
+  };
 
   // Private Chat Room Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -1510,8 +1537,12 @@ export default function ChatPage() {
             title="Switch room"
           >
             <span className="text-amber-400 font-bold text-sm md:text-base">#</span>
-            <span className="font-mono font-bold text-sm md:text-base text-white whitespace-nowrap truncate max-w-[180px] sm:max-w-[240px] md:max-w-none group-hover:text-amber-300 transition-colors">
+            <span className="font-mono font-bold text-sm md:text-base text-white whitespace-nowrap truncate max-w-[150px] sm:max-w-[220px] md:max-w-none group-hover:text-amber-300 transition-colors">
               {currentChannelData.name}
+            </span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
+              <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+              <span>{currentChannelEngagement.postCount}</span>
             </span>
             <ChevronDown className="w-4 h-4 text-amber-400/70 group-hover:text-amber-300 shrink-0" />
           </button>
@@ -1611,7 +1642,11 @@ export default function ChatPage() {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-mono text-slate-400">{currentChannelData.activeUsers} online</span>
+              <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
+                <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                {currentChannelEngagement.postCount} posts
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 hidden xs:inline">{currentChannelData.activeUsers} online</span>
               <div className="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-[9px] font-bold text-amber-300 flex items-center gap-1">
                 <span>ROOMS</span>
                 <ChevronDown className="w-3 h-3 text-amber-400" />
@@ -1687,6 +1722,7 @@ export default function ChatPage() {
             {visibleChannels.map((ch) => {
               const isActive = currentChannel === ch.id;
               const unread = unreadCounts[ch.id] || 0;
+              const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
               return (
                 <button
                   key={ch.id}
@@ -1700,17 +1736,20 @@ export default function ChatPage() {
                 >
                   <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
                   <span>{ch.name}</span>
+
+                  {/* Post Counter Badge on Pill */}
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 ${
+                    isActive ? "bg-black/25 text-black font-black" : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                  }`} title={`${engagement.postCount} posts in #${ch.name}`}>
+                    <MessageSquare className="w-2 h-2" />
+                    {engagement.postCount}
+                  </span>
+
                   {unread > 0 && !isActive ? (
                     <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
                       {unread > 9 ? "9+" : unread}
                     </span>
-                  ) : (
-                    <span className={`text-[9px] px-1 rounded ${
-                      isActive ? "bg-black/20 text-black font-extrabold" : "bg-white/10 text-slate-400"
-                    }`}>
-                      {ch.activeUsers}
-                    </span>
-                  )}
+                  ) : null}
                 </button>
               );
             })}
@@ -1739,6 +1778,7 @@ export default function ChatPage() {
               <div className="space-y-2">
                 {visibleChannels.map((ch) => {
                   const isActive = currentChannel === ch.id;
+                  const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
                   return (
                     <button
                       key={ch.id}
@@ -1756,15 +1796,35 @@ export default function ChatPage() {
                           <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
                           <span>{ch.name}</span>
                         </div>
-                        <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
-                          isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
-                        }`}>
-                          {ch.badge}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {/* Post Counter on Channel Card */}
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold flex items-center gap-1 ${
+                            isActive
+                              ? "bg-black/25 text-black font-extrabold"
+                              : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/25"
+                          }`}>
+                            <MessageSquare className="w-2.5 h-2.5" />
+                            {engagement.postCount} {engagement.postCount === 1 ? "post" : "posts"}
+                          </span>
+
+                          <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
+                            isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
+                          }`}>
+                            {ch.badge}
+                          </span>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-400 line-clamp-1">
-                        {ch.desc}
-                      </p>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] text-slate-400 line-clamp-1 flex-1">
+                          {ch.desc}
+                        </p>
+                        {engagement.reactionCount > 0 && (
+                          <span className="text-[9px] font-mono text-amber-300/80 flex items-center gap-0.5 shrink-0 font-bold">
+                            <Flame className="w-2.5 h-2.5 text-amber-400" />
+                            {engagement.reactionCount}
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
@@ -2688,6 +2748,7 @@ export default function ChatPage() {
         currentChannel={currentChannel}
         onSelectChannel={(chId) => setCurrentChannel(chId)}
         unreadCounts={unreadCounts}
+        engagementCounts={channelEngagementMap}
         onPlayChirp={playTacticalChirp}
       />
 

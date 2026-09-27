@@ -14,9 +14,16 @@ import {
   Flame,
   Wind,
   Target,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from "lucide-react";
 import { ChannelConfig } from "@/lib/types";
+
+export interface ChannelEngagementInfo {
+  postCount: number;
+  reactionCount?: number;
+  dopeCount?: number;
+}
 
 interface ChannelPickerModalProps {
   isOpen: boolean;
@@ -25,6 +32,7 @@ interface ChannelPickerModalProps {
   currentChannel: string;
   onSelectChannel: (channelId: string) => void;
   unreadCounts?: Record<string, number>;
+  engagementCounts?: Record<string, ChannelEngagementInfo>;
   onPlayChirp?: (freq?: number) => void;
 }
 
@@ -35,6 +43,7 @@ export function ChannelPickerModal({
   currentChannel,
   onSelectChannel,
   unreadCounts = {},
+  engagementCounts = {},
   onPlayChirp,
 }: ChannelPickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -328,6 +337,19 @@ export function ChannelPickerModal({
                           {ch.badge}
                         </span>
 
+                        {/* Engagement / Post Counter Badge */}
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1">
+                          <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                          <span>{(engagementCounts[ch.id]?.postCount ?? 0)} {(engagementCounts[ch.id]?.postCount === 1 ? "post" : "posts")}</span>
+                        </span>
+
+                        {engagementCounts[ch.id]?.reactionCount ? (
+                          <span className="text-[9px] font-mono text-amber-300/80 flex items-center gap-0.5 font-bold">
+                            <Flame className="w-2.5 h-2.5 text-amber-400" />
+                            {engagementCounts[ch.id]?.reactionCount}
+                          </span>
+                        ) : null}
+
                         {isActive && (
                           <span className="text-[9px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -349,8 +371,14 @@ export function ChannelPickerModal({
                       </span>
                     )}
 
-                    <div className="text-right font-mono text-[11px] text-slate-400 hidden sm:block">
-                      <strong className="text-white">{ch.activeUsers}</strong> shooters
+                    <div className="text-right font-mono text-[11px] text-slate-400 hidden xs:block">
+                      <div className="flex items-center justify-end gap-1 text-slate-200">
+                        <strong className="text-white font-mono">{engagementCounts[ch.id]?.postCount ?? 0}</strong>
+                        <span className="text-slate-400 text-[10px]">posts</span>
+                      </div>
+                      <div className="text-[9px] text-slate-400 hidden sm:block">
+                        {ch.activeUsers} shooters
+                      </div>
                     </div>
 
                     <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
