@@ -52,6 +52,22 @@ export function Navbar() {
       if (profile) {
         try {
           const parsed = JSON.parse(profile);
+          if (
+            parsed.callsign === "LTDAN" ||
+            parsed.callsign === "ROB" ||
+            parsed.member_id === "SS-2026-0001" ||
+            (parsed.name && parsed.name.toLowerCase().includes("neilson"))
+          ) {
+            parsed.callsign = "RADAR";
+            parsed.rifleSetup = "Smart Systems Integrations";
+            parsed.division = "Lead Developer & Tech Advisor";
+            parsed.badgeText = "DEV ADVISOR";
+            parsed.member_id = "SS-2026-0001";
+            parsed.role = "MASTER_OWNER";
+            try {
+              localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
+            } catch {}
+          }
           if (parsed.callsign) setCallsign(parsed.callsign);
         } catch {
           // ignore

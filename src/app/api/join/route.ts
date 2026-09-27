@@ -13,16 +13,16 @@ const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "LTDAN",
+    callsign: "RADAR",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Master Owner / Dev Admin",
-    rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Dev Operations"],
+    experience_level: "Lead Developer & Tech Advisor",
+    rifle_setup: "Smart Systems Integrations",
+    interests: ["Smart Systems Integrations", "Dev Operations", "AI & Telemetry", "Private Comms", "Tech Advisory"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468 | Callsign: LTDAN / ROB)",
+    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (PIN: 2468 | Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -177,6 +177,7 @@ function ensureStorageInitialized(): SocietyMember[] {
         m.member_id === "SS-2026-0001" ||
         (m.full_name.toLowerCase().includes("rob") &&
          m.full_name.toLowerCase().includes("neilson")) ||
+        m.callsign === "RADAR" ||
         m.callsign === "LTDAN" ||
         m.callsign === "ROB"
     );
@@ -186,7 +187,9 @@ function ensureStorageInitialized(): SocietyMember[] {
       rob.member_id = "SS-2026-0001";
       rob.full_name = "Rob Neilson";
       rob.role = "MASTER_OWNER";
-      rob.callsign = "LTDAN";
+      rob.callsign = "RADAR";
+      rob.rifle_setup = "Smart Systems Integrations";
+      rob.experience_level = "Lead Developer & Tech Advisor";
       memberMap.set(rob.member_id, rob);
     }
 

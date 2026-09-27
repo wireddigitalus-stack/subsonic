@@ -281,27 +281,29 @@ export default function ChatPage() {
         if (saved) {
           try {
             parsedShooter = JSON.parse(saved);
-            // Reconcile Rob Neilson (LTDAN or ROB)
+            // Reconcile Rob Neilson (RADAR, LTDAN, or ROB)
             if (
+              parsedShooter.callsign === "RADAR" ||
               parsedShooter.callsign === "LTDAN" ||
               parsedShooter.callsign === "ROB" ||
               (parsedShooter.name && parsedShooter.name.toLowerCase().includes("neilson"))
             ) {
               parsedShooter.member_id = "SS-2026-0001";
               parsedShooter.name = "Rob Neilson";
+              parsedShooter.callsign = "RADAR";
               parsedShooter.role = "MASTER_OWNER";
-              parsedShooter.division = "Master Owner / Dev Admin";
-              parsedShooter.badgeText = "MASTER OWNER";
-              if (!parsedShooter.callsign) parsedShooter.callsign = "LTDAN";
+              parsedShooter.division = "Lead Developer & Tech Advisor";
+              parsedShooter.badgeText = "DEV ADVISOR";
+              parsedShooter.rifleSetup = "Smart Systems Integrations";
               try {
                 localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
                 localStorage.setItem("subsonic_member_profile", JSON.stringify({
                   member_id: "SS-2026-0001",
                   full_name: "Rob Neilson",
-                  callsign: parsedShooter.callsign,
+                  callsign: "RADAR",
                   state: "TN",
-                  experience_level: "Master Owner / Dev Admin",
-                  rifle_setup: parsedShooter.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+                  experience_level: "Lead Developer & Tech Advisor",
+                  rifle_setup: "Smart Systems Integrations",
                   created_at: "2026-07-04T12:00:00Z"
                 }));
               } catch {}
@@ -963,9 +965,9 @@ export default function ChatPage() {
     const cleanPass = loginPasscode.trim();
 
     // Specific Executive PINs:
-    // Rob Neilson: "LTDAN" or "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Rob Neilson: "RADAR", "LTDAN", or "ROB" with PIN "2468" (Master Owner, Lead Developer & Tech Advisor)
     // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
-    const isRob = cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
+    const isRob = cleanCallsign === "RADAR" || cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
     const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY" || cleanPass === "620620";
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
@@ -983,24 +985,24 @@ export default function ChatPage() {
         : isAllen 
         ? "Allen Hurley" 
         : (shooterProfile.name || cleanCallsign),
-      callsign: isAllen ? "ALLEN" : isRob ? (cleanCallsign === "ROB" ? "ROB" : "LTDAN") : cleanCallsign,
+      callsign: isAllen ? "ALLEN" : isRob ? "RADAR" : cleanCallsign,
       role: isRob 
         ? ("MASTER_OWNER" as const)
         : isAllen 
         ? ("OWNER_ADMIN" as const)
         : (shooterProfile.role || "PRO_COMPETITOR"),
       division: isRob 
-        ? "Master Owner / Dev Admin" 
+        ? "Lead Developer & Tech Advisor" 
         : isAllen 
         ? "Owner Admin / Executive" 
         : (shooterProfile.division || "Open Division Pro"),
       rifleSetup: isRob 
-        ? (shooterProfile.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527") 
+        ? "Smart Systems Integrations" 
         : isAllen 
         ? (shooterProfile.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527") 
         : (shooterProfile.rifleSetup || "Custom Precision Rimfire"),
       badgeText: isRob 
-        ? "MASTER OWNER" 
+        ? "DEV ADVISOR" 
         : isAllen 
         ? "OWNER ADMIN" 
         : "PRO SHOOTER",
@@ -1024,10 +1026,10 @@ export default function ChatPage() {
           localStorage.setItem("subsonic_member_profile", JSON.stringify({
             member_id: "SS-2026-0001",
             full_name: "Rob Neilson",
-            callsign: cleanCallsign === "ROB" ? "ROB" : "LTDAN",
+            callsign: "RADAR",
             state: "TN",
-            experience_level: "Master Owner / Dev Admin",
-            rifle_setup: profile.rifleSetup,
+            experience_level: "Lead Developer & Tech Advisor",
+            rifle_setup: "Smart Systems Integrations",
             created_at: "2026-07-04T12:00:00Z"
           }));
         } else if (isAllen) {

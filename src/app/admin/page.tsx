@@ -86,16 +86,16 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0001",
     full_name: "Rob Neilson",
-    callsign: "LTDAN",
+    callsign: "RADAR",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Master Owner / Dev Admin",
-    rifle_setup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-    interests: ["Private Comms", "Match Operations", "Subsonic DNA", "Dev Operations"],
+    experience_level: "Lead Developer & Tech Advisor",
+    rifle_setup: "Smart Systems Integrations",
+    interests: ["Smart Systems Integrations", "Dev Operations", "AI & Telemetry", "Private Comms", "Tech Advisory"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner & Lead Developer — Full Administrative & Security Authority (PIN: 2468 | Callsign: LTDAN / ROB)",
+    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (PIN: 2468 | Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -563,13 +563,20 @@ export default function AdminDashboardPage() {
         const savedSession = localStorage.getItem("subsonic_admin_session");
         if (savedSession) {
           try {
-            setAdminSession(JSON.parse(savedSession));
+            const parsed = JSON.parse(savedSession);
+            if (parsed.memberId === "SS-2026-0001" || parsed.callsign === "LTDAN" || parsed.callsign === "ROB") {
+              parsed.callsign = "RADAR";
+              parsed.name = "Rob Neilson";
+              parsed.role = "MASTER_OWNER";
+              localStorage.setItem("subsonic_admin_session", JSON.stringify(parsed));
+            }
+            setAdminSession(parsed);
           } catch {}
         } else {
           // Default to Master Owner Rob Neilson if previously authenticated
           setAdminSession({
             name: "Rob Neilson",
-            callsign: "ROB",
+            callsign: "RADAR",
             role: "MASTER_OWNER",
             memberId: "SS-2026-0001",
           });
@@ -619,7 +626,7 @@ export default function AdminDashboardPage() {
         memberId: string;
       } = {
         name: "Rob Neilson",
-        callsign: "LTDAN",
+        callsign: "RADAR",
         role: "MASTER_OWNER",
         memberId: "SS-2026-0001",
       };
@@ -784,7 +791,7 @@ export default function AdminDashboardPage() {
               onClick={() => {
                 const session = {
                   name: "Rob Neilson",
-                  callsign: "LTDAN",
+                  callsign: "RADAR",
                   role: "MASTER_OWNER" as const,
                   memberId: "SS-2026-0001",
                 };
@@ -836,7 +843,7 @@ export default function AdminDashboardPage() {
       m.member_id.toLowerCase().includes(q) ||
       (m.rifle_setup && m.rifle_setup.toLowerCase().includes(q)) ||
       (m.notes && m.notes.toLowerCase().includes(q)) ||
-      ((q === "ltdan" || q === "dan" || q === "rob" || q === "robert") && m.member_id === "SS-2026-0001");
+      ((q === "radar" || q === "ltdan" || q === "dan" || q === "rob" || q === "robert" || q.includes("smart") || q.includes("systems")) && m.member_id === "SS-2026-0001");
     return matchesState && matchesRole && matchesSearch;
   });
 

@@ -140,18 +140,29 @@ export default function HomePage() {
         try {
           const parsed = JSON.parse(savedProfile);
           if (
+            parsed.callsign === "RADAR" ||
             parsed.callsign === "LTDAN" ||
             parsed.callsign === "ROB" ||
             (parsed.name && parsed.name.toLowerCase().includes("neilson"))
           ) {
             parsed.member_id = "SS-2026-0001";
             parsed.name = "Rob Neilson";
+            parsed.callsign = "RADAR";
             parsed.role = "MASTER_OWNER";
-            parsed.division = "Master Owner / Dev Admin";
-            parsed.badgeText = "MASTER OWNER";
-            if (!parsed.callsign) parsed.callsign = "LTDAN";
+            parsed.division = "Lead Developer & Tech Advisor";
+            parsed.badgeText = "DEV ADVISOR";
+            parsed.rifleSetup = "Smart Systems Integrations";
             try {
               localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
+              localStorage.setItem("subsonic_member_profile", JSON.stringify({
+                member_id: "SS-2026-0001",
+                full_name: "Rob Neilson",
+                callsign: "RADAR",
+                state: "TN",
+                experience_level: "Lead Developer & Tech Advisor",
+                rifle_setup: "Smart Systems Integrations",
+                created_at: "2026-07-04T12:00:00Z"
+              }));
             } catch {}
           }
           // Only use shooter profile data if member profile didn't already fill the fields
@@ -162,10 +173,10 @@ export default function HomePage() {
             setSavedMemberData({
               memberId: parsed.member_id || "SS-2026-0001",
               fullName: parsed.name || "Rob Neilson",
-              callsign: parsed.callsign || "LTDAN",
+              callsign: parsed.callsign || "RADAR",
               state: "TN",
-              division: parsed.division || "Master Owner / Dev Admin",
-              rifleSetup: parsed.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+              division: parsed.division || "Lead Developer & Tech Advisor",
+              rifleSetup: parsed.rifleSetup || "Smart Systems Integrations",
             });
           }
         } catch {
@@ -202,9 +213,9 @@ export default function HomePage() {
     const cleanPass = passcode.trim();
 
     // Specific Executive PINs:
-    // Rob Neilson: "LTDAN" or "ROB" with PIN "2468" (Master Owner / Dev Admin)
+    // Rob Neilson: "RADAR", "LTDAN", or "ROB" with PIN "2468" (Master Owner, Lead Developer & Tech Advisor)
     // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
-    const isRob = cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
+    const isRob = cleanCallsign === "RADAR" || cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
     const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY" || cleanPass === "620620";
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
@@ -247,24 +258,24 @@ export default function HomePage() {
         : isAllen 
         ? "Allen Hurley" 
         : (shooterName.trim() || existingMember?.full_name || existingProfile?.name || cleanCallsign),
-      callsign: isAllen ? "ALLEN" : isRob ? (cleanCallsign === "ROB" ? "ROB" : "LTDAN") : cleanCallsign,
+      callsign: isAllen ? "ALLEN" : isRob ? "RADAR" : cleanCallsign,
       role: isRob 
         ? ("MASTER_OWNER" as const)
         : isAllen 
         ? ("OWNER_ADMIN" as const)
         : (existingProfile?.role || "PRO_COMPETITOR"),
       division: isRob 
-        ? "Master Owner / Dev Admin" 
+        ? "Lead Developer & Tech Advisor" 
         : isAllen 
         ? "Owner Admin / Executive" 
         : (division || existingProfile?.division || "Open Division Pro"),
       rifleSetup: isRob 
-        ? (existingProfile?.rifleSetup || "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527") 
+        ? "Smart Systems Integrations" 
         : isAllen 
         ? (existingProfile?.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527") 
         : (existingProfile?.rifleSetup || existingMember?.rifle_setup || "Custom Precision Rimfire"),
       badgeText: isRob 
-        ? "MASTER OWNER" 
+        ? "DEV ADVISOR" 
         : isAllen 
         ? "OWNER ADMIN" 
         : (division.includes("Production") ? "PRODUCTION" : "PRO SHOOTER"),
@@ -277,10 +288,10 @@ export default function HomePage() {
           localStorage.setItem("subsonic_member_profile", JSON.stringify({
             member_id: "SS-2026-0001",
             full_name: "Rob Neilson",
-            callsign: cleanCallsign === "ROB" ? "ROB" : "LTDAN",
+            callsign: "RADAR",
             state: "TN",
-            experience_level: "Master Owner / Dev Admin",
-            rifle_setup: activeProfile.rifleSetup,
+            experience_level: "Lead Developer & Tech Advisor",
+            rifle_setup: "Smart Systems Integrations",
             created_at: existingMember?.created_at || "2026-07-04T12:00:00Z"
           }));
         } else if (isAllen) {
