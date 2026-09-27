@@ -54,7 +54,7 @@ import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed, computeBotStats } from "@/lib/chat-bots";
 import { BotRosterCard } from "@/components/chat/BotRosterCard";
-import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp } from "@/lib/chat-audio";
+import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -1401,7 +1401,10 @@ export default function ChatPage() {
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => setBotsEnabled(!botsEnabled)}
+                    onClick={() => {
+                      unlockAudio();
+                      setBotsEnabled(!botsEnabled);
+                    }}
                     className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border text-[10px] font-mono font-semibold transition-all ${
                       botsEnabled
                         ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
@@ -1417,6 +1420,7 @@ export default function ChatPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      unlockAudio();
                       setIsBotCardOpen(true);
                       playTacticalChirp(1100);
                     }}
@@ -1432,7 +1436,10 @@ export default function ChatPage() {
                   {botsEnabled && (
                     <select
                       value={botSpeed}
-                      onChange={(e) => setBotSpeed(e.target.value as BotSpeed)}
+                      onChange={(e) => {
+                        unlockAudio();
+                        setBotSpeed(e.target.value as BotSpeed);
+                      }}
                       className="h-6 px-1 rounded bg-black/60 border border-white/10 text-[9px] font-mono text-slate-300 focus:outline-none focus:border-cyan-500/40 cursor-pointer"
                       title="Bot message speed"
                     >
@@ -1564,6 +1571,7 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={() => {
+                  unlockAudio();
                   setIsBotCardOpen(true);
                   playTacticalChirp(1100);
                 }}

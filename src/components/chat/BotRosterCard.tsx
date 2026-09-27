@@ -12,6 +12,7 @@ import { ChatMessage } from "@/lib/types";
 import {
   playRealCommsChirp,
   playBotTelemetryChirp,
+  unlockAudio,
 } from "@/lib/chat-audio";
 import {
   X,
@@ -60,6 +61,7 @@ export function BotRosterCard({
   const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(messages);
 
   const handleManualTrigger = (botId: string, forceDope?: boolean) => {
+    unlockAudio();
     const newMsg = triggerSingleBotTransmission(
       botId,
       currentChannel,
@@ -149,7 +151,10 @@ export function BotRosterCard({
             {/* Tone Station Buttons */}
             <button
               type="button"
-              onClick={() => playRealCommsChirp()}
+              onClick={() => {
+                unlockAudio();
+                playRealCommsChirp();
+              }}
               className="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-[11px] flex items-center gap-1.5 font-bold transition-all active:scale-95 shadow-[0_0_8px_rgba(245,158,11,0.2)]"
               title="Audition Tactical VHF Radio Roger Tone (Real Human Chats)"
             >
@@ -159,7 +164,10 @@ export function BotRosterCard({
 
             <button
               type="button"
-              onClick={() => playBotTelemetryChirp()}
+              onClick={() => {
+                unlockAudio();
+                playBotTelemetryChirp();
+              }}
               className="px-2.5 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 text-[11px] flex items-center gap-1.5 font-bold transition-all active:scale-95 shadow-[0_0_8px_rgba(6,182,212,0.2)]"
               title="Audition Digital Synthetic Telemetry Tone (Bot Chats)"
             >
@@ -172,7 +180,10 @@ export function BotRosterCard({
               <span className="text-slate-400 text-[10px]">Speed:</span>
               <select
                 value={botSpeed}
-                onChange={(e) => onChangeSpeed(e.target.value as BotSpeed)}
+                onChange={(e) => {
+                  unlockAudio();
+                  onChangeSpeed(e.target.value as BotSpeed);
+                }}
                 className="bg-transparent text-slate-200 font-bold focus:outline-none cursor-pointer"
               >
                 <option value="FAST" className="bg-slate-900 text-white">FAST (4-12s)</option>
@@ -184,7 +195,10 @@ export function BotRosterCard({
             {/* Master Start / Pause Toggle */}
             <button
               type="button"
-              onClick={onToggleBots}
+              onClick={() => {
+                unlockAudio();
+                onToggleBots();
+              }}
               className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 ${
                 botsEnabled
                   ? "bg-red-500/20 text-red-300 border-red-500/40 hover:bg-red-500/30"
