@@ -394,6 +394,24 @@ export function Navbar() {
                   </Link>
 
                   <Link
+                    href="/competitor-packet"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
+                        <span>2026 Competitor Packet</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Official PDF</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        Nov 13–15 schedule, lodging, dining & guide
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
                     href="/shooters/intake"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group border-t border-white/5"
                   >
@@ -583,6 +601,14 @@ export function Navbar() {
                   >
                     <FileText className="w-4 h-4 text-cyan-400" />
                     <span>Competition Documents (COF & Waivers)</span>
+                  </Link>
+                  <Link
+                    href="/competitor-packet"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-white/10"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>2026 Competitor Packet & Bristol Guide</span>
                   </Link>
                   <Link
                     href="/shooters"

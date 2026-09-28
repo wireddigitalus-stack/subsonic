@@ -271,6 +271,49 @@ export default function CompetitionDocumentsPage() {
           </div>
         </div>
 
+        {/* Featured 2026 Competitor Packet Callout Banner */}
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-black/80 to-blue-500/10 border border-amber-500/35 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase tracking-wider">
+                  OFFICIAL 2026 PACKET
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Nov 13–15, 2026 • The Hideout, Bristol, TN
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white">
+                Subsonic Society Invitational — Competitor Packet & Bristol Guide
+              </h3>
+              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Presented by Modacam Custom Rifles. Includes Allen Hurley welcome letter, weekend schedule, $2,500 cash side matches, 220-acre facility features, 12 recommended hotels, and Bristol dining & fly-fishing guide.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full md:w-auto shrink-0">
+            <Link
+              href="/competitor-packet"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
+            >
+              <span>View Interactive Guide</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+            <a
+              href="/documents/2026-Subsonic-Society-Invitational-Competitor-Packet.pdf"
+              download="2026-Subsonic-Society-Invitational-Competitor-Packet.pdf"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download PDF (246 KB)</span>
+            </a>
+          </div>
+        </div>
+
         {/* Mandatory Waiver Alert Banner if any mandatory doc exists */}
         {documents.some((d) => d.isMandatory) && (
           <div className="p-4 sm:p-5 rounded-2xl bg-red-950/30 border border-red-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -376,6 +419,15 @@ export default function CompetitionDocumentsPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                      {doc.id === "invitational-2026-competitor-packet" && (
+                        <Link
+                          href="/competitor-packet"
+                          className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-1 transition-all"
+                        >
+                          <span>Guide</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
                       <a
                         href={doc.fileUrl}
                         target="_blank"

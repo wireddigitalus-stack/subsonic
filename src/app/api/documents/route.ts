@@ -10,6 +10,20 @@ const DOCUMENTS_FILE = path.join(DATA_DIR, "competition-documents.jsonl");
 
 const SEED_DOCUMENTS: CompetitionDocument[] = [
   {
+    id: "invitational-2026-competitor-packet",
+    title: "2026 Competitor Packet — Subsonic Society Invitational Money Match",
+    category: "RANGE_INTEL",
+    matchId: "subsonic-invitational-2026",
+    matchTitle: "The Subsonic Society Invitational 2026",
+    description: "Official 4-page competitor packet presented by Modacam Custom Rifles. Includes Allen Hurley welcome letter, weekend schedule (Nov 13-15), 220-acre range amenities, $2,500 cash side matches, hotel directory, and Bristol dining & attractions guide.",
+    fileName: "2026-Subsonic-Society-Invitational-Competitor-Packet.pdf",
+    fileSize: "246 KB",
+    fileUrl: "/documents/2026-Subsonic-Society-Invitational-Competitor-Packet.pdf",
+    version: "Official Nov 2026",
+    updatedAt: "2026-09-28T12:00:00Z",
+    isMandatory: true,
+  },
+  {
     id: "invitational-2026-cof",
     title: "Official Course of Fire (COF) — Stages 1 to 18",
     category: "COF",
