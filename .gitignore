@@ -37,4 +37,5 @@ next-env.d.ts
 data/*.jsonl
 !data/society-members.jsonl
 !data/invites.jsonl
+!data/shooters.jsonl
 

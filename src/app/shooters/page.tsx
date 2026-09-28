@@ -140,22 +140,51 @@ function ShootersContent() {
 
   useEffect(() => {
     const fetchShooters = async () => {
+      let localList: ShooterProfile[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          const rawAll = localStorage.getItem("subsonic_all_shooters");
+          if (rawAll) {
+            const parsed = JSON.parse(rawAll);
+            if (Array.isArray(parsed)) {
+              localList.push(...parsed);
+            }
+          }
+          const rawPro = localStorage.getItem("subsonic_pro_full_profile");
+          if (rawPro) {
+            const pro = JSON.parse(rawPro);
+            if (pro && pro.id && !localList.some((s) => s.id === pro.id)) {
+              localList.unshift(pro);
+            }
+          }
+        } catch (e) {
+          console.warn("Error reading local shooters:", e);
+        }
+      }
+
       try {
         setLoading(true);
         const res = await fetch("/api/shooters");
         if (res.ok) {
           const data = await res.json();
           if (data.shooters && data.shooters.length > 0) {
-            setShooters(data.shooters);
-            // If requested ID in URL, select it
+            const map = new Map<string, ShooterProfile>();
+            for (const s of data.shooters) map.set(s.id.toLowerCase(), s);
+            for (const s of localList) {
+              if (!map.has(s.id.toLowerCase())) map.set(s.id.toLowerCase(), s);
+            }
+            const finalShooters = Array.from(map.values());
+            setShooters(finalShooters);
+
             if (requestedId) {
-              const matched = data.shooters.find((s: ShooterProfile) => s.id === requestedId);
+              const matched = finalShooters.find((s: ShooterProfile) => s.id.toLowerCase() === requestedId.toLowerCase());
               if (matched) {
                 setSelectedShooter(matched);
                 return;
               }
             }
-            setSelectedShooter(data.shooters[0]);
+            setSelectedShooter(finalShooters[0]);
+            return;
           }
         }
       } catch (err) {
@@ -163,6 +192,14 @@ function ShootersContent() {
       } finally {
         setLoading(false);
       }
+
+      // Fallback merge if API network fails
+      const fallbackMap = new Map<string, ShooterProfile>();
+      for (const s of FALLBACK_SHOOTERS) fallbackMap.set(s.id.toLowerCase(), s);
+      for (const s of localList) fallbackMap.set(s.id.toLowerCase(), s);
+      const combined = Array.from(fallbackMap.values());
+      setShooters(combined);
+      setSelectedShooter(combined[0]);
     };
 
     fetchShooters();

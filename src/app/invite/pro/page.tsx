@@ -311,10 +311,27 @@ function ProInviteContent() {
         // Continue even if claim fails
       }
 
-      // 3. Save session in localStorage for instant Chat auth
+      // 3. Save session and complete profile in localStorage for instant Chat auth & resilient profile viewing
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("subsonic_chat_authenticated", "true");
+          localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(savedShooter));
+
+          // Also save in subsonic_all_shooters list
+          try {
+            const rawAll = localStorage.getItem("subsonic_all_shooters");
+            const list = rawAll ? JSON.parse(rawAll) : [];
+            const idx = list.findIndex(
+              (s: any) => s.id === savedShooter.id || s.callsign?.toLowerCase() === savedShooter.callsign?.toLowerCase()
+            );
+            if (idx >= 0) {
+              list[idx] = savedShooter;
+            } else {
+              list.unshift(savedShooter);
+            }
+            localStorage.setItem("subsonic_all_shooters", JSON.stringify(list));
+          } catch {}
+
           localStorage.setItem(
             "subsonic_shooter_profile",
             JSON.stringify({
