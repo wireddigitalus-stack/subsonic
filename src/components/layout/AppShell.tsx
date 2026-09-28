@@ -8,9 +8,9 @@ import { MobileTabs } from "@/components/layout/MobileTabs";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isEvoVision = pathname?.startsWith("/evovision");
+  const isEvos = pathname?.startsWith("/evos") || pathname?.startsWith("/evovision");
 
-  if (isEvoVision) {
+  if (isEvos) {
     return <main className="min-h-screen w-full">{children}</main>;
   }
 

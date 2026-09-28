@@ -22,6 +22,25 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/evovision",
+        destination: "/evos1.0",
+        permanent: false,
+      },
+      {
+        source: "/evos1",
+        destination: "/evos1.0",
+        permanent: false,
+      },
+      {
+        source: "/evos",
+        destination: "/evos1.0",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

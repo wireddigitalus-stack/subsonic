@@ -40,7 +40,8 @@ import {
   Bell,
   CheckCircle2,
   Mic,
-  Bot
+  Bot,
+  Activity
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData } from "@/lib/types";
@@ -1443,6 +1444,16 @@ export default function ChatPage() {
                   </button>
                 </div>
               )}
+
+              <Link
+                href="/evos1.0"
+                target="_blank"
+                title="Launch EVOS 1.0 Dynamic Neural Network Topology"
+                className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-[10px] font-mono text-cyan-300 transition-colors shadow-[0_0_8px_rgba(6,182,212,0.15)]"
+              >
+                <Activity className="w-3 h-3 text-cyan-400 shrink-0 animate-pulse" />
+                <span className="font-bold">EVOS 1.0</span>
+              </Link>
 
               <Link
                 href="/admin"

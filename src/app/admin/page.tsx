@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { 
   Activity, 
   MousePointerClick, 
@@ -988,6 +989,16 @@ export default function AdminDashboardPage() {
           >
             <RefreshCw className="w-4 h-4" />
           </button>
+
+          <Link
+            href="/evos1.0"
+            target="_blank"
+            className="px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(6,182,212,0.25)]"
+            title="Launch EVOS 1.0 Dynamic Neural Network Topology"
+          >
+            <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>EVOS 1.0</span>
+          </Link>
 
           <button
             onClick={() => downloadTelemetryExport("csv")}
