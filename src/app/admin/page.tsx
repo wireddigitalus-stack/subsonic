@@ -86,6 +86,7 @@ import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { AdminInviteGeneratorTab } from "@/components/admin/AdminInviteGeneratorTab";
+import { CallsignInput } from "@/components/common/CallsignInput";
 
 const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
@@ -3719,18 +3720,14 @@ export default function AdminDashboardPage() {
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-mono text-slate-300 uppercase">
-                      Tactical Callsign / Handle *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={memberForm.callsign || ""}
-                      onChange={(e) => setMemberForm((prev) => ({ ...prev, callsign: e.target.value.toUpperCase() }))}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono font-bold text-base sm:text-xs focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
+                  <CallsignInput
+                    value={memberForm.callsign || ""}
+                    onChange={(val) => setMemberForm((prev) => ({ ...prev, callsign: val }))}
+                    excludeMemberId={memberForm.member_id}
+                    stateCode={memberForm.state}
+                    label="Tactical Callsign / Handle *"
+                    sublabel="Unique Network Identifier"
+                  />
                 </div>
 
                 {/* Email & Home State */}

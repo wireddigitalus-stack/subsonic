@@ -20,6 +20,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
+import { CallsignInput } from "@/components/common/CallsignInput";
 
 const POPULAR_SPONSORS = [
   "Modacam Custom Rifles",
@@ -82,6 +83,7 @@ export default function ShooterIntakePage() {
   const [headshotPreview, setHeadshotPreview] = useState<string>("/assets/subsonic-coin.jpg");
   const [actionPhotoPreview, setActionPhotoPreview] = useState<string>("/assets/subsonic-coin.jpg");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCallsignValid, setIsCallsignValid] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -161,6 +163,12 @@ export default function ShooterIntakePage() {
 
     if (!formData.name.trim() || !formData.callsign.trim()) {
       setErrorMessage("Please enter both your Full Name and Tactical Callsign.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!isCallsignValid) {
+      setErrorMessage("The tactical callsign you entered is taken or reserved. Please choose an available callsign or select one of the suggested alternatives.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -319,19 +327,14 @@ export default function ShooterIntakePage() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">
-                TACTICAL CALLSIGN / HANDLE <span className="text-amber-400">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.callsign}
-                onChange={(e) => setFormData({ ...formData, callsign: e.target.value })}
-                placeholder="e.g. GHOST or APEX-22"
-                className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-sm font-mono uppercase focus:border-amber-400 outline-none transition-colors"
-              />
-            </div>
+            <CallsignInput
+              value={formData.callsign}
+              onChange={(val) => setFormData({ ...formData, callsign: val })}
+              stateCode="TN"
+              onValidationChange={(valid) => setIsCallsignValid(valid)}
+              label="TACTICAL CALLSIGN / HANDLE *"
+              sublabel="Unique Competitor ID"
+            />
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 font-bold block">

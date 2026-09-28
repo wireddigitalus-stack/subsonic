@@ -19,6 +19,7 @@ import {
   Download
 } from "lucide-react";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
+import { CallsignInput } from "@/components/common/CallsignInput";
 
 function StandardInviteContent() {
   const searchParams = useSearchParams();
@@ -33,6 +34,7 @@ function StandardInviteContent() {
   // Form
   const [fullName, setFullName] = useState("");
   const [callsign, setCallsign] = useState("");
+  const [isCallsignValid, setIsCallsignValid] = useState(false);
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [email, setEmail] = useState("");
@@ -101,6 +103,11 @@ function StandardInviteContent() {
       return;
     }
 
+    if (!isCallsignValid) {
+      setFormError("The tactical callsign you entered is taken or reserved. Please choose an available callsign or select one of the suggested alternatives.");
+      return;
+    }
+
     if (pin.trim().length < 4) {
       setFormError("Please create a 4 to 6-digit login PIN code.");
       return;
@@ -117,20 +124,7 @@ function StandardInviteContent() {
       const assignedCallsign = callsign.trim().toUpperCase();
       const memberId = `SS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      // 1. Claim invite code
-      try {
-        await fetch("/api/invites/claim", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            code: inviteCode,
-            callsign: assignedCallsign,
-            memberId,
-          }),
-        });
-      } catch {}
-
-      // 2. Build member profile and persist in society database
+      // 1. Build member profile and persist in society database
       const memberObj = {
         member_id: memberId,
         full_name: fullName.trim(),
@@ -146,7 +140,7 @@ function StandardInviteContent() {
       };
 
       try {
-        await fetch("/api/join", {
+        const joinRes = await fetch("/api/join", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -161,9 +155,31 @@ function StandardInviteContent() {
             pin: pin.trim(),
           }),
         });
+
+        if (!joinRes.ok) {
+          const errData = await joinRes.json();
+          if (joinRes.status === 409) {
+            setFormError(errData.error || "Tactical callsign is already assigned. Please choose another.");
+            setIsSubmitting(false);
+            return;
+          }
+        }
       } catch (e) {
         console.warn("Error saving member to database:", e);
       }
+
+      // 2. Claim invite code
+      try {
+        await fetch("/api/invites/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: inviteCode,
+            callsign: assignedCallsign,
+            memberId,
+          }),
+        });
+      } catch {}
 
       // 3. Save to localStorage for instant Chat auth
       if (typeof window !== "undefined") {
@@ -357,20 +373,13 @@ function StandardInviteContent() {
             />
           </div>
 
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-xs font-mono font-bold text-amber-400 uppercase flex items-center justify-between">
-              <span>Tactical Callsign *</span>
-              <span className="text-[10px] text-slate-400 font-normal">Shows in live chat room</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={callsign}
-              onChange={(e) => setCallsign(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
-              placeholder="e.g. RECON, APEX, ECHO"
-              className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-amber-500/40 text-amber-400 font-mono font-bold text-xs sm:text-sm uppercase focus:border-amber-400 focus:outline-none"
-            />
-          </div>
+          <CallsignInput
+            value={callsign}
+            onChange={setCallsign}
+            stateCode={stateCode}
+            onValidationChange={(valid) => setIsCallsignValid(valid)}
+            className="sm:col-span-2"
+          />
 
           <div className="space-y-1">
             <label className="text-xs font-mono font-bold text-emerald-400 uppercase">

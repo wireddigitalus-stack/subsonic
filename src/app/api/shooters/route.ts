@@ -5,6 +5,7 @@ import {
   saveShooterToStorage, 
   getShooterBySlug 
 } from "@/lib/shooters";
+import { checkCallsignAvailability } from "@/lib/callsigns";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,30 @@ export async function POST(req: NextRequest) {
 
     if (!body.name || !body.callsign) {
       return NextResponse.json({ error: "Name and callsign are required" }, { status: 400 });
+    }
+
+    const candidateCallsign = body.callsign.trim().toUpperCase();
+    const existingShooter = getShootersFromStorage().find(
+      (s) => s.id.toLowerCase() === (body.id || "").toLowerCase()
+    );
+
+    // Enforce uniqueness and provide suggestions if taken
+    const callsignCheck = checkCallsignAvailability(candidateCallsign, {
+      excludeMemberId: existingShooter ? existingShooter.id : undefined,
+    });
+
+    if (
+      !callsignCheck.isAvailable &&
+      (!existingShooter || !existingShooter.callsign || existingShooter.callsign.toUpperCase() !== candidateCallsign)
+    ) {
+      return NextResponse.json(
+        {
+          error: callsignCheck.message,
+          suggestions: callsignCheck.suggestions,
+          code: "CALLSIGN_TAKEN",
+        },
+        { status: 409 }
+      );
     }
 
     // Auto-generate clean slug ID from callsign or name

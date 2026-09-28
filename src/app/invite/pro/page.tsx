@@ -25,6 +25,7 @@ import {
   Check
 } from "lucide-react";
 import { compressImageFile, CompressionResult } from "@/lib/imageCompression";
+import { CallsignInput } from "@/components/common/CallsignInput";
 
 const POPULAR_SPONSORS = [
   "Modacam Custom Rifles",
@@ -69,6 +70,7 @@ function ProInviteContent() {
   // Form State
   const [fullName, setFullName] = useState("");
   const [callsign, setCallsign] = useState("");
+  const [isCallsignValid, setIsCallsignValid] = useState(false);
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [division, setDivision] = useState("Open Division Pro");
@@ -227,6 +229,12 @@ function ProInviteContent() {
 
     if (!fullName.trim() || !callsign.trim()) {
       setFormError("Please enter your Full Name and Tactical Callsign.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!isCallsignValid) {
+      setFormError("The tactical callsign you entered is taken or reserved. Please choose an available callsign or select one of the suggested alternatives.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -600,20 +608,14 @@ function ProInviteContent() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-amber-400 uppercase flex items-center justify-between">
-                <span>Tactical Callsign *</span>
-                <span className="text-[10px] text-slate-400 font-normal">Used in live chat & URL</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={callsign}
-                onChange={(e) => setCallsign(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
-                placeholder="e.g. GHOST, APEX, REAPER"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-amber-500/40 text-amber-400 font-mono font-bold text-xs sm:text-sm uppercase focus:border-amber-400 focus:outline-none"
-              />
-            </div>
+            <CallsignInput
+              value={callsign}
+              onChange={setCallsign}
+              stateCode="TN"
+              onValidationChange={(valid) => setIsCallsignValid(valid)}
+              label="Tactical Callsign *"
+              sublabel="Used in live chat & URL (/shooters/[callsign])"
+            />
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-emerald-400 uppercase flex items-center justify-between">

@@ -7,6 +7,7 @@ import {
   deleteMemberFromStorage,
   saveAllMembersToStorage 
 } from "@/lib/members";
+import { checkCallsignAvailability } from "@/lib/callsigns";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +106,30 @@ export async function POST(req: NextRequest) {
     const assignedCallsign = callsign ? callsign.trim().toUpperCase() : resolvedName.split(" ")[0].toUpperCase();
     const assignedMemberId = memberId || member_id || `SS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
+    // Validate uniqueness of tactical callsign
+    const existingMember = getMembersFromStorage().find(
+      (m) => m.member_id === assignedMemberId
+    );
+
+    const callsignCheck = checkCallsignAvailability(assignedCallsign, {
+      excludeMemberId: existingMember ? existingMember.member_id : undefined,
+      state: state || "TN",
+    });
+
+    if (
+      !callsignCheck.isAvailable &&
+      (!existingMember || !existingMember.callsign || existingMember.callsign.toUpperCase() !== assignedCallsign)
+    ) {
+      return NextResponse.json(
+        {
+          error: callsignCheck.message,
+          suggestions: callsignCheck.suggestions,
+          code: "CALLSIGN_TAKEN",
+        },
+        { status: 409 }
+      );
+    }
+
     const newMember: SocietyMember = {
       member_id: assignedMemberId,
       full_name: resolvedName,
@@ -160,6 +185,27 @@ export async function PATCH(req: NextRequest) {
 
     if (index === -1) {
       return NextResponse.json({ error: "Member not found." }, { status: 404 });
+    }
+
+    if (
+      callsign !== undefined && 
+      callsign.trim().toUpperCase() !== (currentMembers[index].callsign || "").toUpperCase()
+    ) {
+      const callsignCheck = checkCallsignAvailability(callsign.trim().toUpperCase(), {
+        excludeMemberId: member_id,
+        state: state || currentMembers[index].state,
+      });
+
+      if (!callsignCheck.isAvailable) {
+        return NextResponse.json(
+          {
+            error: callsignCheck.message,
+            suggestions: callsignCheck.suggestions,
+            code: "CALLSIGN_TAKEN",
+          },
+          { status: 409 }
+        );
+      }
     }
 
     const updatedMember: SocietyMember = {
