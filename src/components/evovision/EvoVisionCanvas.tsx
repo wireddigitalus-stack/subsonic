@@ -344,6 +344,27 @@ export function EvoVisionCanvas({
         ctx.stroke();
         ctx.shadowBlur = 0;
 
+        // Center callsign/symbol inside orb
+        if (node.radius >= 18) {
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font =
+            node.radius >= 40
+              ? "900 13px ui-monospace, monospace"
+              : node.radius >= 26
+              ? "bold 10px ui-monospace, monospace"
+              : "bold 8px ui-monospace, monospace";
+          ctx.fillStyle = "#FFFFFF";
+          ctx.shadowColor = "#000000";
+          ctx.shadowBlur = 6;
+          const orbText = node.callsign
+            ? node.callsign.slice(0, 6)
+            : node.label.slice(0, 3).toUpperCase();
+          ctx.fillText(orbText, node.x, node.y);
+          ctx.textBaseline = "alphabetic";
+          ctx.shadowBlur = 0;
+        }
+
         // Selection pulsing ring
         if (isSelected) {
           const pulseR = node.radius + 6 + Math.sin(time * 6) * 3;
