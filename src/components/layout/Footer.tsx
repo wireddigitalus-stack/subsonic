@@ -14,8 +14,6 @@ import {
   Microscope,
   Users,
   Trophy,
-  Film,
-  ShoppingBag,
   Award,
   Sparkles
 } from "lucide-react";
@@ -100,11 +98,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="hover:text-amber-400 transition-colors flex items-center gap-1">
-                  <span>Official Gear & Apparel</span>
-                </Link>
-              </li>
-              <li>
                 <Link href="/contact" className="hover:text-amber-400 transition-colors">
                   Contact & Inquiries
                 </Link>
@@ -175,12 +168,6 @@ export function Footer() {
               <li>
                 <Link href="/shooters" className="hover:text-purple-300 transition-colors">
                   Competitor Gear Specs
-                </Link>
-              </li>
-              <li>
-                <Link href="/watch" className="hover:text-red-300 transition-colors flex items-center gap-1">
-                  <Film className="w-3 h-3 text-red-400" />
-                  <span>Slow-Mo 300-Yd Video</span>
                 </Link>
               </li>
               <li>

@@ -11,12 +11,8 @@ import {
   ShieldCheck, 
   Crosshair, 
   Compass,
-  Play,
-  Film,
   Users,
   Microscope,
-  Volume2,
-  VolumeX,
   MessageSquare,
   Sparkles,
   FileText
@@ -25,7 +21,6 @@ import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
 
 export function HeroSection() {
-  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
 
   return (
     <section data-section="hero" className="relative pt-4 pb-16 overflow-hidden">
@@ -74,22 +69,8 @@ export function HeroSection() {
         {/* Live Animated Tactical Chat Terminal & Guest Clearance Hub */}
         <HeroChatTerminal />
 
-        {/* 4 PRIMARY BUTTONS: WATCH • MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-2">
-          {/* Button 1: WATCH */}
-          <Link
-            href="/watch"
-            data-telemetry="hero_primary_btn_watch"
-            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-red-500/50 hover:bg-red-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
-          >
-            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 shrink-0">
-                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-red-400" />
-              </div>
-              <span className="truncate">WATCH</span>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
-          </Link>
+        {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
 
           {/* Button 2: MATCHES */}
           <Link

@@ -411,66 +411,6 @@ export function Navbar() {
               <span>Subsonic DNA</span>
             </Link>
 
-            {/* Submenu 3: Media & Gear */}
-            <div 
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("media")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === "media" ? null : "media")}
-                data-telemetry="nav_dropdown_media"
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  pathname.startsWith("/watch") || pathname.startsWith("/shop") || activeDropdown === "media"
-                    ? "bg-white/15 text-white shadow-sm"
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <span>Media & Gear</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "media" ? "rotate-180 text-amber-400" : "text-slate-400"}`} />
-              </button>
-
-              {activeDropdown === "media" && (
-                <div className="absolute top-full right-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
-                  <Link
-                    href="/watch"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0 mt-0.5">
-                      <Film className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-red-400 flex items-center gap-1.5">
-                        <span>Watch Hub</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 font-mono">Slow-Mo</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        300-yd impacts, stage runs & trace
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/shop"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <ShoppingBag className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
-                        <span>Community Shop</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Gear & Apparel</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Official match jerseys, hats & gear
-                      </p>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Right Action: Private Comms controls, Join CTA, and Mobile toggle */}
@@ -645,10 +585,10 @@ export function Navbar() {
                   </Link>
                 </div>
 
-                {/* Group 3: Subsonic DNA & Media */}
+                {/* Group 3: Subsonic DNA & Research */}
                 <div className="space-y-1 pt-2 border-t border-white/5">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold px-2">
-                    Ballistics & Media
+                    Ballistics & Research
                   </span>
                   <Link
                     href="/dna"
@@ -657,22 +597,6 @@ export function Navbar() {
                   >
                     <Microscope className="w-4 h-4 text-blue-400" />
                     <span>Subsonic DNA Testing Lab</span>
-                  </Link>
-                  <Link
-                    href="/watch"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <Film className="w-4 h-4 text-red-400" />
-                    <span>Watch Slow-Mo 300-Yd Video</span>
-                  </Link>
-                  <Link
-                    href="/shop"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <ShoppingBag className="w-4 h-4 text-amber-400" />
-                    <span>Shop Official Gear & Apparel</span>
                   </Link>
                 </div>
 
