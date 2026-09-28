@@ -42,6 +42,8 @@ export default function EvosDashboardPage() {
   const [activeClusterFilter, setActiveClusterFilter] = useState<string | null>(null);
   const [transmissionSuccessNotice, setTransmissionSuccessNotice] = useState<string | null>(null);
   const [spacemanActive, setSpacemanActive] = useState<boolean>(true);
+  const [is3DMode, setIs3DMode] = useState<boolean>(false);
+  const [autoRotate, setAutoRotate] = useState<boolean>(true);
 
   const handleSimulateTransmission = (node: EvoNode) => {
     setTransmissionSuccessNotice(`Dispatched live packet from [${node.callsign || node.label}] to Central Hub`);
@@ -130,7 +132,51 @@ export default function EvosDashboardPage() {
         </div>
 
         {/* Status / Quick Links */}
-        <div className="flex items-center gap-2">
+        {/* Status / Quick Links & 3D Meeting Presentation Switch */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* 3D Holographic Orbit Meeting Switch */}
+          <div className="flex items-center rounded-lg bg-black/60 border border-white/10 p-0.5 shadow-inner">
+            <button
+              onClick={() => setIs3DMode(false)}
+              className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
+                !is3DMode
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
+                  : "text-slate-400 hover:text-white"
+              }`}
+              title="2D Tactical Top-Down View"
+            >
+              2D FLAT
+            </button>
+            <button
+              onClick={() => setIs3DMode(true)}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
+                is3DMode
+                  ? "bg-gradient-to-r from-cyan-500/30 to-blue-500/30 text-cyan-200 border border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                  : "text-slate-400 hover:text-white"
+              }`}
+              title="3D Holographic Orbit View for Big Screen Meetings"
+            >
+              <span className="text-xs">🪐</span>
+              <span>3D ORBIT</span>
+            </button>
+          </div>
+
+          {/* Pause / Play Auto-Rotation when in 3D */}
+          {is3DMode && (
+            <button
+              onClick={() => setAutoRotate(!autoRotate)}
+              className={`hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-bold transition-all ${
+                autoRotate
+                  ? "bg-cyan-950/60 border-cyan-500/40 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.25)]"
+                  : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+              }`}
+              title={autoRotate ? "Pause 3D auto-rotation" : "Resume 3D auto-rotation"}
+            >
+              <span>{autoRotate ? "⏸" : "▶"}</span>
+              <span>{autoRotate ? "REVOLVING" : "PAUSED"}</span>
+            </button>
+          )}
+
           <Link
             href="/admin"
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] text-emerald-300 hover:bg-emerald-900/60 transition-colors"
@@ -167,6 +213,10 @@ export default function EvosDashboardPage() {
           activeFilter={activeClusterFilter}
           spacemanEnabled={spacemanActive}
           onToggleSpaceman={setSpacemanActive}
+          is3DMode={is3DMode}
+          autoRotate={autoRotate}
+          onToggle3D={setIs3DMode}
+          onToggleAutoRotate={setAutoRotate}
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
@@ -199,7 +249,7 @@ export default function EvosDashboardPage() {
 
         {/* Floating Quick Hint (Bottom Center) */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
-          Drag to pan • Scroll to zoom • Click any node or spaceman
+          Drag to pan • Scroll to zoom • Click any node or spaceman • Toggle 3D Orbit for meeting presentations
         </div>
 
         {/* Subtle Spaceman Toggle Button (Bottom Right) */}

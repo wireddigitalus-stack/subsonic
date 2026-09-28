@@ -9,6 +9,10 @@ interface EvoVisionCanvasProps {
   activeFilter: string | null;
   spacemanEnabled?: boolean;
   onToggleSpaceman?: (enabled: boolean) => void;
+  is3DMode?: boolean;
+  autoRotate?: boolean;
+  onToggle3D?: (active: boolean) => void;
+  onToggleAutoRotate?: (active: boolean) => void;
 }
 
 interface Particle {
@@ -68,6 +72,10 @@ export function EvoVisionCanvas({
   activeFilter,
   spacemanEnabled = true,
   onToggleSpaceman,
+  is3DMode = false,
+  autoRotate = true,
+  onToggle3D,
+  onToggleAutoRotate,
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -96,6 +104,28 @@ export function EvoVisionCanvas({
   hoveredNodeRef.current = hoveredNode;
   const hoveredSpacemanRef = useRef(hoveredSpaceman);
   hoveredSpacemanRef.current = hoveredSpaceman;
+
+  // 3D Perspective & Rotation parameters
+  const is3DModeRef = useRef(is3DMode);
+  is3DModeRef.current = is3DMode;
+  const autoRotateRef = useRef(autoRotate);
+  autoRotateRef.current = autoRotate;
+
+  const orbit3DRef = useRef({
+    pitch: 0,           // 0 rad (flat 2D) -> 0.95 rad (~54 deg tilted 3D plane)
+    targetPitch: 0,
+    yaw: 0,             // rotation around Z-axis
+    yawSpeed: 0.0016,   // smooth majestic revolution
+  });
+
+  useEffect(() => {
+    orbit3DRef.current.targetPitch = is3DMode ? 0.95 : 0;
+  }, [is3DMode]);
+
+  // Projected node coordinates map for 100% accurate hit-testing in 2D or 3D
+  const projectedNodeMap = useRef<
+    Map<string, { px: number; py: number; scale: number; z: number; radius: number }>
+  >(new Map());
 
   // Background stars cache
   const starsRef = useRef<Star[]>([]);
@@ -257,6 +287,45 @@ export function EvoVisionCanvas({
       cam.x += (cam.targetX - cam.x) * 0.08;
       cam.y += (cam.targetY - cam.y) * 0.08;
       cam.zoom += (cam.targetZoom - cam.zoom) * 0.08;
+
+      // Smooth 3D camera interpolation
+      const o3d = orbit3DRef.current;
+      o3d.pitch += (o3d.targetPitch - o3d.pitch) * 0.05;
+
+      if (autoRotateRef.current && (o3d.pitch > 0.02 || is3DModeRef.current)) {
+        o3d.yaw += o3d.yawSpeed;
+      }
+
+      // 3D projection mathematical transformation helper
+      const project3D = (x: number, y: number, zOffset: number = 0) => {
+        const pitch = o3d.pitch;
+        const yaw = o3d.yaw;
+
+        // 1. Yaw rotation around central hub (0, 0)
+        const cosY = Math.cos(yaw);
+        const sinY = Math.sin(yaw);
+        const x1 = x * cosY - y * sinY;
+        const y1 = x * sinY + y * cosY;
+
+        // 2. Pitch incline tilt around X axis
+        const cosP = Math.cos(pitch);
+        const sinP = Math.sin(pitch);
+        const x2 = x1;
+        const y2 = y1 * cosP - zOffset * sinP;
+        const z2 = y1 * sinP + zOffset * cosP;
+
+        // 3. Perspective projection
+        const focalDist = 1350;
+        const depthScale = focalDist / (focalDist + z2);
+
+        return {
+          px: x2 * depthScale,
+          py: y2 * depthScale,
+          z: z2,
+          scale: depthScale,
+          alphaFactor: Math.max(0.35, Math.min(1.0, 0.75 + (1 - z2 / 850) * 0.25)),
+        };
+      };
 
       ctx.clearRect(0, 0, width, height);
 
@@ -450,17 +519,39 @@ export function EvoVisionCanvas({
         }
       }
 
-      // ─── 2. Orbiting Stardust Rings Around Center Hub ──────────────
+      // ─── 2. Orbiting Stardust Rings & Holographic Celestial Grid in 3D ──
+      // Subtle 3D celestial coordinate grid discs when tilted
+      if (o3d.pitch > 0.04) {
+        ctx.save();
+        const gridAlpha = 0.14 * (o3d.pitch / 0.95);
+        ctx.strokeStyle = `rgba(6, 182, 212, ${gridAlpha})`;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        [420, 720, 1020].forEach((r) => {
+          ctx.beginPath();
+          for (let a = 0; a <= Math.PI * 2; a += Math.PI / 32) {
+            const p = project3D(Math.cos(a) * r, Math.sin(a) * r);
+            if (a === 0) ctx.moveTo(p.px, p.py);
+            else ctx.lineTo(p.px, p.py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        });
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
       const ringRadius = 140;
       for (let i = 0; i < 48; i++) {
         const angle = (i / 48) * Math.PI * 2 + time * 0.2;
         const rad = ringRadius + Math.sin(angle * 3 + time) * 12;
         const px = Math.cos(angle) * rad;
         const py = Math.sin(angle) * rad;
-        const pAlpha = 0.2 + (Math.sin(angle * 2 + time * 3) + 1) * 0.25;
+        const rProj = project3D(px, py);
+        const pAlpha = (0.2 + (Math.sin(angle * 2 + time * 3) + 1) * 0.25) * rProj.alphaFactor;
         ctx.fillStyle = `rgba(6, 182, 212, ${pAlpha})`;
         ctx.beginPath();
-        ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+        ctx.arc(rProj.px, rProj.py, Math.max(0.8, 1.8 * rProj.scale), 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -471,9 +562,10 @@ export function EvoVisionCanvas({
         const rad = ring2Radius + Math.cos(angle * 2 + time) * 10;
         const px = Math.cos(angle) * rad;
         const py = Math.sin(angle) * rad;
-        ctx.fillStyle = `rgba(56, 189, 248, 0.25)`;
+        const rProj = project3D(px, py);
+        ctx.fillStyle = `rgba(56, 189, 248, ${0.25 * rProj.alphaFactor})`;
         ctx.beginPath();
-        ctx.arc(px, py, 1.2, 0, Math.PI * 2);
+        ctx.arc(rProj.px, rProj.py, Math.max(0.6, 1.2 * rProj.scale), 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -481,19 +573,54 @@ export function EvoVisionCanvas({
       const selectedNodeVal = selectedNodeRef.current;
       const hoveredNodeVal = hoveredNodeRef.current;
 
-      // ─── 3. Organic Synaptic Links (Curved Beziers) ────────────────
+      // Project all nodes and update projected lookup map for 100% accurate hit-testing
+      const projectedNodes = EVO_NODES.map((node) => {
+        const proj = project3D(node.x, node.y);
+        return {
+          node,
+          px: proj.px,
+          py: proj.py,
+          scale: proj.scale,
+          z: proj.z,
+          alphaFactor: proj.alphaFactor,
+        };
+      });
+
+      projectedNodeMap.current.clear();
+      projectedNodes.forEach((pn) => {
+        projectedNodeMap.current.set(pn.node.id, {
+          px: pn.px,
+          py: pn.py,
+          scale: pn.scale,
+          z: pn.z,
+          radius: pn.node.radius * pn.scale,
+        });
+      });
+
+      // Track camera to selected node if selected
+      if (selectedNodeVal) {
+        const selPn = projectedNodeMap.current.get(selectedNodeVal.id);
+        if (selPn) {
+          cam.targetX = -selPn.px;
+          cam.targetY = -selPn.py;
+          cam.targetZoom = selectedNodeVal.cluster === "HUB" ? 1.05 : 1.25;
+        }
+      }
+
+      // ─── 3. Organic Synaptic Links (Curved Beziers in 3D) ───────────
       EVO_LINKS.forEach((link) => {
         const src = nodeMap.current.get(link.sourceId);
         const tgt = nodeMap.current.get(link.targetId);
         if (!src || !tgt) return;
 
-        // Is this link dimmed by filter?
+        const srcProj = project3D(src.x, src.y);
+        const tgtProj = project3D(tgt.x, tgt.y);
+
         const isDimmed =
           activeFilterVal &&
           src.cluster !== activeFilterVal &&
           tgt.cluster !== activeFilterVal;
 
-        // Control point for smooth organic curve
         const midX = (src.x + tgt.x) / 2;
         const midY = (src.y + tgt.y) / 2;
         const dx = tgt.x - src.x;
@@ -504,36 +631,40 @@ export function EvoVisionCanvas({
         const curveFactor = (link.curvature || 0.08) * 80;
         const cpX = midX + normX * curveFactor;
         const cpY = midY + normY * curveFactor;
+        const cpProj = project3D(cpX, cpY, 20);
+
+        const avgScale = (srcProj.scale + tgtProj.scale) / 2;
+        const avgAlpha = (srcProj.alphaFactor + tgtProj.alphaFactor) / 2;
 
         // Outer glow path
         ctx.strokeStyle = link.color;
-        ctx.globalAlpha = isDimmed ? 0.06 : 0.25;
-        ctx.lineWidth = 3.5;
+        ctx.globalAlpha = (isDimmed ? 0.05 : 0.25) * avgAlpha;
+        ctx.lineWidth = Math.max(1.5, 3.5 * avgScale);
         ctx.beginPath();
-        ctx.moveTo(src.x, src.y);
-        ctx.quadraticCurveTo(cpX, cpY, tgt.x, tgt.y);
+        ctx.moveTo(srcProj.px, srcProj.py);
+        ctx.quadraticCurveTo(cpProj.px, cpProj.py, tgtProj.px, tgtProj.py);
         ctx.stroke();
 
         // Inner core path
         ctx.strokeStyle = "#FFFFFF";
-        ctx.globalAlpha = isDimmed ? 0.04 : 0.6;
-        ctx.lineWidth = 1;
+        ctx.globalAlpha = (isDimmed ? 0.03 : 0.6) * avgAlpha;
+        ctx.lineWidth = Math.max(0.6, 1 * avgScale);
         ctx.beginPath();
-        ctx.moveTo(src.x, src.y);
-        ctx.quadraticCurveTo(cpX, cpY, tgt.x, tgt.y);
+        ctx.moveTo(srcProj.px, srcProj.py);
+        ctx.quadraticCurveTo(cpProj.px, cpProj.py, tgtProj.px, tgtProj.py);
         ctx.stroke();
 
         // Latency pill text along the link
         if (link.latencyLabel && !isDimmed) {
-          ctx.globalAlpha = 0.75;
-          ctx.font = "9px ui-monospace, SFMono-Regular, Menlo, monospace";
+          ctx.globalAlpha = 0.75 * cpProj.alphaFactor;
+          ctx.font = `${Math.max(7, Math.round(9 * cpProj.scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           ctx.fillStyle = link.color;
           ctx.textAlign = "center";
-          ctx.fillText(link.latencyLabel, cpX, cpY - 4);
+          ctx.fillText(link.latencyLabel, cpProj.px, cpProj.py - 4);
         }
       });
 
-      // ─── 4. Travelling Energy Pulse Packets ─────────────────────────
+      // ─── 4. Travelling Energy Pulse Packets in 3D ───────────────────
       particlesRef.current.forEach((p) => {
         const link = EVO_LINKS.find((l) => l.id === p.linkId);
         if (!link) return;
@@ -556,56 +687,62 @@ export function EvoVisionCanvas({
         const cpX = midX + normX * curveFactor;
         const cpY = midY + normY * curveFactor;
 
-        // Quadratic Bezier formula B(t) = (1-t)^2*P0 + 2(1-t)t*P1 + t^2*P2
+        // Quadratic Bezier formula
         const bx = (1 - t) * (1 - t) * src.x + 2 * (1 - t) * t * cpX + t * t * tgt.x;
         const by = (1 - t) * (1 - t) * src.y + 2 * (1 - t) * t * cpY + t * t * tgt.y;
+        const archZ = 20 * Math.sin(t * Math.PI);
+        const pProj = project3D(bx, by, archZ);
 
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.9 * pProj.alphaFactor;
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = p.color;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 10 * pProj.scale;
         ctx.beginPath();
-        ctx.arc(bx, by, p.size, 0, Math.PI * 2);
+        ctx.arc(pProj.px, pProj.py, Math.max(1, p.size * pProj.scale), 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
       });
 
-      // ─── 5. Bioluminescent Nodes ───────────────────────────────────
-      EVO_NODES.forEach((node) => {
+      // Sort back-to-front (highest z is deepest in background, rendered first)
+      const sortedNodes = [...projectedNodes].sort((a, b) => b.z - a.z);
+
+      // ─── 5. Bioluminescent Nodes in 3D Perspective ─────────────────
+      sortedNodes.forEach(({ node, px, py, scale, z, alphaFactor }) => {
         const isDimmed = activeFilterVal && node.cluster !== activeFilterVal && node.id !== "hub-main";
         const isSelected = selectedNodeVal?.id === node.id;
         const isHovered = hoveredNodeVal?.id === node.id;
 
-        ctx.globalAlpha = isDimmed ? 0.2 : 1;
+        const nodeR = node.radius * scale;
+
+        ctx.globalAlpha = (isDimmed ? 0.2 : 1) * alphaFactor;
 
         // Multi-layer glowing halo
         const haloGrad = ctx.createRadialGradient(
-          node.x,
-          node.y,
-          node.radius * 0.4,
-          node.x,
-          node.y,
-          node.radius * (isSelected ? 2.4 : isHovered ? 2.0 : 1.7)
+          px,
+          py,
+          nodeR * 0.4,
+          px,
+          py,
+          nodeR * (isSelected ? 2.4 : isHovered ? 2.0 : 1.7)
         );
         haloGrad.addColorStop(0, node.glowColor || "rgba(6, 182, 212, 0.4)");
         haloGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = haloGrad;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius * 2.2, 0, Math.PI * 2);
+        ctx.arc(px, py, nodeR * 2.2, 0, Math.PI * 2);
         ctx.fill();
 
         // Node Inner Sphere Body
         const bodyGrad = ctx.createRadialGradient(
-          node.x - node.radius * 0.35,
-          node.y - node.radius * 0.35,
-          node.radius * 0.1,
-          node.x,
-          node.y,
-          node.radius
+          px - nodeR * 0.35,
+          py - nodeR * 0.35,
+          nodeR * 0.1,
+          px,
+          py,
+          nodeR
         );
 
         if (node.id === "hub-main") {
-          // Iridescent swirling chromatic sphere for Center Hub
           bodyGrad.addColorStop(0, "#E0F2FE");
           bodyGrad.addColorStop(0.35, "#38BDF8");
           bodyGrad.addColorStop(0.7, "#0284C7");
@@ -629,74 +766,70 @@ export function EvoVisionCanvas({
 
         ctx.fillStyle = bodyGrad;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.arc(px, py, nodeR, 0, Math.PI * 2);
         ctx.fill();
 
-        // High-gloss specular highlight (glass ring rim)
+        // Specular highlight rim
         ctx.strokeStyle = isSelected ? "#FFFFFF" : node.color;
-        ctx.lineWidth = isSelected ? 3 : 1.5;
+        ctx.lineWidth = Math.max(1, (isSelected ? 3 : 1.5) * scale);
         ctx.shadowColor = node.color;
-        ctx.shadowBlur = isSelected ? 18 : 8;
+        ctx.shadowBlur = (isSelected ? 18 : 8) * scale;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.arc(px, py, nodeR, 0, Math.PI * 2);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Center callsign/symbol inside orb
-        if (node.radius >= 18) {
+        // Center callsign inside orb
+        if (nodeR >= 14) {
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.font =
-            node.radius >= 40
-              ? "900 13px ui-monospace, monospace"
-              : node.radius >= 26
-              ? "bold 10px ui-monospace, monospace"
-              : "bold 8px ui-monospace, monospace";
+          const orbFontSize = Math.round(
+            (node.radius >= 40 ? 13 : node.radius >= 26 ? 10 : 8) * scale
+          );
+          ctx.font = `${node.radius >= 40 ? "900 " : "bold "}${Math.max(7, orbFontSize)}px ui-monospace, monospace`;
           ctx.fillStyle = "#FFFFFF";
           ctx.shadowColor = "#000000";
-          ctx.shadowBlur = 6;
+          ctx.shadowBlur = 4;
           const orbText = node.callsign
             ? node.callsign.slice(0, 6)
             : node.label.slice(0, 3).toUpperCase();
-          ctx.fillText(orbText, node.x, node.y);
+          ctx.fillText(orbText, px, py);
           ctx.textBaseline = "alphabetic";
           ctx.shadowBlur = 0;
         }
 
-        // Selection pulsing ring (sleek solid high-tech aura)
+        // Selection pulsing ring
         if (isSelected) {
-          const pulseR = node.radius + 6 + Math.sin(time * 6) * 3;
+          const pulseR = nodeR + (6 + Math.sin(time * 6) * 3) * scale;
           ctx.strokeStyle = "#38BDF8";
-          ctx.lineWidth = 2;
+          ctx.lineWidth = Math.max(1.5, 2 * scale);
           ctx.shadowColor = "#06B6D4";
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 12 * scale;
           ctx.beginPath();
-          ctx.arc(node.x, node.y, pulseR, 0, Math.PI * 2);
+          ctx.arc(px, py, pulseR, 0, Math.PI * 2);
           ctx.stroke();
           ctx.shadowBlur = 0;
         }
 
-        // Node Label Typography with clear pill backing to prevent line-overlap
+        // Node Label Typography with clear pill backing
         ctx.textAlign = "center";
         const isMajorCluster = node.radius >= 40;
-        const labelFont = isMajorCluster
-          ? "900 13px ui-monospace, SFMono-Regular, Menlo, monospace"
-          : "bold 11px ui-monospace, SFMono-Regular, Menlo, monospace";
-        ctx.font = labelFont;
+        const labelFontSize = Math.round((isMajorCluster ? 13 : 11) * scale);
+        ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
 
         const textMetrics = ctx.measureText(node.label);
-        const textWidth = Math.max(textMetrics.width, node.sublabel ? 80 : 40);
-        const pillHeight = node.sublabel ? 30 : 18;
-        const pillY = node.y + node.radius + 6;
+        const textWidth = Math.max(textMetrics.width, (node.sublabel ? 80 : 40) * scale);
+        const pillHeight = (node.sublabel ? 30 : 18) * scale;
+        const pillY = py + nodeR + 6 * scale;
 
         // Dark frosted backdrop pill
-        ctx.fillStyle = "rgba(4, 8, 19, 0.75)";
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.fillStyle = "rgba(4, 8, 19, 0.78)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        const pillX = node.x - textWidth / 2 - 8;
-        const pillW = textWidth + 16;
-        const pillR = 6;
+        const pillX = px - textWidth / 2 - 8 * scale;
+        const pillW = textWidth + 16 * scale;
+        const pillR = Math.max(2, 6 * scale);
         if (typeof (ctx as any).roundRect === "function") {
           (ctx as any).roundRect(pillX, pillY, pillW, pillHeight, pillR);
         } else {
@@ -709,13 +842,13 @@ export function EvoVisionCanvas({
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = "#000000";
         ctx.shadowBlur = 4;
-        ctx.fillText(node.label, node.x, pillY + (node.sublabel ? 12 : 13));
+        ctx.fillText(node.label, px, pillY + (node.sublabel ? 12 : 13) * scale);
         ctx.shadowBlur = 0;
 
         if (node.sublabel) {
-          ctx.font = "9px ui-monospace, SFMono-Regular, Menlo, monospace";
+          ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           ctx.fillStyle = node.color;
-          ctx.fillText(node.sublabel, node.x, pillY + 24);
+          ctx.fillText(node.sublabel, px, pillY + 24 * scale);
         }
       });
 
@@ -760,9 +893,11 @@ export function EvoVisionCanvas({
     setHoveredSpaceman(isSmHovered);
 
     const hit = EVO_NODES.find((node) => {
-      const dx = worldX - node.x;
-      const dy = worldY - node.y;
-      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 8;
+      const pn = projectedNodeMap.current.get(node.id);
+      if (!pn) return false;
+      const dx = worldX - pn.px;
+      const dy = worldY - pn.py;
+      return Math.sqrt(dx * dx + dy * dy) <= pn.radius + 8;
     });
 
     setHoveredNode(hit || null);
@@ -819,9 +954,11 @@ export function EvoVisionCanvas({
 
     // Check Node click
     const clicked = EVO_NODES.find((node) => {
-      const dx = worldX - node.x;
-      const dy = worldY - node.y;
-      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 8;
+      const pn = projectedNodeMap.current.get(node.id);
+      if (!pn) return false;
+      const dx = worldX - pn.px;
+      const dy = worldY - pn.py;
+      return Math.sqrt(dx * dx + dy * dy) <= pn.radius + 8;
     });
 
     if (clicked) {
