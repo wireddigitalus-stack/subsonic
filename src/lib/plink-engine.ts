@@ -28,6 +28,7 @@ export type ViolationType =
   | "FIREARM_SALE"
   | "STRONG_LANGUAGE"
   | "HARASSMENT"
+  | "UNSPORTSMANLIKE"
   | "SPAM"
   | "COMMERCIAL"
   | null;
@@ -81,6 +82,20 @@ const HARASSMENT_PATTERNS: RegExp[] = [
   /\bnobody\s+(likes|wants|cares)\s+(you|about you)\b/i,
   /doxx/i,
   /\bpersonal\s+(address|info)\b/i,
+  /\bpunch\s+your\s+lights\b/i,
+  /\bbeat\s+(your|you)\s+up\b/i,
+  /\bparking\s+lot\b.*\b(wait|buddy)\b/i,
+];
+
+const UNSPORTSMANLIKE_PATTERNS: RegExp[] = [
+  /pencil\s*whip/i,
+  /\brigged\b/i,
+  /\bcheat(ing|er|s)?\b/i,
+  /\bfraud\b/i,
+  /\bstole\s+\d+\s+(impact|second|point)/i,
+  /\btrash\s+(officiating|ro|marshal|referee)/i,
+  /\bcomplete\s+idiot\b/i,
+  /\bcorrupt\b/i,
 ];
 
 const SPAM_PATTERNS: RegExp[] = [
@@ -195,6 +210,11 @@ const FORMAL_SALE_WARNINGS = [
 
 const HARASSMENT_WARNINGS = [
   (c: string) => `\u{1F6AB} [${c}] — Harassment, threats, or targeted abuse toward other members is not tolerated. This transmission has been escalated to Range Marshal staff. Your access is under review.`,
+];
+
+const UNSPORTSMANLIKE_WARNINGS = [
+  (c: string) => `\u26A0\uFE0F [${c}] — Accusations of cheating, score tampering, or unsportsmanlike attacks on Range Officials violate Subsonic Society standards. Official score protests must be submitted in writing to the Match Director. This incident has been logged and escalated to admin oversight.`,
+  (c: string) => `\u26A0\uFE0F Warning to [${c}]: Hostile disputes regarding scoring or Range Officers are prohibited on public comms. File an official protest with the Match Director. Transmission escalated.`,
 ];
 
 const SPAM_WARNINGS = [
@@ -337,15 +357,20 @@ export function analyzeMsgForPlink(
   if (SALE_PATTERNS.some((p) => p.test(content))) {
     const tier = priorWarnings >= 1 ? 2 : 1;
     const responses = tier >= 2 ? FORMAL_SALE_WARNINGS : SOFT_SALE_WARNINGS;
-    return { content: pick(responses)(callsign), warningTier: tier as 1 | 2, violationType: "FIREARM_SALE", shouldEscalate: tier >= 2, targetCallsign: callsign };
+    return { content: pick(responses)(callsign), warningTier: tier as 1 | 2, violationType: "FIREARM_SALE", shouldEscalate: true, targetCallsign: callsign };
   }
 
   if (HARASSMENT_PATTERNS.some((p) => p.test(content))) {
     return { content: pick(HARASSMENT_WARNINGS)(callsign), warningTier: 3, violationType: "HARASSMENT", shouldEscalate: true, targetCallsign: callsign };
   }
 
+  if (UNSPORTSMANLIKE_PATTERNS.some((p) => p.test(content))) {
+    return { content: pick(UNSPORTSMANLIKE_WARNINGS)(callsign), warningTier: 2, violationType: "UNSPORTSMANLIKE", shouldEscalate: true, targetCallsign: callsign };
+  }
+
   if (COMMERCIAL_PATTERNS.some((p) => p.test(content))) {
-    return { content: pick(COMMERCIAL_WARNINGS)(callsign), warningTier: 1, violationType: "COMMERCIAL", shouldEscalate: false, targetCallsign: callsign };
+    const isPhishingSpam = /bit\.ly|tinyurl|telegram|t\.me|crypto|free\s*eley|giveaway/i.test(content);
+    return { content: pick(COMMERCIAL_WARNINGS)(callsign), warningTier: isPhishingSpam ? 2 : 1, violationType: "COMMERCIAL", shouldEscalate: isPhishingSpam, targetCallsign: callsign };
   }
 
   if (PROFANITY_PATTERNS.some((p) => p.test(content))) {

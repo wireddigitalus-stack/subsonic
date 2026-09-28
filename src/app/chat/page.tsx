@@ -274,6 +274,68 @@ export default function ChatPage() {
   const currentChannelRef = useRef(currentChannel);
   currentChannelRef.current = currentChannel;
 
+  // Unified Bot Message Handler — captures telemetry and dispatches abuse alerts on guidelines violations
+  const handleIncomingBotMessage = useCallback((msg: ChatMessage) => {
+    setMessages((prev) => [...prev, msg]);
+
+    // If bot message violates conduct/guidelines, record live abuse alert for Admin Console
+    if (
+      msg.moderationStatus === "FLAGGED" ||
+      (msg.aiModerationReport &&
+        (msg.aiModerationReport.threatScore > 50 ||
+          msg.aiModerationReport.policyScore > 70 ||
+          msg.aiModerationReport.toxicityScore > 60))
+    ) {
+      const isCritical =
+        (msg.aiModerationReport?.threatScore || 0) > 70 ||
+        (msg.aiModerationReport?.policyScore || 0) > 90;
+      const category =
+        (msg.aiModerationReport?.policyScore || 0) > 90
+          ? "ILLEGAL_COMMERCE"
+          : (msg.aiModerationReport?.threatScore || 0) > 70
+          ? "PHYSICAL_THREAT"
+          : /bit\.ly|telegram|whatsapp|crypto|giveaway/i.test(msg.content)
+          ? "SPAM_SOLICITATION"
+          : "UNSPORTSMANLIKE";
+
+      recordCommsAbuseAlert({
+        severity: isCritical ? "CRITICAL" : "HIGH",
+        category,
+        shooterName: msg.author.name,
+        shooterCallsign: msg.author.callsign || msg.author.name,
+        shooterRole: msg.author.role,
+        squad: `Bot Fleet • #${msg.channelId}`,
+        channel: msg.channelId,
+        messageContent: msg.content,
+        toxicityScore: msg.aiModerationReport?.toxicityScore || 75,
+        threatScore: msg.aiModerationReport?.threatScore || 25,
+        policyScore: msg.aiModerationReport?.policyScore || 80,
+        status: "ACTIVE",
+        aiRationale:
+          msg.aiModerationReport?.flagReason ||
+          "Autonomous bad-actor bot violation flagged by AI Sentinel.",
+        autoActionTaken: isCritical
+          ? "Transmission Suppressed • Bad Actor Flagged in Admin Console"
+          : "Flagged with Warning Badge • Placed into Match Director Queue",
+      });
+    }
+
+    if (soundEnabledRef.current) {
+      playBotTelemetryChirp();
+    }
+
+    // Auto-scroll if user is near bottom
+    setTimeout(() => {
+      if (messagesContainerRef.current) {
+        const c = messagesContainerRef.current;
+        const nearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 200;
+        if (nearBottom) {
+          c.scrollTo({ top: c.scrollHeight, behavior: "smooth" });
+        }
+      }
+    }, 100);
+  }, []);
+
   // Bot Engine — start/stop based on toggle
   useEffect(() => {
     if (botsEnabled) {
@@ -283,23 +345,7 @@ export default function ChatPage() {
       const cleanup = startBotEngine(
         botSpeed,
         {
-          addMessage: (msg) => {
-            setMessages((prev) => [...prev, msg]);
-            // Distinct tone for bot chats: Digital Cyber Telemetry
-            if (soundEnabledRef.current) {
-              playBotTelemetryChirp();
-            }
-            // Auto-scroll if user is near bottom
-            setTimeout(() => {
-              if (messagesContainerRef.current) {
-                const c = messagesContainerRef.current;
-                const nearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 200;
-                if (nearBottom) {
-                  c.scrollTo({ top: c.scrollHeight, behavior: "smooth" });
-                }
-              }
-            }, 100);
-          },
+          addMessage: handleIncomingBotMessage,
           addReaction: (msgId, emoji) => {
             setMessages((prev) =>
               prev.map((m) => {
@@ -2707,7 +2753,7 @@ export default function ChatPage() {
         botSpeed={botSpeed}
         onChangeSpeed={(speed) => setBotSpeed(speed)}
         currentChannel={currentChannel}
-        onAddBotMessage={(msg) => setMessages((prev) => [...prev, msg])}
+        onAddBotMessage={handleIncomingBotMessage}
         soundEnabled={soundEnabled}
         badActorEnabled={badActorEnabled}
         onToggleBadActor={() => setBadActorEnabled(!badActorEnabled)}

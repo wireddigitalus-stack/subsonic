@@ -34,6 +34,17 @@ export function saveCommsAbuseAlerts(alerts: CommsAbuseAlert[]): void {
 
 export function recordCommsAbuseAlert(alertData: Omit<CommsAbuseAlert, "id" | "timestamp" | "status"> & { status?: CommsAbuseAlert["status"] }): CommsAbuseAlert {
   const current = getCommsAbuseAlerts();
+
+  // Deduplication check: if identical violation from the same callsign occurred within 12 seconds, return existing
+  const now = Date.now();
+  const existing = current.find(
+    (a) =>
+      a.shooterCallsign === alertData.shooterCallsign &&
+      a.messageContent === alertData.messageContent &&
+      now - new Date(a.timestamp).getTime() < 12000
+  );
+  if (existing) return existing;
+
   const newAlert: CommsAbuseAlert = {
     ...alertData,
     id: `alert-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,

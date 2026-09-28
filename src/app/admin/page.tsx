@@ -350,9 +350,34 @@ export default function AdminDashboardPage() {
     const alerts = getCommsAbuseAlerts();
     setAbuseAlerts(alerts);
 
-    // Also populate any flagged chat items
-    const flagged = INITIAL_CHAT_MESSAGES.filter((m) => m.moderationStatus === "FLAGGED" || (m.aiModerationReport && m.aiModerationReport.toxicityScore > 30));
-    setFlaggedMessages(flagged);
+    // Populate flagged chat transmissions from live abuse alerts queue
+    const flaggedFromAlerts: ChatMessage[] = alerts.map((a) => ({
+      id: a.id,
+      channelId: a.channel,
+      type: "STANDARD",
+      author: {
+        id: `usr_${a.shooterCallsign.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+        name: a.shooterName,
+        callsign: a.shooterCallsign,
+        role: a.shooterRole as any,
+        badgeText: a.shooterRole,
+        division: a.squad,
+        rifleSetup: "Competition Rig",
+      },
+      content: a.messageContent,
+      timestamp: new Date(a.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      reactions: [],
+      moderationStatus: "FLAGGED",
+      aiModerationReport: {
+        toxicityScore: a.toxicityScore,
+        threatScore: a.threatScore,
+        policyScore: a.policyScore,
+        sentiment: "TOXIC",
+        flagReason: a.aiRationale,
+        aiEngine: "Subsonic Sentinel",
+      },
+    }));
+    setFlaggedMessages(flaggedFromAlerts);
 
     // Fetch Society Members
     try {
@@ -598,17 +623,54 @@ export default function AdminDashboardPage() {
     };
 
     const handleAbuseUpdate = () => {
-      setAbuseAlerts(getCommsAbuseAlerts());
+      const updatedAlerts = getCommsAbuseAlerts();
+      setAbuseAlerts(updatedAlerts);
+
+      const flaggedFromAlerts: ChatMessage[] = updatedAlerts.map((a) => ({
+        id: a.id,
+        channelId: a.channel,
+        type: "STANDARD",
+        author: {
+          id: `usr_${a.shooterCallsign.toLowerCase().replace(/[^a-z0-9]/g, "_")}`,
+          name: a.shooterName,
+          callsign: a.shooterCallsign,
+          role: a.shooterRole as any,
+          badgeText: a.shooterRole,
+          division: a.squad,
+          rifleSetup: "Competition Rig",
+        },
+        content: a.messageContent,
+        timestamp: new Date(a.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        reactions: [],
+        moderationStatus: "FLAGGED",
+        aiModerationReport: {
+          toxicityScore: a.toxicityScore,
+          threatScore: a.threatScore,
+          policyScore: a.policyScore,
+          sentiment: "TOXIC",
+          flagReason: a.aiRationale,
+          aiEngine: "Subsonic Sentinel",
+        },
+      }));
+      setFlaggedMessages(flaggedFromAlerts);
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === "subsonic_comms_abuse_alerts_v2") {
+        handleAbuseUpdate();
+      }
     };
 
     window.addEventListener("subsonic-telemetry-new-event", handleNewEvent);
     window.addEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
     window.addEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
+    window.addEventListener("storage", handleStorage);
     return () => {
       clearInterval(pollInterval);
       window.removeEventListener("subsonic-telemetry-new-event", handleNewEvent);
       window.removeEventListener("subsonic-comms-abuse-alert-updated", handleAbuseUpdate);
       window.removeEventListener("subsonic-comms-abuse-kicked-up", handleAbuseUpdate);
+      window.removeEventListener("storage", handleStorage);
     };
   }, []);
 

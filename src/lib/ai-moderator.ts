@@ -24,7 +24,12 @@ const FIREARM_SALE_PATTERNS = [
 // Spam & solicitation patterns
 const SPAM_PATTERNS = [
   /\b(whatsapp|telegram|t\.me\/|free\s*crypto|bit\.ly|casino|investment\s*profit)\b/i,
-  /\b(check\s*out\s*my\s*onlyfans|click\s*here\s*for\s*free)\b/i,
+  /\b(check\s*out\s*my\s*onlyfans|click\s*here\s*for\s*free|win\s*\d+.*rounds)\b/i,
+];
+
+// Profanity / prohibited language patterns
+const PROFANITY_PATTERNS = [
+  /\b(fuck|fucking|fucked|bullshit|shit|asshole|bitch|stfu)\b/i,
 ];
 
 // Positive sport/rimfire terms
@@ -92,7 +97,23 @@ export function evaluateChatMessage(content: string, authorRole: string = "MEMBE
     };
   }
 
-  // 4. Positive sentiment boost
+  // 4. Check for profanity / prohibited language
+  for (const pattern of PROFANITY_PATTERNS) {
+    if (pattern.test(trimmed)) {
+      return {
+        status: "FLAGGED",
+        toxicityScore: 65,
+        threatScore: 12,
+        policyScore: 70,
+        sentiment: "TOXIC",
+        flagReason: "Language Policy: Vulgar language or profanity violates Subsonic community standards.",
+        shouldBlock: false,
+        timestamp,
+      };
+    }
+  }
+
+  // 5. Positive sentiment boost
   let sentiment: ModerationResult["sentiment"] = "NEUTRAL";
   if (POSITIVE_TERNS.some((p) => p.test(trimmed))) {
     sentiment = "POSITIVE";

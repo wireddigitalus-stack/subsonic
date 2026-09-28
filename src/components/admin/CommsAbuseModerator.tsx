@@ -81,11 +81,19 @@ export function CommsAbuseModerator() {
       }
     };
 
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === "subsonic_comms_abuse_alerts_v2") {
+        loadAlerts();
+      }
+    };
+
     window.addEventListener("subsonic-comms-abuse-alert-updated", handleAlertsUpdated);
     window.addEventListener("subsonic-comms-abuse-kicked-up", handleKickedUp);
+    window.addEventListener("storage", handleStorage);
     return () => {
       window.removeEventListener("subsonic-comms-abuse-alert-updated", handleAlertsUpdated);
       window.removeEventListener("subsonic-comms-abuse-kicked-up", handleKickedUp);
+      window.removeEventListener("storage", handleStorage);
     };
   }, [soundEnabled, policies.audioAlerts]);
 

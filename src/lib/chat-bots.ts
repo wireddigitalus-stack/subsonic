@@ -8,6 +8,7 @@
 
 import { ChatMessage, DopeCardData } from "./types";
 import { evaluateChatMessage } from "./ai-moderator";
+import { recordCommsAbuseAlert } from "./abuse-moderation";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // BOT PERSONAS
@@ -447,6 +448,38 @@ export interface BotEngineOptions {
 export function createBotMessage(bot: BotPersona, channelId: string, content: string, dopeCard?: DopeCardData): ChatMessage {
   const evaluation = evaluateChatMessage(content, bot.role);
   const isFlagged = evaluation.status === "FLAGGED" || evaluation.status === "REJECTED";
+
+  // If this bot message breaches guidelines, immediately record a live comms abuse alert for Admin
+  if (isFlagged && typeof window !== "undefined") {
+    const isCritical = evaluation.threatScore > 70 || evaluation.policyScore > 90 || evaluation.status === "REJECTED";
+    const category =
+      evaluation.policyScore > 90
+        ? "ILLEGAL_COMMERCE"
+        : evaluation.threatScore > 70
+        ? "PHYSICAL_THREAT"
+        : /bit\.ly|telegram|whatsapp|crypto|giveaway|win\s+\d+/i.test(content)
+        ? "SPAM_SOLICITATION"
+        : "UNSPORTSMANLIKE";
+
+    recordCommsAbuseAlert({
+      severity: isCritical ? "CRITICAL" : "HIGH",
+      category,
+      shooterName: bot.name,
+      shooterCallsign: bot.callsign,
+      shooterRole: bot.role,
+      squad: `Bot Fleet • #${channelId}`,
+      channel: channelId,
+      messageContent: content,
+      toxicityScore: evaluation.toxicityScore,
+      threatScore: evaluation.threatScore,
+      policyScore: evaluation.policyScore,
+      status: "ACTIVE",
+      aiRationale: evaluation.flagReason || "Autonomous bot stress-testing violation detected by Sentinel.",
+      autoActionTaken: isCritical
+        ? "Transmission Suppressed • Bad Actor Flagged in Admin Console"
+        : "Flagged with Warning Badge • Placed into Match Director Queue",
+    });
+  }
 
   return {
     id: `bot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
