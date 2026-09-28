@@ -1299,7 +1299,7 @@ export default function ChatPage() {
       className={
         isFullscreen
           ? "fixed inset-0 z-[60] bg-[#07090E] p-0 md:p-4 flex flex-col h-[100dvh] w-full max-w-full overflow-hidden overflow-x-hidden animate-fadeIn"
-          : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden pt-20 sm:pt-24 bg-[#07090E]"
+          : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden bg-[#07090E]"
       }
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
@@ -1802,9 +1802,9 @@ export default function ChatPage() {
 
         {/* DESKTOP-ONLY Channels Sidebar (Hidden in Fullscreen or Mobile) */}
         {!isFullscreen && (
-          <div className="hidden lg:block lg:col-span-4 space-y-4">
-            <div className="ios-glass rounded-3xl p-4 sm:p-5 border border-white/10 space-y-4">
-              <div className="flex items-center justify-between px-1">
+          <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
+            <div className="ios-glass rounded-2xl md:rounded-3xl p-4 sm:p-5 border border-white/10 flex flex-col h-full min-h-0">
+              <div className="flex items-center justify-between px-1 mb-3 shrink-0">
                 <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
                   {activeNetTab === "PRO" ? "Pro Squad Channels" : "Society Channels"}
                 </span>
@@ -1814,7 +1814,7 @@ export default function ChatPage() {
               </div>
 
               {/* Channels List */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex-1 min-h-0 overflow-y-auto no-scrollbar pr-0.5">
                 {visibleChannels.map((ch) => {
                   const isActive = currentChannel === ch.id;
                   const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
@@ -1866,7 +1866,7 @@ export default function ChatPage() {
               </div>
 
               {/* DOPE Drop Action Box */}
-              <div className="pt-3 border-t border-white/10 space-y-2">
+              <div className="pt-3 border-t border-white/10 space-y-2 shrink-0 mt-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono uppercase text-slate-300 font-bold flex items-center gap-1.5">
                     <Crosshair className="w-3.5 h-3.5 text-amber-400" />

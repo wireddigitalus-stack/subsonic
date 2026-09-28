@@ -9,9 +9,21 @@ import { MobileTabs } from "@/components/layout/MobileTabs";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isEvos = pathname?.startsWith("/evos") || pathname?.startsWith("/evovision");
+  const isChat = pathname === "/chat" || pathname?.startsWith("/chat/");
 
   if (isEvos) {
     return <main className="min-h-screen w-full">{children}</main>;
+  }
+
+  if (isChat) {
+    return (
+      <>
+        <Navbar />
+        <main className="h-[100dvh] w-full overflow-hidden flex flex-col pt-16 sm:pt-20">
+          {children}
+        </main>
+      </>
+    );
   }
 
   return (
