@@ -29,6 +29,7 @@ import {
   Sliders,
   Play,
   Pause,
+  AlertTriangle,
 } from "lucide-react";
 
 interface BotRosterCardProps {
@@ -42,6 +43,8 @@ interface BotRosterCardProps {
   currentChannel: string;
   onAddBotMessage: (msg: ChatMessage) => void;
   soundEnabled: boolean;
+  badActorEnabled?: boolean;
+  onToggleBadActor?: () => void;
 }
 
 export function BotRosterCard({
@@ -55,18 +58,21 @@ export function BotRosterCard({
   currentChannel,
   onAddBotMessage,
   soundEnabled,
+  badActorEnabled = true,
+  onToggleBadActor,
 }: BotRosterCardProps) {
   if (!isOpen) return null;
 
   const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(messages);
 
-  const handleManualTrigger = (botId: string, forceDope?: boolean) => {
+  const handleManualTrigger = (botId: string, forceDope?: boolean, forceViolation?: boolean) => {
     unlockAudio();
     const newMsg = triggerSingleBotTransmission(
       botId,
       currentChannel,
       { addMessage: onAddBotMessage },
-      forceDope
+      forceDope,
+      forceViolation
     );
     if (newMsg && soundEnabled) {
       playBotTelemetryChirp();
@@ -198,6 +204,26 @@ export function BotRosterCard({
               </select>
             </div>
 
+            {/* AI Moderator Stress Test (Bad Actor) Toggle */}
+            {onToggleBadActor && (
+              <button
+                type="button"
+                onClick={() => {
+                  unlockAudio();
+                  onToggleBadActor();
+                }}
+                className={`px-2.5 py-1.5 rounded-xl border text-[11px] flex items-center gap-1.5 font-bold transition-all active:scale-95 ${
+                  badActorEnabled
+                    ? "bg-red-500/20 text-red-300 border-red-500/40 hover:bg-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.2)]"
+                    : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                }`}
+                title="Toggle AI Moderator Stress Test (Causes bad actor bot to occasionally break guidelines to test Plink)"
+              >
+                <AlertTriangle className={`w-3.5 h-3.5 ${badActorEnabled ? "text-red-400" : "text-slate-500"}`} />
+                <span>AI Mod Stress: {badActorEnabled ? "ON" : "OFF"}</span>
+              </button>
+            )}
+
             {/* Master Start / Pause Toggle */}
             <button
               type="button"
@@ -275,7 +301,7 @@ export function BotRosterCard({
                             [{bot.callsign}]
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                           <span
                             className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-extrabold uppercase ${
                               isMatchDirector
@@ -287,6 +313,15 @@ export function BotRosterCard({
                           >
                             {bot.badgeText}
                           </span>
+                          {bot.isBadActor && (
+                            <span
+                              className="text-[9px] font-mono px-1.5 py-0.2 rounded font-extrabold uppercase bg-red-500/20 text-red-300 border border-red-500/40 flex items-center gap-1"
+                              title="Designated AI Moderator Stress Test Actor"
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                              AI MOD TESTER
+                            </span>
+                          )}
                           <span className="text-[10px] text-slate-400 font-mono truncate">
                             {bot.division}
                           </span>
@@ -346,7 +381,19 @@ export function BotRosterCard({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                      {bot.isBadActor && (
+                        <button
+                          type="button"
+                          onClick={() => handleManualTrigger(bot.id, false, true)}
+                          className="px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-[10px] font-mono font-bold text-red-300 transition-all active:scale-95 flex items-center gap-1 shadow-[0_0_8px_rgba(239,68,68,0.25)]"
+                          title="Trigger a simulated rule violation from this bot to test Plink AI Moderator"
+                        >
+                          <AlertTriangle className="w-3 h-3 text-red-400" />
+                          <span>Test Violation</span>
+                        </button>
+                      )}
+
                       {bot.dopeDropRate > 0.1 && (
                         <button
                           type="button"

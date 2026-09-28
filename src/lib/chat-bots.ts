@@ -7,6 +7,7 @@
  */
 
 import { ChatMessage, DopeCardData } from "./types";
+import { evaluateChatMessage } from "./ai-moderator";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // BOT PERSONAS
@@ -24,6 +25,8 @@ export interface BotPersona {
   primaryChannels: string[]; // channels this bot favors
   dopeDropRate: number; // 0-1 probability of dropping DOPE vs standard msg
   reactionRate: number; // 0-1 probability of reacting to another bot's message
+  isBadActor?: boolean; // designates this bot as an occasional AI moderator stress tester
+  violationRate?: number; // 0-1 probability of breaking rules when bad actor mode is on
 }
 
 export const BOT_PERSONAS: BotPersona[] = [
@@ -91,6 +94,8 @@ export const BOT_PERSONAS: BotPersona[] = [
     primaryChannels: ["bristol-pro-shootout", "range-conditions-weather", "squad-briefings"],
     dopeDropRate: 0.3,
     reactionRate: 0.3,
+    isBadActor: true,
+    violationRate: 0.15,
   },
   {
     id: "bot-sofia",
@@ -104,6 +109,58 @@ export const BOT_PERSONAS: BotPersona[] = [
     primaryChannels: ["general-society", "ballistics-and-gear", "range-conditions-weather"],
     dopeDropRate: 0.05,
     reactionRate: 0.6,
+  },
+];
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SIMULATED GUIDELINE VIOLATIONS — AI Moderator Stress Test Pool
+// ──────────────────────────────────────────────────────────────────────────────
+
+export interface BotViolationItem {
+  category: "UNSPORTSMANLIKE" | "FIREARM_SALE" | "STRONG_LANGUAGE" | "SPAM";
+  content: string;
+}
+
+export const BOT_VIOLATIONS: BotViolationItem[] = [
+  // 1. Unsportsmanlike conduct / score disputes (triggers Plink HARASSMENT / evaluateChatMessage FLAGGED)
+  {
+    category: "UNSPORTSMANLIKE",
+    content: "Stage 7 RO is pencil whipping the scorebook for Squad 3. Total fraud call, that was a clean hit on steel.",
+  },
+  {
+    category: "UNSPORTSMANLIKE",
+    content: "That barricade score was rigged. Everyone saw Keller miss 2 impacts and the RO gave him a clean card. Total cheat.",
+  },
+  {
+    category: "UNSPORTSMANLIKE",
+    content: "Stage 4 timer guy is a complete idiot, stole 4 seconds off my split time. Unbelievable trash officiating.",
+  },
+  // 2. Prohibited commerce / unregulated NFA sales (triggers Plink FIREARM_SALE / evaluateChatMessage REJECTED)
+  {
+    category: "FIREARM_SALE",
+    content: "WTS custom titanium rimfire suppressor adapter cash only no paperwork, dm me behind the pavilion.",
+  },
+  {
+    category: "FIREARM_SALE",
+    content: "Selling my spare Vudoo bolt and match ammo cash no ffl required, pm me fast before next stage.",
+  },
+  {
+    category: "FIREARM_SALE",
+    content: "Anyone want to buy my rimfire binary trigger pack? Cash only, dm me for price.",
+  },
+  // 3. Strong language / frustrated vent (triggers Plink STRONG_LANGUAGE / PROFANITY)
+  {
+    category: "STRONG_LANGUAGE",
+    content: "What the fuck was that 18 mph gust on the tank trap? Completely screwed my run, total bullshit.",
+  },
+  {
+    category: "STRONG_LANGUAGE",
+    content: "Missed the cold bore plate at 300 yards by an inch, damn it! That stage was pure crap.",
+  },
+  // 4. Spam / commercial solicitation (triggers Plink COMMERCIAL / SPAM)
+  {
+    category: "SPAM",
+    content: "Win 10,000 rounds of free Eley match ammo! Click here to claim your entry: bit.ly/free-subsonic-ammo",
   },
 ];
 
@@ -380,9 +437,17 @@ export interface BotEngineCallbacks {
   addMessage: (msg: ChatMessage) => void;
   addReaction: (msgId: string, emoji: string) => void;
   getMessages: () => ChatMessage[];
+  getCurrentChannel?: () => string;
+}
+
+export interface BotEngineOptions {
+  enableBadActor?: boolean;
 }
 
 export function createBotMessage(bot: BotPersona, channelId: string, content: string, dopeCard?: DopeCardData): ChatMessage {
+  const evaluation = evaluateChatMessage(content, bot.role);
+  const isFlagged = evaluation.status === "FLAGGED" || evaluation.status === "REJECTED";
+
   return {
     id: `bot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
     channelId,
@@ -400,13 +465,14 @@ export function createBotMessage(bot: BotPersona, channelId: string, content: st
     content,
     timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     reactions: [],
-    moderationStatus: "APPROVED",
+    moderationStatus: isFlagged ? "FLAGGED" : "APPROVED",
     aiModerationReport: {
-      toxicityScore: 0,
-      threatScore: 0,
-      policyScore: 0,
-      sentiment: "POSITIVE",
-      aiEngine: "Bot Engine (Simulated)",
+      toxicityScore: evaluation.toxicityScore,
+      threatScore: evaluation.threatScore,
+      policyScore: evaluation.policyScore,
+      sentiment: evaluation.sentiment,
+      flagReason: evaluation.flagReason,
+      aiEngine: isFlagged ? "Subsonic Sentinel (Flagged)" : "Bot Engine (Simulated)",
     },
   };
 }
@@ -416,7 +482,8 @@ export function createBotMessage(bot: BotPersona, channelId: string, content: st
  */
 export function startBotEngine(
   speed: BotSpeed,
-  callbacks: BotEngineCallbacks
+  callbacks: BotEngineCallbacks,
+  options?: BotEngineOptions
 ): () => void {
   const { minMs, maxMs } = SPEED_CONFIG[speed];
   let active = true;
@@ -457,32 +524,47 @@ export function startBotEngine(
       // Pick a random bot
       const bot = randomItem(BOT_PERSONAS);
 
-      // Pick a channel this bot posts in
-      const channelId = randomItem(bot.primaryChannels);
+      // Check if this bot is designated as a bad actor and triggers a guideline violation
+      const isBadActorActive = options?.enableBadActor !== false;
+      const isViolation = isBadActorActive && bot.isBadActor && Math.random() < (bot.violationRate ?? 0.15);
 
-      // Decide: DOPE card or standard message?
-      const isDopeDrop = Math.random() < bot.dopeDropRate;
-
-      if (isDopeDrop) {
-        const dope = generateDopeCard();
-        const dopeContent = `Verified DOPE for ${dope.targetDistance} on ${dope.targetDescription || "this stage"}. ${dope.ammo?.split(" (")[0] || "Standard ammo"} holding steady. ${dope.notes || ""}`.trim();
-        const msg = createBotMessage(bot, channelId, dopeContent, dope);
+      if (isViolation) {
+        // Target current viewed channel if available so the user sees Plink's live moderation
+        const channelId = callbacks.getCurrentChannel ? callbacks.getCurrentChannel() : randomItem(bot.primaryChannels);
+        const violation = randomItem(BOT_VIOLATIONS);
+        const msg = createBotMessage(bot, channelId, violation.content);
         callbacks.addMessage(msg);
 
         // Schedule reactions from other bots
         scheduleReactions(msg.id);
       } else {
-        const content = getUnusedMessage(bot.id, channelId);
-        if (content) {
-          const msg = createBotMessage(bot, channelId, content);
+        // Pick a channel this bot posts in
+        const channelId = randomItem(bot.primaryChannels);
+
+        // Decide: DOPE card or standard message?
+        const isDopeDrop = Math.random() < bot.dopeDropRate;
+
+        if (isDopeDrop) {
+          const dope = generateDopeCard();
+          const dopeContent = `Verified DOPE for ${dope.targetDistance} on ${dope.targetDescription || "this stage"}. ${dope.ammo?.split(" (")[0] || "Standard ammo"} holding steady. ${dope.notes || ""}`.trim();
+          const msg = createBotMessage(bot, channelId, dopeContent, dope);
           callbacks.addMessage(msg);
 
           // Schedule reactions from other bots
           scheduleReactions(msg.id);
+        } else {
+          const content = getUnusedMessage(bot.id, channelId);
+          if (content) {
+            const msg = createBotMessage(bot, channelId, content);
+            callbacks.addMessage(msg);
 
-          // Occasionally trigger a threaded response from another bot
-          if (Math.random() < 0.3) {
-            scheduleResponse(channelId, bot.id);
+            // Schedule reactions from other bots
+            scheduleReactions(msg.id);
+
+            // Occasionally trigger a threaded response from another bot
+            if (Math.random() < 0.3) {
+              scheduleResponse(channelId, bot.id);
+            }
           }
         }
       }
@@ -612,15 +694,17 @@ export function triggerSingleBotTransmission(
   botId: string,
   channelId: string,
   callbacks: { addMessage: (msg: ChatMessage) => void },
-  forceDope?: boolean
+  forceDope?: boolean,
+  forceViolation?: boolean
 ): ChatMessage | null {
   const bot = BOT_PERSONAS.find((b) => b.id === botId);
   if (!bot) return null;
 
-  const isDope = forceDope ?? (bot.dopeDropRate > 0.25 || Math.random() < bot.dopeDropRate);
-
   let msg: ChatMessage;
-  if (isDope) {
+  if (forceViolation) {
+    const violation = BOT_VIOLATIONS[Math.floor(Math.random() * BOT_VIOLATIONS.length)];
+    msg = createBotMessage(bot, channelId, violation.content);
+  } else if (forceDope ?? (bot.dopeDropRate > 0.25 || Math.random() < bot.dopeDropRate)) {
     const dope = generateDopeCard();
     const dopeContent = `[DEMO TRANSMISSION] Verified DOPE for ${dope.targetDistance} on ${dope.targetDescription || "this stage"}. ${dope.ammo?.split(" (")[0] || "Standard ammo"} holding steady. ${dope.notes || ""}`.trim();
     msg = createBotMessage(bot, channelId, dopeContent, dope);

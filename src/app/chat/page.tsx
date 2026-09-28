@@ -263,12 +263,15 @@ export default function ChatPage() {
   // Bot Engine & Bot Chats Card State
   const [botsEnabled, setBotsEnabled] = useState(false);
   const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
+  const [badActorEnabled, setBadActorEnabled] = useState(true);
   const [isBotCardOpen, setIsBotCardOpen] = useState(false);
   const botCleanupRef = useRef<(() => void) | null>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages; // keep ref in sync
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
+  const currentChannelRef = useRef(currentChannel);
+  currentChannelRef.current = currentChannel;
 
   // Bot Engine — start/stop based on toggle
   useEffect(() => {
@@ -276,46 +279,51 @@ export default function ChatPage() {
       // Clean up previous engine if any
       if (botCleanupRef.current) botCleanupRef.current();
 
-      const cleanup = startBotEngine(botSpeed, {
-        addMessage: (msg) => {
-          setMessages((prev) => [...prev, msg]);
-          // Distinct tone for bot chats: Digital Cyber Telemetry
-          if (soundEnabledRef.current) {
-            playBotTelemetryChirp();
-          }
-          // Auto-scroll if user is near bottom
-          setTimeout(() => {
-            if (messagesContainerRef.current) {
-              const c = messagesContainerRef.current;
-              const nearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 200;
-              if (nearBottom) {
-                c.scrollTo({ top: c.scrollHeight, behavior: "smooth" });
-              }
+      const cleanup = startBotEngine(
+        botSpeed,
+        {
+          addMessage: (msg) => {
+            setMessages((prev) => [...prev, msg]);
+            // Distinct tone for bot chats: Digital Cyber Telemetry
+            if (soundEnabledRef.current) {
+              playBotTelemetryChirp();
             }
-          }, 100);
-        },
-        addReaction: (msgId, emoji) => {
-          setMessages((prev) =>
-            prev.map((m) => {
-              if (m.id !== msgId) return m;
-              const existing = m.reactions.find((r) => r.emoji === emoji);
-              if (existing) {
+            // Auto-scroll if user is near bottom
+            setTimeout(() => {
+              if (messagesContainerRef.current) {
+                const c = messagesContainerRef.current;
+                const nearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 200;
+                if (nearBottom) {
+                  c.scrollTo({ top: c.scrollHeight, behavior: "smooth" });
+                }
+              }
+            }, 100);
+          },
+          addReaction: (msgId, emoji) => {
+            setMessages((prev) =>
+              prev.map((m) => {
+                if (m.id !== msgId) return m;
+                const existing = m.reactions.find((r) => r.emoji === emoji);
+                if (existing) {
+                  return {
+                    ...m,
+                    reactions: m.reactions.map((r) =>
+                      r.emoji === emoji ? { ...r, count: r.count + 1 } : r
+                    ),
+                  };
+                }
                 return {
                   ...m,
-                  reactions: m.reactions.map((r) =>
-                    r.emoji === emoji ? { ...r, count: r.count + 1 } : r
-                  ),
+                  reactions: [...m.reactions, { emoji, count: 1, users: ["bot"] }],
                 };
-              }
-              return {
-                ...m,
-                reactions: [...m.reactions, { emoji, count: 1, users: ["bot"] }],
-              };
-            })
-          );
+              })
+            );
+          },
+          getMessages: () => messagesRef.current,
+          getCurrentChannel: () => currentChannelRef.current,
         },
-        getMessages: () => messagesRef.current,
-      });
+        { enableBadActor: badActorEnabled }
+      );
 
       botCleanupRef.current = cleanup;
     } else {
@@ -331,7 +339,7 @@ export default function ChatPage() {
         botCleanupRef.current = null;
       }
     };
-  }, [botsEnabled, botSpeed]);
+  }, [botsEnabled, botSpeed, badActorEnabled]);
 
   // Tour is opt-in only — user can launch it via the TOUR button in the desktop toolbar
 
@@ -489,6 +497,10 @@ export default function ChatPage() {
         ...prev,
         buildPlinkMessage(response.content, currentChannel, response.warningTier),
       ]);
+
+      if (soundEnabledRef.current) {
+        playTacticalChirp(response.warningTier >= 2 ? 800 : 1200);
+      }
 
       // Update warning count for this user
       if (response.warningTier > 0) {
@@ -2686,6 +2698,8 @@ export default function ChatPage() {
         currentChannel={currentChannel}
         onAddBotMessage={(msg) => setMessages((prev) => [...prev, msg])}
         soundEnabled={soundEnabled}
+        badActorEnabled={badActorEnabled}
+        onToggleBadActor={() => setBadActorEnabled(!badActorEnabled)}
       />
     </div>
   );
