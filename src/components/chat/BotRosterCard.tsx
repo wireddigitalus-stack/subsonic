@@ -144,6 +144,12 @@ export function BotRosterCard({
                 #{currentChannel}
               </span>
             </div>
+            <div className="hidden sm:block">
+              <span className="text-[10px] text-slate-400 block uppercase">Fleet Comms</span>
+              <span className="text-xs font-bold text-purple-300 block">
+                6 Active Bots
+              </span>
+            </div>
           </div>
 
           {/* Controls: Master Toggle, Speed, and Tone Testing */}

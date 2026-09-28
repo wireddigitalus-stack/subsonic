@@ -52,7 +52,7 @@ import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
-import { startBotEngine, BotSpeed, computeBotStats } from "@/lib/chat-bots";
+import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
 import { BotRosterCard } from "@/components/chat/BotRosterCard";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
 
@@ -269,9 +269,6 @@ export default function ChatPage() {
   messagesRef.current = messages; // keep ref in sync
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
-
-  // Compute live bot fleet stats (counts and bot names)
-  const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(messages);
 
   // Bot Engine — start/stop based on toggle
   useEffect(() => {
@@ -1396,27 +1393,25 @@ export default function ChatPage() {
                 <span>{soundEnabled ? "ON" : "OFF"}</span>
               </button>
 
-              {/* Bot Engine Controls & Bot Chats Card Button — Admin only */}
+              {/* Bot On/Off Switch & Fleet Card Access — Admin only */}
               {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN") && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center rounded-lg border border-white/10 bg-black/40 overflow-hidden">
                   <button
                     type="button"
                     onClick={() => {
                       unlockAudio();
                       setBotsEnabled(!botsEnabled);
                     }}
-                    className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border text-[10px] font-mono font-semibold transition-all ${
+                    className={`flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 text-[10px] font-mono font-bold transition-all ${
                       botsEnabled
-                        ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                        : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
+                        ? "bg-cyan-500/25 text-cyan-300 hover:bg-cyan-500/35 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-white/10"
                     }`}
-                    title={botsEnabled ? "Pause test bots" : "Start test bots"}
+                    title={botsEnabled ? "Turn test bots OFF" : "Turn test bots ON"}
                   >
                     <span>🤖</span>
-                    <span>{botsEnabled ? "BOTS ON" : "BOTS"}</span>
+                    <span>{botsEnabled ? "BOTS ON" : "BOTS OFF"}</span>
                   </button>
-
-                  {/* BOT CHATS CARD WITH COUNTS AND BOT NAMES */}
                   <button
                     type="button"
                     onClick={() => {
@@ -1424,30 +1419,16 @@ export default function ChatPage() {
                       setIsBotCardOpen(true);
                       playTacticalChirp(1100);
                     }}
-                    className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg border border-cyan-500/30 bg-cyan-950/40 hover:bg-cyan-900/60 text-[10px] font-mono font-bold text-cyan-300 transition-all shadow-[0_0_8px_rgba(6,182,212,0.15)]"
-                    title="View Bot Chats Card with Counts, Bot Names, and Tone Audition"
+                    className={`px-1.5 py-0.5 sm:py-1 border-l border-white/10 transition-colors ${
+                      botsEnabled
+                        ? "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-100"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-white/10"
+                    }`}
+                    title="Open Bot Fleet Card (roster, live metrics, tones)"
+                    aria-label="Open Bot Fleet Card"
                   >
-                    <span>📊 BOT CARD</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-cyan-500/30 text-cyan-200 text-[9px] font-mono">
-                      {totalBotMessages}
-                    </span>
+                    <Sliders className="w-3 h-3" />
                   </button>
-
-                  {botsEnabled && (
-                    <select
-                      value={botSpeed}
-                      onChange={(e) => {
-                        unlockAudio();
-                        setBotSpeed(e.target.value as BotSpeed);
-                      }}
-                      className="h-6 px-1 rounded bg-black/60 border border-white/10 text-[9px] font-mono text-slate-300 focus:outline-none focus:border-cyan-500/40 cursor-pointer"
-                      title="Bot message speed"
-                    >
-                      <option value="FAST">FAST</option>
-                      <option value="NORMAL">NORMAL</option>
-                      <option value="SLOW">SLOW</option>
-                    </select>
-                  )}
                 </div>
               )}
 
@@ -1565,27 +1546,6 @@ export default function ChatPage() {
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
               <span>Moderated</span>
             </div>
-
-            {/* Bot Card Quick Access Button (shown when admin or when bots active) */}
-            {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN" || botsEnabled) && (
-              <button
-                type="button"
-                onClick={() => {
-                  unlockAudio();
-                  setIsBotCardOpen(true);
-                  playTacticalChirp(1100);
-                }}
-                className={`h-10 px-2.5 md:h-7 md:px-2 rounded-xl md:rounded-lg border flex items-center gap-1 font-mono text-xs transition-all ${
-                  botsEnabled
-                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                    : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10"
-                }`}
-                title="Open Bot Chats Card with Counts & Bot Names"
-              >
-                <Bot className="w-4 h-4 md:w-3.5 md:h-3.5 text-cyan-400" />
-                <span className="text-[10px] font-bold text-cyan-200">{totalBotMessages}</span>
-              </button>
-            )}
 
             {/* Audio Toggle — Icon only on mobile */}
             <button
@@ -1856,45 +1816,6 @@ export default function ChatPage() {
                 </button>
               </div>
 
-              {/* Bot Comms Fleet Card Widget in Desktop Sidebar */}
-              {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN" || botsEnabled) && (
-                <div className="pt-3 border-t border-white/10 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono uppercase text-cyan-300 font-bold flex items-center gap-1.5">
-                      <Bot className="w-3.5 h-3.5 text-cyan-400" />
-                      Bot Comms Fleet
-                    </span>
-                    <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border ${
-                      botsEnabled
-                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                        : "bg-white/5 text-slate-400 border-white/10"
-                    }`}>
-                      {botsEnabled ? "6 ON NET" : "STANDBY"}
-                    </span>
-                  </div>
-
-                  <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/25 flex items-center justify-between font-mono text-xs shadow-[0_0_10px_rgba(6,182,212,0.1)]">
-                    <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">Chats</span>
-                      <span className="font-bold text-cyan-300 text-sm">{totalBotMessages}</span>
-                    </div>
-                    <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">DOPE</span>
-                      <span className="font-bold text-amber-400 text-sm">{totalDopeDrops}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsBotCardOpen(true);
-                        playTacticalChirp(1100);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] active:scale-95"
-                    >
-                      BOT CARD ↗
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
