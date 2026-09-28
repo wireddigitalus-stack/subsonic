@@ -10,7 +10,6 @@ import {
   BarChart3, 
   Radio
 } from "lucide-react";
-import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
 
 interface TabItem {
   name: string;
@@ -21,10 +20,9 @@ interface TabItem {
 
 export function MobileTabs() {
   const pathname = usePathname();
-  const { isDirectorMode } = useDirectorMode();
 
-  // In focused mode (private comms), hide floating bottom sheet so it doesn't obstruct chat keyboard
-  if (!isDirectorMode) return null;
+  // Hide floating bottom sheet on chat screen so it doesn't obstruct keyboard and message input
+  if (pathname === "/chat" || pathname.startsWith("/chat/")) return null;
 
   const tabs: TabItem[] = [
     { name: "Home", href: "/", icon: Home },

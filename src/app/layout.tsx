@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { TelemetryProvider } from "@/components/providers/TelemetryProvider";
-import { DirectorModeProvider } from "@/components/providers/DirectorModeProvider";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -245,9 +244,7 @@ export default function RootLayout({
       </head>
       <body className="bg-[#07090E] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
         <TelemetryProvider>
-          <DirectorModeProvider>
-            <AppShell>{children}</AppShell>
-          </DirectorModeProvider>
+          <AppShell>{children}</AppShell>
         </TelemetryProvider>
       </body>
     </html>

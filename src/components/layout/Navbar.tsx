@@ -29,14 +29,11 @@ import {
   Mail,
   Lock,
   Unlock,
-  LayoutGrid,
   FileText
 } from "lucide-react";
-import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { isDirectorMode, enableDirectorMode, disableDirectorMode } = useDirectorMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -177,20 +174,8 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Navigation: Focused Comms Badge when regular, Full Menus when in Director Mode */}
-          {!isDirectorMode ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                href="/chat"
-                data-telemetry="nav_link_private_comms"
-                className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold hover:bg-emerald-500/20 transition-all shadow-[0_0_15px_rgba(16,185,129,0.18)] group"
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="tracking-wide">PRIVATE CHAT ROOM • SECURE ENCRYPTED COMMS</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="hidden lg:flex items-center gap-1 bg-white/[0.02] px-2 py-1 rounded-xl border border-white/5">
+          {/* Desktop Navigation: Full Public Menus */}
+          <div className="hidden lg:flex items-center gap-1 bg-white/[0.02] px-2 py-1 rounded-xl border border-white/5">
             {/* Overview */}
             <Link
               href="/"
@@ -487,21 +472,42 @@ export function Navbar() {
               )}
             </div>
           </div>
-        )}
 
-          {/* Right Action: Private Comms controls, Director Pass toggle, and Mobile toggle */}
+          {/* Right Action: Private Comms controls, Join CTA, and Mobile toggle */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {isDirectorMode ? (
-              <>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="font-bold">{callsign}</span>
+                </div>
+                {pathname !== "/chat" && (
+                  <Link
+                    href="/chat"
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 shadow-tactical-glow"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 fill-black" />
+                    <span>Enter Room</span>
+                  </Link>
+                )}
                 <button
                   type="button"
-                  onClick={disableDirectorMode}
-                  title="Exit Director Preview"
-                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-mono flex items-center gap-1.5 hover:bg-amber-500/30 transition-all"
+                  onClick={handleLockChat}
+                  title="Lock Comms & Sign Out"
+                  className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-amber-400 hover:bg-white/10 transition-colors"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/chat"
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition-all flex items-center gap-1.5"
                 >
                   <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline font-bold">Exit Preview</span>
-                </button>
+                  <span>Chat Login</span>
+                </Link>
 
                 <Link
                   href="/join"
@@ -511,56 +517,7 @@ export function Navbar() {
                   <Users className="w-3.5 h-3.5 fill-black" />
                   <span>Join The Society</span>
                 </Link>
-              </>
-            ) : (
-              <>
-                {isAuthenticated ? (
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      <span className="font-bold">{callsign}</span>
-                    </div>
-                    {pathname !== "/chat" && (
-                      <Link
-                        href="/chat"
-                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5 fill-black" />
-                        <span>Enter Room</span>
-                      </Link>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleLockChat}
-                      title="Lock Comms & Sign Out"
-                      className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-amber-400 hover:bg-white/10 transition-colors"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <Link
-                    href={pathname === "/chat" ? "/" : "/chat"}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
-                  >
-                    <Lock className="w-3.5 h-3.5 fill-black" />
-                    <span>{pathname === "/chat" ? "Comms Gate" : "Chat Login"}</span>
-                  </Link>
-                )}
-
-                {/* Discreet Director Mode Toggle for Allen's Laptop Review */}
-                <button
-                  type="button"
-                  onClick={enableDirectorMode}
-                  title="Director Mode: View Full Site Preview (Allen)"
-                  data-telemetry="nav_director_preview_btn"
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-amber-400 transition-all flex items-center gap-1"
-                  aria-label="Toggle Director Preview"
-                >
-                  <LayoutGrid className="w-4 h-4 text-amber-400" />
-                  <span className="hidden xl:inline text-[10px] font-mono text-slate-300 font-semibold">Director Pass</span>
-                </button>
-              </>
+              </div>
             )}
 
             {/* Mobile Menu Button */}
@@ -592,70 +549,17 @@ export function Navbar() {
             className="lg:hidden mt-2 ios-glass rounded-2xl p-4 sm:p-5 border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.85)] space-y-4 animate-fadeIn max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain ios-scrollbar touch-pan-y"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {!isDirectorMode ? (
-              /* Focused Mobile Menu */
-              <div className="space-y-3">
-                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-xs">
-                  <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>PRIVATE COMPETITOR NETWORK</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
-                    Holston Mountain Range comms, live target DOPE, stage chat, and verified competitor discussions.
-                  </p>
-                </div>
+            {/* Quick Mobile Action: Private Chat Room */}
+            <Link
+              href="/chat"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full py-3 rounded-xl text-xs font-black bg-emerald-500 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              <MessageSquare className="w-4 h-4 fill-black" />
+              <span>Enter Competitor Comms (Live)</span>
+            </Link>
 
-                <Link
-                  href="/chat"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-3 rounded-xl text-xs font-black bg-emerald-500 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
-                >
-                  <MessageSquare className="w-4 h-4 fill-black" />
-                  <span>Enter Private Chat Room</span>
-                </Link>
-
-                <Link
-                  href="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 flex items-center justify-center gap-2 active:scale-95 transition-all"
-                >
-                  <Mail className="w-4 h-4 text-cyan-400" />
-                  <span>Range Marshal / Support</span>
-                </Link>
-
-                <div className="pt-2 border-t border-white/10 space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      enableDirectorMode();
-                    }}
-                    className="w-full py-2.5 rounded-xl text-xs font-mono font-semibold bg-white/5 hover:bg-white/10 border border-amber-500/30 text-amber-400 flex items-center justify-center gap-2 transition-all"
-                  >
-                    <LayoutGrid className="w-4 h-4 text-amber-400" />
-                    <span>Director Preview: View Full Public Site</span>
-                  </button>
-                  <p className="text-[10px] font-mono text-center text-slate-500">
-                    Subsonic Society • Bristol, TN • Elev 3,420 FT
-                  </p>
-                </div>
-              </div>
-            ) : (
-              /* Full Multi-Page Mobile Drawer when Director Mode is ON */
-              <>
-                {/* Director Preview Banner */}
-                <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between text-xs font-mono">
-                  <span className="text-amber-400 font-bold">Director Mode Active</span>
-                  <button
-                    type="button"
-                    onClick={() => disableDirectorMode()}
-                    className="px-2 py-1 rounded-lg bg-amber-500 text-black text-[10px] font-bold"
-                  >
-                    Exit Preview
-                  </button>
-                </div>
-
-                {/* Group 1: The Society & Facility */}
+            {/* Group 1: The Society & Facility */}
                 <div className="space-y-1">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
                     The Society & Facility
@@ -783,8 +687,6 @@ export function Navbar() {
                     <span>Join The Society — Free Forever</span>
                   </Link>
                 </div>
-              </>
-            )}
           </div>
         )}
       </div>
