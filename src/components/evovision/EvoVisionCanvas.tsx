@@ -13,6 +13,7 @@ interface EvoVisionCanvasProps {
   autoRotate?: boolean;
   onToggle3D?: (active: boolean) => void;
   onToggleAutoRotate?: (active: boolean) => void;
+  onDismissSelection?: () => void;
 }
 
 interface Particle {
@@ -76,6 +77,7 @@ export function EvoVisionCanvas({
   autoRotate = true,
   onToggle3D,
   onToggleAutoRotate,
+  onDismissSelection,
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -966,6 +968,38 @@ export function EvoVisionCanvas({
     }
   };
 
+  // Double-click in blank canvas space to quickly dismiss side pop card
+  const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const cam = cameraRef.current;
+    const worldX = (mouseX - rect.width / 2) / cam.zoom - cam.x;
+    const worldY = (mouseY - rect.height / 2) / cam.zoom - cam.y;
+
+    // Check if clicked any node
+    const hitNode = EVO_NODES.find((node) => {
+      const pn = projectedNodeMap.current.get(node.id);
+      if (!pn) return false;
+      const dx = worldX - pn.px;
+      const dy = worldY - pn.py;
+      return Math.sqrt(dx * dx + dy * dy) <= pn.radius + 8;
+    });
+
+    // Check if clicked spaceman
+    const sm = spacemanStateRef.current;
+    const smDx = worldX - sm.x;
+    const smDy = worldY - sm.y;
+    const isSmHit = sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50;
+
+    // If double-clicked in blank space (no node or spaceman hit)
+    if (!hitNode && !isSmHit && onDismissSelection) {
+      onDismissSelection();
+    }
+  };
+
   // Mouse wheel zoom
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
@@ -981,6 +1015,7 @@ export function EvoVisionCanvas({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onDoubleClick={handleDoubleClick}
         onWheel={handleWheel}
         className="w-full h-full block touch-none"
       />

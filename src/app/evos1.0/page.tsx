@@ -217,6 +217,7 @@ export default function EvosDashboardPage() {
           autoRotate={autoRotate}
           onToggle3D={setIs3DMode}
           onToggleAutoRotate={setAutoRotate}
+          onDismissSelection={() => setSelectedNode(null)}
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
@@ -249,7 +250,7 @@ export default function EvosDashboardPage() {
 
         {/* Floating Quick Hint (Bottom Center) */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
-          Drag to pan • Scroll to zoom • Click any node or spaceman • Toggle 3D Orbit for meeting presentations
+          Drag to pan • Scroll to zoom • Double-click blank space to close card
         </div>
 
         {/* Subtle Spaceman Toggle Button (Bottom Right) */}
