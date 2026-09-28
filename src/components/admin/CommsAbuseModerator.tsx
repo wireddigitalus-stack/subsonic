@@ -243,7 +243,7 @@ export function CommsAbuseModerator() {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
           </div>
           <div className="text-2xl font-black font-mono text-emerald-400">
-            {alerts.length * 7 + 14}
+            {alerts.filter((a) => a.status === "MUTED" || a.status === "DISQUALIFIED" || a.autoActionTaken?.toLowerCase().includes("terminated") || a.autoActionTaken?.toLowerCase().includes("blocked")).length}
           </div>
           <div className="text-[10px] text-slate-400 mt-1 font-mono">
             Direct transmissions intercepted
@@ -269,10 +269,10 @@ export function CommsAbuseModerator() {
             <Zap className="w-3.5 h-3.5 text-amber-400" />
           </div>
           <div className="text-2xl font-black font-mono text-amber-400">
-            98.4%
+            {activeCount === 0 ? "100%" : `${Math.max(60, 100 - activeCount * 8)}%`}
           </div>
           <div className="text-[10px] text-slate-400 mt-1 font-mono">
-            Stage Comms Integrity High
+            {activeCount === 0 ? "All Channels Clean & Nominal" : "Active Alerts Under Review"}
           </div>
         </div>
       </div>
@@ -291,6 +291,23 @@ export function CommsAbuseModerator() {
           </div>
 
           <div className="flex items-center gap-2">
+            {alerts.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearCommsAbuseAlerts();
+                  loadAlerts();
+                  setActionNotice("All comms abuse alerts purged.");
+                  setTimeout(() => setActionNotice(null), 3000);
+                }}
+                className="h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg border border-red-500/30 bg-red-950/30 hover:bg-red-900/40 text-red-300 text-[10px] sm:text-[11px] font-mono font-semibold flex items-center gap-1.5 transition-all"
+                title="Purge all active test alerts"
+              >
+                <RefreshCw className="w-3 h-3 text-red-400 shrink-0" />
+                <span>Clear All</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => {
@@ -431,7 +448,9 @@ export function CommsAbuseModerator() {
 
         {filteredAlerts.length === 0 ? (
           <div className="py-12 text-center text-slate-500 text-xs font-mono">
-            No incidents found under current filter. Click &ldquo;Simulate Threat&rdquo; to trigger live alerts.
+            {alerts.length === 0 
+              ? "All comms channels nominal — no abuse alerts logged. Clean baseline ready for live test events or simulation triggers above." 
+              : "No incidents found under current filter."}
           </div>
         ) : (
           <div className="space-y-3">

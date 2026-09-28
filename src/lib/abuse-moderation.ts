@@ -1,85 +1,16 @@
 import { CommsAbuseAlert } from "./types";
 
-const STORAGE_KEY = "subsonic_comms_abuse_alerts_v1";
+const STORAGE_KEY = "subsonic_comms_abuse_alerts_v2";
 
-export const INITIAL_COMMS_ABUSE_ALERTS: CommsAbuseAlert[] = [
-  {
-    id: "alert-001",
-    timestamp: new Date(Date.now() - 1000 * 60 * 14).toISOString(),
-    severity: "CRITICAL",
-    category: "ILLEGAL_COMMERCE",
-    shooterName: "Colt Stryker",
-    shooterCallsign: "GHOST-TAC",
-    shooterRole: "MEMBER",
-    squad: "Public Comms #Unassigned",
-    channel: "general-society",
-    messageContent: "Selling custom titanium rimfire suppressor no tax stamp cash only meet behind range bunkhouse",
-    toxicityScore: 35,
-    threatScore: 92,
-    policyScore: 99,
-    status: "ACTIVE",
-    aiRationale: "Direct NFA regulated item transaction attempt without FFL/Tax Stamp. Auto-blocked by AI policy shield.",
-    autoActionTaken: "Transmission Terminated • User IP Flagged • Queued for Match Director",
-  },
-  {
-    id: "alert-002",
-    timestamp: new Date(Date.now() - 1000 * 60 * 38).toISOString(),
-    severity: "CRITICAL",
-    category: "PHYSICAL_THREAT",
-    shooterName: "Marcus Kane",
-    shooterCallsign: "RIDGE-99",
-    shooterRole: "PRO_COMPETITOR",
-    squad: "Squad 4 (Stage 11)",
-    channel: "bristol-pro-shootout",
-    messageContent: "Stage 9 RO is a cheating fraud, stole 2 impacts from me. Wait till we get to the parking lot buddy",
-    toxicityScore: 94,
-    threatScore: 89,
-    policyScore: 88,
-    status: "ACTIVE",
-    aiRationale: "Direct verbal physical threat targeting match range official. Severe sportsman conduct breach.",
-    autoActionTaken: "Message Suppressed • RO Notified • Immediate Disqualification Pending",
-  },
-  {
-    id: "alert-003",
-    timestamp: new Date(Date.now() - 1000 * 60 * 92).toISOString(),
-    severity: "HIGH",
-    category: "UNSPORTSMANLIKE",
-    shooterName: "Travis Boyd",
-    shooterCallsign: "TRIGGER-BOY",
-    shooterRole: "PRO_COMPETITOR",
-    squad: "Squad 2 (Stage 4)",
-    channel: "bristol-pro-shootout",
-    messageContent: "Whoever shot right before me is pencil whipping their scorebook, total loser cheat",
-    toxicityScore: 78,
-    threatScore: 28,
-    policyScore: 72,
-    status: "WARNED",
-    aiRationale: "Hostile unsportsmanlike slander against fellow squad competitor without official protest filing.",
-    autoActionTaken: "Flagged with Warning Badge • Match Director Formal Reprimand Issued",
-  },
-  {
-    id: "alert-004",
-    timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-    severity: "MEDIUM",
-    category: "SPAM_SOLICITATION",
-    shooterName: "CryptoMarksman_22",
-    shooterCallsign: "BOT-NET",
-    shooterRole: "MEMBER",
-    squad: "Spectator Access",
-    channel: "ballistics-and-gear",
-    messageContent: "Earn 500% guaranteed profit on custom rimfire ammo trading! Join telegram t.me/subsoniccryptobet",
-    toxicityScore: 18,
-    threatScore: 15,
-    policyScore: 94,
-    status: "MUTED",
-    aiRationale: "Automated Telegram spam solicitation bot detected.",
-    autoActionTaken: "Auto-Muted for 24 Hours • Links Stripped",
-  },
-];
+export const INITIAL_COMMS_ABUSE_ALERTS: CommsAbuseAlert[] = [];
 
 export function getCommsAbuseAlerts(): CommsAbuseAlert[] {
   if (typeof window === "undefined") return INITIAL_COMMS_ABUSE_ALERTS;
   try {
+    // Purge deprecated v1 storage containing hardwired mock abuse alerts
+    if (localStorage.getItem("subsonic_comms_abuse_alerts_v1")) {
+      localStorage.removeItem("subsonic_comms_abuse_alerts_v1");
+    }
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_COMMS_ABUSE_ALERTS));
