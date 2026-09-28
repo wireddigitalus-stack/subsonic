@@ -141,7 +141,7 @@ export const SEED_MEMBERS: SocietyMember[] = [
   },
   {
     member_id: "SS-2026-TEST",
-    full_name: "Test Marksman",
+    full_name: "TEST",
     callsign: "TEST",
     email: "test@member.subsonicsociety.com",
     state: "TN",

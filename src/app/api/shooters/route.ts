@@ -86,10 +86,15 @@ export async function POST(req: NextRequest) {
       ? body.sponsors.split(",").map((s: string) => s.trim()).filter(Boolean)
       : [];
 
+    let finalName = body.name.trim();
+    if (finalName === "VIP Pro Competitor" || finalName === "Invitational Competitor VIP") {
+      finalName = candidateCallsign || "TEST";
+    }
+
     const newShooter: ShooterProfile = {
       id,
-      name: body.name.trim(),
-      callsign: body.callsign.trim().toUpperCase(),
+      name: finalName,
+      callsign: candidateCallsign,
       pin: body.pin ? body.pin.trim() : undefined,
       division: body.division || "Open Division Pro",
       ranking: body.ranking || "Appalachian Rimfire Competitor",

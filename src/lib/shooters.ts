@@ -152,7 +152,7 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
   },
   {
     id: "test",
-    name: "Test Marksman",
+    name: "TEST",
     callsign: "TEST",
     division: "Open Division Pro",
     ranking: "Appalachian Marksman • Subsonic Society Pro",

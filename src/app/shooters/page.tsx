@@ -143,30 +143,59 @@ function ShootersContent() {
       let localList: ShooterProfile[] = [];
       if (typeof window !== "undefined") {
         try {
+          // Auto-sanitize any stale generic boilerplate from previous invite tests
+          for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (
+                parsed.name === "VIP Pro Competitor" || 
+                parsed.full_name === "VIP Pro Competitor" ||
+                parsed.name === "Invitational Competitor VIP"
+              ) {
+                if (parsed.name) parsed.name = parsed.callsign || "TEST";
+                if (parsed.full_name) parsed.full_name = parsed.callsign || "TEST";
+                localStorage.setItem(key, JSON.stringify(parsed));
+              }
+            }
+          }
+
           const rawAll = localStorage.getItem("subsonic_all_shooters");
           if (rawAll) {
             const parsed = JSON.parse(rawAll);
             if (Array.isArray(parsed)) {
-              localList.push(...parsed);
+              for (const item of parsed) {
+                if (item.name === "VIP Pro Competitor" || item.name === "Invitational Competitor VIP") {
+                  item.name = item.callsign || "TEST";
+                }
+                localList.push(item);
+              }
             }
           }
           const rawPro = localStorage.getItem("subsonic_pro_full_profile");
           if (rawPro) {
             const pro = JSON.parse(rawPro);
-            if (pro && pro.id && !localList.some((s) => s.id === pro.id)) {
-              localList.unshift(pro);
+            if (pro && pro.id) {
+              if (pro.name === "VIP Pro Competitor" || pro.name === "Invitational Competitor VIP") {
+                pro.name = pro.callsign || "TEST";
+              }
+              if (!localList.some((s) => s.id === pro.id)) {
+                localList.unshift(pro);
+              }
             }
           }
           const rawCur = localStorage.getItem("subsonic_shooter_profile");
           if (rawCur) {
             const cur = JSON.parse(rawCur);
             if (cur && (cur.callsign || cur.name)) {
-              const curId = (cur.callsign || cur.name).toLowerCase().replace(/[^a-z0-9]+/g, "-");
-              if (!localList.some((s) => s.id === curId || s.callsign?.toLowerCase() === cur.callsign?.toLowerCase())) {
+              const curCallsign = cur.callsign || "TEST";
+              const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
+              const curId = curCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+              if (!localList.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
                 localList.unshift({
                   id: curId,
-                  name: cur.name || "Test Marksman",
-                  callsign: cur.callsign || "TEST",
+                  name: curName,
+                  callsign: curCallsign,
                   division: cur.division || "Open Division Pro",
                   ranking: "Appalachian Rimfire Competitor",
                   homeRange: "The Hideout, Bristol, TN",
@@ -204,9 +233,17 @@ function ShootersContent() {
           const data = await res.json();
           if (data.shooters && data.shooters.length > 0) {
             const map = new Map<string, ShooterProfile>();
-            for (const s of data.shooters) map.set(s.id.toLowerCase(), s);
+            for (const s of data.shooters) {
+              if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+                s.name = s.callsign || "TEST";
+              }
+              map.set(s.id.toLowerCase(), s);
+            }
             for (const s of localList) {
-              if (!map.has(s.id.toLowerCase())) map.set(s.id.toLowerCase(), s);
+              if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+                s.name = s.callsign || "TEST";
+              }
+              map.set(s.id.toLowerCase(), s);
             }
             const finalShooters = Array.from(map.values());
             setShooters(finalShooters);
@@ -230,8 +267,18 @@ function ShootersContent() {
 
       // Fallback merge if API network fails
       const fallbackMap = new Map<string, ShooterProfile>();
-      for (const s of FALLBACK_SHOOTERS) fallbackMap.set(s.id.toLowerCase(), s);
-      for (const s of localList) fallbackMap.set(s.id.toLowerCase(), s);
+      for (const s of FALLBACK_SHOOTERS) {
+        if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+          s.name = s.callsign || "TEST";
+        }
+        fallbackMap.set(s.id.toLowerCase(), s);
+      }
+      for (const s of localList) {
+        if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+          s.name = s.callsign || "TEST";
+        }
+        fallbackMap.set(s.id.toLowerCase(), s);
+      }
       const combined = Array.from(fallbackMap.values());
       setShooters(combined);
       setSelectedShooter(combined[0]);
@@ -240,12 +287,21 @@ function ShootersContent() {
     fetchShooters();
   }, [requestedId]);
 
+  const getShooterDisplayName = (s: { name?: string; callsign?: string }): string => {
+    if (!s.name || s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+      return s.callsign || "TEST";
+    }
+    return s.name;
+  };
+
   // Handle filtering
   const filteredShooters = shooters.filter((shooter) => {
     const matchesDiv = divisionFilter === "ALL" || shooter.division.toLowerCase().includes(divisionFilter.toLowerCase());
     const query = searchQuery.toLowerCase().trim();
+    const displayName = getShooterDisplayName(shooter).toLowerCase();
     const matchesSearch = 
       !query ||
+      displayName.includes(query) ||
       shooter.name.toLowerCase().includes(query) ||
       shooter.callsign.toLowerCase().includes(query) ||
       shooter.ranking.toLowerCase().includes(query) ||
@@ -373,7 +429,7 @@ function ShootersContent() {
                             {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") ? (
                               <img
                                 src={shooter.image}
-                                alt={shooter.name}
+                                alt={getShooterDisplayName(shooter)}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
@@ -387,7 +443,7 @@ function ShootersContent() {
                               {shooter.division}
                             </div>
                             <h3 className="text-sm font-black text-white truncate">
-                              {shooter.name}
+                              {getShooterDisplayName(shooter)}
                             </h3>
                             <p className="text-[10px] text-slate-400 mt-0.5 truncate">
                               {shooter.ranking}
@@ -434,7 +490,7 @@ function ShootersContent() {
                     {selectedShooter.image?.startsWith("data:") || selectedShooter.image?.startsWith("/") ? (
                       <img
                         src={selectedShooter.image}
-                        alt={selectedShooter.name}
+                        alt={getShooterDisplayName(selectedShooter)}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -453,7 +509,7 @@ function ShootersContent() {
                       </span>
                     </div>
                     <h2 className="text-xl sm:text-3xl font-black text-white">
-                      {selectedShooter.name}
+                      {getShooterDisplayName(selectedShooter)}
                     </h2>
                     <p className="text-xs sm:text-sm font-semibold text-emerald-400">
                       {selectedShooter.ranking}
@@ -595,7 +651,7 @@ function ShootersContent() {
               {selectedShooter.interview && selectedShooter.interview.length > 0 && (
                 <div className="space-y-4 pt-4 border-t border-white/10">
                   <h3 className="text-lg font-black text-white flex items-center gap-2">
-                    <span>In The Crosshairs: Interview with {selectedShooter.name.split(" ")[0]}</span>
+                    <span>In The Crosshairs: Interview with {getShooterDisplayName(selectedShooter).split(" ")[0]}</span>
                   </h3>
 
                   <div className="space-y-4">

@@ -83,7 +83,13 @@ function StandardInviteContent() {
         setCodeValid(true);
         setInviteCode(clean);
         setInviteMeta(data);
-        if (data.recipientName && !fullName) {
+        if (
+          data.recipientName && 
+          !fullName && 
+          !data.recipientName.toLowerCase().includes("vip") && 
+          !data.recipientName.toLowerCase().includes("competitor") && 
+          !data.recipientName.toLowerCase().includes("invitational")
+        ) {
           setFullName(data.recipientName);
         }
       }

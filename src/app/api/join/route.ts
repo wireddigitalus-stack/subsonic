@@ -95,7 +95,10 @@ export async function POST(req: NextRequest) {
       inviteCode 
     } = body;
 
-    const resolvedName = (fullName || full_name || "").trim();
+    let resolvedName = (fullName || full_name || "").trim();
+    if (resolvedName === "VIP Pro Competitor" || resolvedName === "Invitational Competitor VIP") {
+      resolvedName = callsign ? callsign.trim().toUpperCase() : "TEST";
+    }
     if (!resolvedName) {
       return NextResponse.json(
         { error: "Full name is required." },

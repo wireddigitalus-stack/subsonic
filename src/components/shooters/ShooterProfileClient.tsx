@@ -26,12 +26,54 @@ interface Props {
   slug: string;
 }
 
+const sanitizeShooter = (s: ShooterProfile | null): ShooterProfile | null => {
+  if (!s) return null;
+  const copy = { ...s };
+  if (!copy.name || copy.name === "VIP Pro Competitor" || copy.name === "Invitational Competitor VIP") {
+    copy.name = copy.callsign || "TEST";
+  }
+  return copy;
+};
+
+const getShooterDisplayName = (s?: { name?: string; callsign?: string } | null): string => {
+  if (!s) return "";
+  if (!s.name || s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+    return s.callsign || "TEST";
+  }
+  return s.name;
+};
+
 export function ShooterProfileClient({ initialShooter, slug }: Props) {
-  const [shooter, setShooter] = useState<ShooterProfile | null>(initialShooter);
+  const [shooter, setShooter] = useState<ShooterProfile | null>(() => sanitizeShooter(initialShooter));
   const [loading, setLoading] = useState(!initialShooter);
 
   useEffect(() => {
-    if (shooter) return;
+    // 0. Auto-clean any stale VIP Pro boilerplate in browser storage
+    if (typeof window !== "undefined") {
+      try {
+        for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (
+              parsed.name === "VIP Pro Competitor" || 
+              parsed.full_name === "VIP Pro Competitor" ||
+              parsed.name === "Invitational Competitor VIP"
+            ) {
+              if (parsed.name) parsed.name = parsed.callsign || "TEST";
+              if (parsed.full_name) parsed.full_name = parsed.callsign || "TEST";
+              localStorage.setItem(key, JSON.stringify(parsed));
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Storage sanitize error:", e);
+      }
+    }
+
+    if (shooter && shooter.name !== "VIP Pro Competitor" && shooter.name !== "Invitational Competitor VIP") {
+      return;
+    }
 
     const findShooterLocallyOrRemotely = async () => {
       const cleanSlug = slug.toLowerCase().trim();
@@ -42,18 +84,20 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
           const rawFull = localStorage.getItem("subsonic_pro_full_profile");
           if (rawFull) {
             const parsed = JSON.parse(rawFull);
+            const sanitized = sanitizeShooter(parsed);
             if (
-              parsed.id?.toLowerCase() === cleanSlug ||
-              parsed.callsign?.toLowerCase() === cleanSlug ||
-              parsed.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug
+              sanitized?.id?.toLowerCase() === cleanSlug ||
+              sanitized?.callsign?.toLowerCase() === cleanSlug ||
+              sanitized?.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug ||
+              cleanSlug === "vip-pro-competitor"
             ) {
-              setShooter(parsed);
+              setShooter(sanitized);
               setLoading(false);
               // Sync to server in background
               fetch("/api/shooters", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(parsed),
+                body: JSON.stringify(sanitized),
               }).catch(() => {});
               return;
             }
@@ -63,19 +107,23 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
           const rawAll = localStorage.getItem("subsonic_all_shooters");
           if (rawAll) {
             const list: ShooterProfile[] = JSON.parse(rawAll);
-            const match = list.find(
-              (s) =>
-                s.id?.toLowerCase() === cleanSlug ||
-                s.callsign?.toLowerCase() === cleanSlug ||
-                s.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug
-            );
+            const match = list.find((s) => {
+              const san = sanitizeShooter(s);
+              return (
+                san?.id?.toLowerCase() === cleanSlug ||
+                san?.callsign?.toLowerCase() === cleanSlug ||
+                san?.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug ||
+                cleanSlug === "vip-pro-competitor"
+              );
+            });
             if (match) {
-              setShooter(match);
+              const sanMatch = sanitizeShooter(match);
+              setShooter(sanMatch);
               setLoading(false);
               fetch("/api/shooters", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(match),
+                body: JSON.stringify(sanMatch),
               }).catch(() => {});
               return;
             }
@@ -85,15 +133,18 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
           const rawCur = localStorage.getItem("subsonic_shooter_profile");
           if (rawCur) {
             const parsed = JSON.parse(rawCur);
+            const curCallsign = parsed.callsign || cleanSlug.toUpperCase();
+            const curName = (!parsed.name || parsed.name === "VIP Pro Competitor" || parsed.name === "Invitational Competitor VIP") ? curCallsign : parsed.name;
             if (
               parsed.callsign?.toLowerCase() === cleanSlug ||
-              parsed.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug
+              parsed.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug ||
+              cleanSlug === "vip-pro-competitor"
             ) {
               // Construct profile from saved session
               const constructed: ShooterProfile = {
                 id: cleanSlug,
-                name: parsed.name || "Marksman",
-                callsign: parsed.callsign || cleanSlug.toUpperCase(),
+                name: curName,
+                callsign: curCallsign,
                 division: parsed.division || "Open Division Pro",
                 ranking: "Appalachian Rimfire Competitor",
                 homeRange: "The Hideout, Bristol, TN",
@@ -132,7 +183,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
         if (res.ok) {
           const data = await res.json();
           if (data.shooter) {
-            setShooter(data.shooter);
+            setShooter(sanitizeShooter(data.shooter));
           }
         }
       } catch (err) {
@@ -203,7 +254,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: shooter.name,
+    name: getShooterDisplayName(shooter),
     alternateName: shooter.callsign,
     description: shooter.quote,
     image: shooter.image?.startsWith("http")
@@ -292,7 +343,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
                 <img
                   src={shooter.image || "/assets/subsonic-coin.jpg"}
-                  alt={shooter.name}
+                  alt={getShooterDisplayName(shooter)}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -313,7 +364,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 </div>
 
                 <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
-                  {shooter.name}
+                  {getShooterDisplayName(shooter)}
                 </h1>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-mono text-slate-300 pt-0.5">
@@ -384,7 +435,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               Competition Rifle Rig Specifications
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
-              Verified component configuration fielded by {shooter.name} in Appalachian match conditions.
+              Verified component configuration fielded by {getShooterDisplayName(shooter)} in Appalachian match conditions.
             </p>
           </div>
 
@@ -471,7 +522,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-white/10 relative bg-black">
                 <img
                   src={shooter.actionPhoto}
-                  alt={`${shooter.name} in competition`}
+                  alt={`${getShooterDisplayName(shooter)} in competition`}
                   className="w-full h-full object-cover"
                 />
               </div>

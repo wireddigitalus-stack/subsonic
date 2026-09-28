@@ -421,15 +421,34 @@ export default function AdminDashboardPage() {
         // Hybrid merge with local storage for newly registered members/pros
         if (typeof window !== "undefined") {
           try {
+            // Auto-clean stale VIP Pro boilerplate in browser storage
+            for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
+              const raw = localStorage.getItem(key);
+              if (raw) {
+                const parsed = JSON.parse(raw);
+                if (
+                  parsed.name === "VIP Pro Competitor" || 
+                  parsed.full_name === "VIP Pro Competitor" ||
+                  parsed.name === "Invitational Competitor VIP"
+                ) {
+                  if (parsed.name) parsed.name = parsed.callsign || "TEST";
+                  if (parsed.full_name) parsed.full_name = parsed.callsign || "TEST";
+                  localStorage.setItem(key, JSON.stringify(parsed));
+                }
+              }
+            }
+
             const rawPro = localStorage.getItem("subsonic_pro_full_profile");
             if (rawPro) {
               const pro = JSON.parse(rawPro);
-              if (pro?.name && !apiMembers.some((m) => m.callsign === pro.callsign || m.full_name === pro.name)) {
+              const proCallsign = pro.callsign || "TEST";
+              const proName = (!pro.name || pro.name === "VIP Pro Competitor" || pro.name === "Invitational Competitor VIP") ? proCallsign : pro.name;
+              if (proName && !apiMembers.some((m) => m.callsign?.toLowerCase() === proCallsign.toLowerCase() || m.full_name === proName)) {
                 apiMembers.unshift({
-                  member_id: `SS-PRO-${pro.callsign || "VIP"}`,
-                  full_name: pro.name,
-                  callsign: pro.callsign,
-                  email: `${pro.callsign?.toLowerCase()}@competitor.subsonicsociety.com`,
+                  member_id: `SS-PRO-${proCallsign}`,
+                  full_name: proName,
+                  callsign: proCallsign,
+                  email: `${proCallsign.toLowerCase()}@competitor.subsonicsociety.com`,
                   state: "TN",
                   experience_level: pro.division || "Pro Division Marksman",
                   rifle_setup: pro.rifleSetup?.action || "Precision Rimfire Rig",
@@ -445,11 +464,13 @@ export default function AdminDashboardPage() {
             const rawMem = localStorage.getItem("subsonic_member_profile");
             if (rawMem) {
               const mem = JSON.parse(rawMem);
-              if (mem?.full_name && !apiMembers.some((m) => m.callsign === mem.callsign || m.member_id === mem.member_id)) {
+              const memCallsign = mem.callsign || "OPERATIVE";
+              const memName = (!mem.full_name || mem.full_name === "VIP Pro Competitor" || mem.full_name === "Invitational Competitor VIP") ? memCallsign : mem.full_name;
+              if (memName && !apiMembers.some((m) => m.callsign?.toLowerCase() === memCallsign.toLowerCase() || m.member_id === mem.member_id)) {
                 apiMembers.unshift({
                   member_id: mem.member_id || `SS-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-                  full_name: mem.full_name,
-                  callsign: mem.callsign || "OPERATIVE",
+                  full_name: memName,
+                  callsign: memCallsign,
                   email: mem.email || undefined,
                   state: mem.state || "TN",
                   experience_level: mem.experience_level || "Member",
@@ -466,12 +487,14 @@ export default function AdminDashboardPage() {
             const rawCurShooter = localStorage.getItem("subsonic_shooter_profile");
             if (rawCurShooter) {
               const cur = JSON.parse(rawCurShooter);
-              if (cur?.callsign && !apiMembers.some((m) => m.callsign?.toLowerCase() === cur.callsign?.toLowerCase())) {
+              const curCallsign = cur.callsign || "TEST";
+              const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
+              if (curCallsign && !apiMembers.some((m) => m.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
                 apiMembers.unshift({
-                  member_id: `SS-PRO-${cur.callsign}`,
-                  full_name: cur.name || "Test Marksman",
-                  callsign: cur.callsign,
-                  email: `${cur.callsign.toLowerCase()}@member.subsonicsociety.com`,
+                  member_id: `SS-PRO-${curCallsign}`,
+                  full_name: curName,
+                  callsign: curCallsign,
+                  email: `${curCallsign.toLowerCase()}@member.subsonicsociety.com`,
                   state: "TN",
                   experience_level: cur.division || "Pro Competitor",
                   rifle_setup: cur.rifleSetup || "Precision Rimfire",
@@ -487,6 +510,13 @@ export default function AdminDashboardPage() {
             console.warn("Local storage member merge error:", e);
           }
         }
+
+        apiMembers = apiMembers.map((m) => {
+          if (m.full_name === "VIP Pro Competitor" || m.full_name === "Invitational Competitor VIP") {
+            return { ...m, full_name: m.callsign || "TEST" };
+          }
+          return m;
+        });
 
         setMembers(apiMembers);
       }
@@ -529,6 +559,9 @@ export default function AdminDashboardPage() {
             const rawPro = localStorage.getItem("subsonic_pro_full_profile");
             if (rawPro) {
               const pro = JSON.parse(rawPro);
+              if (pro?.name === "VIP Pro Competitor" || pro?.name === "Invitational Competitor VIP") {
+                pro.name = pro.callsign || "TEST";
+              }
               if (pro?.id && !list.some((s) => s.id === pro.id || s.callsign === pro.callsign)) {
                 list.unshift(pro);
               }
@@ -538,6 +571,9 @@ export default function AdminDashboardPage() {
               const all = JSON.parse(rawAll);
               if (Array.isArray(all)) {
                 for (const item of all) {
+                  if (item?.name === "VIP Pro Competitor" || item?.name === "Invitational Competitor VIP") {
+                    item.name = item.callsign || "TEST";
+                  }
                   if (item?.id && !list.some((s) => s.id === item.id)) {
                     list.unshift(item);
                   }
@@ -549,12 +585,14 @@ export default function AdminDashboardPage() {
             if (rawCurShooter) {
               const cur = JSON.parse(rawCurShooter);
               if (cur && (cur.callsign || cur.name)) {
-                const curId = (cur.callsign || cur.name).toLowerCase().replace(/[^a-z0-9]+/g, "-");
-                if (!list.some((s) => s.id === curId || s.callsign?.toLowerCase() === cur.callsign?.toLowerCase())) {
+                const curCallsign = cur.callsign || "TEST";
+                const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
+                const curId = curCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                if (!list.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
                   list.unshift({
                     id: curId,
-                    name: cur.name || "Test Marksman",
-                    callsign: cur.callsign || "TEST",
+                    name: curName,
+                    callsign: curCallsign,
                     division: cur.division || "Open Division Pro",
                     ranking: "Appalachian Rimfire Competitor",
                     homeRange: "The Hideout, Bristol, TN",
@@ -584,6 +622,13 @@ export default function AdminDashboardPage() {
             console.warn("Local storage shooters merge error:", e);
           }
         }
+
+        list = list.map((s) => {
+          if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
+            return { ...s, name: s.callsign || "TEST" };
+          }
+          return s;
+        });
 
         setShooterProfiles(list);
       }
