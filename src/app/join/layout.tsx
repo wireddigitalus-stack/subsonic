@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Join The Society | Private Chat Room Access & Member Callsign",
+  title: "Membership By Invitation Only | The Subsonic Society",
   description:
-    "Register for free Subsonic Society membership. Unlock verified shooter credentials, a unique marksman callsign, and immediate access to the Subsonic Private Chat Room.",
+    "Subsonic Society membership and private squad comms are strictly by invitation only. Log in with the invitation credentials sent to you, or enter your invite code to activate your profile.",
   keywords: [
-    "Join Subsonic Society",
-    "Rimfire shooter membership",
+    "Subsonic Society Invitation",
+    "Invitation Only Membership",
     "Precision rifle membership",
     "Subsonic credentials",
     "Private chat room access",
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     canonical: "https://subsonicsociety.com/join",
   },
   openGraph: {
-    title: "Join The Society | Private Chat Room Access",
+    title: "Membership By Invitation Only | The Subsonic Society",
     description:
-      "Claim your callsign and member ID for immediate entry into the Subsonic Private Chat Room.",
+      "Membership and private comms are by invitation only. Log in with your credentials or claim your invitation code.",
     url: "https://subsonicsociety.com/join",
     siteName: "Subsonic Society",
     images: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         url: "/assets/subsonic-social-share-clean.jpg?v=3",
         width: 1200,
         height: 630,
-        alt: "Join Subsonic Society",
+        alt: "Subsonic Society - Membership By Invitation Only",
       },
     ],
     locale: "en_US",
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Join Subsonic Society | Marksman Membership",
-    description: "Get verified shooter credentials and early match slot access.",
+    title: "Membership By Invitation Only | The Subsonic Society",
+    description: "Log in with your invitation credentials or enter your invite code.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
   },
 };

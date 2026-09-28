@@ -240,11 +240,11 @@ function StandardInviteContent() {
               MEMBERSHIP BY INVITATION ONLY
             </span>
             <h1 className="text-2xl font-black text-white tracking-tight">
-              JOIN THE SOCIETY
+              CLAIM YOUR INVITATION
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed">
               Subsonic Society squad comms and competitor networks are strictly invitation-only. 
-              Enter your access code to begin profile setup.
+              Log in with your invitation credentials we sent you, or enter your invite code below to activate your marksman dossier.
             </p>
           </div>
 

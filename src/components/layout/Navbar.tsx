@@ -29,7 +29,8 @@ import {
   Mail,
   Lock,
   Unlock,
-  FileText
+  FileText,
+  Key
 } from "lucide-react";
 
 export function Navbar() {
@@ -481,16 +482,16 @@ export function Navbar() {
                   className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition-all flex items-center gap-1.5"
                 >
                   <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Chat Login</span>
+                  <span>Member Login</span>
                 </Link>
 
                 <Link
-                  href="/join"
-                  data-telemetry="nav_primary_join_cta"
+                  href="/invite"
+                  data-telemetry="nav_primary_invite_cta"
                   className="hidden sm:flex px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all items-center gap-1.5"
                 >
-                  <Users className="w-3.5 h-3.5 fill-black" />
-                  <span>Join The Society</span>
+                  <Key className="w-3.5 h-3.5 fill-black" />
+                  <span>Claim Invite</span>
                 </Link>
               </div>
             )}
@@ -643,15 +644,15 @@ export function Navbar() {
                   </Link>
                 </div>
 
-                {/* Mobile Action: Join The Society */}
-                <div className="pt-2 border-t border-white/10">
+                {/* Mobile Action: Invitation-Only Member Sign-In */}
+                <div className="pt-2 border-t border-white/10 space-y-2">
                   <Link
-                    href="/join"
+                    href="/invite"
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
                   >
-                    <Users className="w-4 h-4 fill-black" />
-                    <span>Join The Society — Free Forever</span>
+                    <Key className="w-4 h-4 fill-black" />
+                    <span>Membership By Invitation Only • Enter Credentials</span>
                   </Link>
                 </div>
           </div>

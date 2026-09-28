@@ -17,7 +17,8 @@ import {
   FileText, 
   Flame, 
   Award,
-  RefreshCw
+  RefreshCw,
+  Key
 } from "lucide-react";
 import { playRealCommsChirp, playBotTelemetryChirp } from "@/lib/chat-audio";
 
@@ -434,11 +435,11 @@ export function HeroChatTerminal() {
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <Link
-                href="/join"
+                href="/invite"
                 className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-95"
               >
-                <Sparkles className="w-4 h-4 fill-black" />
-                <span>Claim Callsign &amp; Join Society</span>
+                <Key className="w-4 h-4 fill-black" />
+                <span>Claim Invite &amp; Activate Callsign</span>
               </Link>
 
               <Link
@@ -446,7 +447,7 @@ export function HeroChatTerminal() {
                 className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
               >
                 <Users className="w-4 h-4" />
-                <span>Enter Competitor Comms</span>
+                <span>Member Login</span>
               </Link>
             </div>
           </div>
@@ -489,24 +490,24 @@ export function HeroChatTerminal() {
       {/* 5. Simulated Composer Bar at Bottom */}
       <div className="p-3 sm:p-4 bg-[#0A0D14] border-t border-white/10 flex items-center gap-2.5">
         <Link
-          href="/join"
+          href="/chat"
           className="flex-1 flex items-center justify-between px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 hover:border-amber-400/50 text-slate-400 hover:text-white transition-all text-xs font-mono group"
         >
           <div className="flex items-center gap-2">
             <Lock className="w-3.5 h-3.5 text-amber-400" />
-            <span className="truncate">Sign up to transmit on squad net...</span>
+            <span className="truncate">Membership by invitation only • Log in with credentials...</span>
           </div>
           <span className="text-[10px] text-amber-400 font-bold group-hover:underline">
-            GET PASS →
+            LOGIN / CLAIM →
           </span>
         </Link>
 
         <Link
-          href="/join"
+          href="/invite"
           className="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black transition-all active:scale-95 shadow-tactical-glow shrink-0"
-          title="Sign up to broadcast"
+          title="Claim Invitation Code"
         >
-          <Send className="w-4 h-4" />
+          <Key className="w-4 h-4" />
         </Link>
       </div>
     </div>

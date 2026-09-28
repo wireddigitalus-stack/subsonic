@@ -22,7 +22,8 @@ import {
   Play,
   FileText,
   MessageSquare,
-  Download
+  Download,
+  Key
 } from "lucide-react";
 
 export function FullHomePage() {
@@ -517,33 +518,33 @@ export function FullHomePage() {
           <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
-              Join The Brotherhood
+              Invitation-Only Network
             </span>
             <h3 className="text-2xl sm:text-4xl font-black text-white">
-              CLAIM YOUR FREE DIGITAL MEMBER CREDENTIAL
+              MEMBERSHIP BY INVITATION ONLY
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Instant Apple Wallet style digital pass, priority notice on match registrations, Subsonic DNA laboratory lot data, and staff-moderated competitor comms. No annual fees.
+              Log in with your invitation credentials we sent you, or enter your invite code to activate your digital marksman dossier and squad comms.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link
-              href="/join"
+              href="/invite"
               data-telemetry="home_bottom_join_cta"
               className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-sm flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
             >
-              <Users className="w-4 h-4 fill-black" />
-              <span>Join The Society — Free Forever</span>
+              <Key className="w-4 h-4 fill-black" />
+              <span>Claim Your Invite Code</span>
             </Link>
 
             <Link
-              href="/matches"
-              data-telemetry="home_bottom_matches_cta"
+              href="/chat"
+              data-telemetry="home_bottom_login_cta"
               className="px-8 py-3.5 rounded-2xl ios-glass text-white font-bold text-sm flex items-center gap-2 border border-white/10 hover:bg-white/10 active:scale-95 transition-all"
             >
-              <Target className="w-4 h-4 text-amber-400" />
-              <span>Browse 2026 Matches</span>
+              <Users className="w-4 h-4 text-amber-400" />
+              <span>Member Login</span>
             </Link>
           </div>
         </div>

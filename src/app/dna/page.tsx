@@ -547,13 +547,13 @@ export default function SubsonicDnaPage() {
             WANT YOUR AMMUNITION LOT BENCHMARKED?
           </h3>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-            Subsonic Society members can submit ammunition lots for our digital testing queue at The Hideout. We return full Garmin velocity plots and 300-yard high-speed video trace.
+            Subsonic Society membership is strictly by invitation only. Log in with your invitation credentials to access the digital testing queue, or enter your invite code to activate your profile.
           </p>
           <Link
-            href="/join"
+            href="/invite"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-extrabold text-xs shadow-tactical-glow hover:brightness-110 transition-all"
           >
-            <span>Register as Society Tester</span>
+            <span>Enter Invitation Code</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>

@@ -17,7 +17,8 @@ import {
   Calendar, 
   HelpCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Key
 } from "lucide-react";
 import { recordTelemetryEvent } from "@/lib/telemetry";
 
@@ -117,11 +118,11 @@ export default function ContactPage() {
 
           <div className="flex flex-col gap-2">
             <Link
-              href="/join"
+              href="/invite"
               className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
             >
-              <Sparkles className="w-4 h-4 fill-black" />
-              <span>Free Membership Pass</span>
+              <Key className="w-4 h-4 fill-black" />
+              <span>Claim Invitation Pass</span>
             </Link>
             <Link
               href="/matches"

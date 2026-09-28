@@ -242,10 +242,10 @@ export default function TheHideoutPage() {
                 <span>View Matches at The Hideout</span>
               </Link>
               <Link
-                href="/join"
+                href="/invite"
                 className="px-4 py-2.5 rounded-xl ios-glass text-white text-xs font-bold border border-white/10 hover:bg-white/10 transition-all text-center w-full sm:w-auto"
               >
-                <span>Request Range Access Pass</span>
+                <span>Enter Invitation Code</span>
               </Link>
             </div>
           </div>

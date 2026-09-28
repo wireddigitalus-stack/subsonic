@@ -882,7 +882,7 @@ export default function AdminDashboardPage() {
       { eventType: "click" as const, targetElement: "button_register_bristol_pro", targetText: "Register Squad ($275)", targetCategory: "Bristol Pro Portal", pageRoute: "/bristol-pro", isMember: true, memberId: "SS-2026-1044", memberCallsign: "GHOST_RIDER", memberName: "Wyatt Sterling" },
       { eventType: "page_landed" as const, targetElement: "Page: /dna", targetText: "Landed on /dna", targetCategory: "Page Landing", pageRoute: "/dna", isMember: false },
       { eventType: "click" as const, targetElement: "tab_ballistics_solver", targetText: "Mountain DOPE Solver", targetCategory: "Subsonic DNA Lab", pageRoute: "/dna", isMember: false },
-      { eventType: "click" as const, targetElement: "button_join_society", targetText: "Join The Society", targetCategory: "Membership & Registration", pageRoute: "/join", isMember: false },
+      { eventType: "click" as const, targetElement: "button_claim_invite", targetText: "Claim Invite Code", targetCategory: "Membership & Registration", pageRoute: "/invite", isMember: false },
     ];
     mockEvents.forEach((item, idx) => {
       setTimeout(() => {

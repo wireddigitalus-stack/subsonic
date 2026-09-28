@@ -103,8 +103,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/join" className="text-amber-400 font-bold hover:underline transition-all">
-                  Join Free Membership
+                <Link href="/invite" className="text-amber-400 font-bold hover:underline transition-all">
+                  Claim Invitation Code
                 </Link>
               </li>
             </ul>

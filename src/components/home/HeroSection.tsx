@@ -15,7 +15,8 @@ import {
   Microscope,
   MessageSquare,
   Sparkles,
-  FileText
+  FileText,
+  Key
 } from "lucide-react";
 import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
@@ -69,7 +70,7 @@ export function HeroSection() {
         {/* Live Animated Tactical Chat Terminal & Guest Clearance Hub */}
         <HeroChatTerminal />
 
-        {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
+        {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • CLAIM INVITE */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
 
           {/* Button 2: MATCHES */}
@@ -102,17 +103,17 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Button 4: JOIN THE SOCIETY */}
+          {/* Button 4: CLAIM INVITE (INVITATION ONLY) */}
           <Link
-            href="/join"
-            data-telemetry="hero_primary_btn_join"
+            href="/invite"
+            data-telemetry="hero_primary_btn_invite"
             className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs sm:text-sm flex items-center justify-between shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
           >
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
-                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
+                <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
               </div>
-              <span className="truncate">JOIN NOW</span>
+              <span className="truncate">CLAIM INVITE</span>
             </div>
             <ChevronRight className="w-4 h-4 text-black shrink-0" />
           </Link>
@@ -134,7 +135,7 @@ export function HeroSection() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <div className="text-[10px] font-mono text-slate-400 truncate">
-                  Private room & DOPE drops
+                  Invite-only squad network
                 </div>
               </div>
             </div>

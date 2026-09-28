@@ -11,7 +11,8 @@ import {
   Compass, 
   ArrowRight,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Key
 } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -55,11 +56,11 @@ export default function SocietyPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
-              href="/join"
+              href="/invite"
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-tactical-glow hover:brightness-110 transition-all"
             >
-              <Users className="w-4 h-4 fill-black" />
-              <span>Join The Society — Free Forever</span>
+              <Key className="w-4 h-4 fill-black" />
+              <span>Membership By Invitation Only</span>
             </Link>
 
             <Link
@@ -228,25 +229,25 @@ export default function SocietyPage() {
 
           <div className="space-y-2 max-w-xl mx-auto">
             <h3 className="text-2xl sm:text-3xl font-black text-white">
-              BECOME PART OF THE SOCIETY TODAY
+              MEMBERSHIP BY INVITATION ONLY
             </h3>
             <p className="text-sm text-slate-300">
-              Free membership gives you access to the Subsonic DNA testing lab, squad registrations, digital member pass, and community comms.
+              Access to verified squad comms, match registrations, and the Subsonic DNA testing lab is strictly invite-only. Log in with the credentials sent to you, or enter your invite code to activate your profile.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/join"
+              href="/invite"
               className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-sm shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
             >
-              Claim Your Free Digital Member ID
+              Claim Your Invitation Code
             </Link>
             <Link
-              href="/matches"
+              href="/chat"
               className="px-8 py-3.5 rounded-2xl ios-glass text-white font-bold text-sm border border-white/10 hover:bg-white/10 active:scale-95 transition-all"
             >
-              Explore 2026 Matches
+              Member Login
             </Link>
           </div>
         </div>
