@@ -1747,10 +1747,12 @@ export default function ChatPage() {
 
                   {/* Post Counter Badge on Pill */}
                   <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 ${
-                    isActive ? "bg-black/25 text-black font-black" : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                    isActive
+                      ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 shadow-sm"
+                      : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
                   }`} title={`${engagement.postCount} posts in #${ch.name}`}>
-                    <MessageSquare className="w-2 h-2" />
-                    {engagement.postCount}
+                    <MessageSquare className="w-2 h-2 text-cyan-400" />
+                    <span>{engagement.postCount}</span>
                   </span>
 
                   {unread > 0 && !isActive ? (
@@ -1806,13 +1808,9 @@ export default function ChatPage() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           {/* Post Counter on Channel Card */}
-                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold flex items-center gap-1 ${
-                            isActive
-                              ? "bg-black/25 text-black font-extrabold"
-                              : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/25"
-                          }`}>
-                            <MessageSquare className="w-2.5 h-2.5" />
-                            {engagement.postCount} {engagement.postCount === 1 ? "post" : "posts"}
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold flex items-center gap-1 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                            <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                            <span>{engagement.postCount} {engagement.postCount === 1 ? "post" : "posts"}</span>
                           </span>
 
                           <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
