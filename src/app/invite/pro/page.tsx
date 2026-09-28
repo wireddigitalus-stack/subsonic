@@ -311,6 +311,29 @@ function ProInviteContent() {
         // Continue even if claim fails
       }
 
+      // 2b. Also register as an official Society Member for Admin Dashboard tracking
+      try {
+        await fetch("/api/join", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            memberId: `SS-PRO-${savedShooter.callsign}`,
+            fullName: savedShooter.name,
+            callsign: savedShooter.callsign,
+            email: `${savedShooter.callsign.toLowerCase()}@competitor.subsonicsociety.com`,
+            state: "TN",
+            experienceLevel: savedShooter.division || "Pro Division Marksman",
+            rifleSetup: `${savedShooter.rifleSetup?.action || "Custom Precision Rimfire"} / ${savedShooter.rifleSetup?.optic || "Precision Scope"}`,
+            role: "MEMBER",
+            notes: `Pro VIP Onboarding (Code: ${inviteCode}). Home: ${savedShooter.homeRange}. Podiums: ${savedShooter.podiums}`,
+            inviteCode: inviteCode,
+            pin: savedShooter.pin,
+          }),
+        });
+      } catch (e) {
+        console.warn("Error registering pro shooter in society members:", e);
+      }
+
       // 3. Save session and complete profile in localStorage for instant Chat auth & resilient profile viewing
       if (typeof window !== "undefined") {
         try {

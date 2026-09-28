@@ -415,7 +415,58 @@ export default function AdminDashboardPage() {
       const res = await fetch("/api/join");
       if (res.ok) {
         const data = await res.json();
-        setMembers(data.members || []);
+        let apiMembers: SocietyMember[] = data.members || [];
+
+        // Hybrid merge with local storage for newly registered members/pros
+        if (typeof window !== "undefined") {
+          try {
+            const rawPro = localStorage.getItem("subsonic_pro_full_profile");
+            if (rawPro) {
+              const pro = JSON.parse(rawPro);
+              if (pro?.name && !apiMembers.some((m) => m.callsign === pro.callsign || m.full_name === pro.name)) {
+                apiMembers.unshift({
+                  member_id: `SS-PRO-${pro.callsign || "VIP"}`,
+                  full_name: pro.name,
+                  callsign: pro.callsign,
+                  email: `${pro.callsign?.toLowerCase()}@competitor.subsonicsociety.com`,
+                  state: "TN",
+                  experience_level: pro.division || "Pro Division Marksman",
+                  rifle_setup: pro.rifleSetup?.action || "Precision Rimfire Rig",
+                  interests: ["Competition", "PRS Rimfire", "Subsonic DNA"],
+                  created_at: pro.createdAt || new Date().toISOString(),
+                  status: "ACTIVE",
+                  role: "MEMBER",
+                  notes: `Pro VIP Onboarding. Career Podiums: ${pro.podiums || 0}. Home Range: ${pro.homeRange || "The Hideout"}`,
+                });
+              }
+            }
+
+            const rawMem = localStorage.getItem("subsonic_member_profile");
+            if (rawMem) {
+              const mem = JSON.parse(rawMem);
+              if (mem?.full_name && !apiMembers.some((m) => m.callsign === mem.callsign || m.member_id === mem.member_id)) {
+                apiMembers.unshift({
+                  member_id: mem.member_id || `SS-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+                  full_name: mem.full_name,
+                  callsign: mem.callsign || "OPERATIVE",
+                  email: mem.email || undefined,
+                  state: mem.state || "TN",
+                  experience_level: mem.experience_level || "Member",
+                  rifle_setup: mem.rifle_setup || "Precision Rimfire",
+                  interests: mem.interests || ["Competition"],
+                  created_at: mem.created_at || new Date().toISOString(),
+                  status: "ACTIVE",
+                  role: "MEMBER",
+                  notes: "Enrolled via invitation code",
+                });
+              }
+            }
+          } catch (e) {
+            console.warn("Local storage member merge error:", e);
+          }
+        }
+
+        setMembers(apiMembers);
       }
     } catch (err) {
       console.warn("Error fetching society members:", err);
@@ -448,7 +499,35 @@ export default function AdminDashboardPage() {
       const res = await fetch("/api/shooters");
       if (res.ok) {
         const data = await res.json();
-        setShooterProfiles(data.shooters || []);
+        let list: ShooterProfile[] = data.shooters || [];
+
+        // Hybrid merge with local storage for newly registered pro shooters
+        if (typeof window !== "undefined") {
+          try {
+            const rawPro = localStorage.getItem("subsonic_pro_full_profile");
+            if (rawPro) {
+              const pro = JSON.parse(rawPro);
+              if (pro?.id && !list.some((s) => s.id === pro.id || s.callsign === pro.callsign)) {
+                list.unshift(pro);
+              }
+            }
+            const rawAll = localStorage.getItem("subsonic_all_shooters");
+            if (rawAll) {
+              const all = JSON.parse(rawAll);
+              if (Array.isArray(all)) {
+                for (const item of all) {
+                  if (item?.id && !list.some((s) => s.id === item.id)) {
+                    list.unshift(item);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Local storage shooters merge error:", e);
+          }
+        }
+
+        setShooterProfiles(list);
       }
     } catch (err) {
       console.warn("Error fetching shooter profiles:", err);

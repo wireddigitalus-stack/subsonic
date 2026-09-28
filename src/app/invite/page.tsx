@@ -130,7 +130,7 @@ function StandardInviteContent() {
         });
       } catch {}
 
-      // 2. Build member profile
+      // 2. Build member profile and persist in society database
       const memberObj = {
         member_id: memberId,
         full_name: fullName.trim(),
@@ -138,9 +138,32 @@ function StandardInviteContent() {
         email: email.trim() || undefined,
         state: stateCode,
         experience_level: experienceLevel,
-        rifle_setup: "Precision Rimfire",
+        rifle_setup: "Precision Rimfire Rig",
         created_at: new Date().toISOString(),
+        status: "ACTIVE" as const,
+        role: "MEMBER" as const,
+        notes: `Enrolled via invitation code: ${inviteCode}`,
       };
+
+      try {
+        await fetch("/api/join", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            memberId: memberObj.member_id,
+            fullName: memberObj.full_name,
+            callsign: memberObj.callsign,
+            email: memberObj.email,
+            state: memberObj.state,
+            experienceLevel: memberObj.experience_level,
+            rifleSetup: memberObj.rifle_setup,
+            inviteCode: inviteCode,
+            pin: pin.trim(),
+          }),
+        });
+      } catch (e) {
+        console.warn("Error saving member to database:", e);
+      }
 
       // 3. Save to localStorage for instant Chat auth
       if (typeof window !== "undefined") {
