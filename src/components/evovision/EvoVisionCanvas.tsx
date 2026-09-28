@@ -68,6 +68,25 @@ interface SpacemanState {
   sparkles: SpacemanSparkle[];
 }
 
+// Generate data pulse packets flowing at a smooth, dignified, and visible pace
+function createInitialParticles(): Particle[] {
+  const particles: Particle[] = [];
+  EVO_LINKS.forEach((link) => {
+    // 2 staggered pulse dots per link for continuous, balanced data flow
+    [0.15, 0.65].forEach((offset) => {
+      particles.push({
+        linkId: link.id,
+        progress: (offset + Math.random() * 0.2) % 1,
+        // Dignified, smooth flow speed (~6-8 seconds to traverse the link)
+        speed: 0.0022 + Math.random() * 0.001,
+        color: link.color,
+        size: Math.random() * 1.5 + 2.8,
+      });
+    });
+  });
+  return particles;
+}
+
 export function EvoVisionCanvas({
   selectedNode,
   onSelectNode,
@@ -153,8 +172,8 @@ export function EvoVisionCanvas({
 
   // Background stars cache
   const starsRef = useRef<Star[]>([]);
-  // Travelling energy packets
-  const particlesRef = useRef<Particle[]>([]);
+  // Travelling energy packets (flowing at smooth, dignified speed)
+  const particlesRef = useRef<Particle[]>(createInitialParticles());
   // Periodic shooting stars
   const shootingStarsRef = useRef<ShootingStar[]>([]);
   const nextShootingStarTimeRef = useRef<number>(2.5);
@@ -219,14 +238,12 @@ export function EvoVisionCanvas({
     };
   }, []);
 
-  // Node position map for quick lookup
-  const nodeMap = useRef<Map<string, EvoNode>>(new Map());
-  useEffect(() => {
-    nodeMap.current.clear();
-    EVO_NODES.forEach((n) => nodeMap.current.set(n.id, n));
-  }, []);
+  // Node position map for instant lookup without waiting for mount
+  const nodeMap = useRef<Map<string, EvoNode>>(
+    new Map(EVO_NODES.map((n) => [n.id, n]))
+  );
 
-  // Initialize stars and link particles
+  // Initialize stars background cache
   useEffect(() => {
     const stars: Star[] = [];
     for (let i = 0; i < 220; i++) {
@@ -239,26 +256,6 @@ export function EvoVisionCanvas({
       });
     }
     starsRef.current = stars;
-
-    // Create 2 travelling pulses per link
-    const particles: Particle[] = [];
-    EVO_LINKS.forEach((link) => {
-      particles.push({
-        linkId: link.id,
-        progress: Math.random(),
-        speed: (link.pulseSpeed || 1) * (0.003 + Math.random() * 0.003),
-        color: link.color,
-        size: Math.random() * 2 + 2,
-      });
-      particles.push({
-        linkId: link.id,
-        progress: Math.random(),
-        speed: (link.pulseSpeed || 1) * (0.003 + Math.random() * 0.003),
-        color: link.color,
-        size: Math.random() * 2 + 2,
-      });
-    });
-    particlesRef.current = particles;
   }, []);
 
   // Smooth camera tween when selectedNode changes
@@ -704,8 +701,14 @@ export function EvoVisionCanvas({
         const tgt = nodeMap.current.get(link.targetId);
         if (!src || !tgt) return;
 
+        // Is this link dimmed by filter?
+        const isDimmed =
+          activeFilterVal &&
+          src.cluster !== activeFilterVal &&
+          tgt.cluster !== activeFilterVal;
+
         p.progress += p.speed;
-        if (p.progress > 1) p.progress = 0;
+        if (p.progress >= 1) p.progress = 0;
 
         const t = p.progress;
         const midX = (src.x + tgt.x) / 2;
@@ -725,13 +728,19 @@ export function EvoVisionCanvas({
         const archZ = 20 * Math.sin(t * Math.PI);
         const pProj = project3D(bx, by, archZ);
 
-        ctx.globalAlpha = 0.9 * pProj.alphaFactor;
+        // Render glowing energy packet dot
+        ctx.globalAlpha = (isDimmed ? 0.08 : 0.95) * pProj.alphaFactor;
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = p.color;
-        ctx.shadowBlur = 10 * pProj.scale;
+        ctx.shadowBlur = 12 * pProj.scale;
         ctx.beginPath();
-        ctx.arc(pProj.px, pProj.py, Math.max(1, p.size * pProj.scale), 0, Math.PI * 2);
+        ctx.arc(pProj.px, pProj.py, Math.max(1.8, p.size * pProj.scale), 0, Math.PI * 2);
         ctx.fill();
+
+        // Neon outer color rim
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(0.8, 1.2 * pProj.scale);
+        ctx.stroke();
         ctx.shadowBlur = 0;
       });
 
