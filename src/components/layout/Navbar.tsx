@@ -65,6 +65,23 @@ export function Navbar() {
             try {
               localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
             } catch {}
+          } else if (
+            parsed.callsign === "ALLEN" ||
+            parsed.callsign === "AHURLEY" ||
+            parsed.member_id === "SS-2026-0002" ||
+            (parsed.name && parsed.name.toLowerCase().includes("hurley")) ||
+            (parsed.name && parsed.name.toLowerCase().includes("allen"))
+          ) {
+            parsed.callsign = "ALLEN";
+            parsed.name = "Allen Hurley";
+            parsed.rifleSetup = parsed.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527";
+            parsed.division = "Owner Admin / Executive";
+            parsed.badgeText = "OWNER ADMIN";
+            parsed.member_id = "SS-2026-0002";
+            parsed.role = "OWNER_ADMIN";
+            try {
+              localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
+            } catch {}
           }
           if (parsed.callsign) setCallsign(parsed.callsign);
         } catch {

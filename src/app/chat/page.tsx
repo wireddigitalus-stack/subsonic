@@ -1116,12 +1116,24 @@ export default function ChatPage() {
 
     // Specific Executive PINs:
     // Rob Neilson: "RADAR", "LTDAN", or "ROB" with PIN "2468" (Master Owner, Lead Developer & Tech Advisor)
-    // Allen Hurley: "ALLEN" / "AHURLEY" with PIN "620620" (Owner Admin)
-    const isRob = cleanCallsign === "RADAR" || cleanCallsign === "LTDAN" || cleanCallsign === "ROB" || cleanPass === "2468";
-    const isAllen = cleanCallsign === "ALLEN" || cleanCallsign === "AHURLEY" || cleanPass === "620620";
+    // Allen Hurley: "ALLEN", "AHURLEY", or "ALLEN HURLEY" with PIN "620620" (Owner Admin)
+    const isRob = 
+      cleanCallsign === "RADAR" || 
+      cleanCallsign === "LTDAN" || 
+      cleanCallsign === "ROB" || 
+      cleanPass === "2468" || 
+      cleanCallsign.includes("NEILSON");
+
+    const isAllen = 
+      cleanCallsign === "ALLEN" || 
+      cleanCallsign === "AHURLEY" || 
+      cleanCallsign === "HURLEY" ||
+      cleanCallsign.includes("ALLEN") || 
+      cleanCallsign === "620620" ||
+      cleanPass === "620620";
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
-    const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026");
+    const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026" || cleanCallsign === "620620");
     const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
 
     if (!isRobValid && !isAllenValid && !isGeneralValid) {
@@ -1245,7 +1257,7 @@ export default function ChatPage() {
                 required
                 value={loginCallsign}
                 onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
-                placeholder="e.g. APEX-22 or ROB"
+                placeholder="e.g. ALLEN, ROB, or Callsign"
                 autoComplete="username"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400 transition-colors"
               />
@@ -1253,14 +1265,14 @@ export default function ChatPage() {
 
             <div className="space-y-1">
               <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
-                <span>Member Key or 4-Digit PIN</span>
-                <span className="text-[10px] text-amber-400/80 font-normal normal-case">PIN 2468 for ROB</span>
+                <span>Member Key or Security PIN</span>
+                <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for ALLEN • 2468 for ROB</span>
               </label>
               <input
                 type="password"
                 value={loginPasscode}
                 onChange={(e) => setLoginPasscode(e.target.value)}
-                placeholder="Enter member key or 4-digit PIN (e.g. 2468)..."
+                placeholder="Enter PIN (e.g. 620620 or 2468)..."
                 autoComplete="current-password"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400 transition-colors"
               />

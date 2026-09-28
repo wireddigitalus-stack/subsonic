@@ -792,7 +792,15 @@ export default function AdminDashboardPage() {
   const handleUnlock = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = passkeyInput.trim().toLowerCase();
-    const VALID_ADMIN_KEYS = ["2468", "620620", "subsonic2026", "admin"];
+    const VALID_ADMIN_KEYS = [
+      "2468", 
+      "620620", 
+      "subsonic2026", 
+      "admin",
+      "allen",
+      "allen 620620",
+      "allen620620"
+    ];
     if (VALID_ADMIN_KEYS.includes(clean)) {
       setIsAuthenticated(true);
       setPasskeyError(false);
@@ -809,7 +817,7 @@ export default function AdminDashboardPage() {
         memberId: "SS-2026-0001",
       };
 
-      if (clean === "620620") {
+      if (clean === "620620" || clean === "allen" || clean.includes("620620") || clean.includes("allen")) {
         session = {
           name: "Allen Hurley",
           callsign: "ALLEN",
@@ -940,7 +948,7 @@ export default function AdminDashboardPage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter passkey or PIN (e.g. 2468 or 620620)..."
+                placeholder="Enter PIN (e.g. 620620 for Allen or 2468 for Rob)..."
                 value={passkeyInput}
                 onChange={(e) => {
                   setPasskeyInput(e.target.value);
@@ -950,7 +958,7 @@ export default function AdminDashboardPage() {
               />
               {passkeyError && (
                 <div className="text-[11px] text-red-400 font-mono mt-1">
-                  Invalid security passkey. Try PIN &quot;2468&quot;, &quot;620620&quot;, or &quot;subsonic2026&quot;.
+                  Invalid security passkey. Try PIN &quot;620620&quot; (Allen), &quot;2468&quot; (Rob), or &quot;subsonic2026&quot;.
                 </div>
               )}
             </div>
