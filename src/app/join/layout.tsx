@@ -22,10 +22,10 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
-        width: 1200,
-        height: 630,
-        alt: "Subsonic Society - Membership By Invitation Only",
+        url: "/assets/subsonic-invite-social-share.jpg",
+        width: 1280,
+        height: 720,
+        alt: "The Subsonic Society - Membership By Invitation Only",
       },
     ],
     locale: "en_US",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Membership By Invitation Only | The Subsonic Society",
     description: "Log in with your invitation credentials or enter your invite code.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-invite-social-share.jpg"],
   },
 };
 
