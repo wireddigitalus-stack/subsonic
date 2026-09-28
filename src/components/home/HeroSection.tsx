@@ -16,7 +16,10 @@ import {
   Users,
   Microscope,
   Volume2,
-  VolumeX
+  VolumeX,
+  MessageSquare,
+  Sparkles,
+  FileText
 } from "lucide-react";
 import { CountdownBanner } from "./CountdownBanner";
 
@@ -182,6 +185,72 @@ export function HeroSection() {
               <span className="truncate">JOIN NOW</span>
             </div>
             <ChevronRight className="w-4 h-4 text-black shrink-0" />
+          </Link>
+        </div>
+
+        {/* Competitor Net & Portal Fast-Access Strip */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+          <Link
+            href="/chat"
+            className="p-3 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/30 text-white flex items-center justify-between group transition-all"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                <MessageSquare className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="text-[11px] font-black text-white group-hover:text-emerald-400 flex items-center gap-1.5">
+                  <span>Competitor Comms</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                </div>
+                <div className="text-[10px] font-mono text-slate-400 truncate">
+                  Private room & DOPE drops
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+          </Link>
+
+          <Link
+            href="/shooters/intake"
+            className="p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/30 text-white flex items-center justify-between group transition-all"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                <Sparkles className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="text-[11px] font-black text-white group-hover:text-amber-400 flex items-center gap-1.5">
+                  <span>Shooter Questionnaire</span>
+                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-500/20 text-amber-300">Auto-Card</span>
+                </div>
+                <div className="text-[10px] font-mono text-slate-400 truncate">
+                  2-Min rig & profile builder
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+          </Link>
+
+          <Link
+            href="/documents"
+            className="p-3 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/15 border border-cyan-500/30 text-white flex items-center justify-between group transition-all"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="text-[11px] font-black text-white group-hover:text-cyan-400 flex items-center gap-1.5">
+                  <span>Competition Vault</span>
+                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300">18 COF</span>
+                </div>
+                <div className="text-[10px] font-mono text-slate-400 truncate">
+                  Stage packets & waivers
+                </div>
+              </div>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all shrink-0" />
           </Link>
         </div>
 

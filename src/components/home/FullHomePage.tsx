@@ -19,7 +19,10 @@ import {
   ExternalLink,
   ShieldCheck,
   Building2,
-  Play
+  Play,
+  FileText,
+  MessageSquare,
+  Download
 } from "lucide-react";
 
 export function FullHomePage() {
@@ -285,7 +288,126 @@ export function FullHomePage() {
         </div>
       </section>
 
-      {/* 5. Official Subsonic Social Feed (Live Facebook RSS Integration) */}
+      {/* 5. Competitor Dossier & Documents Vault Hub */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Card 1: 2-Minute Shooter Questionnaire & Auto-Card Generator */}
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow bg-gradient-to-br from-amber-500/10 via-black/40 to-black/60 space-y-5 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>2-MINUTE COMPETITOR ONBOARDING</span>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                  AUTO-DOSSIER
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  AUTO-GENERATE YOUR SHOOTER CARD
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Are you shooting in the 2026 Invitational or Appalachian circuit? Skip the manual forms. Enter your rig specs, 1-tap accolade badges (Team USA, National Champion), sponsor tags, and photos to generate your verified public dossier.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono text-slate-300 pt-1">
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
+                  <span className="text-[10px] text-amber-400 font-bold block">1-TAP BADGES</span>
+                  <span className="text-[11px] text-slate-300 truncate block">Team USA & Podiums</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
+                  <span className="text-[10px] text-amber-400 font-bold block">6 RIG SPECS</span>
+                  <span className="text-[11px] text-slate-300 truncate block">Action, Barrel, Ammo</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5 col-span-2 sm:col-span-1">
+                  <span className="text-[10px] text-amber-400 font-bold block">2 PHOTOS</span>
+                  <span className="text-[11px] text-slate-300 truncate block">Headshot & Rig Action</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
+              <Link
+                href="/shooters/intake"
+                className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 fill-black" />
+                <span>Launch Intake Questionnaire</span>
+              </Link>
+
+              <Link
+                href="/shooters"
+                className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition-all"
+              >
+                <Users className="w-4 h-4 text-purple-400" />
+                <span>Browse Marksmen Roster</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 2: Competition Documents Vault */}
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border-2 border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.15)] bg-gradient-to-br from-cyan-500/10 via-black/40 to-black/60 space-y-5 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>OFFICIAL STAGE PACKETS & RULES</span>
+                </div>
+                <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  18 STAGES
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl sm:text-3xl font-black text-white">
+                  COMPETITION DOCUMENTS VAULT
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Download verified Course of Fire dossiers, match rules, cold range liability waivers, and Appalachian elevation intel out to 465 yards. One-click access for all squadded competitors.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-mono text-slate-300 pt-1">
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
+                  <span className="text-[10px] text-cyan-400 font-bold block">18 STAGES</span>
+                  <span className="text-[11px] text-slate-300 truncate block">Official Match COF</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5">
+                  <span className="text-[10px] text-cyan-400 font-bold block">SAFETY WAIVER</span>
+                  <span className="text-[11px] text-slate-300 truncate block">Mandatory Cold Range</span>
+                </div>
+                <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-0.5 col-span-2 sm:col-span-1">
+                  <span className="text-[10px] text-cyan-400 font-bold block">ELEVATION</span>
+                  <span className="text-[11px] text-slate-300 truncate block">3,420 FT Holston Topo</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
+              <Link
+                href="/documents"
+                className="px-5 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all active:scale-95"
+              >
+                <Download className="w-4 h-4" />
+                <span>Open Documents Vault</span>
+              </Link>
+
+              <Link
+                href="/matches"
+                className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition-all"
+              >
+                <Target className="w-4 h-4 text-amber-400" />
+                <span>Match Schedule</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Official Subsonic Social Feed (Live Facebook RSS Integration) */}
       <div id="facebook-feed">
         <FacebookFeed />
       </div>
