@@ -22,6 +22,7 @@ import {
   FileText
 } from "lucide-react";
 import { CountdownBanner } from "./CountdownBanner";
+import { HeroChatTerminal } from "./HeroChatTerminal";
 
 export function HeroSection() {
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
@@ -70,60 +71,8 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Cinematic Video Showcase Container */}
-        <div className="relative ios-glass rounded-3xl p-2 sm:p-3 border border-white/15 shadow-2xl overflow-hidden group">
-          <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-black flex items-center justify-center">
-            {/* Cinematic Background Poster / Video Preview */}
-            <Image
-              src="/assets/subsonic-facebook-cover.jpg"
-              alt="Cinematic slow-motion rimfire shots, 300-yard impacts at The Hideout, wind flags, rifles, ammunition, steel"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-60"
-              priority
-            />
-
-            {/* Video Overlay Tint */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/60" />
-
-            {/* Cinematic Telemetry Overlay */}
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between text-xs font-mono text-white/80 pointer-events-none">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                <span className="font-bold tracking-wider text-red-400">4K CINEMATIC TRACE</span>
-                <span className="hidden sm:inline text-slate-400">| 1,000 FPS PHANTOM HIGH-SPEED</span>
-              </div>
-              <div className="hidden sm:flex items-center gap-3 text-slate-300">
-                <span>300 YD STEEL IMPACT</span>
-                <span>THE HIDEOUT • 3,420 FT</span>
-              </div>
-            </div>
-
-            {/* Center Play Button with Slow-Mo Motif */}
-            <div className="relative z-10 text-center space-y-3 max-w-lg px-4">
-              <Link
-                href="/watch"
-                data-telemetry="hero_play_cinematic_video"
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-amber-500 to-amber-400 text-black flex items-center justify-center shadow-[0_0_35px_rgba(245,158,11,0.6)] hover:scale-110 active:scale-95 transition-all mx-auto group/btn"
-              >
-                <Play className="w-8 h-8 sm:w-10 sm:h-10 fill-black ml-1 group-hover/btn:translate-x-0.5 transition-transform" />
-              </Link>
-              <div>
-                <h3 className="text-lg sm:text-2xl font-black text-white drop-shadow-md">
-                  SLOW-MOTION 300-YARD RIMFIRE IMPACTS
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 font-mono drop-shadow">
-                  High-speed bullet trace, mountain wind flags & custom match builds at The Hideout
-                </p>
-              </div>
-            </div>
-
-            {/* Bottom Specs Bar inside Video */}
-            <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-slate-400 pointer-events-none">
-              <span className="truncate">Lapua Center-X 40gr • 1,062 FPS • Flight Time: 1.18s</span>
-              <span className="text-amber-400 font-bold hidden sm:inline">WATCH REEL</span>
-            </div>
-          </div>
-        </div>
+        {/* Live Animated Tactical Chat Terminal & Guest Clearance Hub */}
+        <HeroChatTerminal />
 
         {/* 4 PRIMARY BUTTONS: WATCH • MATCHES • SUBSONIC DNA • JOIN THE SOCIETY */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-2">
