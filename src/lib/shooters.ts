@@ -150,6 +150,39 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
     createdAt: "2026-07-01T12:00:00Z",
     status: "PUBLISHED",
   },
+  {
+    id: "test",
+    name: "Test Marksman",
+    callsign: "TEST",
+    division: "Open Division Pro",
+    ranking: "Appalachian Marksman • Subsonic Society Pro",
+    homeRange: "The Hideout, Bristol, TN",
+    podiums: 5,
+    featuredMatch: "The Subsonic Society Invitational 2026",
+    image: "/assets/subsonic-coin.jpg",
+    actionPhoto: "/assets/subsonic-coin.jpg",
+    quote: "In the mountains, you learn to trust your bubble level, read the mirage along the ridgeline, and commit cleanly to every single shot.",
+    accolades: ["PRO COMPETITOR 🏅", "THE HIDEOUT PRO SERIES", "VERIFIED MARKSMAN"],
+    sponsors: ["Modacam Custom Rifles", "Vudoo Gun Works", "Lapua Rimfire"],
+    rifleSetup: {
+      action: "Vudoo Gun Works V-22 Rimfire",
+      barrel: "Bartlein MTU 20\" Match (1:16 Twist)",
+      trigger: "Bix'n Andy TacSport PRO (4.2 oz)",
+      chassis: "MDT ACC Elite Chassis with Titanium Weights",
+      optic: "Zero Compromise Optic ZC527 MPCT3X",
+      mount: "Spuhr QDP-4002 0 MOA with Level",
+      tuner: "Harrell Precision Custom Rimfire Tuner",
+      ammoLot: "Lapua Center-X (1,062 FPS)",
+    },
+    interview: [
+      {
+        question: "What is your focus when testing ammunition lots for competition?",
+        answer: "I clean down to bare metal, season the bore with 25 rounds of the test lot, and shoot consecutive 10-shot strings over the Garmin chronograph to confirm single-digit standard deviations."
+      }
+    ],
+    createdAt: "2026-09-28T17:00:00Z",
+    status: "PUBLISHED",
+  },
 ];
 
 // In-process memory cache to survive serverless function calls

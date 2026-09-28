@@ -139,6 +139,20 @@ export const SEED_MEMBERS: SocietyMember[] = [
     created_at: "2026-09-08T08:20:10Z",
     status: "ACTIVE",
   },
+  {
+    member_id: "SS-2026-TEST",
+    full_name: "Test Marksman",
+    callsign: "TEST",
+    email: "test@member.subsonicsociety.com",
+    state: "TN",
+    experience_level: "Open Division Pro",
+    rifle_setup: "Vudoo V-22 / ZCO 527 / MDT ACC Elite",
+    interests: ["Competition", "PRS Rimfire", "Subsonic DNA"],
+    created_at: "2026-09-28T17:00:00Z",
+    status: "ACTIVE",
+    role: "PRO_COMPETITOR",
+    notes: "Pro VIP Verified Competitor (Callsign: TEST)",
+  },
 ];
 
 let memoryMembers: SocietyMember[] = [...SEED_MEMBERS];

@@ -462,6 +462,27 @@ export default function AdminDashboardPage() {
                 });
               }
             }
+
+            const rawCurShooter = localStorage.getItem("subsonic_shooter_profile");
+            if (rawCurShooter) {
+              const cur = JSON.parse(rawCurShooter);
+              if (cur?.callsign && !apiMembers.some((m) => m.callsign?.toLowerCase() === cur.callsign?.toLowerCase())) {
+                apiMembers.unshift({
+                  member_id: `SS-PRO-${cur.callsign}`,
+                  full_name: cur.name || "Test Marksman",
+                  callsign: cur.callsign,
+                  email: `${cur.callsign.toLowerCase()}@member.subsonicsociety.com`,
+                  state: "TN",
+                  experience_level: cur.division || "Pro Competitor",
+                  rifle_setup: cur.rifleSetup || "Precision Rimfire",
+                  interests: ["Competition", "Subsonic DNA"],
+                  created_at: new Date().toISOString(),
+                  status: "ACTIVE",
+                  role: "MEMBER",
+                  notes: "Enrolled Marksman",
+                });
+              }
+            }
           } catch (e) {
             console.warn("Local storage member merge error:", e);
           }
@@ -520,6 +541,42 @@ export default function AdminDashboardPage() {
                   if (item?.id && !list.some((s) => s.id === item.id)) {
                     list.unshift(item);
                   }
+                }
+              }
+            }
+
+            const rawCurShooter = localStorage.getItem("subsonic_shooter_profile");
+            if (rawCurShooter) {
+              const cur = JSON.parse(rawCurShooter);
+              if (cur && (cur.callsign || cur.name)) {
+                const curId = (cur.callsign || cur.name).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                if (!list.some((s) => s.id === curId || s.callsign?.toLowerCase() === cur.callsign?.toLowerCase())) {
+                  list.unshift({
+                    id: curId,
+                    name: cur.name || "Test Marksman",
+                    callsign: cur.callsign || "TEST",
+                    division: cur.division || "Open Division Pro",
+                    ranking: "Appalachian Rimfire Competitor",
+                    homeRange: "The Hideout, Bristol, TN",
+                    podiums: 1,
+                    featuredMatch: "The Subsonic Society Invitational 2026",
+                    image: cur.image || "/assets/subsonic-coin.jpg",
+                    actionPhoto: cur.image || "/assets/subsonic-coin.jpg",
+                    quote: "Precision rimfire demands absolute trust in your elevation DOPE and wind read.",
+                    accolades: ["VERIFIED COMPETITOR"],
+                    sponsors: ["Subsonic Society"],
+                    rifleSetup: {
+                      action: cur.rifleSetup || "Custom Precision Rimfire Rig",
+                      barrel: 'Match Contour 20" (1:16)',
+                      trigger: "Match Grade Trigger",
+                      chassis: "Precision Chassis",
+                      optic: "Zero Compromise Optic",
+                      mount: "Spuhr 0 MOA",
+                      ammoLot: "Lapua Center-X",
+                    },
+                    createdAt: new Date().toISOString(),
+                    status: "PUBLISHED",
+                  });
                 }
               }
             }
