@@ -1277,30 +1277,213 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Admin Navigation Tabs — Sticky, horizontal scroll, no wrap */}
-      <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2 bg-[#07090E]/95 backdrop-blur-md border-b border-white/10">
-        <div className="overflow-x-auto no-scrollbar">
-          <div className="flex gap-1 min-w-max">
+      {/* Admin Navigation Command Deck — Modern Stacked Tactical Layout for Desktop & Mobile */}
+      <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2.5 bg-[#07090E]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl">
+        {/* DESKTOP (md & up): 3 Stacked Command Sectors — 100% visible, zero horizontal overflow */}
+        <div className="hidden md:grid md:grid-cols-3 gap-2.5">
+          {/* Sector 1: OPERATIVES & SQUAD */}
+          <div className={`p-2.5 rounded-2xl border transition-all ${
+            ["MEMBERS", "INVITES", "SHOOTERS", "REGISTRATIONS"].includes(activeAdminTab)
+              ? "bg-amber-500/[0.04] border-amber-500/35 shadow-[0_0_15px_rgba(245,158,11,0.06)]"
+              : "bg-white/[0.02] border-white/10"
+          }`}>
+            <div className="flex items-center justify-between mb-1.5 px-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span>OPERATIVES &amp; SQUAD</span>
+              </span>
+              <span className="text-[9px] font-mono text-slate-500">4 MODULES</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
+                { id: "INVITES", label: "Invite Keys & VIP", icon: Key, badge: "INVITE ONLY", highlight: true },
+                { id: "SHOOTERS", label: "Shooter Profiles", icon: Users, badge: `${shooterProfiles.length}` },
+                { id: "REGISTRATIONS", label: "Registrations", icon: Trophy, badge: `${registrations.length}` },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeAdminTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveAdminTab(tab.id as any)}
+                    className={`px-2.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-between gap-1.5 transition-all text-left ${
+                      isActive
+                        ? "bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-tactical-glow"
+                        : tab.highlight
+                        ? "bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 border border-amber-500/30"
+                        : "bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/10 border border-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate text-[11px]">{tab.label}</span>
+                    </div>
+                    {tab.badge && (
+                      <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-black shrink-0 ${
+                        isActive ? "bg-black/25 text-black" : "bg-white/15 text-slate-300"
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sector 2: MATCHES & VAULT */}
+          <div className={`p-2.5 rounded-2xl border transition-all ${
+            ["EVENTS", "DOCUMENTS", "LEADS"].includes(activeAdminTab)
+              ? "bg-blue-500/[0.04] border-blue-500/35 shadow-[0_0_15px_rgba(59,130,246,0.06)]"
+              : "bg-white/[0.02] border-white/10"
+          }`}>
+            <div className="flex items-center justify-between mb-1.5 px-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span>MATCHES &amp; VAULT</span>
+              </span>
+              <span className="text-[9px] font-mono text-slate-500">3 MODULES</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { id: "EVENTS", label: "Match Schedule", icon: Calendar, badge: `${matches.length}` },
+                { id: "DOCUMENTS", label: "Competition Vault", icon: FileText, badge: `${competitionDocs.length}` },
+                { 
+                  id: "LEADS", 
+                  label: "Leads & Inquiries", 
+                  icon: Mail, 
+                  badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
+                  isAlert: leads.filter((l) => l.status === "NEW").length > 0,
+                  colSpan2: true
+                },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeAdminTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveAdminTab(tab.id as any)}
+                    className={`px-2.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-between gap-1.5 transition-all text-left ${
+                      tab.colSpan2 ? "col-span-2" : ""
+                    } ${
+                      isActive
+                        ? tab.isAlert
+                          ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-extrabold"
+                          : "bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-tactical-glow"
+                        : tab.isAlert
+                        ? "text-red-400 bg-red-950/50 hover:bg-red-900/60 border border-red-500/40"
+                        : "bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/10 border border-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${tab.isAlert ? "text-red-300 animate-pulse" : ""}`} />
+                      <span className="truncate text-[11px]">{tab.label}</span>
+                    </div>
+                    {tab.badge && (
+                      <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-black shrink-0 ${
+                        isActive
+                          ? "bg-black/25 text-black"
+                          : tab.isAlert
+                          ? "bg-red-600 text-white animate-pulse"
+                          : "bg-white/15 text-slate-300"
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sector 3: COMMS & TELEMETRY */}
+          <div className={`p-2.5 rounded-2xl border transition-all ${
+            ["CHAT", "AI_MODERATION", "CLICKSTREAM", "PAGES_AND_CLICKS"].includes(activeAdminTab)
+              ? "bg-emerald-500/[0.04] border-emerald-500/35 shadow-[0_0_15px_rgba(16,185,129,0.06)]"
+              : "bg-white/[0.02] border-white/10"
+          }`}>
+            <div className="flex items-center justify-between mb-1.5 px-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>COMMS &amp; SECURITY</span>
+              </span>
+              <span className="text-[9px] font-mono text-slate-500">4 MODULES</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { id: "CHAT", label: "Chat Comms", icon: MessageSquare },
+                { 
+                  id: "AI_MODERATION", 
+                  label: "AI Defense", 
+                  icon: ShieldAlert, 
+                  badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
+                  isAlert: activeAbuseCount > 0
+                },
+                { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
+                { id: "PAGES_AND_CLICKS", label: "Pages & Clicks", icon: Flame },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeAdminTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveAdminTab(tab.id as any)}
+                    className={`px-2.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-between gap-1.5 transition-all text-left ${
+                      isActive
+                        ? tab.isAlert
+                          ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-extrabold"
+                          : "bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-tactical-glow"
+                        : tab.isAlert
+                        ? "text-red-400 bg-red-950/50 hover:bg-red-900/60 border border-red-500/40"
+                        : "bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/10 border border-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${tab.isAlert ? "text-red-300 animate-pulse" : ""}`} />
+                      <span className="truncate text-[11px]">{tab.label}</span>
+                    </div>
+                    {tab.badge && (
+                      <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-black shrink-0 ${
+                        isActive
+                          ? "bg-black/25 text-black"
+                          : tab.isAlert
+                          ? "bg-red-600 text-white animate-pulse"
+                          : "bg-white/15 text-slate-300"
+                      }`}>
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* MOBILE (< md): Clean Touch-Scrollable Row */}
+        <div className="md:hidden overflow-x-auto no-scrollbar">
+          <div className="flex gap-1.5 min-w-max pb-1">
             {[
-              { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
-              { id: "INVITES", label: "Invite Keys & VIP", icon: Key, badge: "INVITE ONLY" },
-              { id: "REGISTRATIONS", label: "Registered Shooters", icon: Trophy, badge: `${registrations.length}` },
+              { id: "MEMBERS", label: "Members", icon: UserCheck, badge: `${members.length}` },
+              { id: "INVITES", label: "Invites & VIP", icon: Key, badge: "INVITE ONLY" },
+              { id: "REGISTRATIONS", label: "Shooters", icon: Trophy, badge: `${registrations.length}` },
               { 
                 id: "LEADS", 
-                label: "Leads & Inquiries", 
+                label: "Leads", 
                 icon: Mail, 
                 badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
                 isAlert: leads.filter((l) => l.status === "NEW").length > 0
               },
-              { id: "SHOOTERS", label: "Shooter Profiles", icon: Users, badge: `${shooterProfiles.length}` },
-              { id: "DOCUMENTS", label: "Competition Vault", icon: FileText, badge: `${competitionDocs.length}` },
-              { id: "CHAT", label: "Chat Moderation", icon: MessageSquare },
-              { id: "EVENTS", label: "Match Schedule", icon: Calendar },
-              { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
-              { id: "PAGES_AND_CLICKS", label: "Pages & Clicks", icon: Flame },
+              { id: "SHOOTERS", label: "Profiles", icon: Users, badge: `${shooterProfiles.length}` },
+              { id: "DOCUMENTS", label: "Vault", icon: FileText, badge: `${competitionDocs.length}` },
+              { id: "CHAT", label: "Chat", icon: MessageSquare },
+              { id: "EVENTS", label: "Matches", icon: Calendar },
+              { id: "CLICKSTREAM", label: "Telemetry", icon: MousePointerClick, badge: `${events.length}` },
+              { id: "PAGES_AND_CLICKS", label: "Pages", icon: Flame },
               { 
                 id: "AI_MODERATION", 
-                label: "AI Abuse Defense", 
+                label: "AI Defense", 
                 icon: ShieldAlert, 
                 badge: activeAbuseCount > 0 ? `${activeAbuseCount} ACTIVE` : undefined,
                 isAlert: activeAbuseCount > 0
@@ -1312,7 +1495,7 @@ export default function AdminDashboardPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveAdminTab(tab.id as any)}
-                  className={`whitespace-nowrap px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+                  className={`whitespace-nowrap px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
                     isActive
                       ? tab.isAlert 
                         ? "bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)] font-bold" 
