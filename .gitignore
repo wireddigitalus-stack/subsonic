@@ -36,4 +36,5 @@ next-env.d.ts
 # telemetry runtime data
 data/*.jsonl
 !data/society-members.jsonl
+!data/invites.jsonl
 

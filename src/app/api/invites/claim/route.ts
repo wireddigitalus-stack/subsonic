@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, saveAllInvitesToStorage } from "@/lib/invites";
+import { getInvitesFromStorage, saveAllInvitesToStorage, ensureInviteExists } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +26,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const invites = getInvitesFromStorage();
-    const index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
+    let invites = getInvitesFromStorage();
+    let index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
+
+    if (index === -1) {
+      const created = ensureInviteExists(rawCode);
+      if (created) {
+        invites = getInvitesFromStorage();
+        index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
+      }
+    }
 
     if (index === -1) {
       return NextResponse.json(
