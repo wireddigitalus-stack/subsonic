@@ -29,7 +29,8 @@ import {
   Mail,
   Lock,
   Unlock,
-  LayoutGrid
+  LayoutGrid,
+  FileText
 } from "lucide-react";
 import { useDirectorMode } from "@/components/providers/DirectorModeProvider";
 
@@ -373,19 +374,37 @@ export function Navbar() {
                   </Link>
 
                   <Link
-                    href="/bristol-pro"
+                    href="/documents"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                      <Mountain className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+                      <FileText className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-blue-400 flex items-center gap-1.5">
-                        <span>Bristol Mountain Pro</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-mono">18 Stages</span>
+                      <div className="text-xs font-bold text-white group-hover:text-cyan-400 flex items-center gap-1.5">
+                        <span>Competition Documents</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">COF & Waivers</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Detailed stage briefs & high-angle COF
+                        Stage packets, rules, safety waivers & intel
+                      </p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/shooters/intake"
+                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group border-t border-white/5"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-amber-400 group-hover:text-amber-300 flex items-center gap-1.5">
+                        <span>Shooter Questionnaire</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Auto-Card</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
+                        2-min profile & rig auto-generator
                       </p>
                     </div>
                   </Link>
@@ -697,12 +716,28 @@ export function Navbar() {
                     <span>Matches ($7,500 Purse Invitational)</span>
                   </Link>
                   <Link
+                    href="/documents"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
+                  >
+                    <FileText className="w-4 h-4 text-cyan-400" />
+                    <span>Competition Documents (COF & Waivers)</span>
+                  </Link>
+                  <Link
                     href="/shooters"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
                   >
                     <Users className="w-4 h-4 text-purple-400" />
                     <span>Shooter Profiles & Rifle Builds</span>
+                  </Link>
+                  <Link
+                    href="/shooters/intake"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-400 hover:bg-white/10"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <span>Shooter Intake (Auto-Card)</span>
                   </Link>
                 </div>
 

@@ -166,7 +166,15 @@ export default function MatchesPage() {
             </div>
 
             {/* Quick Action CTAs */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/documents"
+                className="px-4 py-2.5 rounded-xl ios-glass text-cyan-300 hover:text-white text-xs font-bold border border-cyan-500/30 flex items-center gap-2 hover:bg-white/10 transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+              >
+                <FileText className="w-4 h-4 text-cyan-400" />
+                <span>Competition Documents</span>
+              </Link>
+
               <button
                 onClick={() => setShowRulebookModal(true)}
                 className="px-4 py-2.5 rounded-xl ios-glass text-slate-200 hover:text-white text-xs font-bold border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all"

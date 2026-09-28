@@ -219,3 +219,50 @@ export interface ContactLead {
   status: "NEW" | "IN_REVIEW" | "CONTACTED" | "ARCHIVED";
 }
 
+export interface ShooterProfile {
+  id: string;
+  name: string;
+  callsign: string;
+  division: string;
+  ranking: string;
+  homeRange: string;
+  podiums: number;
+  featuredMatch?: string;
+  image: string; // Headshot / profile photo
+  actionPhoto?: string; // Secondary rifle rig / action photo
+  quote: string;
+  accolades: string[]; // e.g. ["TEAM USA 🇺🇸", "NATIONAL CHAMPION", "APPALACHIAN CUP 1ST"]
+  sponsors: string[]; // e.g. ["Modacam Custom Rifles", "Vudoo Gun Works", "Lapua"]
+  rifleSetup: {
+    action: string;
+    barrel: string;
+    trigger: string;
+    chassis: string;
+    optic: string;
+    mount: string;
+    tuner?: string;
+    ammoLot: string;
+  };
+  interview?: {
+    question: string;
+    answer: string;
+  }[];
+  createdAt: string;
+  status: "PUBLISHED" | "PENDING_REVIEW" | "ARCHIVED";
+}
+
+export interface CompetitionDocument {
+  id: string;
+  title: string;
+  category: "COF" | "RULES" | "SCHEDULE" | "RANGE_INTEL" | "WAIVER";
+  matchId?: string;
+  matchTitle?: string;
+  description: string;
+  fileName: string;
+  fileSize?: string;
+  fileUrl: string;
+  version: string;
+  updatedAt: string;
+  isMandatory?: boolean;
+}
+

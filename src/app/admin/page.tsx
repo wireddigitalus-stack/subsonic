@@ -76,7 +76,9 @@ import {
   CommsAbuseAlert,
   SocietyMember,
   MatchRegistration,
-  ContactLead
+  ContactLead,
+  ShooterProfile,
+  CompetitionDocument
 } from "@/lib/types";
 import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
@@ -225,11 +227,38 @@ export default function AdminDashboardPage() {
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<
-    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION" | "CHAT"
+    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "SHOOTERS" | "DOCUMENTS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION" | "CHAT"
   >("MEMBERS");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
+
+  // Shooter Profiles & Competition Vault state
+  const [shooterProfiles, setShooterProfiles] = useState<ShooterProfile[]>([]);
+  const [competitionDocs, setCompetitionDocs] = useState<CompetitionDocument[]>([]);
+  const [shooterSearch, setShooterSearch] = useState("");
+  const [docSearch, setDocSearch] = useState("");
+  const [isAddDocModalOpen, setIsAddDocModalOpen] = useState(false);
+  const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
+  const [newDocForm, setNewDocForm] = useState<{
+    title: string;
+    category: "COF" | "RULES" | "SCHEDULE" | "RANGE_INTEL" | "WAIVER";
+    matchTitle: string;
+    description: string;
+    fileName: string;
+    fileUrl: string;
+    version: string;
+    isMandatory: boolean;
+  }>({
+    title: "",
+    category: "COF",
+    matchTitle: "The Subsonic Society Invitational 2026",
+    description: "",
+    fileName: "",
+    fileUrl: "",
+    version: "v1.0",
+    isMandatory: false,
+  });
 
   // Telemetry filter state (strictly page landings, items clicked, and members)
   const [telemetryTypeFilter, setTelemetryTypeFilter] = useState<"ALL" | "PAGE_LANDED" | "CLICK">("ALL");
@@ -410,6 +439,92 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.warn("Error fetching contact leads:", err);
+    }
+
+    // Fetch Shooter Profiles (Intake & Custom)
+    try {
+      const res = await fetch("/api/shooters");
+      if (res.ok) {
+        const data = await res.json();
+        setShooterProfiles(data.shooters || []);
+      }
+    } catch (err) {
+      console.warn("Error fetching shooter profiles:", err);
+    }
+
+    // Fetch Competition Documents Vault
+    try {
+      const res = await fetch("/api/documents");
+      if (res.ok) {
+        const data = await res.json();
+        setCompetitionDocs(data.documents || []);
+      }
+    } catch (err) {
+      console.warn("Error fetching competition documents:", err);
+    }
+  };
+
+  const handleDeleteShooter = async (id: string, name: string) => {
+    if (!confirm(`Delete profile for marksman "${name}"?`)) return;
+    try {
+      const res = await fetch(`/api/shooters?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.ok) {
+        setShooterProfiles((prev) => prev.filter((s) => s.id !== id));
+      }
+    } catch (err) {
+      alert("Error deleting shooter profile");
+    }
+  };
+
+  const handleCreateDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDocForm.title || !newDocForm.fileName) {
+      alert("Please provide at least a title and file name.");
+      return;
+    }
+    setIsSubmittingDoc(true);
+    try {
+      const res = await fetch("/api/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newDocForm),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.document) {
+          setCompetitionDocs((prev) => [data.document, ...prev]);
+        }
+        setIsAddDocModalOpen(false);
+        setNewDocForm({
+          title: "",
+          category: "COF",
+          matchTitle: "The Subsonic Society Invitational 2026",
+          description: "",
+          fileName: "",
+          fileUrl: "",
+          version: "v1.0",
+          isMandatory: false,
+        });
+      } else {
+        alert("Failed to create document.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving document.");
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id: string, title: string) => {
+    if (!confirm(`Permanently remove document "${title}" from the competition vault?`)) return;
+    try {
+      const res = await fetch(`/api/documents?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (res.ok) {
+        setCompetitionDocs((prev) => prev.filter((d) => d.id !== id));
+      }
+    } catch (err) {
+      alert("Error deleting document");
     }
   };
 
@@ -1166,6 +1281,8 @@ export default function AdminDashboardPage() {
                 badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
                 isAlert: leads.filter((l) => l.status === "NEW").length > 0
               },
+              { id: "SHOOTERS", label: "Shooter Profiles", icon: Users, badge: `${shooterProfiles.length}` },
+              { id: "DOCUMENTS", label: "Competition Vault", icon: FileText, badge: `${competitionDocs.length}` },
               { id: "CHAT", label: "Chat Moderation", icon: MessageSquare },
               { id: "EVENTS", label: "Match Schedule", icon: Calendar },
               { id: "CLICKSTREAM", label: "Live Telemetry", icon: MousePointerClick, badge: `${events.length}` },
@@ -2683,6 +2800,472 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: SHOOTER PROFILES (AUTO-INTAKE & ROSTER) */}
+      {activeAdminTab === "SHOOTERS" && (
+        <div className="space-y-6">
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-400" />
+                  <h3 className="text-xl font-black text-white">
+                    Automated Competitor Profiles &amp; Rig Dossiers ({shooterProfiles.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Profiles generated automatically from competitor intake questionnaires. Real rig specs, accolades, and sponsors.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/shooters/intake"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Launch Intake Form</span>
+                </Link>
+
+                <Link
+                  href="/shooters"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-2 transition-all"
+                >
+                  <ExternalLink className="w-4 h-4 text-purple-400" />
+                  <span>View Public Roster</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative pt-2">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={shooterSearch}
+                onChange={(e) => setShooterSearch(e.target.value)}
+                placeholder="Search by marksman name, callsign, division, sponsor, or rifle action..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+          </div>
+
+          {/* Shooters List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {shooterProfiles
+              .filter((s) => {
+                const q = shooterSearch.toLowerCase().trim();
+                return (
+                  !q ||
+                  s.name.toLowerCase().includes(q) ||
+                  s.callsign.toLowerCase().includes(q) ||
+                  s.division.toLowerCase().includes(q) ||
+                  (s.sponsors && s.sponsors.some((sp) => sp.toLowerCase().includes(q))) ||
+                  (s.rifleSetup?.action && s.rifleSetup.action.toLowerCase().includes(q))
+                );
+              })
+              .map((shooter) => (
+                <div
+                  key={shooter.id}
+                  className="ios-glass rounded-2xl p-5 border border-white/10 hover:border-white/20 transition-all space-y-4 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-amber-400/60 bg-black relative shrink-0">
+                          {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") ? (
+                            <img src={shooter.image} alt={shooter.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-amber-400 font-bold text-xs">
+                              {shooter.callsign?.slice(0, 2) || "SS"}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[10px] font-mono font-bold">
+                              {shooter.callsign}
+                            </span>
+                            <span className="text-[10px] font-mono text-slate-400 truncate">
+                              {shooter.division}
+                            </span>
+                          </div>
+                          <h4 className="text-base font-black text-white">{shooter.name}</h4>
+                          <p className="text-[11px] text-emerald-400">{shooter.ranking}</p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-[10px] font-mono text-slate-400 block">PODIUMS</span>
+                        <span className="text-base font-mono font-black text-amber-400">{shooter.podiums}</span>
+                      </div>
+                    </div>
+
+                    {/* Accolades */}
+                    {shooter.accolades && shooter.accolades.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {shooter.accolades.map((acc, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1">
+                            <Trophy className="w-2.5 h-2.5 text-amber-400" />
+                            <span>{acc}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Sponsors */}
+                    {shooter.sponsors && shooter.sponsors.length > 0 && (
+                      <div className="text-[10px] font-mono text-slate-400">
+                        <span className="text-slate-500">Sponsors: </span>
+                        {shooter.sponsors.join(" • ")}
+                      </div>
+                    )}
+
+                    {/* Rifle Specs summary */}
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5 grid grid-cols-2 gap-2 text-[10px] font-mono">
+                      <div>
+                        <span className="text-slate-500 block">ACTION:</span>
+                        <span className="text-slate-200 truncate block">{shooter.rifleSetup?.action || "Custom"}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">OPTIC:</span>
+                        <span className="text-slate-200 truncate block">{shooter.rifleSetup?.optic || "Competition Glass"}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">BARREL:</span>
+                        <span className="text-slate-200 truncate block">{shooter.rifleSetup?.barrel || "Match"}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block">AMMO LOT:</span>
+                        <span className="text-amber-400 truncate block">{shooter.rifleSetup?.ammoLot || "Standard"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between pt-3 border-t border-white/10 gap-2">
+                    <Link
+                      href={`/shooters?id=${shooter.id}`}
+                      target="_blank"
+                      className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+                      <span>View Live Card</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteShooter(shooter.id, shooter.name)}
+                      className="p-1.5 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-500/20 transition-colors"
+                      title="Delete Shooter Profile"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: COMPETITION VAULT & DOCUMENTS */}
+      {activeAdminTab === "DOCUMENTS" && (
+        <div className="space-y-6">
+          <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-xl font-black text-white">
+                    Competition Documents Vault ({competitionDocs.length})
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Manage Course of Fire (COF) packets, match bylaws, cold range liability waivers, and elevation dossiers.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddDocModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>+ Register New Document</span>
+                </button>
+
+                <Link
+                  href="/documents"
+                  target="_blank"
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-2 transition-all"
+                >
+                  <ExternalLink className="w-4 h-4 text-cyan-400" />
+                  <span>Open Public Hub</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative pt-2">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={docSearch}
+                onChange={(e) => setDocSearch(e.target.value)}
+                placeholder="Search documents by title, category, match name, or file name..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+          </div>
+
+          {/* Documents Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {competitionDocs
+              .filter((d) => {
+                const q = docSearch.toLowerCase().trim();
+                return (
+                  !q ||
+                  d.title.toLowerCase().includes(q) ||
+                  d.category.toLowerCase().includes(q) ||
+                  d.description.toLowerCase().includes(q) ||
+                  (d.matchTitle && d.matchTitle.toLowerCase().includes(q)) ||
+                  d.fileName.toLowerCase().includes(q)
+                );
+              })
+              .map((doc) => (
+                <div
+                  key={doc.id}
+                  className="ios-glass rounded-2xl p-5 border border-white/10 hover:border-white/20 transition-all space-y-4 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
+                          {doc.category}
+                        </span>
+                        {doc.isMandatory && (
+                          <span className="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-mono font-bold flex items-center gap-1">
+                            <ShieldAlert className="w-3 h-3" />
+                            <span>MANDATORY</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                        {doc.version}
+                      </span>
+                    </div>
+
+                    <div>
+                      {doc.matchTitle && (
+                        <div className="text-[10px] font-mono text-amber-400 font-semibold mb-0.5 truncate">
+                          {doc.matchTitle}
+                        </div>
+                      )}
+                      <h4 className="text-base font-black text-white">{doc.title}</h4>
+                      <p className="text-xs text-slate-300 mt-1 leading-relaxed">{doc.description}</p>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-2 border-t border-white/5">
+                      <span className="truncate">{doc.fileName}</span>
+                      <span className="shrink-0">{doc.fileSize || "PDF"}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-white/10 gap-2">
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-1.5 shadow-tactical-glow transition-all"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download File</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDocument(doc.id, doc.title)}
+                      className="p-2 rounded-xl bg-red-600/10 hover:bg-red-600/25 border border-red-500/30 text-red-400 transition-colors"
+                      title="Delete Document"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* ADD NEW COMPETITION DOCUMENT MODAL                                  */}
+      {/* ==================================================================== */}
+      {isAddDocModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto ios-glass-card rounded-3xl p-5 sm:p-7 border border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.3)] relative space-y-5 my-auto">
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-cyan-400" />
+                  <h3 className="text-base sm:text-lg font-black text-white">
+                    REGISTER COMPETITION DOCUMENT
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Add Course of Fire packets, rules, cold-range waivers, or elevation maps to the vault.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAddDocModalOpen(false)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateDocument} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                  Document Title *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 2026 Official Course of Fire Stage Briefs"
+                  value={newDocForm.title}
+                  onChange={(e) => setNewDocForm((p) => ({ ...p, title: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                    Category *
+                  </label>
+                  <select
+                    value={newDocForm.category}
+                    onChange={(e) => setNewDocForm((p) => ({ ...p, category: e.target.value as any }))}
+                    className="w-full px-3 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                  >
+                    <option value="COF">Course of Fire (COF)</option>
+                    <option value="RULES">Match Rules &amp; Bylaws</option>
+                    <option value="WAIVER">Cold Range Waiver</option>
+                    <option value="SCHEDULE">Squadding &amp; Flight</option>
+                    <option value="RANGE_INTEL">Elevation &amp; Topo Intel</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                    Version
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="v1.0"
+                    value={newDocForm.version}
+                    onChange={(e) => setNewDocForm((p) => ({ ...p, version: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                  Associated Match
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. The Subsonic Society Invitational 2026"
+                  value={newDocForm.matchTitle}
+                  onChange={(e) => setNewDocForm((p) => ({ ...p, matchTitle: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                    File Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="official-cof-2026.pdf"
+                    value={newDocForm.fileName}
+                    onChange={(e) => setNewDocForm((p) => ({ ...p, fileName: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                    File URL / Path *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="/documents/official-cof-2026.pdf"
+                    value={newDocForm.fileUrl}
+                    onChange={(e) => setNewDocForm((p) => ({ ...p, fileUrl: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-mono text-slate-300 uppercase font-bold">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Brief synopsis of stage counts, safety requirements, or elevation notes..."
+                  value={newDocForm.description}
+                  onChange={(e) => setNewDocForm((p) => ({ ...p, description: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/20 border border-red-500/25">
+                <input
+                  type="checkbox"
+                  id="mandatory-doc"
+                  checked={newDocForm.isMandatory}
+                  onChange={(e) => setNewDocForm((p) => ({ ...p, isMandatory: e.target.checked }))}
+                  className="w-4 h-4 rounded text-red-500 focus:ring-red-400 border-white/20 bg-black/50"
+                />
+                <label htmlFor="mandatory-doc" className="text-xs text-red-300 font-mono font-bold cursor-pointer">
+                  Mandatory Document (Competitors must review/sign prior to shooting)
+                </label>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsAddDocModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingDoc}
+                  className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all disabled:opacity-50"
+                >
+                  {isSubmittingDoc ? "Registering..." : "Save to Vault"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
