@@ -6,22 +6,18 @@ import Link from "next/link";
 import { 
   Radio, 
   Lock, 
-  Unlock, 
   Send, 
   Volume2, 
   VolumeX, 
   Sparkles, 
   Target, 
-  ShieldCheck, 
   ChevronRight, 
   Users, 
-  Crosshair, 
-  Compass, 
-  Wind,
-  CheckCircle2,
-  FileText,
-  Flame,
-  Award
+  CheckCircle2, 
+  FileText, 
+  Flame, 
+  Award,
+  RefreshCw
 } from "lucide-react";
 import { playRealCommsChirp, playBotTelemetryChirp } from "@/lib/chat-audio";
 
@@ -45,10 +41,9 @@ interface TerminalMessage {
     velocity: string;
     hitProb: string;
   };
-  isSystemInterceptor?: boolean;
 }
 
-const INITIAL_MESSAGES_STREAM: TerminalMessage[] = [
+const STREAM_ITEMS: TerminalMessage[] = [
   {
     id: "msg-1",
     sender: {
@@ -115,42 +110,54 @@ export function HeroChatTerminal() {
   const [messages, setMessages] = useState<TerminalMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingName, setTypingName] = useState<string | null>(null);
+  const [showInterceptor, setShowInterceptor] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [customReplyCount, setCustomReplyCount] = useState(0);
+  const [replayCount, setReplayCount] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll chat terminal to bottom on message update
+  // Smooth scroll to keep newest message in view
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+      if (messages.length <= 1 && !showInterceptor) {
+        scrollRef.current.scrollTop = 0;
+      } else {
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, showInterceptor]);
 
-  // Sequenced message delivery for cinematic "wow" effect
+  // Sequenced message delivery
   useEffect(() => {
     let timers: NodeJS.Timeout[] = [];
     setMessages([]);
+    setShowInterceptor(false);
+    setIsTyping(false);
+
+    // Initial position at top
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
 
     const sequence = [
-      { delay: 400, typingDelay: 600, msg: INITIAL_MESSAGES_STREAM[0], typingWho: "Wyatt 'Ghost' Sterling" },
-      { delay: 2400, typingDelay: 700, msg: INITIAL_MESSAGES_STREAM[1], typingWho: "Kendra 'Coldbore' Cross" },
-      { delay: 4800, typingDelay: 800, msg: INITIAL_MESSAGES_STREAM[2], typingWho: "Subsonic Sentinel AI" },
-      { delay: 7400, typingDelay: 600, msg: INITIAL_MESSAGES_STREAM[3], typingWho: "Match Director Allen" },
+      { delay: 300, typingDelay: 800, msg: STREAM_ITEMS[0], typingWho: "Wyatt 'Ghost' Sterling" },
+      { delay: 2200, typingDelay: 800, msg: STREAM_ITEMS[1], typingWho: "Kendra 'Coldbore' Cross" },
+      { delay: 4500, typingDelay: 900, msg: STREAM_ITEMS[2], typingWho: "Subsonic Sentinel AI" },
+      { delay: 7200, typingDelay: 800, msg: STREAM_ITEMS[3], typingWho: "Match Director Allen" },
     ];
 
     sequence.forEach(({ delay, typingDelay, msg, typingWho }) => {
-      // Trigger typing indicator
-      const typingTimer = setTimeout(() => {
+      // Show typing indicator
+      const t1 = setTimeout(() => {
         setIsTyping(true);
         setTypingName(typingWho);
       }, delay);
-      timers.push(typingTimer);
+      timers.push(t1);
 
-      // Deliver message
-      const msgTimer = setTimeout(() => {
+      // Post message
+      const t2 = setTimeout(() => {
         setIsTyping(false);
         setTypingName(null);
         setMessages((prev) => [...prev, msg]);
@@ -162,15 +169,25 @@ export function HeroChatTerminal() {
           }
         }
       }, delay + typingDelay);
-      timers.push(msgTimer);
+      timers.push(t2);
     });
+
+    // Reveal interceptor invitation AFTER all messages have animated in
+    const tFinal = setTimeout(() => {
+      setShowInterceptor(true);
+      if (soundEnabled) playBotTelemetryChirp();
+    }, 9400);
+    timers.push(tFinal);
 
     return () => {
       timers.forEach(clearTimeout);
     };
-  }, [soundEnabled]);
+  }, [soundEnabled, replayCount]);
 
-  // Quick prompt interaction
+  const handleRestart = () => {
+    setReplayCount((c) => c + 1);
+  };
+
   const handleQuickPrompt = (actionType: "DOPE" | "SQUAD" | "DOCS") => {
     if (actionType === "DOCS") {
       window.location.href = "/documents";
@@ -205,7 +222,7 @@ export function HeroChatTerminal() {
           },
         };
         setMessages((prev) => [...prev, newMsg]);
-        setCustomReplyCount((c) => c + 1);
+        setShowInterceptor(true);
         if (soundEnabled) playBotTelemetryChirp();
       }, 700);
     } else if (actionType === "SQUAD") {
@@ -228,14 +245,14 @@ export function HeroChatTerminal() {
           timestamp: "Just now",
         };
         setMessages((prev) => [...prev, newMsg]);
-        setCustomReplyCount((c) => c + 1);
+        setShowInterceptor(true);
         if (soundEnabled) playRealCommsChirp();
       }, 700);
     }
   };
 
   return (
-    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/80 via-black/90 to-[#07090E] transition-all">
+    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/90 via-[#07090E]/95 to-black transition-all">
       {/* 1. HUD Telemetry Bar (Tactical Satellite & Radio Banner) */}
       <div className="px-4 sm:px-6 py-3 border-b border-white/10 bg-black/60 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
@@ -253,10 +270,14 @@ export function HeroChatTerminal() {
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono">
-          <div className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[10px]">
-            <Lock className="w-3 h-3 text-emerald-400" />
-            <span>AES-256</span>
-          </div>
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-colors"
+            title="Replay Transmission Sequence"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
 
           <button
             type="button"
@@ -269,28 +290,38 @@ export function HeroChatTerminal() {
             title="Toggle Tactical Radio Audio"
           >
             {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span>{soundEnabled ? "AUDIO ON" : "AUDIO MUTED"}</span>
+            <span className="hidden sm:inline">{soundEnabled ? "AUDIO ON" : "AUDIO MUTED"}</span>
           </button>
 
           <Link
             href="/chat"
             className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[10px] flex items-center gap-1 transition-all active:scale-95 shadow-tactical-glow"
           >
-            <span>LIVE ROOM</span>
+            <span>ENTER ROOM</span>
             <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
 
-      {/* 2. Messages Display Viewport */}
+      {/* 2. Messages Display Viewport — starts cleanly from top */}
       <div 
         ref={scrollRef}
-        className="p-4 sm:p-6 space-y-3.5 max-h-[380px] sm:max-h-[420px] overflow-y-auto no-scrollbar overscroll-contain"
+        className="p-4 sm:p-6 space-y-3.5 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
       >
-        {messages.map((msg) => (
+        {messages.length === 0 && !isTyping && (
+          <div className="py-12 text-center space-y-2">
+            <Radio className="w-6 h-6 text-amber-400 animate-pulse mx-auto" />
+            <p className="text-xs font-mono text-slate-400">Locking onto Holston Ridge satellite transponder...</p>
+          </div>
+        )}
+
+        {messages.map((msg, index) => (
           <div 
             key={msg.id} 
-            className="animate-fadeIn space-y-1.5 max-w-2xl"
+            className="space-y-1.5 max-w-2xl transition-all duration-300"
+            style={{
+              animation: "fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            }}
           >
             {/* Sender Metadata Bar */}
             <div className="flex items-center gap-2 text-xs">
@@ -316,15 +347,15 @@ export function HeroChatTerminal() {
               </span>
             </div>
 
-            {/* Message Body Bubble */}
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed shadow-sm">
+            {/* Message Body Bubble with subtle neon edge glow */}
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed shadow-sm hover:border-white/20 transition-all">
               <p>{msg.text}</p>
 
               {/* Dope Card Rich Visualizer */}
               {msg.dopeCard && (
-                <div className="mt-2.5 p-3 rounded-xl bg-cyan-950/20 border border-cyan-500/30 text-cyan-200 font-mono space-y-2">
+                <div className="mt-2.5 p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/40 text-cyan-200 font-mono space-y-2 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
                   <div className="flex items-center justify-between text-[11px] pb-1 border-b border-cyan-500/20">
-                    <span className="font-bold text-white flex items-center gap-1">
+                    <span className="font-bold text-white flex items-center gap-1.5">
                       <Target className="w-3.5 h-3.5 text-cyan-400" />
                       <span>{msg.dopeCard.stage}</span>
                     </span>
@@ -332,19 +363,19 @@ export function HeroChatTerminal() {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                    <div className="bg-black/40 p-1.5 rounded-lg border border-white/5">
+                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
                       <span className="text-slate-400 block text-[9px]">ELEVATION</span>
                       <span className="text-white font-bold">{msg.dopeCard.elev}</span>
                     </div>
-                    <div className="bg-black/40 p-1.5 rounded-lg border border-white/5">
+                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
                       <span className="text-slate-400 block text-[9px]">WIND HOLD</span>
                       <span className="text-amber-400 font-bold">{msg.dopeCard.wind}</span>
                     </div>
-                    <div className="bg-black/40 p-1.5 rounded-lg border border-white/5">
+                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
                       <span className="text-slate-400 block text-[9px]">MUZZLE VEL</span>
                       <span className="text-white font-bold">{msg.dopeCard.velocity}</span>
                     </div>
-                    <div className="bg-black/40 p-1.5 rounded-lg border border-white/5">
+                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
                       <span className="text-slate-400 block text-[9px]">CONFIDENCE</span>
                       <span className="text-emerald-400 font-bold">{msg.dopeCard.hitProb}</span>
                     </div>
@@ -355,10 +386,10 @@ export function HeroChatTerminal() {
           </div>
         ))}
 
-        {/* Dynamic Typing Indicator */}
+        {/* Dynamic In-Line Typing Indicator right below latest message */}
         {isTyping && (
-          <div className="flex items-center gap-2 p-2 text-xs font-mono text-amber-400 animate-fadeIn">
-            <span className="flex gap-1">
+          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs font-mono text-amber-400 max-w-sm animate-pulse">
+            <span className="flex gap-1 items-center">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -367,52 +398,59 @@ export function HeroChatTerminal() {
           </div>
         )}
 
-        {/* 3. The Conversion Trigger: Guest Monitor Mode Interceptor */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-black/80 to-emerald-500/15 border-2 border-amber-400/70 shadow-glow space-y-3.5 my-2 animate-fadeIn">
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 fill-black" />
-                  GUEST MONITOR MODE ACTIVE
-                </span>
-                <span className="text-[10px] font-mono text-emerald-400 font-semibold">
-                  COMMS LINK OPEN
-                </span>
+        {/* 3. The Conversion Trigger: Appears seamlessly AFTER messages have arrived */}
+        {showInterceptor && (
+          <div 
+            className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-black/80 to-emerald-500/15 border-2 border-amber-400/70 shadow-glow space-y-3.5 my-2 transition-all"
+            style={{
+              animation: "fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+            }}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 fill-black" />
+                    GUEST MONITOR MODE ACTIVE
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400 font-semibold">
+                    COMMS LINK OPEN
+                  </span>
+                </div>
+                <h4 className="text-sm sm:text-base font-black text-white leading-tight">
+                  CLAIM YOUR CALLSIGN &amp; JOIN THE CONVERSATION
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
+                  You are monitoring squad radio in read-only mode. Claim your official marksman callsign, access private squad DOPE drops, and auto-generate your competitor profile card.
+                </p>
               </div>
-              <h4 className="text-sm sm:text-base font-black text-white leading-tight">
-                CLAIM YOUR CALLSIGN &amp; JOIN THE CONVERSATION
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
-                You are monitoring squad radio in read-only mode. Claim your official marksman callsign, access private squad DOPE drops, and auto-generate your competitor profile card.
-              </p>
+
+              <div className="hidden sm:block shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-glow">
+                  <Award className="w-6 h-6" />
+                </div>
+              </div>
             </div>
 
-            <div className="hidden sm:block shrink-0">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-glow">
-                <Award className="w-6 h-6" />
-              </div>
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <Link
+                href="/join"
+                className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 fill-black" />
+                <span>Claim Callsign &amp; Join Society</span>
+              </Link>
+
+              <Link
+                href="/chat"
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+              >
+                <Users className="w-4 h-4" />
+                <span>Enter Competitor Comms</span>
+              </Link>
             </div>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
-            <Link
-              href="/join"
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-95"
-            >
-              <Sparkles className="w-4 h-4 fill-black" />
-              <span>Claim Callsign &amp; Join Society</span>
-            </Link>
-
-            <Link
-              href="/chat"
-              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
-            >
-              <Users className="w-4 h-4" />
-              <span>Enter Competitor Comms</span>
-            </Link>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* 4. Interactive Quick-Reply Prompt Chips */}
