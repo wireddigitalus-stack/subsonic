@@ -14,6 +14,7 @@ interface EvoVisionCanvasProps {
   onToggle3D?: (active: boolean) => void;
   onToggleAutoRotate?: (active: boolean) => void;
   onDismissSelection?: () => void;
+  recenterSignal?: number;
 }
 
 interface Particle {
@@ -78,6 +79,7 @@ export function EvoVisionCanvas({
   onToggle3D,
   onToggleAutoRotate,
   onDismissSelection,
+  recenterSignal = 0,
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -117,12 +119,32 @@ export function EvoVisionCanvas({
     pitch: 0,           // 0 rad (flat 2D) -> 0.95 rad (~54 deg tilted 3D plane)
     targetPitch: 0,
     yaw: 0,             // rotation around Z-axis
+    targetYaw: null as number | null,
+    isResettingYaw: false,
     yawSpeed: 0.0016,   // smooth majestic revolution
   });
 
   useEffect(() => {
     orbit3DRef.current.targetPitch = is3DMode ? 0.95 : 0;
   }, [is3DMode]);
+
+  // Handle Recenter signal: smooth camera reset and return to original canonical orientation (0 rad)
+  const prevRecenterRef = useRef(recenterSignal);
+  useEffect(() => {
+    if (recenterSignal && recenterSignal !== prevRecenterRef.current) {
+      prevRecenterRef.current = recenterSignal;
+      const o3d = orbit3DRef.current;
+      // Calculate nearest canonical multiple of 2*PI for shortest angular glide back to starting orientation
+      const nearestMultiple = Math.round(o3d.yaw / (Math.PI * 2));
+      o3d.targetYaw = nearestMultiple * (Math.PI * 2);
+      o3d.isResettingYaw = true;
+
+      // Recenter camera smoothly
+      cameraRef.current.targetX = 0;
+      cameraRef.current.targetY = 0;
+      cameraRef.current.targetZoom = 1.0;
+    }
+  }, [recenterSignal]);
 
   // Projected node coordinates map for 100% accurate hit-testing in 2D or 3D
   const projectedNodeMap = useRef<
@@ -294,7 +316,15 @@ export function EvoVisionCanvas({
       const o3d = orbit3DRef.current;
       o3d.pitch += (o3d.targetPitch - o3d.pitch) * 0.05;
 
-      if (autoRotateRef.current && (o3d.pitch > 0.02 || is3DModeRef.current)) {
+      if (o3d.isResettingYaw && o3d.targetYaw !== null) {
+        const diff = o3d.targetYaw - o3d.yaw;
+        o3d.yaw += diff * 0.08;
+        if (Math.abs(diff) < 0.001) {
+          o3d.yaw = 0;
+          o3d.targetYaw = null;
+          o3d.isResettingYaw = false;
+        }
+      } else if (autoRotateRef.current && (o3d.pitch > 0.02 || is3DModeRef.current)) {
         o3d.yaw += o3d.yawSpeed;
       }
 

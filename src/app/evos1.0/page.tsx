@@ -44,6 +44,7 @@ export default function EvosDashboardPage() {
   const [spacemanActive, setSpacemanActive] = useState<boolean>(true);
   const [is3DMode, setIs3DMode] = useState<boolean>(false);
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
+  const [recenterSignal, setRecenterSignal] = useState<number>(0);
 
   const handleSimulateTransmission = (node: EvoNode) => {
     setTransmissionSuccessNotice(`Dispatched live packet from [${node.callsign || node.label}] to Central Hub`);
@@ -186,11 +187,11 @@ export default function EvosDashboardPage() {
           </Link>
           <button
             onClick={() => {
-              const hub = EVO_NODES.find((n) => n.id === "hub-main");
-              setSelectedNode(hub || null);
+              setSelectedNode(null);
+              setRecenterSignal((prev) => prev + 1);
             }}
             className="px-2.5 py-1 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-bold hover:bg-cyan-900/60 transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)]"
-            title="Recenter Camera on Main Hub"
+            title="Recenter Camera & Return to Original Starting Orientation"
           >
             ⟲ RECENTER
           </button>
@@ -218,6 +219,7 @@ export default function EvosDashboardPage() {
           onToggle3D={setIs3DMode}
           onToggleAutoRotate={setAutoRotate}
           onDismissSelection={() => setSelectedNode(null)}
+          recenterSignal={recenterSignal}
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
