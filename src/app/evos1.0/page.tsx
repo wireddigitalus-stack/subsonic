@@ -38,10 +38,7 @@ import {
 } from "lucide-react";
 
 export default function EvosDashboardPage() {
-  const [selectedNode, setSelectedNode] = useState<EvoNode | null>(() => {
-    // Default selected node to Wyatt Sterling or Main Hub
-    return EVO_NODES.find((n) => n.id === "user-wyatt") || EVO_NODES[0];
-  });
+  const [selectedNode, setSelectedNode] = useState<EvoNode | null>(null);
   const [activeClusterFilter, setActiveClusterFilter] = useState<string | null>(null);
   const [transmissionSuccessNotice, setTransmissionSuccessNotice] = useState<string | null>(null);
 

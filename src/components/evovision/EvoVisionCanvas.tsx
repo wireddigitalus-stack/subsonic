@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { EvoNode, EvoLink, EVO_NODES, EVO_LINKS, EVO_CLUSTERS } from "@/lib/evovision-data";
 
 interface EvoVisionCanvasProps {
   selectedNode: EvoNode | null;
-  onSelectNode: (node: EvoNode | null) => void;
-  activeFilter?: string | null;
+  onSelectNode: (node: EvoNode) => void;
+  activeFilter: string | null;
 }
 
 interface Particle {
@@ -47,6 +47,14 @@ export function EvoVisionCanvas({
 
   const [hoveredNode, setHoveredNode] = useState<EvoNode | null>(null);
 
+  // Keep live refs for uninterrupted 60 FPS animation loop
+  const selectedNodeRef = useRef(selectedNode);
+  selectedNodeRef.current = selectedNode;
+  const activeFilterRef = useRef(activeFilter);
+  activeFilterRef.current = activeFilter;
+  const hoveredNodeRef = useRef(hoveredNode);
+  hoveredNodeRef.current = hoveredNode;
+
   // Background stars cache
   const starsRef = useRef<Star[]>([]);
   // Travelling energy packets
@@ -62,11 +70,11 @@ export function EvoVisionCanvas({
   // Initialize stars and link particles
   useEffect(() => {
     const stars: Star[] = [];
-    for (let i = 0; i < 160; i++) {
+    for (let i = 0; i < 200; i++) {
       stars.push({
-        x: (Math.random() - 0.5) * 2400,
-        y: (Math.random() - 0.5) * 1600,
-        radius: Math.random() * 1.5 + 0.5,
+        x: (Math.random() - 0.5) * 2800,
+        y: (Math.random() - 0.5) * 2000,
+        radius: Math.random() * 1.6 + 0.4,
         alpha: Math.random() * 0.7 + 0.2,
         pulseSpeed: Math.random() * 0.02 + 0.005,
       });
@@ -99,11 +107,15 @@ export function EvoVisionCanvas({
     if (selectedNode) {
       cameraRef.current.targetX = -selectedNode.x;
       cameraRef.current.targetY = -selectedNode.y;
-      cameraRef.current.targetZoom = selectedNode.cluster === "HUB" ? 1.05 : 1.35;
+      cameraRef.current.targetZoom = selectedNode.cluster === "HUB" ? 1.05 : 1.25;
+    } else {
+      cameraRef.current.targetX = 0;
+      cameraRef.current.targetY = 0;
+      cameraRef.current.targetZoom = 1.0;
     }
   }, [selectedNode]);
 
-  // Main render loop
+  // Main 60 FPS continuous render loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -113,22 +125,27 @@ export function EvoVisionCanvas({
     let animationFrameId: number;
     let time = 0;
 
-    const handleResize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
     const render = () => {
       time += 0.016;
+      const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
+
+      if (width === 0 || height === 0) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
+      // Auto-sync canvas resolution for retina displays
+      const displayW = Math.round(width * dpr);
+      const displayH = Math.round(height * dpr);
+      if (canvas.width !== displayW || canvas.height !== displayH) {
+        canvas.width = displayW;
+        canvas.height = displayH;
+      }
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Smooth camera interpolation
       const cam = cameraRef.current;
@@ -179,9 +196,26 @@ export function EvoVisionCanvas({
         const pAlpha = 0.2 + (Math.sin(angle * 2 + time * 3) + 1) * 0.25;
         ctx.fillStyle = `rgba(6, 182, 212, ${pAlpha})`;
         ctx.beginPath();
-        ctx.arc(px, py, 1.6, 0, Math.PI * 2);
+        ctx.arc(px, py, 1.8, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // Secondary wider planetary dust ring
+      const ring2Radius = 260;
+      for (let i = 0; i < 36; i++) {
+        const angle = (i / 36) * Math.PI * 2 - time * 0.12;
+        const rad = ring2Radius + Math.cos(angle * 2 + time) * 10;
+        const px = Math.cos(angle) * rad;
+        const py = Math.sin(angle) * rad;
+        ctx.fillStyle = `rgba(56, 189, 248, 0.25)`;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const activeFilterVal = activeFilterRef.current;
+      const selectedNodeVal = selectedNodeRef.current;
+      const hoveredNodeVal = hoveredNodeRef.current;
 
       // ─── 3. Organic Synaptic Links (Curved Beziers) ────────────────
       EVO_LINKS.forEach((link) => {
@@ -191,16 +225,16 @@ export function EvoVisionCanvas({
 
         // Is this link dimmed by filter?
         const isDimmed =
-          activeFilter &&
-          src.cluster !== activeFilter &&
-          tgt.cluster !== activeFilter;
+          activeFilterVal &&
+          src.cluster !== activeFilterVal &&
+          tgt.cluster !== activeFilterVal;
 
         // Control point for smooth organic curve
         const midX = (src.x + tgt.x) / 2;
         const midY = (src.y + tgt.y) / 2;
         const dx = tgt.x - src.x;
         const dy = tgt.y - src.y;
-        const dist = Math.sqrt(dx * dy + dy * dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
         const normX = -dy / (dist || 1);
         const normY = dx / (dist || 1);
         const curveFactor = (link.curvature || 0.08) * 80;
@@ -209,7 +243,7 @@ export function EvoVisionCanvas({
 
         // Outer glow path
         ctx.strokeStyle = link.color;
-        ctx.globalAlpha = isDimmed ? 0.08 : 0.25;
+        ctx.globalAlpha = isDimmed ? 0.06 : 0.25;
         ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.moveTo(src.x, src.y);
@@ -251,7 +285,7 @@ export function EvoVisionCanvas({
         const midY = (src.y + tgt.y) / 2;
         const dx = tgt.x - src.x;
         const dy = tgt.y - src.y;
-        const dist = Math.sqrt(dx * dy + dy * dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
         const normX = -dy / (dist || 1);
         const normY = dx / (dist || 1);
         const curveFactor = (link.curvature || 0.08) * 80;
@@ -274,9 +308,9 @@ export function EvoVisionCanvas({
 
       // ─── 5. Bioluminescent Nodes ───────────────────────────────────
       EVO_NODES.forEach((node) => {
-        const isDimmed = activeFilter && node.cluster !== activeFilter && node.id !== "hub-main";
-        const isSelected = selectedNode?.id === node.id;
-        const isHovered = hoveredNode?.id === node.id;
+        const isDimmed = activeFilterVal && node.cluster !== activeFilterVal && node.id !== "hub-main";
+        const isSelected = selectedNodeVal?.id === node.id;
+        const isHovered = hoveredNodeVal?.id === node.id;
 
         ctx.globalAlpha = isDimmed ? 0.2 : 1;
 
@@ -289,7 +323,7 @@ export function EvoVisionCanvas({
           node.y,
           node.radius * (isSelected ? 2.4 : isHovered ? 2.0 : 1.7)
         );
-        haloGrad.addColorStop(0, node.glowColor);
+        haloGrad.addColorStop(0, node.glowColor || "rgba(6, 182, 212, 0.4)");
         haloGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = haloGrad;
         ctx.beginPath();
@@ -424,9 +458,8 @@ export function EvoVisionCanvas({
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
     };
-  }, [activeFilter, selectedNode, hoveredNode]);
+  }, []); // Run continuously at 60 FPS without tearing down on state changes
 
   // Pointer drag to Pan
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -450,7 +483,7 @@ export function EvoVisionCanvas({
     const hit = EVO_NODES.find((node) => {
       const dx = worldX - node.x;
       const dy = worldY - node.y;
-      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 6;
+      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 8;
     });
 
     setHoveredNode(hit || null);
@@ -469,7 +502,6 @@ export function EvoVisionCanvas({
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    const wasPanning = cameraRef.current.isPanning;
     cameraRef.current.isPanning = false;
 
     // Check click hit
@@ -485,7 +517,7 @@ export function EvoVisionCanvas({
     const clicked = EVO_NODES.find((node) => {
       const dx = worldX - node.x;
       const dy = worldY - node.y;
-      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 6;
+      return Math.sqrt(dx * dx + dy * dy) <= node.radius + 8;
     });
 
     if (clicked) {
