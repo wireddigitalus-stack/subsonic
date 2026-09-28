@@ -7,6 +7,8 @@ interface EvoVisionCanvasProps {
   selectedNode: EvoNode | null;
   onSelectNode: (node: EvoNode) => void;
   activeFilter: string | null;
+  spacemanEnabled?: boolean;
+  onToggleSpaceman?: (enabled: boolean) => void;
 }
 
 interface Particle {
@@ -25,10 +27,47 @@ interface Star {
   pulseSpeed: number;
 }
 
+interface ShootingStar {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  angle: number;
+  alpha: number;
+  life: number;
+  maxLife: number;
+}
+
+interface SpacemanSparkle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  alpha: number;
+  size: number;
+}
+
+interface SpacemanState {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  angle: number;
+  rotSpeed: number;
+  scale: number;
+  targetScale: number;
+  opacity: number;
+  isVanishing: boolean;
+  active: boolean;
+  sparkles: SpacemanSparkle[];
+}
+
 export function EvoVisionCanvas({
   selectedNode,
   onSelectNode,
   activeFilter,
+  spacemanEnabled = true,
+  onToggleSpaceman,
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -46,6 +85,7 @@ export function EvoVisionCanvas({
   });
 
   const [hoveredNode, setHoveredNode] = useState<EvoNode | null>(null);
+  const [hoveredSpaceman, setHoveredSpaceman] = useState(false);
 
   // Keep live refs for uninterrupted 60 FPS animation loop
   const selectedNodeRef = useRef(selectedNode);
@@ -54,11 +94,76 @@ export function EvoVisionCanvas({
   activeFilterRef.current = activeFilter;
   const hoveredNodeRef = useRef(hoveredNode);
   hoveredNodeRef.current = hoveredNode;
+  const hoveredSpacemanRef = useRef(hoveredSpaceman);
+  hoveredSpacemanRef.current = hoveredSpaceman;
 
   // Background stars cache
   const starsRef = useRef<Star[]>([]);
   // Travelling energy packets
   const particlesRef = useRef<Particle[]>([]);
+  // Periodic shooting stars
+  const shootingStarsRef = useRef<ShootingStar[]>([]);
+  const nextShootingStarTimeRef = useRef<number>(2.5);
+
+  // Spaceman astronaut image & state
+  const spacemanImgRef = useRef<HTMLImageElement | null>(null);
+  const spacemanStateRef = useRef<SpacemanState>({
+    x: 180,
+    y: -90,
+    vx: 0.22,
+    vy: 0.07,
+    angle: -0.15,
+    rotSpeed: 0.0025,
+    scale: 0.28,
+    targetScale: 0.28,
+    opacity: 0.88,
+    isVanishing: false,
+    active: true,
+    sparkles: [],
+  });
+
+  // Sync external spaceman toggle
+  const prevSpacemanEnabledRef = useRef(spacemanEnabled);
+  useEffect(() => {
+    if (prevSpacemanEnabledRef.current !== spacemanEnabled) {
+      prevSpacemanEnabledRef.current = spacemanEnabled;
+      const sm = spacemanStateRef.current;
+      if (spacemanEnabled && !sm.active) {
+        // Respawn spaceman floating in distance
+        sm.active = true;
+        sm.isVanishing = false;
+        sm.x = -cameraRef.current.x - 280;
+        sm.y = -cameraRef.current.y + 120;
+        sm.scale = 0.05;
+        sm.targetScale = 0.28;
+        sm.opacity = 0.2;
+      } else if (!spacemanEnabled && sm.active && !sm.isVanishing) {
+        // Trigger vanish poof
+        sm.isVanishing = true;
+        for (let i = 0; i < 22; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const s = Math.random() * 2.5 + 1;
+          sm.sparkles.push({
+            x: sm.x,
+            y: sm.y,
+            vx: Math.cos(a) * s,
+            vy: Math.sin(a) * s,
+            alpha: 1,
+            size: Math.random() * 2.5 + 1,
+          });
+        }
+      }
+    }
+  }, [spacemanEnabled]);
+
+  // Load spaceman image
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/images/sm.png";
+    img.onload = () => {
+      spacemanImgRef.current = img;
+    };
+  }, []);
 
   // Node position map for quick lookup
   const nodeMap = useRef<Map<string, EvoNode>>(new Map());
@@ -70,10 +175,10 @@ export function EvoVisionCanvas({
   // Initialize stars and link particles
   useEffect(() => {
     const stars: Star[] = [];
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 220; i++) {
       stars.push({
-        x: (Math.random() - 0.5) * 2800,
-        y: (Math.random() - 0.5) * 2000,
+        x: (Math.random() - 0.5) * 3200,
+        y: (Math.random() - 0.5) * 2200,
         radius: Math.random() * 1.6 + 0.4,
         alpha: Math.random() * 0.7 + 0.2,
         pulseSpeed: Math.random() * 0.02 + 0.005,
@@ -185,6 +290,140 @@ export function EvoVisionCanvas({
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fill();
       });
+
+      // ─── 1B. Periodic Shooting Stars ──────────────────────────────
+      if (time >= nextShootingStarTimeRef.current) {
+        // Spawn a new shooting star across the cosmic horizon
+        const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.45;
+        shootingStarsRef.current.push({
+          x: (Math.random() - 0.5) * 2200 - 450,
+          y: -950 + (Math.random() - 0.5) * 350,
+          length: 140 + Math.random() * 90,
+          speed: 20 + Math.random() * 12,
+          angle,
+          alpha: 0,
+          life: 0,
+          maxLife: 60 + Math.random() * 25,
+        });
+        // Schedule next shooting star in 8 to 16 seconds
+        nextShootingStarTimeRef.current = time + 8 + Math.random() * 8;
+      }
+
+      // Update and render shooting stars
+      for (let i = shootingStarsRef.current.length - 1; i >= 0; i--) {
+        const ss = shootingStarsRef.current[i];
+        ss.life++;
+        ss.x += Math.cos(ss.angle) * ss.speed;
+        ss.y += Math.sin(ss.angle) * ss.speed;
+
+        // Smooth parabolic fade-in and fade-out
+        const progress = ss.life / ss.maxLife;
+        ss.alpha = Math.sin(progress * Math.PI);
+
+        if (ss.life >= ss.maxLife) {
+          shootingStarsRef.current.splice(i, 1);
+          continue;
+        }
+
+        const tailX = ss.x - Math.cos(ss.angle) * ss.length;
+        const tailY = ss.y - Math.sin(ss.angle) * ss.length;
+
+        // Ion streak trail
+        const grad = ctx.createLinearGradient(ss.x, ss.y, tailX, tailY);
+        grad.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha * 0.95})`);
+        grad.addColorStop(0.2, `rgba(56, 189, 248, ${ss.alpha * 0.8})`);
+        grad.addColorStop(1, "rgba(56, 189, 248, 0)");
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(ss.x, ss.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+
+        // High-energy head spark
+        ctx.fillStyle = `rgba(255, 255, 255, ${ss.alpha})`;
+        ctx.shadowColor = "#38BDF8";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(ss.x, ss.y, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // ─── 1C. Floating Little Space Man (Astronaut sm.png) ──────────
+      const sm = spacemanStateRef.current;
+      const smImg = spacemanImgRef.current;
+
+      if (sm.active && smImg) {
+        // Floating zero-gravity physics
+        sm.x += sm.vx + Math.sin(time * 0.4) * 0.12;
+        sm.y += sm.vy + Math.cos(time * 0.3) * 0.15;
+        sm.angle += sm.rotSpeed;
+
+        // Screen wrap
+        if (sm.x > 1400) sm.x = -1400;
+        if (sm.y > 1000) sm.y = -1000;
+        if (sm.x < -1400) sm.x = 1400;
+        if (sm.y < -1000) sm.y = 1000;
+
+        // Handle smooth spawn or vanishing poof
+        if (sm.isVanishing) {
+          sm.angle += 0.18;
+          sm.scale *= 0.85;
+          sm.opacity *= 0.85;
+          if (sm.scale < 0.01) {
+            sm.active = false;
+            sm.isVanishing = false;
+            if (onToggleSpaceman) onToggleSpaceman(false);
+          }
+        } else {
+          if (sm.scale < sm.targetScale) {
+            sm.scale += (sm.targetScale - sm.scale) * 0.08;
+          }
+          if (sm.opacity < 0.88) {
+            sm.opacity += (0.88 - sm.opacity) * 0.08;
+          }
+        }
+
+        // Draw astronaut
+        ctx.save();
+        ctx.translate(sm.x, sm.y);
+        ctx.rotate(sm.angle);
+        ctx.scale(sm.scale, sm.scale);
+        ctx.globalAlpha = sm.opacity;
+
+        // Soft cyan aura halo around spaceman
+        ctx.shadowColor = "#38BDF8";
+        ctx.shadowBlur = hoveredSpacemanRef.current ? 35 : 18;
+
+        const w = smImg.width;
+        const h = smImg.height;
+        ctx.drawImage(smImg, -w / 2, -h / 2);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
+      // Render vanish sparkles
+      if (sm.sparkles.length > 0) {
+        for (let i = sm.sparkles.length - 1; i >= 0; i--) {
+          const spk = sm.sparkles[i];
+          spk.x += spk.vx;
+          spk.y += spk.vy;
+          spk.alpha *= 0.92;
+          if (spk.alpha < 0.02) {
+            sm.sparkles.splice(i, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(56, 189, 248, ${spk.alpha})`;
+          ctx.shadowColor = "#38BDF8";
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(spk.x, spk.y, spk.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
 
       // ─── 2. Orbiting Stardust Rings Around Center Hub ──────────────
       const ringRadius = 140;
@@ -480,10 +719,17 @@ export function EvoVisionCanvas({
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Hit-testing against nodes
+    // Hit-testing against nodes and spaceman in world coordinates
     const cam = cameraRef.current;
     const worldX = (mouseX - rect.width / 2) / cam.zoom - cam.x;
     const worldY = (mouseY - rect.height / 2) / cam.zoom - cam.y;
+
+    // Check spaceman hit
+    const sm = spacemanStateRef.current;
+    const smDx = worldX - sm.x;
+    const smDy = worldY - sm.y;
+    const isSmHovered = sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50;
+    setHoveredSpaceman(isSmHovered);
 
     const hit = EVO_NODES.find((node) => {
       const dx = worldX - node.x;
@@ -492,7 +738,7 @@ export function EvoVisionCanvas({
     });
 
     setHoveredNode(hit || null);
-    canvas.style.cursor = hit ? "pointer" : cam.isPanning ? "grabbing" : "grab";
+    canvas.style.cursor = isSmHovered || hit ? "pointer" : cam.isPanning ? "grabbing" : "grab";
 
     if (cameraRef.current.isPanning) {
       const dx = e.clientX - cameraRef.current.startX;
@@ -509,7 +755,6 @@ export function EvoVisionCanvas({
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     cameraRef.current.isPanning = false;
 
-    // Check click hit
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -519,6 +764,28 @@ export function EvoVisionCanvas({
     const worldX = (mouseX - rect.width / 2) / cam.zoom - cam.x;
     const worldY = (mouseY - rect.height / 2) / cam.zoom - cam.y;
 
+    // Check Spaceman click -> Vanish in poof of cosmic sparkles!
+    const sm = spacemanStateRef.current;
+    const smDx = worldX - sm.x;
+    const smDy = worldY - sm.y;
+    if (sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50) {
+      sm.isVanishing = true;
+      for (let i = 0; i < 24; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const s = Math.random() * 3 + 1;
+        sm.sparkles.push({
+          x: sm.x,
+          y: sm.y,
+          vx: Math.cos(a) * s,
+          vy: Math.sin(a) * s,
+          alpha: 1,
+          size: Math.random() * 2.5 + 1.2,
+        });
+      }
+      return;
+    }
+
+    // Check Node click
     const clicked = EVO_NODES.find((node) => {
       const dx = worldX - node.x;
       const dy = worldY - node.y;

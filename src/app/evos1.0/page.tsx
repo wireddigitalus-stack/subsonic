@@ -41,6 +41,7 @@ export default function EvosDashboardPage() {
   const [selectedNode, setSelectedNode] = useState<EvoNode | null>(null);
   const [activeClusterFilter, setActiveClusterFilter] = useState<string | null>(null);
   const [transmissionSuccessNotice, setTransmissionSuccessNotice] = useState<string | null>(null);
+  const [spacemanActive, setSpacemanActive] = useState<boolean>(true);
 
   const handleSimulateTransmission = (node: EvoNode) => {
     setTransmissionSuccessNotice(`Dispatched live packet from [${node.callsign || node.label}] to Central Hub`);
@@ -164,6 +165,8 @@ export default function EvosDashboardPage() {
           selectedNode={selectedNode}
           onSelectNode={(node) => setSelectedNode(node)}
           activeFilter={activeClusterFilter}
+          spacemanEnabled={spacemanActive}
+          onToggleSpaceman={setSpacemanActive}
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
@@ -196,7 +199,26 @@ export default function EvosDashboardPage() {
 
         {/* Floating Quick Hint (Bottom Center) */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
-          Drag to pan • Scroll to zoom • Click any node to focus & inspect rich card
+          Drag to pan • Scroll to zoom • Click any node or spaceman
+        </div>
+
+        {/* Subtle Spaceman Toggle Button (Bottom Right) */}
+        <div className="absolute bottom-4 right-4 z-20">
+          <button
+            onClick={() => setSpacemanActive((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-mono font-bold transition-all shadow-lg backdrop-blur-md cursor-pointer ${
+              spacemanActive
+                ? "bg-cyan-950/70 hover:bg-cyan-900/90 border-cyan-500/40 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.25)]"
+                : "bg-black/70 hover:bg-white/10 border-white/10 text-slate-400"
+            }`}
+            title={spacemanActive ? "Astronaut is floating in space. Click to hide or recall." : "Astronaut is resting. Click to launch into orbit in distance."}
+          >
+            <span className="text-sm">👨‍🚀</span>
+            <span className="hidden sm:inline">SPACEMAN:</span>
+            <span className={spacemanActive ? "text-cyan-400 font-extrabold" : "text-slate-500"}>
+              {spacemanActive ? "ACTIVE" : "OFF"}
+            </span>
+          </button>
         </div>
 
         {/* ─── RICH NODE INSPECTOR CARD (Right Side) ──────────────────── */}
