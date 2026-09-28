@@ -361,11 +361,32 @@ export function EvoVisionCanvas({
         sm.y += sm.vy + Math.cos(time * 0.3) * 0.15;
         sm.angle += sm.rotSpeed;
 
-        // Screen wrap
-        if (sm.x > 1400) sm.x = -1400;
-        if (sm.y > 1000) sm.y = -1000;
-        if (sm.x < -1400) sm.x = 1400;
-        if (sm.y < -1000) sm.y = 1000;
+        // Frontier screen-space coordinate tracking for smooth edge fade-out / fade-in
+        const screenSmX = (sm.x + cam.x) * cam.zoom + width / 2;
+        const screenSmY = (sm.y + cam.y) * cam.zoom + height / 2;
+
+        const fadeMargin = 160; // 160px smooth fade zone before reaching the frontier
+        const distLeft = screenSmX;
+        const distRight = width - screenSmX;
+        const distTop = screenSmY;
+        const distBottom = height - screenSmY;
+        const minDistToEdge = Math.min(distLeft, distRight, distTop, distBottom);
+
+        // Smooth frontier screen wrap: wrap to opposite exterior edge once fully invisible
+        if (screenSmX > width + 100) {
+          sm.x = (-90 - width / 2) / cam.zoom - cam.x;
+        } else if (screenSmX < -100) {
+          sm.x = (width + 90 - width / 2) / cam.zoom - cam.x;
+        }
+
+        if (screenSmY > height + 100) {
+          sm.y = (-90 - height / 2) / cam.zoom - cam.y;
+        } else if (screenSmY < -100) {
+          sm.y = (height + 90 - height / 2) / cam.zoom - cam.y;
+        }
+
+        // Calculate smooth edge fade factor (1.0 in center -> 0.0 at screen frontier edge)
+        const edgeFadeFactor = Math.max(0, Math.min(1, minDistToEdge / fadeMargin));
 
         // Handle smooth spawn or vanishing poof
         if (sm.isVanishing) {
@@ -386,22 +407,26 @@ export function EvoVisionCanvas({
           }
         }
 
-        // Draw astronaut
-        ctx.save();
-        ctx.translate(sm.x, sm.y);
-        ctx.rotate(sm.angle);
-        ctx.scale(sm.scale, sm.scale);
-        ctx.globalAlpha = sm.opacity;
+        // Draw astronaut with edge-frontier fade factor
+        const renderOpacity = sm.isVanishing ? sm.opacity : sm.opacity * edgeFadeFactor;
 
-        // Soft cyan aura halo around spaceman
-        ctx.shadowColor = "#38BDF8";
-        ctx.shadowBlur = hoveredSpacemanRef.current ? 35 : 18;
+        if (renderOpacity > 0.01) {
+          ctx.save();
+          ctx.translate(sm.x, sm.y);
+          ctx.rotate(sm.angle);
+          ctx.scale(sm.scale, sm.scale);
+          ctx.globalAlpha = Math.max(0, Math.min(1, renderOpacity));
 
-        const w = smImg.width;
-        const h = smImg.height;
-        ctx.drawImage(smImg, -w / 2, -h / 2);
-        ctx.shadowBlur = 0;
-        ctx.restore();
+          // Soft cyan aura halo around spaceman
+          ctx.shadowColor = "#38BDF8";
+          ctx.shadowBlur = hoveredSpacemanRef.current ? 35 : 18;
+
+          const w = smImg.width;
+          const h = smImg.height;
+          ctx.drawImage(smImg, -w / 2, -h / 2);
+          ctx.shadowBlur = 0;
+          ctx.restore();
+        }
       }
 
       // Render vanish sparkles
@@ -728,7 +753,10 @@ export function EvoVisionCanvas({
     const sm = spacemanStateRef.current;
     const smDx = worldX - sm.x;
     const smDy = worldY - sm.y;
-    const isSmHovered = sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50;
+    const screenSmX = (sm.x + cam.x) * cam.zoom + rect.width / 2;
+    const screenSmY = (sm.y + cam.y) * cam.zoom + rect.height / 2;
+    const isSmVisibleOnScreen = screenSmX > 20 && screenSmX < rect.width - 20 && screenSmY > 20 && screenSmY < rect.height - 20;
+    const isSmHovered = sm.active && !sm.isVanishing && isSmVisibleOnScreen && Math.sqrt(smDx * smDx + smDy * smDy) <= 50;
     setHoveredSpaceman(isSmHovered);
 
     const hit = EVO_NODES.find((node) => {
@@ -768,7 +796,11 @@ export function EvoVisionCanvas({
     const sm = spacemanStateRef.current;
     const smDx = worldX - sm.x;
     const smDy = worldY - sm.y;
-    if (sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50) {
+    const screenSmX = (sm.x + cam.x) * cam.zoom + rect.width / 2;
+    const screenSmY = (sm.y + cam.y) * cam.zoom + rect.height / 2;
+    const isSmVisibleOnScreen = screenSmX > 20 && screenSmX < rect.width - 20 && screenSmY > 20 && screenSmY < rect.height - 20;
+
+    if (sm.active && !sm.isVanishing && isSmVisibleOnScreen && Math.sqrt(smDx * smDx + smDy * smDy) <= 50) {
       sm.isVanishing = true;
       for (let i = 0; i < 24; i++) {
         const a = Math.random() * Math.PI * 2;
