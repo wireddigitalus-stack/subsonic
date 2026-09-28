@@ -17,12 +17,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isChat) {
     return (
-      <>
-        <Navbar />
-        <main className="h-[100dvh] w-full overflow-hidden flex flex-col pt-16 sm:pt-20">
-          {children}
-        </main>
-      </>
+      <main className="h-[100dvh] w-full overflow-hidden flex flex-col p-0 m-0">
+        {children}
+      </main>
     );
   }
 

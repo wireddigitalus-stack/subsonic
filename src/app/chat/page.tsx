@@ -1320,26 +1320,36 @@ export default function ChatPage() {
         <div className="ios-glass rounded-2xl p-2.5 sm:p-3 border border-amber-500/20 shadow-tactical-glow">
           {/* Mobile Top Bar: Single clean, zero-clutter row */}
           <div className="flex sm:hidden items-center justify-between gap-2">
-            {/* Shooter Callsign & Pass Pill */}
-            <button
-              id="tour-step-pass"
-              type="button"
-              onClick={() => {
-                setProfileForm(shooterProfile);
-                setProfileActiveTab("PASS");
-                setIsProfileModalOpen(true);
-              }}
-              data-telemetry="chat_mobile_view_pass"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0"
-            >
-              <div className="w-5 h-5 rounded-md bg-amber-500 text-black font-bold flex items-center justify-center text-[10px] shrink-0">
-                {shooterProfile.callsign.slice(0, 2)}
-              </div>
-              <span className="font-mono font-bold text-amber-300 text-xs truncate max-w-[100px]">
-                {shooterProfile.callsign}
-              </span>
-              <QrCode className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Link
+                href="/"
+                title="Return to Main Site"
+                className="w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0 transition-colors"
+              >
+                <ChevronDown className="w-4 h-4 text-amber-400 -rotate-90" />
+              </Link>
+
+              {/* Shooter Callsign & Pass Pill */}
+              <button
+                id="tour-step-pass"
+                type="button"
+                onClick={() => {
+                  setProfileForm(shooterProfile);
+                  setProfileActiveTab("PASS");
+                  setIsProfileModalOpen(true);
+                }}
+                data-telemetry="chat_mobile_view_pass"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0"
+              >
+                <div className="w-5 h-5 rounded-md bg-amber-500 text-black font-bold flex items-center justify-center text-[10px] shrink-0">
+                  {shooterProfile.callsign.slice(0, 2)}
+                </div>
+                <span className="font-mono font-bold text-amber-300 text-xs truncate max-w-[80px]">
+                  {shooterProfile.callsign}
+                </span>
+                <QrCode className="w-3 h-3 text-emerald-400 shrink-0" />
+              </button>
+            </div>
 
             {/* Mobile Actions: Fullscreen, Audio, Lock */}
             <div className="flex items-center gap-1.5 shrink-0">
@@ -1390,7 +1400,27 @@ export default function ChatPage() {
           {/* Desktop Top Bar: Rich Weather & Expanded Controls */}
           <div className="hidden sm:flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
             {/* Left: Weather & Elevation Telemetry */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-mono">
+              <Link
+                href="/"
+                title="Return to Main Site"
+                className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/60 hover:bg-white/10 border border-white/15 text-white transition-all group shrink-0 shadow-sm"
+              >
+                <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/80 bg-black shrink-0">
+                  <Image
+                    src="/assets/subsonic-coin.jpg"
+                    alt="Subsonic"
+                    width={20}
+                    height={20}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="font-extrabold text-[11px] font-mono tracking-wider text-slate-200 group-hover:text-amber-400">
+                  SUBSONIC
+                </span>
+                <ChevronDown className="w-3 h-3 text-slate-400 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                 <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
