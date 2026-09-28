@@ -399,54 +399,59 @@ export function EvoVisionCanvas({
           ctx.shadowBlur = 0;
         }
 
-        // Selection pulsing ring
+        // Selection pulsing ring (sleek solid high-tech aura)
         if (isSelected) {
           const pulseR = node.radius + 6 + Math.sin(time * 6) * 3;
-          ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = "#38BDF8";
+          ctx.lineWidth = 2;
+          ctx.shadowColor = "#06B6D4";
+          ctx.shadowBlur = 12;
           ctx.beginPath();
           ctx.arc(node.x, node.y, pulseR, 0, Math.PI * 2);
           ctx.stroke();
-          ctx.setLineDash([]);
+          ctx.shadowBlur = 0;
         }
 
-        // Mini sparkline graph on nodes with sparkline metrics
-        if (node.metrics?.sparkline && node.metrics.sparkline.length > 0) {
-          const spk = node.metrics.sparkline;
-          const spkW = node.radius * 1.8;
-          const spkH = 14;
-          const spkX = node.x - spkW / 2;
-          const spkY = node.y + node.radius + 24;
-
-          ctx.strokeStyle = node.color;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          spk.forEach((val, idx) => {
-            const px = spkX + (idx / (spk.length - 1)) * spkW;
-            const py = spkY + spkH - (val / 100) * spkH;
-            if (idx === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-          });
-          ctx.stroke();
-        }
-
-        // Node Label Typography
+        // Node Label Typography with clear pill backing to prevent line-overlap
         ctx.textAlign = "center";
         const isMajorCluster = node.radius >= 40;
-        ctx.font = isMajorCluster
-          ? "bold 13px ui-monospace, monospace"
-          : "bold 10px ui-monospace, monospace";
+        const labelFont = isMajorCluster
+          ? "900 13px ui-monospace, SFMono-Regular, Menlo, monospace"
+          : "bold 11px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.font = labelFont;
+
+        const textMetrics = ctx.measureText(node.label);
+        const textWidth = Math.max(textMetrics.width, node.sublabel ? 80 : 40);
+        const pillHeight = node.sublabel ? 30 : 18;
+        const pillY = node.y + node.radius + 6;
+
+        // Dark frosted backdrop pill
+        ctx.fillStyle = "rgba(4, 8, 19, 0.75)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const pillX = node.x - textWidth / 2 - 8;
+        const pillW = textWidth + 16;
+        const pillR = 6;
+        if (typeof (ctx as any).roundRect === "function") {
+          (ctx as any).roundRect(pillX, pillY, pillW, pillHeight, pillR);
+        } else {
+          ctx.rect(pillX, pillY, pillW, pillHeight);
+        }
+        ctx.fill();
+        ctx.stroke();
+
+        // Label text
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = "#000000";
         ctx.shadowBlur = 4;
-        ctx.fillText(node.label, node.x, node.y + node.radius + 14);
+        ctx.fillText(node.label, node.x, pillY + (node.sublabel ? 12 : 13));
         ctx.shadowBlur = 0;
 
         if (node.sublabel) {
-          ctx.font = "9px ui-monospace, monospace";
+          ctx.font = "9px ui-monospace, SFMono-Regular, Menlo, monospace";
           ctx.fillStyle = node.color;
-          ctx.fillText(node.sublabel, node.x, node.y + node.radius + 25);
+          ctx.fillText(node.sublabel, node.x, pillY + 24);
         }
       });
 

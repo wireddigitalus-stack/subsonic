@@ -50,7 +50,7 @@ export default function EvosDashboardPage() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#020409] text-white font-mono flex flex-col select-none">
+    <div spellCheck={false} className="relative w-screen h-screen overflow-hidden bg-[#020409] text-white font-mono flex flex-col select-none">
       {/* ─── TOP CYBER HEADER BAR ────────────────────────────────────── */}
       <header className="shrink-0 h-14 border-b border-cyan-500/20 bg-black/70 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between z-20">
         <div className="flex items-center gap-3 sm:gap-4">
