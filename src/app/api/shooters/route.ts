@@ -6,6 +6,7 @@ import {
   getShooterBySlug 
 } from "@/lib/shooters";
 import { checkCallsignAvailability } from "@/lib/callsigns";
+import { hashPin, isHashedPin } from "@/lib/pin-hash";
 
 export const dynamic = "force-dynamic";
 
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       id,
       name: finalName,
       callsign: candidateCallsign,
-      pin: body.pin ? body.pin.trim() : undefined,
+      pin: body.pin ? (isHashedPin(body.pin.trim()) ? body.pin.trim() : await hashPin(body.pin.trim())) : undefined,
       division: body.division || "Open Division Pro",
       ranking: body.ranking || "Appalachian Rimfire Competitor",
       homeRange: body.homeRange || "The Hideout, Bristol, TN",

@@ -1,4 +1,5 @@
 import fs from "fs";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import path from "path";
 import { ShooterProfile } from "@/lib/types";
 
@@ -186,9 +187,84 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
 ];
 
 // In-process memory cache to survive serverless function calls
+
+// Map camelCase to snake_case for Supabase
+function mapShooterToDb(s: ShooterProfile) {
+  return {
+    id: s.id,
+    name: s.name,
+    callsign: s.callsign,
+    division: s.division,
+    ranking: s.ranking,
+    home_range: s.homeRange,
+    podiums: s.podiums,
+    featured_match: s.featuredMatch,
+    image: s.image,
+    action_photo: s.actionPhoto,
+    quote: s.quote,
+    accolades: s.accolades,
+    sponsors: s.sponsors,
+    rifle_setup: s.rifleSetup,
+    pin: s.pin,
+    interview: s.interview,
+    created_at: s.createdAt,
+    status: s.status,
+  };
+}
+
+// Map snake_case to camelCase from Supabase
+function mapDbToShooter(row: any): ShooterProfile {
+  return {
+    id: row.id,
+    name: row.name,
+    callsign: row.callsign,
+    division: row.division,
+    ranking: row.ranking,
+    homeRange: row.home_range,
+    podiums: row.podiums,
+    featuredMatch: row.featured_match,
+    image: row.image,
+    actionPhoto: row.action_photo,
+    quote: row.quote,
+    accolades: row.accolades,
+    sponsors: row.sponsors,
+    rifleSetup: row.rifle_setup,
+    pin: row.pin,
+    interview: row.interview,
+    createdAt: row.created_at,
+    status: row.status,
+  };
+}
+
+let shootersCacheRefreshed = false;
+
 let memoryShooters: ShooterProfile[] = [...SEED_SHOOTERS];
 
 export function getShootersFromStorage(): ShooterProfile[] {
+  if (!shootersCacheRefreshed && isSupabaseConfigured && supabase) {
+    shootersCacheRefreshed = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase.from("shooters").select("*");
+        if (error) {
+          console.error("Error fetching shooters from Supabase:", error);
+          return;
+        }
+        if (data && data.length > 0) {
+          const map = new Map<string, ShooterProfile>();
+          for (const s of memoryShooters) map.set(s.id.toLowerCase(), s);
+          for (const row of data) {
+            const s = mapDbToShooter(row);
+            map.set(s.id.toLowerCase(), s);
+          }
+          memoryShooters = Array.from(map.values());
+        }
+      } catch (err) {
+        console.error("Supabase refresh error (shooters):", err);
+      }
+    })();
+  }
+
   try {
     let raw = "";
     if (fs.existsSync(WRITABLE_SHOOTERS_FILE)) {
@@ -245,12 +321,23 @@ export function saveShooterToStorage(shooter: ShooterProfile): void {
     }
     const content = updated.map((s) => JSON.stringify(s)).join("\n") + "\n";
     fs.writeFileSync(WRITABLE_SHOOTERS_FILE, content, "utf-8");
-
     if (!IS_SERVERLESS) {
       if (!fs.existsSync(REPO_DATA_DIR)) {
         fs.mkdirSync(REPO_DATA_DIR, { recursive: true });
       }
       fs.writeFileSync(REPO_SHOOTERS_FILE, content, "utf-8");
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      (async () => {
+        try {
+          const dbRow = mapShooterToDb(shooter);
+          const { error } = await supabase.from('shooters').upsert(dbRow, { onConflict: 'id' });
+          if (error) console.error("Error upserting shooter to Supabase:", error);
+        } catch (err) {
+          console.error("Supabase upsert catch (shooters):", err);
+        }
+      })();
     }
   } catch (err) {
     console.error("Error saving shooter:", err);

@@ -101,7 +101,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (PIN: 2468 | Callsign: RADAR)",
+    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -115,7 +115,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority (PIN: 620620)",
+    notes: "Owner Admin & Executive — Full Management Authority",
   },
   {
     member_id: "SS-2026-1001",
@@ -882,32 +882,19 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    try {
-      if (typeof window !== "undefined" && localStorage.getItem("subsonic_admin_authenticated") === "true") {
-        setIsAuthenticated(true);
-        const savedSession = localStorage.getItem("subsonic_admin_session");
-        if (savedSession) {
-          try {
-            const parsed = JSON.parse(savedSession);
-            if (parsed.memberId === "SS-2026-0001" || parsed.callsign === "LTDAN" || parsed.callsign === "ROB") {
-              parsed.callsign = "RADAR";
-              parsed.name = "Rob Neilson";
-              parsed.role = "MASTER_OWNER";
-              localStorage.setItem("subsonic_admin_session", JSON.stringify(parsed));
-            }
-            setAdminSession(parsed);
-          } catch {}
-        } else {
-          // Default to Master Owner Rob Neilson if previously authenticated
-          setAdminSession({
-            name: "Rob Neilson",
-            callsign: "RADAR",
-            role: "MASTER_OWNER",
-            memberId: "SS-2026-0001",
-          });
+    const checkSession = async () => {
+      try {
+        const res = await fetch("/api/admin/session");
+        const data = await res.json();
+        if (res.ok && data.authenticated) {
+          setIsAuthenticated(true);
+          setAdminSession(data.session);
         }
+      } catch (e) {
+        console.error("Session check failed", e);
       }
-    } catch {}
+    };
+    checkSession();
 
     loadData();
 
@@ -973,68 +960,36 @@ export default function AdminDashboardPage() {
     };
   }, []);
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
     const clean = passkeyInput.trim().toLowerCase();
-    const VALID_ADMIN_KEYS = [
-      "2468", 
-      "620620", 
-      "subsonic2026", 
-      "admin",
-      "allen",
-      "allen 620620",
-      "allen620620"
-    ];
-    if (VALID_ADMIN_KEYS.includes(clean)) {
-      setIsAuthenticated(true);
-      setPasskeyError(false);
-
-      let session: {
-        name: string;
-        callsign: string;
-        role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN";
-        memberId: string;
-      } = {
-        name: "Rob Neilson",
-        callsign: "RADAR",
-        role: "MASTER_OWNER",
-        memberId: "SS-2026-0001",
-      };
-
-      if (clean === "620620" || clean === "allen" || clean.includes("620620") || clean.includes("allen")) {
-        session = {
-          name: "Allen Hurley",
-          callsign: "ALLEN",
-          role: "OWNER_ADMIN",
-          memberId: "SS-2026-0002",
-        };
-      } else if (clean === "subsonic2026" || clean === "admin") {
-        session = {
-          name: "System Administrator",
-          callsign: "ADMIN",
-          role: "ADMIN",
-          memberId: "SS-ADMIN-SYS",
-        };
+    
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passkey: clean })
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        setPasskeyError(false);
+        setAdminSession(data.session);
+      } else {
+        setPasskeyError(true);
       }
-
-      setAdminSession(session);
-
-      try {
-        localStorage.setItem("subsonic_admin_authenticated", "true");
-        localStorage.setItem("subsonic_admin_session", JSON.stringify(session));
-      } catch {}
-    } else {
+    } catch (e) {
       setPasskeyError(true);
     }
   };
 
-  const handleLock = () => {
+  const handleLock = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (e) {}
     setIsAuthenticated(false);
     setAdminSession(null);
-    try {
-      localStorage.removeItem("subsonic_admin_authenticated");
-      localStorage.removeItem("subsonic_admin_session");
-    } catch {}
   };
 
   const handleClearTelemetry = async () => {
@@ -1132,7 +1087,7 @@ export default function AdminDashboardPage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter PIN (e.g. 620620 for Allen or 2468 for Rob)..."
+                placeholder="Enter admin security passkey..."
                 value={passkeyInput}
                 onChange={(e) => {
                   setPasskeyInput(e.target.value);
@@ -1142,7 +1097,7 @@ export default function AdminDashboardPage() {
               />
               {passkeyError && (
                 <div className="text-[11px] text-red-400 font-mono mt-1">
-                  Invalid security passkey. Try PIN &quot;620620&quot; (Allen), &quot;2468&quot; (Rob), or &quot;subsonic2026&quot;.
+                  Invalid security passkey. Contact an administrator for access credentials.
                 </div>
               )}
             </div>
@@ -1155,27 +1110,7 @@ export default function AdminDashboardPage() {
               <span>Unlock Dashboard</span>
             </button>
 
-            {/* Instant Demo Access Button */}
-            <button
-              type="button"
-              onClick={() => {
-                const session = {
-                  name: "Rob Neilson",
-                  callsign: "RADAR",
-                  role: "MASTER_OWNER" as const,
-                  memberId: "SS-2026-0001",
-                };
-                setAdminSession(session);
-                setIsAuthenticated(true);
-                try {
-                  localStorage.setItem("subsonic_admin_authenticated", "true");
-                  localStorage.setItem("subsonic_admin_session", JSON.stringify(session));
-                } catch {}
-              }}
-              className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-medium text-xs border border-white/10 transition-all"
-            >
-              Demo One-Click Access (Subsonic Admin)
-            </button>
+
           </form>
         </div>
       </div>

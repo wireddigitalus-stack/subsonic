@@ -200,7 +200,6 @@ function StandardInviteContent() {
               rifleSetup: "Precision Rimfire",
               badgeText: "SOCIETY MEMBER",
               role: "MEMBER",
-              pin: pin.trim(),
             })
           );
           localStorage.setItem("subsonic_member_profile", JSON.stringify(memberObj));

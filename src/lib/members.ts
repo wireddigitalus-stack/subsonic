@@ -1,4 +1,5 @@
 import fs from "fs";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import path from "path";
 import { SocietyMember } from "@/lib/types";
 import { getShootersFromStorage } from "@/lib/shooters";
@@ -27,7 +28,7 @@ export const SEED_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (PIN: 2468 | Callsign: RADAR)",
+    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -41,7 +42,7 @@ export const SEED_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority (PIN: 620620)",
+    notes: "Owner Admin & Executive — Full Management Authority",
   },
   {
     member_id: "SS-2026-1001",
@@ -156,8 +157,30 @@ export const SEED_MEMBERS: SocietyMember[] = [
 ];
 
 let memoryMembers: SocietyMember[] = [...SEED_MEMBERS];
+let membersCacheRefreshed = false;
 
 export function getMembersFromStorage(): SocietyMember[] {
+  if (!membersCacheRefreshed && isSupabaseConfigured && supabase) {
+    membersCacheRefreshed = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase.from("society_members").select("*");
+        if (error) {
+          console.error("Error fetching members from Supabase:", error);
+          return;
+        }
+        if (data && data.length > 0) {
+          const map = new Map<string, SocietyMember>();
+          for (const m of memoryMembers) map.set(m.member_id.toLowerCase(), m);
+          for (const m of (data as SocietyMember[])) map.set(m.member_id.toLowerCase(), m);
+          memoryMembers = Array.from(map.values());
+        }
+      } catch (err) {
+        console.error("Supabase refresh error:", err);
+      }
+    })();
+  }
+
   try {
     const memberMap = new Map<string, SocietyMember>();
 
@@ -334,6 +357,18 @@ export function addOrUpdateMember(member: SocietyMember): SocietyMember {
   }
 
   saveAllMembersToStorage(updatedList);
+
+  if (isSupabaseConfigured && supabase) {
+    (async () => {
+      try {
+        const { error } = await supabase.from('society_members').upsert(savedMember, { onConflict: 'member_id' });
+        if (error) console.error("Error upserting member to Supabase:", error);
+      } catch (err) {
+        console.error("Supabase upsert catch:", err);
+      }
+    })();
+  }
+
   return savedMember;
 }
 
@@ -349,5 +384,17 @@ export function deleteMemberFromStorage(memberId: string): boolean {
   }
 
   saveAllMembersToStorage(filtered);
+
+  if (isSupabaseConfigured && supabase) {
+    (async () => {
+      try {
+        const { error } = await supabase.from('society_members').delete().eq('member_id', memberId);
+        if (error) console.error("Error deleting member from Supabase:", error);
+      } catch (err) {
+        console.error("Supabase delete catch:", err);
+      }
+    })();
+  }
+
   return true;
 }
