@@ -5,7 +5,7 @@ import { INITIAL_FACEBOOK_POSTS } from "@/lib/initial-data";
 
 export const dynamic = "force-dynamic";
 
-const RSS_FEED_URL = "https://rss.app/feeds/fDvnsMqngpEKf9yc.xml";
+const RSS_FEED_URL = process.env.FACEBOOK_RSS_FEED_URL || "https://rss.app/feeds/fDvnsMqngpEKf9yc.xml";
 const FB_PAGE_URL = "https://www.facebook.com/p/Subsonic-Society-61578052196057/";
 
 function cleanHtml(html: string): string {
