@@ -194,13 +194,22 @@ function ShootersContent() {
               <span>SUBSONIC SOCIETY ATHLETES & RIG BLUEPRINTS</span>
             </div>
 
-            <Link
-              href="/shooters/intake"
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>Auto-Generate Your Shooter Card</span>
-            </Link>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                href="/invite/pro"
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 fill-black" />
+                <span>Claim Pro Profile (VIP Code)</span>
+              </Link>
+
+              <Link
+                href="/invite"
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs border border-white/10 transition-all"
+              >
+                <span>Member Invite</span>
+              </Link>
+            </div>
           </div>
 
           <div className="space-y-2 max-w-3xl">
@@ -380,11 +389,21 @@ function ShootersContent() {
                   </div>
                 </div>
 
-                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">PODIUM FINISHES</span>
-                  <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">
-                    {selectedShooter.podiums}
-                  </span>
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5 gap-2.5">
+                  <div className="text-right">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase">PODIUM FINISHES</span>
+                    <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono block">
+                      {selectedShooter.podiums}
+                    </span>
+                  </div>
+
+                  <Link
+                    href={`/shooters/${selectedShooter.id}`}
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    <span>Full SEO Profile</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
 

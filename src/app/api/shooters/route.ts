@@ -251,6 +251,7 @@ export async function POST(req: NextRequest) {
         tuner: body.rifleSetup?.tuner || body.tuner || "Precision Rimfire Tuner",
         ammoLot: body.rifleSetup?.ammoLot || body.ammoLot || "Lapua / SK Match Spec (1,060 FPS)",
       },
+      pin: body.pin ? String(body.pin).trim() : undefined,
       interview: body.interview || [
         {
           question: "What is your match day strategy at The Hideout?",
@@ -267,7 +268,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: `Shooter profile for ${newShooter.name} [${newShooter.callsign}] auto-generated successfully!`,
       shooter: newShooter,
-      profileUrl: `/shooters?id=${newShooter.id}`,
+      profileUrl: `/shooters/${newShooter.id}`,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

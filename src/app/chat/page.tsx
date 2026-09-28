@@ -1134,10 +1134,30 @@ export default function ChatPage() {
 
     const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
     const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026" || cleanCallsign === "620620");
-    const isGeneralValid = ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
+
+    // Check if user has a personal PIN stored from their invite onboarding
+    let savedPin: string | null = null;
+    let savedCallsign: string | null = null;
+    if (typeof window !== "undefined") {
+      const savedProfileStr = localStorage.getItem("subsonic_shooter_profile");
+      if (savedProfileStr) {
+        try {
+          const parsed = JSON.parse(savedProfileStr);
+          if (parsed.pin) savedPin = String(parsed.pin).trim();
+          if (parsed.callsign) savedCallsign = String(parsed.callsign).trim().toUpperCase();
+        } catch {}
+      }
+    }
+
+    const isPersonalPinValid = 
+      (savedPin && cleanPass === savedPin) ||
+      (savedCallsign && cleanCallsign === savedCallsign && cleanPass.length >= 4);
+
+    const isInviteCode = cleanPass.startsWith("SS-") || cleanPass.includes("VIP") || cleanPass.includes("HIDE");
+    const isGeneralValid = isPersonalPinValid || isInviteCode || ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
 
     if (!isRobValid && !isAllenValid && !isGeneralValid) {
-      triggerAuthError("Invalid Member Key or PIN. Contact your Range Marshal for access.");
+      triggerAuthError("Invalid Callsign, Member Key or PIN. If you have an invite code, click 'Claim Member Code' below.");
       return;
     }
 
@@ -1287,15 +1307,33 @@ export default function ChatPage() {
             </button>
           </form>
 
-          <div className="pt-2 border-t border-white/10 space-y-2">
-            <Link
-              href="/join"
-              className="flex items-center justify-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>New here? Register for free chat access →</span>
-            </Link>
-            <a href="/" className="block text-xs text-slate-500 hover:text-slate-300 transition-colors">
+          <div className="pt-3 border-t border-white/10 space-y-3">
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
+              <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block tracking-wider">
+                MEMBERSHIP & CHAT BY INVITATION ONLY
+              </span>
+              <p className="text-[11px] text-slate-300">
+                Have an invitation code from Allen or a Range Officer?
+              </p>
+              <div className="flex items-center justify-center gap-2 pt-1">
+                <Link
+                  href="/invite"
+                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 transition-all"
+                >
+                  <span>Claim Member Code</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/invite/pro"
+                  className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all"
+                >
+                  <span>Pro VIP Intake</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            <a href="/" className="block text-xs text-slate-500 hover:text-slate-300 transition-colors text-center">
               ← Return to Main Portal
             </a>
           </div>

@@ -243,12 +243,32 @@ export interface ShooterProfile {
     tuner?: string;
     ammoLot: string;
   };
+  pin?: string; // 6-digit personal login PIN for chat access
   interview?: {
     question: string;
     answer: string;
   }[];
   createdAt: string;
   status: "PUBLISHED" | "PENDING_REVIEW" | "ARCHIVED";
+}
+
+export type InviteTier = "MEMBER" | "PRO";
+
+export interface SocietyInvite {
+  id: string;
+  code: string;
+  tier: InviteTier;
+  recipientName?: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  note?: string;
+  createdBy: string;
+  createdAt: string;
+  expiresAt?: string;
+  maxUses: number;
+  usedCount: number;
+  claimedBy?: string[]; // list of callsigns or member IDs
+  status: "ACTIVE" | "EXHAUSTED" | "REVOKED";
 }
 
 export interface CompetitionDocument {

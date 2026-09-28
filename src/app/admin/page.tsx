@@ -58,7 +58,8 @@ import {
   UserPlus,
   Gavel,
   Crown,
-  Shield
+  Shield,
+  Key
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -84,6 +85,7 @@ import { INITIAL_MATCHES, INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { CommsAbuseModerator } from "@/components/admin/CommsAbuseModerator";
 import { getCommsAbuseAlerts } from "@/lib/abuse-moderation";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
+import { AdminInviteGeneratorTab } from "@/components/admin/AdminInviteGeneratorTab";
 
 const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
@@ -227,7 +229,7 @@ export default function AdminDashboardPage() {
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
   const [globalBannerDismissed, setGlobalBannerDismissed] = useState(false);
   const [activeAdminTab, setActiveAdminTab] = useState<
-    "MEMBERS" | "REGISTRATIONS" | "LEADS" | "SHOOTERS" | "DOCUMENTS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION" | "CHAT"
+    "MEMBERS" | "INVITES" | "REGISTRATIONS" | "LEADS" | "SHOOTERS" | "DOCUMENTS" | "EVENTS" | "CLICKSTREAM" | "PAGES_AND_CLICKS" | "AI_MODERATION" | "CHAT"
   >("MEMBERS");
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
@@ -1281,6 +1283,7 @@ export default function AdminDashboardPage() {
           <div className="flex gap-1 min-w-max">
             {[
               { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
+              { id: "INVITES", label: "Invite Keys & VIP", icon: Key, badge: "INVITE ONLY" },
               { id: "REGISTRATIONS", label: "Registered Shooters", icon: Trophy, badge: `${registrations.length}` },
               { 
                 id: "LEADS", 
@@ -1335,6 +1338,10 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
+      {/* TAB: INVITATION CODES & VIP GENERATOR */}
+      {activeAdminTab === "INVITES" && (
+        <AdminInviteGeneratorTab />
+      )}
 
       {/* TAB: ALL SOCIETY MEMBERS DIRECTORY */}
       {activeAdminTab === "MEMBERS" && (
