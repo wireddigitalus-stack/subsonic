@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   dope_card JSONB,
   author JSONB NOT NULL,
   content TEXT NOT NULL,
-  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  "timestamp" TIMESTAMPTZ DEFAULT NOW(),
   reactions JSONB DEFAULT '[]',
   moderation_status TEXT DEFAULT 'APPROVED' CHECK (moderation_status IN ('APPROVED', 'FLAGGED', 'PENDING_REVIEW', 'REJECTED')),
   ai_moderation_report JSONB
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 -- Index for fast channel queries
 CREATE INDEX IF NOT EXISTS idx_chat_messages_channel ON chat_messages(channel_id);
-CREATE INDEX IF NOT EXISTS idx_chat_messages_timestamp ON chat_messages(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_timestamp ON chat_messages("timestamp" DESC);
 
 -- 5. REGISTRATIONS
 CREATE TABLE IF NOT EXISTS registrations (
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS telemetry_events (
   member_id TEXT,
   member_callsign TEXT,
   member_name TEXT,
-  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  "timestamp" TIMESTAMPTZ DEFAULT NOW(),
   device JSONB,
   session_id TEXT,
   visitor_id TEXT,
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS telemetry_events (
   scroll_depth NUMERIC
 );
 
-CREATE INDEX IF NOT EXISTS idx_telemetry_timestamp ON telemetry_events(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_telemetry_timestamp ON telemetry_events("timestamp" DESC);
 CREATE INDEX IF NOT EXISTS idx_telemetry_event_type ON telemetry_events(event_type);
 
 -- 9. MATCHES (for registration count tracking)

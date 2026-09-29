@@ -43,19 +43,6 @@ export function HeroSection() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
-        {/* Core Pillars Badge */}
-        <div className="flex items-center justify-center sm:justify-start max-w-full">
-          <div className="inline-flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[9px] sm:text-xs font-mono max-w-full tracking-tight sm:tracking-normal text-center">
-            <span className="text-amber-400 font-bold">COMPETITION</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-blue-400 font-bold">TESTING</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-emerald-400 font-bold">EDUCATION</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-purple-400 font-bold">COMMUNITY</span>
-          </div>
-        </div>
-
         {/* Hero Headline & Brand Mantra */}
         <div className="max-w-4xl">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
@@ -64,6 +51,15 @@ export function HeroSection() {
               PRECISION IS IN OUR DNA.
             </span>
           </h1>
+          <p className="mt-2 sm:mt-3 text-[11px] sm:text-sm font-mono tracking-wider text-slate-400">
+            <span className="text-amber-400/80">COMPETITION</span>
+            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
+            <span className="text-blue-400/80">TESTING</span>
+            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
+            <span className="text-emerald-400/80">EDUCATION</span>
+            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
+            <span className="text-purple-400/80">COMMUNITY</span>
+          </p>
         </div>
 
         {/* Video Banner Reel -> 3-Sec Crosshair Lock -> Live Animated Tactical Chat Terminal */}
