@@ -474,37 +474,69 @@ export default function CompetitorPacketPage() {
         </div>
       </section>
 
-      {/* Jump Navigation Sticky Strip */}
-      <div className="sticky top-12 z-30 bg-black/85 backdrop-blur-xl border-b border-white/10 px-4 py-2.5 overflow-x-auto ios-scrollbar">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 text-xs font-mono whitespace-nowrap">
-          <span className="text-[11px] text-slate-500 uppercase tracking-widest mr-1">Jump to:</span>
-          <a href="#welcome" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Allen&apos;s Welcome
-          </a>
-          <a href="#facility" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            The Hideout 220 Acres
-          </a>
-          <a href="#schedule" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Weekend Schedule
-          </a>
-          <a href="#hospitality" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Food & Hospitality
-          </a>
-          <a href="#hotels" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Lodging Directory (12)
-          </a>
-          <a href="#dining" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Bristol Dining Guide (12)
-          </a>
-          <a href="#attractions" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Attractions (10)
-          </a>
-          <a href="#fishing" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Trout Fly Fishing
-          </a>
-          <a href="#rules" className="px-2.5 py-1 rounded-md bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 transition-colors">
-            Range SOP & Weather
-          </a>
+      {/* Jump Navigation Clean Stacked Panel */}
+      <div className="bg-black/90 backdrop-blur-xl border-b border-white/10 px-4 py-3 sm:py-3.5">
+        <div className="max-w-7xl mx-auto space-y-2">
+          <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-amber-400 font-bold">
+            <Compass className="w-3.5 h-3.5 text-amber-400" />
+            <span>Match Dossier Sections & Jump Navigation</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1.5 sm:gap-2 text-xs font-mono">
+            <a
+              href="#welcome"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Allen&apos;s Welcome
+            </a>
+            <a
+              href="#facility"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              The Hideout 220A
+            </a>
+            <a
+              href="#schedule"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Weekend Schedule
+            </a>
+            <a
+              href="#hospitality"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Food & Hospitality
+            </a>
+            <a
+              href="#hotels"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Lodging (12)
+            </a>
+            <a
+              href="#dining"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Bristol Dining (12)
+            </a>
+            <a
+              href="#attractions"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Attractions (10)
+            </a>
+            <a
+              href="#fishing"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium"
+            >
+              Trout Fly Fishing
+            </a>
+            <a
+              href="#rules"
+              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-300 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-medium col-span-2 sm:col-span-1"
+            >
+              Range SOP
+            </a>
+          </div>
         </div>
       </div>
 

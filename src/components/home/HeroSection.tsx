@@ -88,17 +88,17 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Button 3: SUBSONIC DNA */}
+          {/* Button 3: COMPETITOR PACKET */}
           <Link
-            href="/dna"
-            data-telemetry="hero_primary_btn_dna"
-            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
+            href="/competitor-packet"
+            data-telemetry="hero_primary_btn_packet"
+            className="p-3 sm:p-4 rounded-2xl ios-glass border border-white/10 hover:border-amber-500/50 hover:bg-amber-500/10 text-white font-black text-xs sm:text-sm flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                <Microscope className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <span className="truncate">DNA LAB</span>
+              <span className="truncate">2026 PACKET</span>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>

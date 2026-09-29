@@ -144,85 +144,62 @@ export function FullHomePage() {
         </div>
       </section>
 
-      {/* 3. Subsonic DNA Lab Teaser */}
+      {/* 3. 2026 Subsonic Society Invitational Competitor Packet Spotlight */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="ios-glass rounded-3xl p-6 sm:p-10 border border-white/10 space-y-6">
+        <div className="ios-glass rounded-3xl p-6 sm:p-10 border border-amber-500/30 bg-gradient-to-br from-amber-500/5 via-black/80 to-zinc-950 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono font-semibold">
-                <Microscope className="w-3.5 h-3.5" />
-                <span>SUBSONIC DNA LAB PREVIEW</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>OFFICIAL MATCH DOSSIER • THE HIDEOUT BRISTOL</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">
-                LATEST AMMUNITION LOT BENCHMARKS
+              <h2 className="text-2xl sm:text-3xl font-black text-white font-heading">
+                2026 INVITATIONAL COMPETITOR PACKET
               </h2>
             </div>
 
             <Link
-              href="/dna"
-              className="px-4 py-2 rounded-xl ios-glass text-blue-300 hover:text-white text-xs font-bold border border-blue-500/30 hover:bg-blue-600/20 flex items-center gap-1.5 transition-all"
+              href="/competitor-packet"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black text-xs font-black shadow-tactical-glow flex items-center gap-2 transition-all"
             >
-              <span>Explore Complete Testing Database</span>
+              <span>Explore Full Competitor Guide & PDF</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                brand: "Lapua",
-                ammo: "Center-X (Lot 32187)",
-                avg: "1,062.4 FPS",
-                sd: "4.8 FPS",
-                group100: "0.38 MOA",
-                status: "TOP MATCH LOT",
-                accent: "text-amber-400",
-              },
-              {
-                brand: "Lapua",
-                ammo: "Midas+ (Lot 99120)",
-                avg: "1,058.1 FPS",
-                sd: "3.9 FPS",
-                group100: "0.31 MOA",
-                status: "OLYMPIC GRADE",
-                accent: "text-emerald-400",
-              },
-              {
-                brand: "Eley",
-                ammo: "Tenex Flat Nose (Lot 1058)",
-                avg: "1,066.8 FPS",
-                sd: "5.2 FPS",
-                group100: "0.42 MOA",
-                status: "MATCH GRADE",
-                accent: "text-blue-400",
-              },
-            ].map((item, idx) => (
-              <div
-                key={idx}
-                className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-3 hover:border-white/20 transition-all"
-              >
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-400">{item.brand}</span>
-                  <span className={`font-bold ${item.accent}`}>{item.status}</span>
-                </div>
-                <h4 className="text-base font-bold text-white">{item.ammo}</h4>
-
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5 text-xs font-mono">
-                  <div>
-                    <span className="text-[9px] text-slate-500 block">VELOCITY</span>
-                    <span className="font-bold text-slate-200">{item.avg}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-slate-500 block">SD (FPS)</span>
-                    <span className={`font-bold ${item.accent}`}>{item.sd}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-slate-500 block">100 YD</span>
-                    <span className="font-bold text-white">{item.group100}</span>
-                  </div>
-                </div>
+            <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-amber-400 font-bold uppercase tracking-wider">SCHEDULE & PURSES</span>
+                <span className="text-emerald-400 font-mono font-bold">$2,500 CASH</span>
               </div>
-            ))}
+              <h4 className="text-base font-bold text-white">Full 3-Day Championship Timeline</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Nov 13–15 at The Hideout. Friday zero & BBQ, Saturday 10 stages & $1,000 Speed Duel, Sunday 10 stages & $1,500 1,000Y Cold Bore.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-blue-400 font-bold uppercase tracking-wider">BRISTOL LODGING</span>
+                <span className="text-slate-300 font-mono font-bold">12 HOTELS</span>
+              </div>
+              <h4 className="text-base font-bold text-white">Curated Shooter Lodging Directory</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                The Bristol Hotel rooftop luxury, Hard Rock Hotel & Casino 24/7 gaming, Marriott suites near The Pinnacle, plus on-site RV hookups.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="text-purple-400 font-bold uppercase tracking-wider">DINING & ACTIVITIES</span>
+                <span className="text-amber-400 font-mono font-bold">TOP PICKS</span>
+              </div>
+              <h4 className="text-base font-bold text-white">Blackbird Bakery, BBQ & Fly Fishing</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Famous 24h bakery doughnuts, slow-smoked Delta Blues BBQ, hand-cut steaks at 620 State, and world-class South Holston brown trout tailwaters.
+              </p>
+            </div>
           </div>
         </div>
       </section>

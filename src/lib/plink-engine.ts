@@ -384,7 +384,7 @@ export function getFaqResponse(content: string): string {
       `• **Prohibited:** Any hyper-velocity or magnum rimfire (.22 WMR, .17 HMR).\n` +
       `• **Chrono Station:** Random squad chronograph checks conducted during Friday practice & Saturday staging.\n` +
       `• **Top Match Lots:** Lapua Center-X, SK Long Range Match, Eley Tenex, and RWS R50.\n` +
-      `• **Elevation DOPE:** Range elevation sits at 3,420 FT. Account for thermal ridge drafts and lower air density. Check Subsonic DNA (/dna) for lot ballistics.`;
+      `• **Elevation DOPE:** Range elevation sits at 3,420 FT. Account for thermal ridge drafts and lower air density. Check the Competitor Packet (/competitor-packet) for range elevation and match ballistics.`;
   }
 
   // 8. RULES & SAFETY

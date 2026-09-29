@@ -64,11 +64,11 @@ export default function SocietyPage() {
             </Link>
 
             <Link
-              href="/dna"
+              href="/competitor-packet"
               className="px-6 py-3 rounded-xl ios-glass text-white font-bold text-xs sm:text-sm flex items-center gap-2 border border-white/10 hover:bg-white/10 transition-all"
             >
-              <Microscope className="w-4 h-4 text-amber-400" />
-              <span>Explore Subsonic DNA Lab</span>
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>2026 Competitor Packet (PDF)</span>
             </Link>
           </div>
         </div>

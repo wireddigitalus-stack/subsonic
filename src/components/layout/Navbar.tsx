@@ -433,18 +433,18 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Direct Link: Subsonic DNA */}
+            {/* Direct Link: 2026 Competitor Packet */}
             <Link
-              href="/dna"
-              data-telemetry="nav_link_dna"
+              href="/competitor-packet"
+              data-telemetry="nav_link_packet"
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                pathname === "/dna"
-                  ? "bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-sm"
+                pathname === "/competitor-packet"
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <Microscope className="w-3.5 h-3.5 text-blue-400" />
-              <span>Subsonic DNA</span>
+              <FileText className="w-3.5 h-3.5 text-amber-400" />
+              <span>Competitor Packet</span>
             </Link>
 
           </div>
@@ -629,20 +629,7 @@ export function Navbar() {
                   </Link>
                 </div>
 
-                {/* Group 3: Subsonic DNA & Research */}
-                <div className="space-y-1 pt-2 border-t border-white/5">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold px-2">
-                    Ballistics & Research
-                  </span>
-                  <Link
-                    href="/dna"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
-                  >
-                    <Microscope className="w-4 h-4 text-blue-400" />
-                    <span>Subsonic DNA Testing Lab</span>
-                  </Link>
-                </div>
+
 
                 {/* Mobile Action: Invitation-Only Member Sign-In */}
                 <div className="pt-2 border-t border-white/10 space-y-2">

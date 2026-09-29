@@ -148,21 +148,21 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Testing & Media */}
+          {/* Column 4: Dossiers & Comms */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
-              Subsonic DNA & Media
+              Competitor Dossiers & Comms
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/dna" className="hover:text-blue-300 transition-colors flex items-center gap-1">
-                  <Microscope className="w-3 h-3 text-blue-400" />
-                  <span>Ammunition Lot Database</span>
+                <Link href="/competitor-packet" className="hover:text-amber-400 transition-colors flex items-center gap-1">
+                  <Award className="w-3 h-3 text-amber-400" />
+                  <span>2026 Competitor Packet (PDF)</span>
                 </Link>
               </li>
               <li>
-                <Link href="/dna" className="hover:text-blue-300 transition-colors">
-                  Harmonic Tuner Matrices
+                <Link href="/documents" className="hover:text-cyan-300 transition-colors">
+                  Match Rules & Waivers
                 </Link>
               </li>
               <li>
