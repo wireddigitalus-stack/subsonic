@@ -263,8 +263,38 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
 
 export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   {
+    id: "msg-ro-001",
+    channelId: "invitational",
+    type: "MATCH_ALERT",
+    author: {
+      id: "plink_ai_moderator",
+      name: "RO",
+      callsign: "RO",
+      role: "OFFICIAL",
+      badgeText: "RANGE OFFICER",
+      division: "Range Officer • The Hideout",
+      rifleSetup: "Official Range Officer • The Hideout Bristol",
+    },
+    content:
+      "🎯 Welcome competitors to the 2026 Subsonic Society Invitational Money Match at The Hideout (Nov 13–15, 2026)! I am your Range Officer (RO). I have full operational intel on match schedules, the $2,500 cash side matches, the 220-acre facility, 12 Bristol hotel options, top dining spots (Blackbird Bakery is open 24h!), and local entertainment like South Holston River trophy trout fly fishing and the Hard Rock Casino. Say 'hey ro' or ask '@ro help' anytime!",
+    timestamp: "09:00 AM",
+    reactions: [
+      { emoji: "🎯", count: 32, users: ["u1", "u2", "u3", "u4", "u5"] },
+      { emoji: "🏆", count: 21, users: ["u6", "u7", "u8"] },
+      { emoji: "⛰️", count: 18, users: ["u9", "u10"] },
+    ],
+    moderationStatus: "APPROVED",
+    aiModerationReport: {
+      toxicityScore: 0,
+      threatScore: 0,
+      policyScore: 0,
+      sentiment: "POSITIVE",
+      aiEngine: "Range Officer RO",
+    },
+  },
+  {
     id: "msg-001",
-    channelId: "bristol-pro-shootout",
+    channelId: "invitational",
     type: "MATCH_ALERT",
     author: {
       id: "user-md",
@@ -276,12 +306,11 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "Vudoo Official Chrono Spec",
     },
     content:
-      "Welcome competitors to the 2026 Appalachian Mountain Rimfire Pro Invitational. Stage 1 through Stage 18 course of fire will be posted next week. Squad assignments go live Friday. Ensure your DOPE is true out to 465 yards!",
-    timestamp: "10:14 AM",
+      "All competitors: Staging opens Friday Nov 13 at 10:00 AM for check-in, zero confirmation, and chrono testing at The Hideout (111 Hwy 44). Welcome address and smoked BBQ dinner by Allen Hurley starts at 5:30 PM (all meals included all weekend). Saturday we kick off Stages 1–10 followed by the $1,000 Rimfire Speed Duel at 4:30 PM!",
+    timestamp: "09:30 AM",
     reactions: [
-      { emoji: "🎯", count: 18, users: ["u1", "u2", "u3"] },
-      { emoji: "🔥", count: 12, users: ["u4", "u5"] },
-      { emoji: "⛰️", count: 9, users: ["u6"] },
+      { emoji: "🎯", count: 24, users: ["u1", "u2", "u3"] },
+      { emoji: "🔥", count: 19, users: ["u4", "u5"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
@@ -294,7 +323,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-002",
-    channelId: "bristol-pro-shootout",
+    channelId: "invitational",
     type: "DOPE_DROP",
     author: {
       id: "user-wyatt",
@@ -306,7 +335,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
     },
     content:
-      "Verified DOPE card for the 340-yard diamond plate on Stage 4. Lapua Center-X lot 32187 holding 1062 fps. Watch for the thermal lift off the lower draw.",
+      "DOPE card for Stage 4 (340-yard diamond steel across the hollow). Lapua Center-X holding 1,062 fps. Also heads up: our squad booked rooms at The Bristol Hotel in Historic Downtown on State Street. Lumac Rooftop has incredible mountain sunset views if anyone wants drinks Thursday night.",
     dopeCard: {
       targetDistance: "340 YDS",
       targetDescription: "Stage 4 • Diamond KYL Rack",
@@ -315,13 +344,13 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       windVelocity: "9 MPH @ 260° WNW",
       ammo: "Lapua Center-X 40gr (1,062 FPS)",
       densityAltitude: "+2,150 FT",
-      notes: "Hold left-edge center. Downdraft causes 0.2 mil vertical drop if wind drops under 6 mph.",
+      notes: "Hold left-edge center. Expect 0.2 mil vertical drop in canyon draw when wind slackens.",
     },
-    timestamp: "10:45 AM",
+    timestamp: "10:15 AM",
     reactions: [
-      { emoji: "🎯", count: 14, users: ["u1", "u7", "u9"] },
-      { emoji: "👏", count: 8, users: ["u8"] },
-      { emoji: "💡", count: 11, users: ["u2"] },
+      { emoji: "🎯", count: 17, users: ["u1", "u7", "u9"] },
+      { emoji: "🍺", count: 12, users: ["u8", "u2"] },
+      { emoji: "💡", count: 14, users: ["u3"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
@@ -334,7 +363,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-003",
-    channelId: "ballistics-and-gear",
+    channelId: "invitational",
     type: "STANDARD",
     author: {
       id: "user-kendra",
@@ -346,11 +375,11 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "RimX / Proof Carbon 22\" / TT525P",
     },
     content:
-      "For anyone asking about tuners on the RimX: The Harrell tuner clamped 1.5 inches back tightened our 100-yard group from 0.42 MOA to 0.28 MOA with SK Long Range. Worth every ounce of forward balance weight.",
-    timestamp: "11:20 AM",
+      "Mandatory Bristol recommendation: Blackbird Bakery on Piedmont Ave is open 24 hours (Mon–Sat). We are grabbing 4 dozen doughnuts and espresso Friday morning before arriving at The Hideout for zeroing. Best doughnuts in the Southeast.",
+    timestamp: "10:45 AM",
     reactions: [
-      { emoji: "💡", count: 14, users: ["u1", "u2"] },
-      { emoji: "🔥", count: 6, users: ["u3"] },
+      { emoji: "🍩", count: 28, users: ["u1", "u2", "u3", "u4"] },
+      { emoji: "🔥", count: 15, users: ["u5", "u6"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
@@ -363,7 +392,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-004",
-    channelId: "general-society",
+    channelId: "invitational",
     type: "STANDARD",
     author: {
       id: "user-eli",
@@ -375,12 +404,15 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "CZ 457 MTR / Vortex Razor Gen III",
     },
     content:
-      "Anyone travelling to Bristol from North Carolina wanting to share a cabin near South Holston Lake? Plenty of room for gear cases and loading benches.",
-    timestamp: "12:05 PM",
-    reactions: [{ emoji: "👍", count: 6, users: ["u3", "u4"] }],
+      "Anyone bringing fly rods to Bristol? The South Holston River is one of the top wild brown trout tailwaters in the country. I'm doing a half-day float with Trophy Water Guide Service Friday morning before check-in. Got 1 extra spot in the drift boat if someone wants in!",
+    timestamp: "11:30 AM",
+    reactions: [
+      { emoji: "🎣", count: 16, users: ["u3", "u4", "u9"] },
+      { emoji: "👍", count: 11, users: ["u7"] },
+    ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
-      toxicityScore: 2,
+      toxicityScore: 0,
       threatScore: 0,
       policyScore: 0,
       sentiment: "POSITIVE",
@@ -389,23 +421,23 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-005",
-    channelId: "range-conditions-weather",
+    channelId: "invitational",
     type: "STANDARD",
     author: {
-      id: "user-md",
-      name: "Garrett Vance",
-      callsign: "DIRECTOR-01",
-      role: "MATCH_DIRECTOR",
-      badgeText: "MATCH DIRECTOR",
-      division: "RANGE MASTER",
-      rifleSetup: "Kestrel 5700 Elite Link",
+      id: "user-marcus",
+      name: "Marcus Webb",
+      callsign: "IRONHIDE",
+      role: "PRO_COMPETITOR",
+      badgeText: "OPEN PRO",
+      division: "Open Division Pro",
+      rifleSetup: "Vudoo Ravage / Krieger 20\" / NF ATACR 7-35",
     },
     content:
-      "Ridge weather update from Station 2 (Elevation 3,420 FT): Current winds 9 gusting 14 mph from 270° (WNW). Density altitude is sitting at +2,150 ft. Expect strong mirage on targets past 300 yards between 11:30 and 14:00.",
-    timestamp: "12:30 PM",
+      "For lodging: We stayed at the Courtyard by Marriott right off Exit 74 near The Pinnacle. 14 minutes from The Hideout, super quiet, and right next to Bass Pro Shops in case you need last-minute camping or shooting gear.",
+    timestamp: "12:10 PM",
     reactions: [
-      { emoji: "⛰️", count: 15, users: ["u1", "u5"] },
-      { emoji: "🎯", count: 9, users: ["u2"] },
+      { emoji: "🏨", count: 12, users: ["u1", "u5"] },
+      { emoji: "🎯", count: 8, users: ["u2"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
@@ -418,23 +450,23 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-006",
-    channelId: "squad-briefings",
+    channelId: "invitational",
     type: "STANDARD",
     author: {
-      id: "user-wyatt",
-      name: "Wyatt Sterling",
-      callsign: "GHOST",
-      role: "PRO_COMPETITOR",
-      badgeText: "SQUAD 3 LEAD",
-      division: "Open Division Pro",
-      rifleSetup: "Vudoo V-22 / Bartlein MTU 20\"",
+      id: "user-sofia",
+      name: "Sofia Reyes",
+      callsign: "VIPER",
+      role: "MEMBER",
+      badgeText: "PRODUCTION",
+      division: "Production Division",
+      rifleSetup: "Bergara B-14R / Bushnell XRS3 6-36",
     },
     content:
-      "Squad 3 check-in: We start Stage 7 (The Tank Trap Barricade) at 08:30 Saturday. Bring extra chamber flags and 2 friction pads. Make sure your magazine extensions are clean.",
-    timestamp: "1:15 PM",
+      "Our squad is staying at the Hard Rock Hotel & Casino Bristol! About 20 minutes from the range. Sportsbook and live music on Saturday evening after the $1,000 Speed Duel. Who's entering the $1,500 1,000-Yard Cold Bore Challenge on Sunday?",
+    timestamp: "01:20 PM",
     reactions: [
-      { emoji: "👍", count: 7, users: ["u1", "u3"] },
-      { emoji: "🎯", count: 4, users: ["u4"] },
+      { emoji: "🎰", count: 15, users: ["u1", "u3", "u6"] },
+      { emoji: "🎯", count: 19, users: ["u4", "u8"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {
@@ -447,23 +479,24 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
   {
     id: "msg-007",
-    channelId: "match-day-alerts",
+    channelId: "invitational",
     type: "MATCH_ALERT",
     author: {
-      id: "user-md",
-      name: "Garrett Vance",
-      callsign: "DIRECTOR-01",
-      role: "MATCH_DIRECTOR",
-      badgeText: "MATCH DIRECTOR",
-      division: "RANGE MASTER",
-      rifleSetup: "Official Range Control",
+      id: "user-allen",
+      name: "Allen Hurley",
+      callsign: "ALLEN",
+      role: "OWNER_ADMIN",
+      badgeText: "FOUNDER",
+      division: "Executive / Match Host",
+      rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
     },
     content:
-      "🚨 OFFICIAL NOTICE: Mandatory competitor safety briefing will commence at 07:15 AM sharp under Pavilion 1. Chronograph verification is open from 06:00 to 07:00 AM. Cold range rules in effect.",
-    timestamp: "2:00 PM",
+      "Welcome to The Hideout, marksmen. Two hundred and twenty acres of Tennessee ridgeline purpose-built for shooters who take precision rimfire seriously. Friday Welcome BBQ starts at 5:30 PM under the main pavilion. Take care of the property, shoot clean, and enjoy everything Bristol has to offer. Said. Done.",
+    timestamp: "02:00 PM",
     reactions: [
-      { emoji: "🎯", count: 24, users: ["u1", "u2", "u3", "u4", "u5"] },
-      { emoji: "👏", count: 11, users: ["u6"] },
+      { emoji: "👑", count: 35, users: ["u1", "u2", "u3", "u4", "u5"] },
+      { emoji: "🎯", count: 28, users: ["u6", "u7"] },
+      { emoji: "👏", count: 22, users: ["u8"] },
     ],
     moderationStatus: "APPROVED",
     aiModerationReport: {

@@ -26,14 +26,14 @@ export function ChatChannelSidebar({
       <div className="ios-glass rounded-2xl md:rounded-3xl p-4 sm:p-5 border border-white/10 flex flex-col h-full min-h-0">
         <div className="flex items-center justify-between px-1 mb-3 shrink-0">
           <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-            {activeNetTab === "PRO" ? "Pro Squad anys" : "Society anys"}
+            Official Match Frequency
           </span>
           <span className="text-[10px] font-mono text-amber-400">
             {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Active Shooters
           </span>
         </div>
 
-        {/* anys List */}
+        {/* Channel Feed */}
         <div className="space-y-2 flex-1 min-h-0 overflow-y-auto no-scrollbar pr-0.5">
           {visibleChannels.map((ch) => {
             const isActive = currentChannel === ch.id;

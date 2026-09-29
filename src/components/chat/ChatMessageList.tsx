@@ -104,10 +104,9 @@ export function ChatMessageList({
                 const isPro = msg.author.role === "PRO_COMPETITOR";
                 const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
                 const isFlagged = msg.moderationStatus === "FLAGGED";
-                const isPlink = msg.author.id === "plink_ai_moderator";
-                // Plink warning tier from aiEngine field
-                // Derive Plink warning severity: toxicityScore encodes tier * 30
-                const plinkSeverity: "warn" | "alert" | "info" = isPlink
+                const isRO = msg.author.id === "plink_ai_moderator" || msg.author.name === "RO" || msg.author.callsign === "RO";
+                // RO warning tier from aiEngine field
+                const roSeverity: "warn" | "alert" | "info" = isRO
                   ? msg.aiModerationReport
                     ? (msg.aiModerationReport.toxicityScore >= 60 ? "alert" : "warn")
                     : "info"
@@ -117,12 +116,12 @@ export function ChatMessageList({
                   <div
                     key={msg.id}
                     className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 ${
-                      isPlink
-                        ? plinkSeverity === "alert"
+                      isRO
+                        ? roSeverity === "alert"
                           ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
-                          : plinkSeverity === "warn"
+                          : roSeverity === "warn"
                           ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
-                          : "bg-gradient-to-r from-cyan-950/40 to-black/80 border-cyan-500/25"
+                          : "bg-gradient-to-r from-amber-950/35 via-black/85 to-zinc-950 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
                         : isMasterOwner
                         ? "bg-gradient-to-r from-amber-950/60 via-black/80 to-yellow-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
                         : isOwnerAdmin
@@ -145,8 +144,8 @@ export function ChatMessageList({
                       <div className="flex items-center gap-2 md:gap-3 min-w-0">
                         {/* Avatar — desktop only */}
                         <div className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 ${
-                          isPlink
-                            ? "bg-cyan-950 text-cyan-300 border-cyan-500/50"
+                          isRO
+                            ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                             : isMasterOwner
                             ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                             : isOwnerAdmin
@@ -161,23 +160,23 @@ export function ChatMessageList({
                             ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
                             : "bg-black/60 text-amber-400 border-white/10"
                         }`}>
-                          {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
+                          {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`text-xs md:text-sm font-bold truncate ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
-                              {msg.author.name}
+                            <span className={`text-xs md:text-sm font-bold truncate ${isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
+                              {isRO ? "RO" : msg.author.name}
                             </span>
                             {/* Callsign brackets — desktop only */}
-                            {msg.author.callsign && !isPlink && (
+                            {msg.author.callsign && !isRO && (
                               <span className="hidden md:inline text-xs font-mono text-amber-400 font-bold">
                                 [{msg.author.callsign}]
                               </span>
                             )}
                             <span
                               className={`text-[8px] md:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
-                                isPlink
-                                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                                isRO
+                                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/50"
                                   : isMasterOwner
                                   ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300"
                                   : isOwnerAdmin
@@ -193,24 +192,22 @@ export function ChatMessageList({
                                   : "bg-white/10 text-slate-300"
                               }`}
                             >
-                              {isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
+                              {isRO ? "RANGE OFFICER" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
                             </span>
                             {/* Timestamp — inline on mobile */}
                             <span className="text-[10px] md:hidden text-slate-500 font-mono">{msg.timestamp}</span>
                           </div>
-                          {/* Rig line — desktop only */}
-                          {msg.author.rifleSetup && (
+                          {/* Rig line or RO Subtitle — desktop only */}
+                          {isRO ? (
+                            <div className="hidden md:flex text-[10px] font-mono text-amber-400/90 items-center gap-1.5 font-medium">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse inline-block" />
+                              <span>Range Officer · The Hideout Official</span>
+                            </div>
+                          ) : msg.author.rifleSetup ? (
                             <div className="hidden md:block text-[10px] font-mono text-slate-400 truncate max-w-md">
                               Rig: {msg.author.rifleSetup}
                             </div>
-                          )}
-                          {/* Plink AI label — desktop only */}
-                          {isPlink && (
-                            <div className="hidden md:flex text-[10px] font-mono text-cyan-500 items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
-                              AI-powered · All channels monitored
-                            </div>
-                          )}
+                          ) : null}
                         </div>
                       </div>
 
@@ -222,8 +219,10 @@ export function ChatMessageList({
                             <AlertTriangle className="w-2.5 h-2.5" />
                             REVIEW
                           </span>
-                        ) : isPlink ? (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 font-bold">AI</span>
+                        ) : isRO ? (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold font-mono">
+                            OFFICIAL RO
+                          </span>
                         ) : (
                           <Check className="w-3.5 h-3.5 text-emerald-400" />
                         )}

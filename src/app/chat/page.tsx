@@ -74,64 +74,13 @@ interface ChannelConfig {
 }
 
 const ALL_CHANNELS: ChannelConfig[] = [
-  // Competitor Pro Net
   {
-    id: "bristol-pro-shootout",
-    name: "bristol-pro-shootout",
-    badge: "PRO SQUADS",
-    desc: "Stage strategies, DOPE sharing, and ridge elevation calls",
+    id: "invitational",
+    name: "invitational",
+    badge: "2026 MATCH",
+    desc: "The Hideout Invitational: Match Ops, Bristol Lodging, Food & Entertainment",
     netType: "PRO",
-    activeUsers: 48,
-  },
-  {
-    id: "squad-briefings",
-    name: "squad-briefings",
-    badge: "SQUAD OPS",
-    desc: "Staging times, rotation orders, and barricade pacing",
-    netType: "PRO",
-    activeUsers: 34,
-  },
-  {
-    id: "match-day-alerts",
-    name: "match-day-alerts",
-    badge: "OFFICIAL MD",
-    desc: "Priority match director broadcasts, cold ranges & hold calls",
-    netType: "PRO",
-    activeUsers: 92,
-  },
-  {
-    id: "ro-disputes-appeals",
-    name: "ro-disputes-appeals",
-    badge: "RO CONTROL",
-    desc: "Official target scoring challenges and stage rule inquiries",
-    netType: "PRO",
-    activeUsers: 16,
-  },
-
-  // Public Comms Net
-  {
-    id: "general-society",
-    name: "general-society",
-    badge: "OPEN NET",
-    desc: "Precision rimfire community banter, travel, and range meetups",
-    netType: "PUBLIC",
-    activeUsers: 64,
-  },
-  {
-    id: "ballistics-and-gear",
-    name: "ballistics-and-gear",
-    badge: "TECH TALK",
-    desc: "Rifles, ammo lots, tuners, LabRadar data, and high-mag glass",
-    netType: "PUBLIC",
-    activeUsers: 51,
-  },
-  {
-    id: "range-conditions-weather",
-    name: "range-conditions-weather",
-    badge: "WEATHER",
-    desc: "Holston Mountain live crosswinds, mirage, DA & barometric updates",
-    netType: "PUBLIC",
-    activeUsers: 39,
+    activeUsers: 94,
   },
 ];
 
@@ -157,7 +106,7 @@ const DEFAULT_PROFILE: ShooterProfile = {
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
   const [activeNetTab, setActiveNetTab] = useState<"PRO" | "PUBLIC">("PRO");
-  const [currentChannel, setCurrentChannel] = useState("bristol-pro-shootout");
+  const [currentChannel, setCurrentChannel] = useState("invitational");
   const [inputText, setInputText] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -191,8 +140,8 @@ export default function ChatPage() {
   // Messages Container Ref for internal container-only scrolling
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // Channels filtered by current active Net tab
-  const visibleChannels = ALL_CHANNELS.filter((ch) => ch.netType === activeNetTab);
+  // Active channel list (Invitational Official Comms)
+  const visibleChannels = ALL_CHANNELS;
   const currentChannelData = ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
   const filteredMessages = messages.filter((m) => m.channelId === currentChannel);
 
@@ -1690,41 +1639,10 @@ export default function ChatPage() {
           {/* Network Mode Selector Tabs */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveNetTab("PRO");
-                  if (!ALL_CHANNELS.filter(c => c.netType === "PRO").some(c => c.id === currentChannel)) {
-                    setCurrentChannel("bristol-pro-shootout");
-                  }
-                }}
-                className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  activeNetTab === "PRO"
-                    ? "bg-amber-500 text-black shadow-tactical-glow"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
+              <div className="px-3 py-1 rounded-lg font-mono text-xs font-bold bg-amber-500 text-black shadow-tactical-glow flex items-center gap-1.5">
                 <Lock className="w-3 h-3" />
-                <span>PRO NET</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveNetTab("PUBLIC");
-                  if (!ALL_CHANNELS.filter(c => c.netType === "PUBLIC").some(c => c.id === currentChannel)) {
-                    setCurrentChannel("general-society");
-                  }
-                }}
-                className={`px-2.5 sm:px-3.5 py-1 rounded-lg font-mono text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  activeNetTab === "PUBLIC"
-                    ? "bg-blue-600 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <Users className="w-3 h-3" />
-                <span>PUBLIC NET</span>
-              </button>
+                <span>OFFICIAL INVITATIONAL COMMS</span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

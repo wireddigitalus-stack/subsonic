@@ -1,26 +1,27 @@
 /**
- * PLINK ENGINE — Subsonic Society AI Range Marshal
- * ────────────────────────────────────────────────
- * Plink is an always-on, rule-based chat moderator that appears
- * as a first-class participant in all Subsonic Society channels.
- *
- * Phase 1: Rule-based pattern matching (free, instant, no API)
- * Phase 2: Gemini API integration (toggle-ready via /api/plink)
+ * RO (RANGE OFFICER) ENGINE — The Subsonic Society Official Range Marshal
+ * ────────────────────────────────────────────────────────────────────────
+ * RO is the official Range Officer for The Subsonic Society and The Hideout.
+ * Armed with complete operational knowledge of the 2026 Subsonic Society Invitational
+ * Money Match, the 220-acre facility, Bristol lodging, dining, and local entertainment.
  */
 
 import { ChatMessage } from "./types";
 
-// ─── PLINK IDENTITY ───────────────────────────────────────────────────────────
+// ─── RO IDENTITY ──────────────────────────────────────────────────────────────
 
-export const PLINK_AUTHOR = {
-  id: "plink_ai_moderator",
-  name: "Plink",
-  callsign: "PLINK",
-  role: "AI_MODERATOR" as const,
-  badgeText: "AI RANGE MARSHAL",
-  division: "Subsonic Society Staff",
-  rifleSetup: undefined,
+export const RO_AUTHOR = {
+  id: "plink_ai_moderator", // keep ID for backwards compatibility with message moderation & filters
+  name: "RO",
+  callsign: "RO",
+  role: "OFFICIAL" as const,
+  badgeText: "RANGE OFFICER",
+  division: "Official Range Officer • The Hideout",
+  rifleSetup: "Official Range Officer • The Hideout Bristol",
 };
+
+// Export PLINK_AUTHOR alias for backwards compatibility
+export const PLINK_AUTHOR = RO_AUTHOR;
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 
@@ -114,196 +115,319 @@ const COMMERCIAL_PATTERNS: RegExp[] = [
   /\bclick\s+(here|this)\b/i,
 ];
 
-// ─── CONVERSATIONAL TRIGGERS ──────────────────────────────────────────────────
+// ─── CONVERSATIONAL TRIGGERS (RO & PLINK COMPATIBLE) ───────────────────────────
 
-// Direct greetings: "hey plink", "hi plink", "hello plink", "yo plink"
-const PLINK_GREETING    = /\b(hey|hi|hello|sup|yo|howdy|hiya|greetings)\s+plink\b/i;
-// Name-first: "Plink," or "Plink!" or "Plink?"
-const PLINK_NAME_FIRST  = /^plink\s*[,!?]/i;
-// Question directed at Plink: "plink, what..." or "@plink what..."
-const PLINK_QUESTION    = /\bplink[\s,]+.{0,40}\?/i;
-// @plink mention
-const PLINK_MENTION     = /@plink/i;
-// Thank you to Plink
-const PLINK_THANKS      = /\b(thanks|thank you|ty|thx|cheers|appreciate)\b.*\bplink\b|\bplink\b.*\b(thanks|thank you|ty|thx|cheers)\b/i;
-// Who / what are you
-const PLINK_IDENTITY    = /\b(who|what)\s+(are|is)\s+plink\b|plink[\s,]+(who|what)\s+are\s+you/i;
-// Are you real / AI
-const PLINK_REAL        = /\bplink\b.*(real|ai|bot|robot|human|alive|automated)/i;
-// How are you
-const PLINK_HOW         = /\bplink\b.*(how\s+are\s+you|you\s+ok|you\s+good|all\s+good)/i;
-// General name catch (lowest priority)
-const PLINK_MENTIONED   = /\bplink\b/i;
+const RO_GREETING = /\b(hey|hi|hello|sup|yo|howdy|hiya|greetings)\s+(ro|range\s*officer|plink)\b/i;
+const RO_NAME_FIRST = /^(ro|range\s*officer|plink)\s*[,!?]/i;
+const RO_QUESTION = /\b(ro|range\s*officer|plink)[\s,]+.{0,50}\?/i;
+const RO_MENTION = /@(ro|range\s*officer|plink)\b/i;
+const RO_THANKS = /\b(thanks|thank you|ty|thx|cheers|appreciate)\b.*\b(ro|range\s*officer|plink)\b|\b(ro|range\s*officer|plink)\b.*\b(thanks|thank you|ty|thx|cheers)\b/i;
+const RO_IDENTITY = /\b(who|what)\s+(are|is)\s+(ro|range\s*officer|plink)\b|(ro|range\s*officer|plink)[\s,]+(who|what)\s+are\s+you/i;
+const RO_REAL = /\b(ro|range\s*officer|plink)\b.*(real|ai|bot|robot|human|alive|automated)/i;
+const RO_HOW = /\b(ro|range\s*officer|plink)\b.*(how\s+are\s+you|you\s+ok|you\s+good|all\s+good)/i;
+const RO_MENTIONED = /\b(ro|range\s*officer|plink)\b/i;
 
 // ─── RESPONSE BANKS ───────────────────────────────────────────────────────────
 
-const PLINK_GREETING_RESPONSES = [
+const RO_GREETING_RESPONSES = [
   (c: string) =>
-    `Hey ${c}! \u{1F3AF} Plink here — on net and monitoring all channels. What do you need? Try @plink rules, @plink channels, or just ask me anything.`,
+    `Hey ${c}! 🎯 RO here — Range Officer on deck for The Hideout Invitational. Ready to talk match stages, Bristol lodging, food spots, or local entertainment. What do you need?`,
   (c: string) =>
-    `${c}, on net. \u{1F44B} Plink standing post at The Hideout. I watch all 7 channels around the clock. What can I help you with?`,
+    `${c}, Range Officer on net! 📻 Standing post for the 2026 Subsonic Society Invitational. Need info on the match schedule, hotels in Bristol, or where to grab dinner tonight? Ask away.`,
   (c: string) =>
-    `Hey there ${c}! I'm Plink — Subsonic Society's AI Range Marshal. Always watching, never sleeping. Ask me anything — rules, range info, channels, or just chat. \u{1F3D4}\uFE0F`,
+    `Welcome to the Invitational frequency, ${c}! ⛰️ I'm your Range Officer (RO). I have the entire 2026 Competitor Packet locked in — stages, side matches, hotels, BBQ, and Bristol entertainment. How can I help you prep?`,
   (c: string) =>
-    `Plink here, ${c}. On net and monitoring. Whether it's community guidelines, range intel, or just a question — I'm your first call. What's up?`,
-  (c: string) =>
-    `${c}! Good to hear from you. \u{1F3AF} I'm Plink — trained on SS guidelines and Holston Mountain range data. What's on your mind?`,
+    `RO here, ${c}. Frequencies open. Whether you need hotel recommendations, stage rotation times, or the best steak and doughnuts in Bristol, I've got your DOPE.`,
 ];
 
-const PLINK_THANKS_RESPONSES = [
-  (c: string) => `Roger that, ${c}. Plink out. \u{1F3AF} Always here if you need me.`,
-  (c: string) => `Anytime, ${c}. Stay dialed in. \u{1F3D4}\uFE0F`,
-  (c: string) => `Copy, ${c}. Plink monitoring. Stay on net.`,
-  (c: string) => `Happy to help, ${c}. \u{1F3AF} I'll be here.`,
+const RO_THANKS_RESPONSES = [
+  (c: string) => `Roger that, ${c}. RO out. 🎯 Keep your chamber flagged and stay dialed in.`,
+  (c: string) => `Anytime, ${c}. See you on the firing line at The Hideout. ⛰️`,
+  (c: string) => `Copy that, ${c}. RO standing by on the Invitational frequency.`,
+  (c: string) => `Glad to help, ${c}. Let's make this the best money match in the country. Said. Done. 🏆`,
 ];
 
-const PLINK_IDENTITY_RESPONSES = [
+const RO_IDENTITY_RESPONSES = [
   (c: string) =>
-    `I'm Plink — Subsonic Society's AI Range Marshal. \u{1F916} I'm always on net across all 7 channels, watching for policy violations and answering member questions. I'm built on rimfire culture, SS community guidelines, and Holston Mountain range data. Type @plink help to see what I can do, ${c}.`,
+    `I'm RO — your official Range Officer for The Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🎯 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Ask me anything!`,
   (c: string) =>
-    `Plink is an AI Range Marshal, ${c} — think of me as an always-on staff member who never needs coffee. I watch every channel, flag violations, and help members navigate the Society. Ask me anything.`,
+    `I am the Range Officer (RO) for Subsonic Society, ${c}. Think of me as your 24/7 match briefing marshal and Bristol town concierge. From stage briefs and cold range rules to Blackbird Bakery doughnut runs and Downtown State Street hotels, I have you covered.`,
 ];
 
-const PLINK_REAL_RESPONSES = [
+const RO_REAL_RESPONSES = [
   (c: string) =>
-    `I'm an AI, ${c} — but I'm a real presence in these channels. \u{1F916} Built specifically for Subsonic Society to keep things clean, helpful, and on-range. I don't sleep, I don't miss messages, and I genuinely know rimfire. Ask me anything.`,
-  (c: string) =>
-    `AI through and through, ${c}. Phase 1 Plink is rule-based and fast. Phase 2 will bring full Gemini conversational AI. Either way — I'm always watching and happy to help.`,
+    `I'm your digital Range Officer, ${c} — running official Subsonic Society match intelligence. 🎯 I'm always on duty across The Hideout network to keep comms safe, answer match questions, and guide competitors visiting Bristol.`,
 ];
 
-const PLINK_HOW_RESPONSES = [
+const RO_HOW_RESPONSES = [
   (c: string) =>
-    `All systems nominal, ${c}. \u{1F7E2} 7 channels monitored, 0 critical incidents active. Weather net is quiet. Range is standing by. How are you?`,
+    `Range is in prime condition, ${c}! 🟢 220 acres prepped, steel freshly painted, elevation 3,420 FT, and Bristol is ready for all competitors. How's your gear prep going?`,
   (c: string) =>
-    `Running clean, ${c}. Pattern banks loaded, channel monitors active, no current escalations. \u{1F3AF} How can I help you today?`,
+    `All systems nominal on the Invitational frequency, ${c}. Weather telemetry is monitoring Holston Mountain drafts, and hotel blocks are filling up fast. What questions can I answer for you?`,
 ];
 
-const PLINK_GENERAL_RESPONSES = [
+const RO_GENERAL_RESPONSES = [
   (c: string) =>
-    `${c} — you mentioned me. What do you need? Try @plink rules, @plink channels, @plink bristol, or just ask your question directly. \u{1F3AF}`,
+    `${c} — you called for the Range Officer. What do you need? Ask about match dates, stage details, hotels, restaurants, or entertainment in Bristol. 🎯`,
   (c: string) =>
-    `On net, ${c}. Did you have a question for me? Type @plink help to see what I can help with.`,
-  (c: string) =>
-    `I caught my name, ${c}. What's up? I can help with community rules, range info, channel guidelines, or just general questions. Fire away.`,
+    `RO standing by, ${c}. Need intel on The Hideout, the $1,500 Cold Bore Challenge, or where to eat in Bristol? Fire away.`,
 ];
+
+// ─── WARNING MESSAGES ─────────────────────────────────────────────────────────
 
 const SOFT_LANGUAGE_WARNINGS = [
-  (c: string) => `Easy on the language, ${c} — we keep it range-professional here. \u{1F3AF}`,
-  (c: string) => `Heads up ${c} — let's keep transmissions clean. All callsigns are monitoring this channel.`,
-  (c: string) => `${c}, friendly reminder to keep the comms PG-13 — families and new shooters read these channels too.`,
+  (c: string) => `Easy on the language, ${c} — Range Officer reminder to keep transmissions range-professional. 🎯`,
+  (c: string) => `Heads up ${c} — let's keep comms clean. Competitors, sponsors, and families monitor this net.`,
 ];
 
 const FORMAL_LANGUAGE_WARNINGS = [
-  (c: string) => `\u26A0\uFE0F [${c}] — This is a formal warning for language that violates Society standards. This message has been flagged for Range Marshal review. Continued violations may result in chat restriction.`,
-  (c: string) => `\u26A0\uFE0F Formal warning issued to [${c}]: repeated use of prohibited language. This incident has been logged and escalated to staff.`,
+  (c: string) => `⚠️ [${c}] — Formal warning from the Range Officer for language violating Society standards. Continued violations will result in removal from the frequency.`,
 ];
 
 const SOFT_SALE_WARNINGS = [
-  (c: string) => `[${c}] — Gear and firearm sales aren't permitted in Society channels. For classifieds, reach out to staff directly. Your post has been flagged.`,
-  (c: string) => `Heads up [${c}] — Subsonic Society chat is not a marketplace. No sales, trades, or classified listings in any channel. Staff have been notified.`,
-  (c: string) => `[${c}] — Firearm and equipment transactions aren't allowed here for legal and safety reasons. Please remove commercial content. This has been logged.`,
+  (c: string) => `[${c}] — Gear and firearm transactions aren't permitted on Invitational comms. Contact match staff directly for official swap tables.`,
 ];
 
 const FORMAL_SALE_WARNINGS = [
-  (c: string) => `\u{1F6AB} [${c}] — Formal warning: posting sales, trades, or solicitations is a serious policy violation. This message has been escalated to Range Marshal staff and may result in immediate chat suspension.`,
+  (c: string) => `🚫 [${c}] — Range Officer notice: Unsolicited sales and commercial solicitations are strictly prohibited on official match frequencies.`,
 ];
 
 const HARASSMENT_WARNINGS = [
-  (c: string) => `\u{1F6AB} [${c}] — Harassment, threats, or targeted abuse toward other members is not tolerated. This transmission has been escalated to Range Marshal staff. Your access is under review.`,
+  (c: string) => `🚫 [${c}] — Unsportsmanlike conduct and targeted harassment will not be tolerated. This incident has been logged by the Range Officer and escalated to Match Director Allen Hurley.`,
 ];
 
 const UNSPORTSMANLIKE_WARNINGS = [
-  (c: string) => `\u26A0\uFE0F [${c}] — Accusations of cheating, score tampering, or unsportsmanlike attacks on Range Officials violate Subsonic Society standards. Official score protests must be submitted in writing to the Match Director. This incident has been logged and escalated to admin oversight.`,
-  (c: string) => `\u26A0\uFE0F Warning to [${c}]: Hostile disputes regarding scoring or Range Officers are prohibited on public comms. File an official protest with the Match Director. Transmission escalated.`,
+  (c: string) => `⚠️ [${c}] — Range Officer notice: Disputing scores or attacking officials on open comms violates match rules. Official score protests must be submitted directly to the Match Director.`,
 ];
 
 const SPAM_WARNINGS = [
-  (c: string) => `[${c}] — Looks like your message may have been sent multiple times or is flooding the channel. Please keep transmissions intentional and spaced out.`,
+  (c: string) => `[${c}] — Message flooding detected. Clear the net and space out your transmissions.`,
 ];
 
 const COMMERCIAL_WARNINGS = [
-  (c: string) => `[${c}] — Promotional links, referral codes, and commercial content aren't permitted in Society channels. Please keep it rimfire-relevant. This has been flagged.`,
+  (c: string) => `[${c}] — Commercial promotions and external links are restricted. Keep transmissions focused on the Invitational match and Bristol community.`,
 ];
 
-// ─── CHANNEL WELCOME MESSAGES ─────────────────────────────────────────────────
-
-const CHANNEL_WELCOMES: Record<string, (callsign: string) => string> = {
-  "bristol-pro-shootout": (c) =>
-    `Range open. Welcome to #bristol-pro-shootout, ${c}. Keep transmissions to match-day DOPE, stage strategy, and elevation calls. No sales, no spam. Say "hey plink" anytime you need me. \u{1F3D4}\uFE0F`,
-  "squad-briefings": (c) =>
-    `On net, ${c}. #squad-briefings is for staging times, rotation orders, and squad coordination. Keep it operational. Say "hey plink" or type @plink rules to see channel guidelines.`,
-  "match-day-alerts": (c) =>
-    `ALERT CHANNEL ACTIVE — ${c}, this is a Match Director broadcast channel. Listen-only unless you're staff or RO. Critical match updates only.`,
-  "ro-disputes-appeals": (c) =>
-    `${c}, you're in #ro-disputes-appeals. Formal target challenges and stage rule inquiries only. State your callsign, stage number, and target in dispute. Staff respond within 15 minutes during active match hours.`,
-  "general-society": (c) =>
-    `Hey ${c} — welcome to #general-society. Main community channel. Rimfire talk, range meetups, travel welcome. Keep it clean. Say "hey plink" or type @plink help anytime. \u{1F3AF}`,
-  "ballistics-and-gear": (c) =>
-    `Welcome to #ballistics-and-gear, ${c}. Share LabRadar data, lot testing results, and optic notes. No sales — tech talk and data only.`,
-  "range-conditions-weather": (c) =>
-    `${c}, you're on the weather net. #range-conditions-weather is for Holston Mountain live conditions — crosswinds, mirage flags, DA updates. Currently monitoring: 3,420 FT elevation. \u{1F32C}\uFE0F`,
-};
-
-const DEFAULT_WELCOME = (channelId: string, callsign: string) =>
-  `Welcome to #${channelId}, ${callsign}. Subsonic Society channels are staff-moderated. Keep transmissions rimfire-relevant and respectful. Say "hey plink" or type @plink rules for community guidelines.`;
-
-// ─── FAQ RESPONSE SYSTEM ──────────────────────────────────────────────────────
+// ─── INVITATIONAL FAQ & BRISTOL KNOWLEDGE BASE ─────────────────────────────────
 
 export function getFaqResponse(content: string): string {
   const lower = content.toLowerCase();
 
-  if (lower.includes("rule") || lower.includes("guideline") || lower.includes("policy")) {
-    return `\u{1F4CB} Subsonic Society Community Rules:\n1\uFE0F\u20E3 No firearm or gear sales in chat — ever.\n2\uFE0F\u20E3 Respect all callsigns — harassment = immediate ban.\n3\uFE0F\u20E3 PRO NET channels are for match-day DOPE and competition talk only.\n4\uFE0F\u20E3 No promotional links, referral codes, or commercial content.\n5\uFE0F\u20E3 Staff and Range Marshal decisions are final.\nSay "hey plink" to chat, or type @plink help for more commands.`;
+  // 1. HOTELS & LODGING IN BRISTOL
+  if (
+    lower.includes("hotel") ||
+    lower.includes("lodg") ||
+    lower.includes("stay") ||
+    lower.includes("room") ||
+    lower.includes("cabin") ||
+    lower.includes("camp") ||
+    lower.includes("rv") ||
+    lower.includes("motel")
+  ) {
+    return `🏨 **Bristol Lodging Guide (From 2026 Competitor Packet):**\n\n` +
+      `• **The Bristol Hotel (Historic Downtown)** — 12 mi / 18 min. Boutique luxury, Lumac Rooftop Bar & Vivian's Table. Highly recommended for couples & squads.\n` +
+      `• **Hard Rock Hotel & Casino Bristol** — 13 mi / 20 min. 24/7 resort gaming, upscale dining, Caesars sportsbook.\n` +
+      `• **Courtyard & Fairfield Inn by Marriott** — 9 mi / 14 min off I-81 Exit 74 near The Pinnacle shopping center.\n` +
+      `• **Hilton Garden Inn & Hampton Inn** — 10–11 mi / 15 min. Clean, dependable, with hot breakfast.\n` +
+      `• **Extended Stay America** — 10 mi / 15 min. Kitchenettes ideal for traveling shooters carrying pelican cases.\n` +
+      `• **Quality Inn / Days Inn / Red Roof** — 10–11 mi. Solid budget-friendly options.\n` +
+      `• **The Hideout On-Site Camping** — RV hookups & primitive camping available directly at 111 Hwy 44!\n\n` +
+      `💡 Check the full 12-hotel directory with direct phone numbers in the Competitor Packet!`;
   }
 
+  // 2. FOOD & DINING IN BRISTOL
+  if (
+    lower.includes("food") ||
+    lower.includes("eat") ||
+    lower.includes("restaur") ||
+    lower.includes("diner") ||
+    lower.includes("dinner") ||
+    lower.includes("lunch") ||
+    lower.includes("breakfast") ||
+    lower.includes("bbq") ||
+    lower.includes("bakery") ||
+    lower.includes("doughnut") ||
+    lower.includes("donut") ||
+    lower.includes("steak") ||
+    lower.includes("beer") ||
+    lower.includes("brew") ||
+    lower.includes("bourbon") ||
+    lower.includes("drink") ||
+    lower.includes("coffee")
+  ) {
+    return `🍽️ **Bristol Food & Dining Intel (Top 12 Picks):**\n\n` +
+      `• **Blackbird Bakery** (56 Piedmont Ave, Bristol VA) — Open 24h Mon–Sat! World-famous doughnuts, artisan pastries & espresso. Mandatory pre-match morning stop!\n` +
+      `• **620 State** (620 State St, Bristol TN) — Hand-cut steaks, Asian-fusion, sushi & cocktails right on the historic state line.\n` +
+      `• **Lumac Rooftop Bar** (510 State St, Bristol VA) — Craft cocktails & small plates with panoramic sunset views over the Appalachians.\n` +
+      `• **Vivian's Table** (Bristol Hotel) — Refined Southern dining, prime ribeyes & top-tier bourbon list.\n` +
+      `• **Delta Blues BBQ** (724 State St) — Slow-smoked Memphis-style ribs, brisket, pulled pork & weekend live blues.\n` +
+      `• **State Street Brewing & Michael Waltrip Brewing** — Downtown small-batch craft beer & NASCAR heritage taprooms.\n` +
+      `• **Lost State Distilling** (295 4th St) — Award-winning Tennessee whiskey, bourbon & gin tastings.\n` +
+      `• **Bloom Café & Listening Room** — Craft espresso, scratch breakfast & live acoustic music.\n` +
+      `• **The Angry Italian** (714 State St) — Chicago-style deep-dish pizza & Italian beef sandwiches for hungry squads.\n` +
+      `• **Cootie Brown's** (118 Volunteer Pkwy) — Jamaican jerk chicken, tamales & signature Key Lime pie.\n\n` +
+      `🍗 *Note: All match meals at The Hideout are included with registration (Friday Welcome BBQ, Sat breakfast & lunch, Sunday breakfast & awards banquet).*`;
+  }
+
+  // 3. ENTERTAINMENT, ATTRACTIONS & FLY FISHING
+  if (
+    lower.includes("entertain") ||
+    lower.includes("attraction") ||
+    lower.includes("do") ||
+    lower.includes("fish") ||
+    lower.includes("trout") ||
+    lower.includes("casino") ||
+    lower.includes("speedway") ||
+    lower.includes("nascar") ||
+    lower.includes("nightlife") ||
+    lower.includes("pinnacle") ||
+    lower.includes("bass pro") ||
+    lower.includes("hike") ||
+    lower.includes("trail") ||
+    lower.includes("museum") ||
+    lower.includes("lake")
+  ) {
+    return `🎯 **Bristol Entertainment & Leisure Guide:**\n\n` +
+      `• **South Holston River Fly Fishing** 🎣 — Ranked among the top tailwater wild brown & rainbow trout fisheries in the eastern US! 40+ miles of cold water. Call South Holston River Fly Shop or Trophy Water Guide Service. TWRA trout license required.\n` +
+      `• **Hard Rock Hotel & Casino Bristol** 🎰 — 24/7 gaming with table games, slots, Caesars Sportsbook & live entertainment.\n` +
+      `• **Historic Downtown State Street** 🏛️ — Walk the brass marker line separating Tennessee and Virginia simultaneously. Independent shops, taprooms, and cafes.\n` +
+      `• **Bristol Motor Speedway & Dragway** 🏎️ — "The Last Great Colosseum", iconic high-banked half-mile concrete track (146,000+ capacity).\n` +
+      `• **Birthplace of Country Music Museum** 🎵 — Smithsonian affiliate commemorating the historic 1927 Bristol Sessions.\n` +
+      `• **The Pinnacle** 🏹 — Massive shopping center off I-81 Exit 74 anchored by Bass Pro Shops.\n` +
+      `• **Appalachian Trail & Backbone Rock** ⛰️ — "The Shortest Tunnel in the World" and South Holston Dam overlook 20–30 min away.\n` +
+      `• **Bristol Caverns & Appalachian Caverns** 🦇 — Spectacular underground illuminated geological formations.\n` +
+      `• **Historic Abingdon & Barter Theatre** 🎭 — 15 min north in VA; historic brick town with the State Theatre of Virginia & 34-mile Creeper Bike Trail.`;
+  }
+
+  // 4. MATCH DATES, SCHEDULE & TIMES
+  if (
+    lower.includes("schedule") ||
+    lower.includes("time") ||
+    lower.includes("date") ||
+    lower.includes("when") ||
+    lower.includes("friday") ||
+    lower.includes("saturday") ||
+    lower.includes("sunday") ||
+    lower.includes("timeline")
+  ) {
+    return `📅 **2026 Invitational Match Schedule (Nov 13–15, 2026):**\n\n` +
+      `• **Friday, Nov 13 — Staging & Check-In:**\n` +
+      `  - 10:00 AM – 5:00 PM: Competitor Check-In, Zero Range Open, Practice Barricades & Chrono\n` +
+      `  - 5:30 PM: Welcome Address by Allen Hurley & Smoked BBQ Dinner (Included)\n\n` +
+      `• **Saturday, Nov 14 — Match Day 1:**\n` +
+      `  - 6:30 AM: Competitor Breakfast (Clubhouse)\n` +
+      `  - 7:30 AM: Mandatory Safety Briefing\n` +
+      `  - 8:00 AM: Match Day 1 Begins (Stages 1–10)\n` +
+      `  - 12:00 PM: Catered Lunch on the Line\n` +
+      `  - 4:30 PM: **$1,000 Rimfire Speed Duel Side Match** ⚡\n\n` +
+      `• **Sunday, Nov 15 — Match Day 2 & Awards:**\n` +
+      `  - 7:00 AM: Competitor Breakfast\n` +
+      `  - 8:00 AM: Match Day 2 Begins (Stages 11–20)\n` +
+      `  - 1:30 PM: **$1,500 1,000-Yard Cold Bore Challenge** 🎯\n` +
+      `  - 3:00 PM: Awards & Trophy Presentation ($28,500+ Prize Table)`;
+  }
+
+  // 5. SIDE MATCHES & CASH PURSES
+  if (
+    lower.includes("side match") ||
+    lower.includes("cold bore") ||
+    lower.includes("speed duel") ||
+    lower.includes("cash") ||
+    lower.includes("purse") ||
+    lower.includes("prize") ||
+    lower.includes("money match")
+  ) {
+    return `💰 **Cash Side Matches & Prize Table ($2,500 Cash Purse):**\n\n` +
+      `1️⃣ **$1,000 Rimfire Speed Duel** (Saturday 4:30 PM):\n` +
+      `   Head-to-head bracket elimination on dual reactive steel knockdowns. Speed, recoil recovery, and clean splits win the cash.\n\n` +
+      `2️⃣ **$1,500 1,000-Yard Cold Bore Challenge** (Sunday 1:30 PM):\n` +
+      `   Held across the deep Appalachian draws on The Hideout's centerfire range. One cold bore shot at 1,000 yards on steel. Closest to center plate takes the cash pot.\n\n` +
+      `🏆 Main Match: Over $28,500 in custom rifles, glass, chassis systems, and cash awarded at Sunday's ceremony. Presented by Modacam Custom Rifles.`;
+  }
+
+  // 6. THE HIDEOUT FACILITY & ADDRESS
+  if (
+    lower.includes("hideout") ||
+    lower.includes("facility") ||
+    lower.includes("address") ||
+    lower.includes("location") ||
+    lower.includes("where is") ||
+    lower.includes("directions") ||
+    lower.includes("acres")
+  ) {
+    return `📍 **The Hideout Facility Blueprint:**\n\n` +
+      `• **Address:** 111 Hwy 44, Bristol, TN 37620\n` +
+      `• **Property:** 220 acres of private Appalachian mountain ridgeline\n` +
+      `• **Ranges:**\n` +
+      `  - 300-Yard Dedicated Precision Rimfire Range (Barricades, tank traps, rooftop, rock ledges)\n` +
+      `  - 1,000-Yard Centerfire Long-Range Course\n` +
+      `  - Sporting Clays & Skeet Field\n` +
+      `• **Clubhouse:** Air-conditioned pro shop, lounge, conference rooms & staging pavilions\n` +
+      `• **Camping:** On-site RV hookups (water/electric) and dry tent camping\n` +
+      `• **Host:** Allen Hurley — Subsonic Society Founder ("Said. Done.")`;
+  }
+
+  // 7. AMMO, BALLISTICS & GEAR
+  if (
+    lower.includes("ammo") ||
+    lower.includes("bullet") ||
+    lower.includes("velocity") ||
+    lower.includes("subsonic") ||
+    lower.includes("gear") ||
+    lower.includes("spec") ||
+    lower.includes("lapua") ||
+    lower.includes("eley") ||
+    lower.includes("sk")
+  ) {
+    return `🎯 **Ammunition & Gear Specifications:**\n\n` +
+      `• **Authorized Ammunition:** Standard-velocity or subsonic .22 LR with muzzle velocity under 1,120 FPS at sea level equivalent.\n` +
+      `• **Prohibited:** Any hyper-velocity or magnum rimfire (.22 WMR, .17 HMR).\n` +
+      `• **Chrono Station:** Random squad chronograph checks conducted during Friday practice & Saturday staging.\n` +
+      `• **Top Match Lots:** Lapua Center-X, SK Long Range Match, Eley Tenex, and RWS R50.\n` +
+      `• **Elevation DOPE:** Range elevation sits at 3,420 FT. Account for thermal ridge drafts and lower air density. Check Subsonic DNA (/dna) for lot ballistics.`;
+  }
+
+  // 8. RULES & SAFETY
+  if (
+    lower.includes("rule") ||
+    lower.includes("safety") ||
+    lower.includes("flag") ||
+    lower.includes("chamber") ||
+    lower.includes("ro") ||
+    lower.includes("range officer")
+  ) {
+    return `📋 **Range Safety & Match Regulations:**\n\n` +
+      `1️⃣ **Cold Range Standard:** Rifles remain completely unloaded with chamber flags inserted until the RO gives the command to load and make ready.\n` +
+      `2️⃣ **Muzzle Discipline:** 120-degree muzzle rule enforced on all transition stages and barricades.\n` +
+      `3️⃣ **Eye & Ear Protection:** Mandatory for all competitors, squad leads, ROs, and spectators.\n` +
+      `4️⃣ **Score Protests:** Inquiries must be filed with the Chief RO or Match Director within 30 minutes of stage completion.\n` +
+      `5️⃣ **Community Comms:** No gear sales, harassment, or commercial spam on the frequency. Respect all marksmen.`;
+  }
+
+  // 9. GENERAL HELP & COMMANDS
   if (lower.includes("help") || lower.includes("command") || lower.includes("what can you")) {
-    return `\u{1F916} I'm Plink — Subsonic Society's AI Range Marshal. Here's what I know:\n\n\u{1F4AC} Say "hey plink" — chat with me directly\n\u{1F4CB} @plink rules — community guidelines\n\u{1F4E1} @plink channels — what to post where\n\u{1F3D4}\uFE0F @plink bristol — range info + elevation\n\u{1F4FB} @plink contact — reach live staff\n\u{1F3AF} @plink ammo — authorized ammunition\n\u270D\uFE0F @plink register — match registration\n\u2696\uFE0F @plink appeal — dispute a warning\n\nOr just ask me a question naturally — I'm always listening.`;
+    return `🎯 **I'm RO — Official Range Officer for The Hideout Invitational. Here's what I know:**\n\n` +
+      `• **@ro schedule** — Full 3-day match schedule (Nov 13–15)\n` +
+      `• **@ro hotels** — 12 recommended Bristol hotels, rates & distances\n` +
+      `• **@ro food** — Top 12 Bristol restaurants, BBQ, steaks & Blackbird Bakery\n` +
+      `• **@ro entertainment** — Fly fishing, Hard Rock Casino, Speedway & attractions\n` +
+      `• **@ro side matches** — $1,000 Speed Duel & $1,500 Cold Bore Challenge\n` +
+      `• **@ro hideout** — 220-acre facility amenities, camping & address\n` +
+      `• **@ro ammo** — Authorized ammo specs & subsonic speed limits\n` +
+      `• **@ro rules** — Safety SOPs and cold range rules\n\n` +
+      `Or just ask any natural question about the match or Bristol — I'm monitoring this frequency 24/7!`;
   }
 
-  if (lower.includes("channel") || lower.includes("where") || lower.includes("post")) {
-    return `\u{1F4E1} Channel guide:\n#bristol-pro-shootout \u2192 Match DOPE & stage strategy\n#squad-briefings \u2192 Staging & rotation logistics\n#match-day-alerts \u2192 MD broadcasts only\n#general-society \u2192 Community talk\n#ballistics-and-gear \u2192 Tech, ammo, LabRadar data\n#range-conditions-weather \u2192 Live Holston Mountain conditions`;
-  }
-
-  if (lower.includes("bristol") || lower.includes("elevation") || lower.includes("hideout") || lower.includes("range")) {
-    return `\u{1F3D4}\uFE0F The Hideout — Holston Mountain, Bristol TN. Elevation: 3,420 FT. 18 natural terrain barricade stages. Steel arrays from 25–465 yards. Cross-canyon wind channels. October 17–18, 2026. Conditions updated live in #range-conditions-weather.`;
-  }
-
-  if (lower.includes("contact") || lower.includes("staff") || lower.includes("director") || lower.includes("marshal")) {
-    return `\u{1F4FB} To reach live Range Marshal staff: post in #ro-disputes-appeals during match hours, or email staff via the Contact page at subsonicsociety.com. For urgent match issues, your RO on deck has priority radio.`;
-  }
-
-  if (lower.includes("ammo") || lower.includes("ammunition") || lower.includes("lot") || lower.includes("lapua") || lower.includes("eley")) {
-    return `\u{1F3AF} Authorized ammo: standard-velocity or subsonic .22 LR under 1,120 FPS at sea level equivalent. Hyper-velocity is prohibited. For lot data and SD charts, check the Subsonic DNA section at subsonicsociety.com/dna.`;
-  }
-
-  if (lower.includes("register") || lower.includes("sign up") || lower.includes("entry") || lower.includes("fee")) {
-    return `\u270D\uFE0F Match registration: subsonicsociety.com/register — $275 entry fee. $7,500 guaranteed cash purse + $15,000+ prize table. Presented by Modacam Custom Rifles. Spots are limited.`;
-  }
-
-  if (lower.includes("warn") || lower.includes("ban") || lower.includes("muted") || lower.includes("appeal")) {
-    return `\u2696\uFE0F To appeal a warning or restriction, post in #ro-disputes-appeals with your callsign, the warning timestamp, and your explanation. A live Range Marshal will review within the match cycle.`;
-  }
-
-  if (lower.includes("weather") || lower.includes("wind") || lower.includes("condition")) {
-    return `\u{1F32C}\uFE0F Live range conditions are posted in #range-conditions-weather. Holston Mountain: 3,420 FT elevation. Cross-canyon winds are unpredictable — check the channel before staging.`;
-  }
-
-  if (lower.includes("score") || lower.includes("result") || lower.includes("standing") || lower.includes("winner")) {
-    return `\u{1F3C6} Live scores and standings are posted in #match-day-alerts by Match Directors after each stage. Final results post within 2 hours of the last stage.`;
-  }
-
-  if (lower.includes("stage") || lower.includes("barricade") || lower.includes("target")) {
-    return `\u{1F3AF} The Hideout has 18 natural terrain barricade stages. Steel targets from 25–465 yards. Stage briefings post in #squad-briefings before each stage cycle. RO and MD calls are final — disputes go to #ro-disputes-appeals.`;
-  }
-
-  return `\u{1F916} I'm Plink, your AI Range Marshal. I'm monitoring all channels. Try @plink rules, @plink channels, @plink bristol, or @plink help. Or just say "hey plink" and ask me directly.`;
+  return `🎯 Range Officer on net! I'm tracking all details for the 2026 Subsonic Society Invitational. Ask me about the match schedule, $2,500 cash side matches, Bristol hotels, restaurants, or local entertainment like South Holston fly fishing and the Hard Rock Casino. Type @ro help for commands!`;
 }
 
 // ─── CHANNEL WELCOME ──────────────────────────────────────────────────────────
 
 export function getChannelWelcome(channelId: string, callsign: string): string {
-  const fn = CHANNEL_WELCOMES[channelId];
-  return fn ? fn(callsign) : DEFAULT_WELCOME(channelId, callsign);
+  return `🎯 Range Officer on net! Welcome to #${channelId}, ${callsign}.\n\n` +
+    `This is the official 2026 Subsonic Society Invitational frequency for The Hideout in Bristol, TN (Nov 13–15). ` +
+    `Use this channel for match operations, stage DOPE, Bristol hotel coordination, food runs, and local entertainment.\n\n` +
+    `Say "hey ro" or ask me anything about the match schedule, $2,500 cash side matches, Bristol dining (Blackbird Bakery!), lodging, or fly fishing on the South Holston!`;
 }
 
 // ─── RANDOM PICKER ───────────────────────────────────────────────────────────
@@ -328,27 +452,36 @@ export function analyzeMsgForPlink(
 
   // ── Conversational checks FIRST (before moderation) ────────────────────────
 
-  if (PLINK_THANKS.test(content)) {
-    return { content: pick(PLINK_THANKS_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  if (RO_THANKS.test(content)) {
+    return { content: pick(RO_THANKS_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  if (PLINK_IDENTITY.test(content)) {
-    return { content: pick(PLINK_IDENTITY_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  if (RO_IDENTITY.test(content)) {
+    return { content: pick(RO_IDENTITY_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  if (PLINK_REAL.test(content)) {
-    return { content: pick(PLINK_REAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  if (RO_REAL.test(content)) {
+    return { content: pick(RO_REAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  if (PLINK_HOW.test(content)) {
-    return { content: pick(PLINK_HOW_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  if (RO_HOW.test(content)) {
+    return { content: pick(RO_HOW_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  if (PLINK_GREETING.test(content) || PLINK_NAME_FIRST.test(content)) {
-    return { content: pick(PLINK_GREETING_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  if (RO_GREETING.test(content) || RO_NAME_FIRST.test(content)) {
+    return { content: pick(RO_GREETING_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  if (PLINK_MENTION.test(content) || PLINK_QUESTION.test(content)) {
+  if (RO_MENTION.test(content) || RO_QUESTION.test(content)) {
+    return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  }
+
+  // Direct question keywords about Bristol or match details
+  const lower = content.toLowerCase();
+  if (
+    (lower.includes("where to stay") || lower.includes("hotel") || lower.includes("lodging") || lower.includes("where to eat") || lower.includes("restaurant") || lower.includes("blackbird") || lower.includes("bbq") || lower.includes("fly fishing") || lower.includes("south holston") || lower.includes("casino") || lower.includes("side match") || lower.includes("cold bore") || lower.includes("schedule")) &&
+    (lower.includes("?") || lower.includes("recommend") || lower.includes("best") || lower.includes("ro") || lower.includes("anyone"))
+  ) {
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
@@ -386,15 +519,15 @@ export function analyzeMsgForPlink(
     return { content: pick(SPAM_WARNINGS)(callsign), warningTier: 1, violationType: "SPAM", shouldEscalate: false, targetCallsign: callsign };
   }
 
-  // ── Low-priority: "plink" mentioned casually ──────────────────────────────
-  if (PLINK_MENTIONED.test(content)) {
-    return { content: pick(PLINK_GENERAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  // ── Low-priority: RO or Plink mentioned casually ───────────────────────────
+  if (RO_MENTIONED.test(content)) {
+    return { content: pick(RO_GENERAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
   return null;
 }
 
-// ─── PLINK MESSAGE BUILDER ────────────────────────────────────────────────────
+// ─── RO MESSAGE BUILDER ───────────────────────────────────────────────────────
 
 export function buildPlinkMessage(
   content: string,
@@ -409,17 +542,17 @@ export function buildPlinkMessage(
   });
 
   return {
-    id: `plink_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    id: `ro_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     channelId,
     type: warningTier >= 2 ? "MATCH_ALERT" : "STANDARD",
-    author: { ...PLINK_AUTHOR },
+    author: { ...RO_AUTHOR },
     content,
     timestamp,
     reactions: [],
     moderationStatus: "APPROVED",
     aiModerationReport:
       warningTier > 0
-        ? { toxicityScore: warningTier * 30, threatScore: 0, policyScore: 0, sentiment: "NEUTRAL", aiEngine: "Plink v1" }
+        ? { toxicityScore: warningTier * 30, threatScore: 0, policyScore: 0, sentiment: "NEUTRAL", aiEngine: "Range Officer RO" }
         : undefined,
   };
 }

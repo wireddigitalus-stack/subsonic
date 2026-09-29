@@ -30,11 +30,11 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: "channels",
     targetId: "tour-step-channels",
-    badge: "01 / FREQUENCIES",
-    title: "Tactical Squad Channels",
+    badge: "01 / INVITATIONAL NET",
+    title: "Official Invitational Frequency",
     description:
-      "Switch between 7 dedicated frequencies. Use #bristol-pro-shootout for match strategy, #range-conditions-weather for live Holston Mountain telemetry, or #general-society to banter with competitors.",
-    proTip: "Swipe horizontally across the channel pills on mobile for fast switching.",
+      "Tune into #invitational — the dedicated frequency for the 2026 Subsonic Society Invitational. Coordinate match operations, verify Bristol lodging, explore top restaurants, and connect with squad mates.",
+    proTip: "Ask RO for lodging, food, side matches, or schedule intel anytime.",
     icon: <Radio className="w-5 h-5 text-amber-400" />,
   },
   {
@@ -60,12 +60,12 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: "plink",
     targetId: "tour-step-plink",
-    badge: "04 / AI MARSHAL",
-    title: "Plink AI Range Marshal",
+    badge: "04 / RANGE OFFICER",
+    title: "RO (Range Officer) Intelligence",
     description:
-      "Meet Plink 🤖, your 24/7 AI Range Marshal. Plink monitors chat for safety and answers range questions. Say 'hey plink', ask '@plink rules', or ask about Bristol weather anytime.",
-    proTip: "Type @plink help to view all available commands and channel guidelines.",
-    icon: <Bot className="w-5 h-5 text-cyan-300" />,
+      "Meet RO 🎯, your official Range Officer for The Hideout Invitational. RO knows all details from the Competitor Packet: match schedules, side matches, Bristol hotels, dining, and local entertainment. Say 'hey ro' or ask '@ro help' anytime.",
+    proTip: "Type @ro help or ask naturally about Bristol hotels, BBQ, or fly fishing.",
+    icon: <Bot className="w-5 h-5 text-amber-400" />,
   },
   {
     id: "pass",
