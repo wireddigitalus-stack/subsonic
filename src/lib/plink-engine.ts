@@ -232,7 +232,7 @@ export function getFaqResponse(content: string): string {
       `• **Extended Stay America** — 10 mi / 15 min. Kitchenettes ideal for traveling shooters carrying pelican cases.\n` +
       `• **Quality Inn / Days Inn / Red Roof** — 10–11 mi. Solid budget-friendly options.\n` +
       `• **The Hideout On-Site Camping** — RV hookups & primitive camping available directly at 111 Hwy 44!\n\n` +
-      `💡 Check the full 12-hotel directory with direct phone numbers in the Competitor Packet!`;
+      `💡 Check the full 12-hotel directory with direct phone numbers & online booking links in the Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet#hotels`;
   }
 
   // 2. FOOD & DINING IN BRISTOL

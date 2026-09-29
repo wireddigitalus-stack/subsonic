@@ -37,6 +37,7 @@ interface HotelItem {
   rate: "$" | "$$" | "$$$";
   category: "luxury" | "standard" | "budget";
   notes?: string;
+  website: string;
 }
 
 const HOTELS_DATA: HotelItem[] = [
@@ -46,7 +47,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 696-3737",
     rate: "$$$",
     category: "luxury",
-    notes: "Boutique historic property with Lumac Rooftop Bar & Vivian's Table."
+    notes: "Boutique historic property with Lumac Rooftop Bar & Vivian's Table.",
+    website: "https://www.bristolhotelva.com"
   },
   {
     name: "Courtyard by Marriott Bristol",
@@ -54,7 +56,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 591-4400",
     rate: "$$",
     category: "standard",
-    notes: "Convenient access off I-81 Exit 74, near The Pinnacle."
+    notes: "Convenient access off I-81 Exit 74, near The Pinnacle.",
+    website: "https://www.marriott.com/en-us/hotels/tricy-courtyard-bristol/overview/"
   },
   {
     name: "Fairfield Inn & Suites Bristol",
@@ -62,15 +65,17 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 669-8088",
     rate: "$$",
     category: "standard",
-    notes: "Modern rooms, complimentary breakfast, close to shopping."
+    notes: "Modern rooms, complimentary breakfast, close to shopping.",
+    website: "https://www.marriott.com/en-us/hotels/trifb-fairfield-inn-and-suites-bristol/overview/"
   },
   {
     name: "Hilton Garden Inn Bristol",
     distance: "11 miles / 16 min",
-    phone: "(276) 644-4444",
+    phone: "(276) 644-4000",
     rate: "$$",
     category: "standard",
-    notes: "Full-service hotel with restaurant and fitness center."
+    notes: "Full-service hotel with restaurant and fitness center.",
+    website: "https://www.hilton.com/en/hotels/trigigi-hilton-garden-inn-bristol/"
   },
   {
     name: "Hard Rock Hotel & Casino Bristol",
@@ -78,15 +83,17 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 244-4444",
     rate: "$$$",
     category: "luxury",
-    notes: "Full resort casino gaming, entertainment, and multiple restaurants."
+    notes: "Full resort casino gaming, entertainment, and multiple restaurants.",
+    website: "https://casino.hardrock.com/bristol"
   },
   {
     name: "Hampton Inn Bristol",
     distance: "10 miles / 15 min",
-    phone: "(276) 764-3600",
+    phone: "(423) 764-3600",
     rate: "$$",
     category: "standard",
-    notes: "Hot breakfast included, quiet location off highway."
+    notes: "Hot breakfast included, quiet location off highway.",
+    website: "https://www.hilton.com/en/hotels/britnhx-hampton-bristol/"
   },
   {
     name: "Holiday Inn & Suites Bristol",
@@ -94,7 +101,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 466-4100",
     rate: "$$",
     category: "standard",
-    notes: "Spacious suites with on-site dining and lounge."
+    notes: "Spacious suites with on-site dining and lounge.",
+    website: "https://www.ihg.com/holidayinn/hotels/us/en/bristol/tricv/hoteldetail"
   },
   {
     name: "Quality Inn & Suites Bristol",
@@ -102,7 +110,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 669-7171",
     rate: "$",
     category: "budget",
-    notes: "Budget-friendly option with quick highway access."
+    notes: "Budget-friendly option with quick highway access.",
+    website: "https://www.choicehotels.com/virginia/bristol/quality-inn-hotels/va553"
   },
   {
     name: "Days Inn by Wyndham Bristol",
@@ -110,7 +119,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 466-6060",
     rate: "$",
     category: "budget",
-    notes: "Affordable lodging option near dining corridors."
+    notes: "Affordable lodging option near dining corridors.",
+    website: "https://www.wyndhamhotels.com/days-inn/bristol-virginia/days-inn-bristol/overview"
   },
   {
     name: "Extended Stay America Bristol",
@@ -118,7 +128,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 645-0010",
     rate: "$",
     category: "budget",
-    notes: "Kitchenette units ideal for shooters carrying gear boxes."
+    notes: "Kitchenette units ideal for shooters carrying gear boxes.",
+    website: "https://www.extendedstayamerica.com/hotels/va/bristol"
   },
   {
     name: "Red Roof Inn Bristol",
@@ -126,7 +137,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 669-1151",
     rate: "$",
     category: "budget",
-    notes: "Pet-friendly, economical rooms near interstate."
+    notes: "Pet-friendly, economical rooms near interstate.",
+    website: "https://www.redroof.com/property/va/bristol/RRI1076"
   },
   {
     name: "Country Inn & Suites Abingdon (Alternative)",
@@ -134,7 +146,8 @@ const HOTELS_DATA: HotelItem[] = [
     phone: "(276) 676-2822",
     rate: "$$",
     category: "standard",
-    notes: "Historic Abingdon charm, Creeper Trail access, 18 miles north."
+    notes: "Historic Abingdon charm, Creeper Trail access, 18 miles north.",
+    website: "https://www.choicehotels.com/virginia/abingdon/country-inn-hotels/va724"
   }
 ];
 
@@ -883,7 +896,7 @@ export default function CompetitorPacketPage() {
               </h2>
               <p className="text-sm text-slate-400 max-w-2xl">
                 12 vetted partner hotels within 9 to 18 minutes of The Hideout range gate. 
-                Book early — November is high season in the Tri-Cities region.
+                Use the direct web links below to reserve online or tap to call front desks. Book early — November is high season in the Tri-Cities region.
               </p>
             </div>
 
@@ -941,21 +954,40 @@ export default function CompetitorPacketPage() {
                     </span>
                   </div>
 
-                  <h4 className="text-base font-bold text-white leading-snug">{h.name}</h4>
+                  <h4 className="text-base font-bold text-white leading-snug">
+                    <a
+                      href={h.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-amber-400 transition-colors inline-block"
+                    >
+                      {h.name}
+                    </a>
+                  </h4>
                   {h.notes && (
                     <p className="text-xs text-slate-400 leading-relaxed">{h.notes}</p>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
                   <a
                     href={`tel:${h.phone.replace(/[^0-9]/g, "")}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 hover:text-emerald-300 transition-colors py-1"
+                    title={`Call ${h.name}`}
                   >
                     <Phone className="w-3.5 h-3.5" />
                     <span>{h.phone}</span>
                   </a>
-                  <span className="text-[11px] text-slate-500 font-mono">1-Tap Dial</span>
+
+                  <a
+                    href={h.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-blue-500/25 text-xs font-mono font-bold transition-all shadow-sm group"
+                  >
+                    <span>Book Online</span>
+                    <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </a>
                 </div>
               </div>
             ))}
