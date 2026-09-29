@@ -19,7 +19,8 @@ import {
   Award,
   RefreshCw,
   Key,
-  Play
+  Play,
+  MessageSquare
 } from "lucide-react";
 import { playRealCommsChirp, playBotTelemetryChirp } from "@/lib/chat-audio";
 
@@ -120,6 +121,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
   const [showInterceptor, setShowInterceptor] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [replayCount, setReplayCount] = useState(0);
+  const [mobileExpandedChat, setMobileExpandedChat] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll to keep newest message in view
@@ -323,11 +325,107 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
         </div>
       </div>
 
-      {/* 2. Messages Display Viewport — starts cleanly from top */}
-      <div 
-        ref={scrollRef}
-        className="p-4 sm:p-6 space-y-3.5 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
-      >
+      {/* MOBILE COMPACT VIEW: Match Director Allen's Final Welcome & Redeem Invite Code */}
+      {!mobileExpandedChat && (
+        <div className="md:hidden p-3.5 sm:p-4 space-y-3 animate-fadeIn">
+          {/* Dispatch Header with Allen's Profile */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.4)] relative bg-black shrink-0">
+                <Image
+                  src="/images/SS-RWB-LOGO.png"
+                  alt="Allen Hurley - Subsonic Match Director"
+                  fill
+                  sizes="40px"
+                  className="object-cover"
+                />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-xs text-white">Allen Hurley</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold">
+                    MD / EXEC
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] text-amber-400 font-bold flex items-center gap-1">
+                  <span>CALLSIGN: DIRECTOR</span>
+                  <span>•</span>
+                  <span>THE HIDEOUT</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>LIVE</span>
+            </div>
+          </div>
+
+          {/* Official Welcome Message Box */}
+          <div className="p-3 rounded-2xl bg-black/60 border border-amber-500/30 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-amber-400 font-black uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Executive Welcome Dispatch</span>
+            </div>
+            <p className="text-xs text-slate-200 leading-relaxed font-sans">
+              Welcome marksman. Squad registration for the 2026 Subsonic Invitational at The Hideout is <strong className="text-amber-400">78% full ($7,500 Cash Purse)</strong>. If you received an invitation or squad pass, redeem your credentials below to unlock private comms, live DOPE drops, and competitor clearance.
+            </p>
+          </div>
+
+          {/* Primary Action Button: Redeem Invite Code */}
+          <Link
+            href="/invite"
+            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow active:scale-95 transition-all"
+          >
+            <Key className="w-4 h-4 fill-black" />
+            <span>REDEEM INVITE CODE &amp; CLAIM PASS</span>
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+
+          {/* Secondary Action Strip */}
+          <div className="flex items-center gap-2 pt-0.5">
+            <Link
+              href="/chat"
+              className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all text-center"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Enter Comms Room</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setMobileExpandedChat(true)}
+              className="flex-1 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
+              <span>Live Feed (4)</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DESKTOP STREAM VIEW & MOBILE EXPANDED VIEW */}
+      <div className={!mobileExpandedChat ? "hidden md:block" : "block"}>
+        {mobileExpandedChat && (
+          <div className="md:hidden px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between">
+            <span className="text-[10px] font-mono text-amber-400 font-bold">
+              STREAMING STAGE NET CHATTER
+            </span>
+            <button
+              type="button"
+              onClick={() => setMobileExpandedChat(false)}
+              className="text-[10px] font-mono text-slate-300 hover:text-white underline"
+            >
+              ← Back to Welcome
+            </button>
+          </div>
+        )}
+
+        {/* 2. Messages Display Viewport — starts cleanly from top */}
+        <div 
+          ref={scrollRef}
+          className="p-4 sm:p-6 space-y-3.5 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
+        >
         {messages.length === 0 && !isTyping && (
           <div className="py-12 text-center space-y-2">
             <Radio className="w-6 h-6 text-amber-400 animate-pulse mx-auto" />
@@ -528,6 +626,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
         >
           <Key className="w-4 h-4" />
         </Link>
+      </div>
       </div>
     </div>
   );

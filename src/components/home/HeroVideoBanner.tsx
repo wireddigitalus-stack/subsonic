@@ -80,13 +80,13 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
   return (
     <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/95 via-[#07090E]/95 to-black transition-all">
       {/* 1. Tactical HUD Header Bar */}
-      <div className="px-4 sm:px-6 py-3 border-b border-white/10 bg-black/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
+      <div className="px-3 sm:px-6 py-2 sm:py-3 border-b border-white/10 bg-black/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <div className="relative flex items-center justify-center">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping absolute" />
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
           </div>
-          <div className="flex items-center gap-1.5 font-mono text-xs">
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs">
             <span className="text-white font-black tracking-wider">BRIEFING FEED</span>
             <span className="text-slate-500">•</span>
             <span className="text-amber-400 font-bold">SUBSONIC BANNER</span>
