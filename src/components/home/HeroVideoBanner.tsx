@@ -24,19 +24,30 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(6.2);
 
-  // Attempt autoplay immediately on mount
+  // Attempt autoplay immediately on mount with mobile event fallbacks
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
       video.muted = true;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            // Autoplay policy fallback
-            setIsPlaying(false);
-          });
+      video.defaultMuted = true;
+      
+      const attemptPlay = () => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => setIsPlaying(true))
+            .catch(() => {
+              // Autoplay policy fallback
+              setIsPlaying(false);
+            });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        attemptPlay();
+      } else {
+        video.addEventListener("canplay", attemptPlay, { once: true });
+        video.addEventListener("loadeddata", attemptPlay, { once: true });
       }
     }
   }, []);
@@ -142,12 +153,15 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
           autoPlay
           muted={isMuted}
           preload="auto"
+          poster="/images/ss-banner-poster.jpg"
           onTimeUpdate={handleTimeUpdate}
           onEnded={onComplete}
           className="w-full h-full object-cover select-none cursor-pointer"
           onClick={togglePlay}
         >
+          <source src="/videos/ss-banner.mp4" type="video/mp4" />
           <source src="/videos/ss-banner.m4v" type="video/mp4" />
+          <source src="/images/ss-banner.mp4" type="video/mp4" />
           <source src="/images/ss-banner.m4v" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
