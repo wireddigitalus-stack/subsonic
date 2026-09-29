@@ -144,9 +144,16 @@ export function ChatMessageList({
                     </span>
                   )}
                 </div>
-                <div className="text-[9px] sm:text-[10px] font-mono text-emerald-400/90 truncate flex items-center gap-1">
-                  <span>🔒 Closed Net Transmission</span>
-                  <span className="hidden sm:inline">· 256-bit Encrypted</span>
+                <div className="text-[9px] sm:text-[10px] font-mono text-emerald-400/90 truncate flex items-center gap-1.5 flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <Lock className="w-2.5 h-2.5 text-emerald-400" />
+                    <span>Closed Net</span>
+                  </span>
+                  <span className="text-slate-500">·</span>
+                  <span className="text-amber-400 font-bold flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/25">
+                    <ShieldCheck className="w-2.5 h-2.5 text-amber-400" />
+                    <span>RO Monitored</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -197,11 +204,15 @@ export function ChatMessageList({
               <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
                 <Lock className="w-7 h-7" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <h4 className="font-mono font-bold text-white text-base">Point-to-Point Uplink Established</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  You are now in a private tactical conversation with <strong className="text-white">{activeDirectPartner?.name || "this competitor"}</strong>. Messages here are confidential and closed to the public match net.
+                  Direct communication channel with <strong className="text-white">{activeDirectPartner?.name || "this competitor"}</strong>. Messages are private to this net.
                 </p>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-[10px] font-mono text-amber-300">
+                  <ShieldCheck className="w-3 h-3 text-amber-400 shrink-0" />
+                  <span>Monitored by RO · Range Safety & Code of Conduct Active</span>
+                </div>
               </div>
 
               {activeDirectPartner?.callsign === "RO" && (

@@ -450,7 +450,8 @@ function pick<T>(arr: T[]): T {
 export function analyzeMsgForPlink(
   msg: ChatMessage,
   userWarningHistory: Record<string, number>,
-  lastMessageContent?: string
+  lastMessageContent?: string,
+  isDirectChat: boolean = false
 ): PlinkResponse | null {
   if (msg.author.id === "plink_ai_moderator") return null;
 
@@ -459,7 +460,60 @@ export function analyzeMsgForPlink(
   const userId = msg.author.id;
   const priorWarnings = userWarningHistory[userId] || 0;
 
-  // ── Conversational checks FIRST (before moderation) ────────────────────────
+  // ── Moderation checks (Active across ALL channels, including direct chat) ────
+
+  if (SALE_PATTERNS.some((p) => p.test(content))) {
+    const tier = priorWarnings >= 1 ? 2 : 1;
+    const responses = tier >= 2 ? FORMAL_SALE_WARNINGS : SOFT_SALE_WARNINGS;
+    const warningText = isDirectChat
+      ? `⚠️ [RO DIRECT NET MONITOR] [${callsign}] — Range Officer notice: Direct private transmissions remain subject to Subsonic Society match safety regulations. Commercial firearm or ammunition transactions are strictly prohibited.`
+      : pick(responses)(callsign);
+    return { content: warningText, warningTier: tier as 1 | 2, violationType: "FIREARM_SALE", shouldEscalate: true, targetCallsign: callsign };
+  }
+
+  if (HARASSMENT_PATTERNS.some((p) => p.test(content))) {
+    const warningText = isDirectChat
+      ? `⚠️ [RO DIRECT NET MONITOR] [${callsign}] — Hostile conduct or personal attacks on private frequencies violate range regulations. This transmission has been logged for Match Director review.`
+      : pick(HARASSMENT_WARNINGS)(callsign);
+    return { content: warningText, warningTier: 3, violationType: "HARASSMENT", shouldEscalate: true, targetCallsign: callsign };
+  }
+
+  if (UNSPORTSMANLIKE_PATTERNS.some((p) => p.test(content))) {
+    const warningText = isDirectChat
+      ? `⚠️ [RO DIRECT NET MONITOR] [${callsign}] — Range Officer reminder: Maintain professional sportsmanship across all Subsonic Society comms.`
+      : pick(UNSPORTSMANLIKE_WARNINGS)(callsign);
+    return { content: warningText, warningTier: 2, violationType: "UNSPORTSMANLIKE", shouldEscalate: true, targetCallsign: callsign };
+  }
+
+  if (COMMERCIAL_PATTERNS.some((p) => p.test(content))) {
+    const isPhishingSpam = /bit\.ly|tinyurl|telegram|t\.me|crypto|free\s*eley|giveaway/i.test(content);
+    return { content: pick(COMMERCIAL_WARNINGS)(callsign), warningTier: isPhishingSpam ? 2 : 1, violationType: "COMMERCIAL", shouldEscalate: isPhishingSpam, targetCallsign: callsign };
+  }
+
+  if (PROFANITY_PATTERNS.some((p) => p.test(content))) {
+    const tier = priorWarnings >= 2 ? 2 : 1;
+    const responses = tier >= 2 ? FORMAL_LANGUAGE_WARNINGS : SOFT_LANGUAGE_WARNINGS;
+    return { content: pick(responses)(callsign), warningTier: tier as 1 | 2, violationType: "STRONG_LANGUAGE", shouldEscalate: tier >= 2, targetCallsign: callsign };
+  }
+
+  if (
+    SPAM_PATTERNS.some((p) => p.test(content)) ||
+    (lastMessageContent && content.trim() === lastMessageContent.trim() && content.length > 5)
+  ) {
+    return { content: pick(SPAM_WARNINGS)(callsign), warningTier: 1, violationType: "SPAM", shouldEscalate: false, targetCallsign: callsign };
+  }
+
+  // ── Direct Chat Behavior: No unsolicited welcome/greetings, monitor silently ──
+  if (isDirectChat) {
+    // Only answer if shooter explicitly addressed RO with @ro or ro question
+    if (RO_MENTION.test(content) || RO_QUESTION.test(content) || /^(hey|hi|hello)\s+(ro|plink)\b/i.test(content)) {
+      return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+    }
+    // Otherwise RO monitors silently without interrupting the 1-on-1 convo
+    return null;
+  }
+
+  // ── Public Net Conversational checks ─────────────────────────────────────────
 
   if (RO_THANKS.test(content)) {
     return { content: pick(RO_THANKS_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
@@ -494,41 +548,7 @@ export function analyzeMsgForPlink(
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  // ── Moderation checks ───────────────────────────────────────────────────────
-
-  if (SALE_PATTERNS.some((p) => p.test(content))) {
-    const tier = priorWarnings >= 1 ? 2 : 1;
-    const responses = tier >= 2 ? FORMAL_SALE_WARNINGS : SOFT_SALE_WARNINGS;
-    return { content: pick(responses)(callsign), warningTier: tier as 1 | 2, violationType: "FIREARM_SALE", shouldEscalate: true, targetCallsign: callsign };
-  }
-
-  if (HARASSMENT_PATTERNS.some((p) => p.test(content))) {
-    return { content: pick(HARASSMENT_WARNINGS)(callsign), warningTier: 3, violationType: "HARASSMENT", shouldEscalate: true, targetCallsign: callsign };
-  }
-
-  if (UNSPORTSMANLIKE_PATTERNS.some((p) => p.test(content))) {
-    return { content: pick(UNSPORTSMANLIKE_WARNINGS)(callsign), warningTier: 2, violationType: "UNSPORTSMANLIKE", shouldEscalate: true, targetCallsign: callsign };
-  }
-
-  if (COMMERCIAL_PATTERNS.some((p) => p.test(content))) {
-    const isPhishingSpam = /bit\.ly|tinyurl|telegram|t\.me|crypto|free\s*eley|giveaway/i.test(content);
-    return { content: pick(COMMERCIAL_WARNINGS)(callsign), warningTier: isPhishingSpam ? 2 : 1, violationType: "COMMERCIAL", shouldEscalate: isPhishingSpam, targetCallsign: callsign };
-  }
-
-  if (PROFANITY_PATTERNS.some((p) => p.test(content))) {
-    const tier = priorWarnings >= 2 ? 2 : 1;
-    const responses = tier >= 2 ? FORMAL_LANGUAGE_WARNINGS : SOFT_LANGUAGE_WARNINGS;
-    return { content: pick(responses)(callsign), warningTier: tier as 1 | 2, violationType: "STRONG_LANGUAGE", shouldEscalate: tier >= 2, targetCallsign: callsign };
-  }
-
-  if (
-    SPAM_PATTERNS.some((p) => p.test(content)) ||
-    (lastMessageContent && content.trim() === lastMessageContent.trim() && content.length > 5)
-  ) {
-    return { content: pick(SPAM_WARNINGS)(callsign), warningTier: 1, violationType: "SPAM", shouldEscalate: false, targetCallsign: callsign };
-  }
-
-  // ── Low-priority: RO or Plink mentioned casually ───────────────────────────
+  // Low-priority: RO or Plink mentioned casually
   if (RO_MENTIONED.test(content)) {
     return { content: pick(RO_GENERAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }

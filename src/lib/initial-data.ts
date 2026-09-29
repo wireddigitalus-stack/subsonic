@@ -508,32 +508,6 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     },
   },
   {
-    id: "dm-ro-001",
-    channelId: "dm_ro",
-    type: "STANDARD",
-    author: {
-      id: "plink_ai_moderator",
-      name: "RO",
-      callsign: "RO",
-      role: "OFFICIAL",
-      badgeText: "RANGE OFFICER",
-      division: "Official Range Officer • The Hideout",
-      rifleSetup: "Official Range Officer • The Hideout Bristol",
-    },
-    content:
-      "🎯 Closed-net direct comms established. Range Officer standing by. What match ops, Bristol lodging, dining, or side match details can I verify for your squad?",
-    timestamp: "09:15 AM",
-    reactions: [],
-    moderationStatus: "APPROVED",
-    aiModerationReport: {
-      toxicityScore: 0,
-      threatScore: 0,
-      policyScore: 0,
-      sentiment: "POSITIVE",
-      aiEngine: "Range Officer RO",
-    },
-  },
-  {
     id: "dm-allen-001",
     channelId: "dm_allen",
     type: "STANDARD",

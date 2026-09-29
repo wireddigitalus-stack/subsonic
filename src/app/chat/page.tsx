@@ -570,13 +570,17 @@ export default function ChatPage() {
     return () => document.body.classList.remove("chat-active");
   }, []);
 
-  // ── Plink: Channel Welcome ────────────────────────────────────────────────
-  // Fires once per channel — greets the user when they enter a new channel.
+  // ── RO: Channel Welcome ───────────────────────────────────────────────────
+  // Fires once per match channel — greets the user when they enter an official channel.
+  // Private / direct chats (dm_*) do NOT receive full welcome messages.
   useEffect(() => {
     if (!isAuthenticated || !shooterProfile.callsign) return;
     if (plinkVisitedChannels.has(currentChannel)) return;
 
     setPlinkVisitedChannels((prev) => new Set(Array.from(prev).concat(currentChannel)));
+
+    // Do NOT send welcome messages in direct / private chats (RO monitors silently)
+    if (currentChannel.startsWith("dm_")) return;
 
     const welcomeMsg = getChannelWelcome(currentChannel, shooterProfile.callsign);
     const timer = setTimeout(() => {
@@ -590,8 +594,9 @@ export default function ChatPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChannel, isAuthenticated]);
 
-  // ── Plink: Message Watcher ────────────────────────────────────────────────
-  // Fires on every new message. Analyzes the last message for violations.
+  // ── RO: Message & Direct Comms Watcher ────────────────────────────────────
+  // Fires on every new message. RO monitors both public frequency and direct chats
+  // for safety violations, code of conduct, and inquiries.
   useEffect(() => {
     if (!isAuthenticated) return;
     const lastMsg = messages[messages.length - 1];
@@ -600,9 +605,12 @@ export default function ChatPage() {
     if (lastMsg.author.id === "plink_ai_moderator") return;
     // Only respond to messages in the currently viewed channel
     if (lastMsg.channelId !== currentChannel) return;
+    // If in 1-on-1 with RO, handleTransmit already provides RO's direct reply
+    if (currentChannel === "dm_ro") return;
 
+    const isDirect = currentChannel.startsWith("dm_");
     const lastContent = lastUserMessageRef.current[lastMsg.author.id];
-    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, lastContent);
+    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, lastContent, isDirect);
 
     // Update the last message ref for spam detection
     lastUserMessageRef.current[lastMsg.author.id] = lastMsg.content;
