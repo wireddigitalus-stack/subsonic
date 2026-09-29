@@ -35,6 +35,7 @@ export interface ChatMessageListProps {
   announcementCollapsed: boolean;
   setAnnouncementCollapsed: (val: boolean) => void;
   messagesContainerRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef?: React.RefObject<HTMLDivElement>;
   handleContainerScroll: () => void;
   filteredMessages: ChatMessage[];
   currentChannelData: { name: string };
@@ -65,6 +66,7 @@ export function ChatMessageList({
   announcementCollapsed,
   setAnnouncementCollapsed,
   messagesContainerRef,
+  messagesEndRef,
   handleContainerScroll,
   filteredMessages,
   currentChannelData,
@@ -196,7 +198,7 @@ export function ChatMessageList({
       <div
         ref={messagesContainerRef}
         onScroll={handleContainerScroll}
-        className="px-2 py-2 md:p-5 space-y-2 md:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0"
+        className="px-2 pt-2 pb-8 md:px-5 md:pt-4 md:pb-12 space-y-2.5 md:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0 scroll-smooth"
       >
         {filteredMessages.length === 0 ? (
           isDirectMode ? (
@@ -271,7 +273,7 @@ export function ChatMessageList({
             return (
               <div
                 key={msg.id}
-                className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 ${
+                className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 scroll-mb-8 ${
                   isRO
                     ? roSeverity === "alert"
                       ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
@@ -561,6 +563,8 @@ export function ChatMessageList({
             );
           })
         )}
+        {/* Bottom anchor sentinel for upward scroll clearance above input bar */}
+        <div ref={messagesEndRef} className="h-6 sm:h-10 w-full shrink-0 pointer-events-none" aria-hidden="true" />
       </div>
 
       {/* New Messages FAB */}

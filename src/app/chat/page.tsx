@@ -233,6 +233,7 @@ export default function ChatPage() {
 
   // Messages Container Ref for internal container-only scrolling
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Active channel list (Invitational Official Comms)
   const visibleChannels = ALL_CHANNELS;
@@ -721,18 +722,26 @@ export default function ChatPage() {
   }, []);
 
   // Dedicated container-only scroll that NEVER scrolls the outer window or jumps to footer
-  const scrollContainerToBottom = (smooth = true) => {
-    if (!messagesContainerRef.current) return;
-    const container = messagesContainerRef.current;
-    if (smooth) {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: "smooth",
+  const scrollContainerToBottom = useCallback((smooth = true) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: smooth ? "smooth" : "auto",
+        block: "end",
       });
-    } else {
-      container.scrollTop = container.scrollHeight;
     }
-  };
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const targetTop = container.scrollHeight;
+      if (smooth) {
+        container.scrollTo({
+          top: targetTop,
+          behavior: "smooth",
+        });
+      } else {
+        container.scrollTop = targetTop;
+      }
+    }
+  }, []);
 
   // Scroll FAB — show when user scrolls up, hide when at bottom
   const handleContainerScroll = () => {
@@ -749,13 +758,46 @@ export default function ChatPage() {
       prevChannelRef.current = currentChannel;
       scrollContainerToBottom(false);
     }
-  }, [currentChannel]);
+  }, [currentChannel, scrollContainerToBottom]);
 
   // Scroll inner container to bottom only when switching channels (initial)
   useEffect(() => {
     scrollContainerToBottom(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [scrollContainerToBottom]);
+
+  // Auto-scroll upward whenever a new message arrives so the bubble is fully visible above the text field
+  const lastMessage = filteredMessages[filteredMessages.length - 1];
+  const lastMessageId = lastMessage?.id;
+  useEffect(() => {
+    if (!lastMessageId) return;
+
+    // Trigger upward smooth scroll across frames so chat bubble is 100% visible above text field
+    const frame = requestAnimationFrame(() => {
+      scrollContainerToBottom(true);
+    });
+    const t1 = setTimeout(() => scrollContainerToBottom(true), 60);
+    const t2 = setTimeout(() => scrollContainerToBottom(true), 220);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [lastMessageId, currentChannel, scrollContainerToBottom]);
+
+  // Maintain scroll pinning to bottom when keyboard/viewport resizes or typing indicator toggles
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const resizeObserver = new ResizeObserver(() => {
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      if (distanceFromBottom < 160) {
+        scrollContainerToBottom(false);
+      }
+    });
+    resizeObserver.observe(container);
+    return () => resizeObserver.disconnect();
+  }, [scrollContainerToBottom]);
 
 
 
@@ -1969,6 +2011,7 @@ export default function ChatPage() {
             announcementCollapsed={announcementCollapsed}
             setAnnouncementCollapsed={setAnnouncementCollapsed}
             messagesContainerRef={messagesContainerRef}
+            messagesEndRef={messagesEndRef}
             handleContainerScroll={handleContainerScroll}
             filteredMessages={filteredMessages}
             currentChannelData={currentChannelData}
@@ -2004,6 +2047,7 @@ export default function ChatPage() {
             setIsDopeModalOpen={setIsDopeModalOpen}
             isAiScanning={isAiScanning}
             shooterProfile={shooterProfile}
+            scrollContainerToBottom={scrollContainerToBottom}
           />
         </div>
       </div>

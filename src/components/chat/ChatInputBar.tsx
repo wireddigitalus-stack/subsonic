@@ -15,6 +15,7 @@ export interface ChatInputBarProps {
   setIsDopeModalOpen: (val: boolean) => void;
   isAiScanning: boolean;
   shooterProfile: any;
+  scrollContainerToBottom?: (smooth?: boolean) => void;
 }
 
 export function ChatInputBar({
@@ -28,6 +29,7 @@ export function ChatInputBar({
   setIsDopeModalOpen,
   isAiScanning,
   shooterProfile,
+  scrollContainerToBottom,
 }: ChatInputBarProps) {
   return (
     <>
@@ -49,12 +51,21 @@ export function ChatInputBar({
             value={inputText}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => {
-              // When keyboard opens on mobile, scroll messages to bottom so replies are visible
+              // When keyboard opens or input is focused, smoothly scroll upward so the newest bubble stays fully visible above text field
               setTimeout(() => {
-                if (messagesContainerRef.current) {
+                if (scrollContainerToBottom) {
+                  scrollContainerToBottom(true);
+                } else if (messagesContainerRef.current) {
                   messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
                 }
-              }, 300);
+              }, 120);
+              setTimeout(() => {
+                if (scrollContainerToBottom) {
+                  scrollContainerToBottom(true);
+                } else if (messagesContainerRef.current) {
+                  messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                }
+              }, 320);
             }}
             spellCheck={true}
             autoCorrect="on"
