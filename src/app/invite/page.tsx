@@ -185,7 +185,9 @@ function StandardInviteContent() {
             memberId,
           }),
         });
-      } catch {}
+      } catch (claimErr) {
+        console.warn("Invite claim warning:", claimErr);
+      }
 
       // 3. Save to localStorage for instant Chat auth
       if (typeof window !== "undefined") {
@@ -413,6 +415,19 @@ function StandardInviteContent() {
               onChange={(e) => setPinConfirm(e.target.value.replace(/[^0-9]/g, ""))}
               placeholder="Re-enter PIN"
               className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-emerald-500/40 text-emerald-300 font-mono tracking-widest text-center text-xs sm:text-sm focus:border-emerald-400 focus:outline-none"
+            />
+          </div>
+
+          <div className="space-y-1 sm:col-span-2">
+            <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+              Email Address (Optional)
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. shooter@example.com"
+              className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
             />
           </div>
 

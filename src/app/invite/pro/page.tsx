@@ -321,8 +321,8 @@ function ProInviteContent() {
             memberId: savedShooter.id,
           }),
         });
-      } catch {
-        // Continue even if claim fails
+      } catch (claimErr) {
+        console.warn("Invite claim warning:", claimErr);
       }
 
       // 2b. Also register as an official Society Member for Admin Dashboard tracking
@@ -367,7 +367,7 @@ function ProInviteContent() {
               list.unshift(savedShooter);
             }
             localStorage.setItem("subsonic_all_shooters", JSON.stringify(list));
-          } catch {}
+          } catch (e) { console.warn("localStorage save warning:", e); }
 
           localStorage.setItem(
             "subsonic_shooter_profile",
@@ -394,7 +394,7 @@ function ProInviteContent() {
               created_at: new Date().toISOString(),
             })
           );
-        } catch {}
+        } catch (e) { console.warn("localStorage profile warning:", e); }
       }
 
       setSubmissionSuccess(savedShooter);

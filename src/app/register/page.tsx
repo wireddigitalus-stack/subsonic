@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 import { INITIAL_MATCHES } from "@/lib/initial-data";
 import { MatchEvent } from "@/lib/types";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+
 import { recordTelemetryEvent } from "@/lib/telemetry";
 
 const DIVISIONS = [
@@ -285,29 +285,6 @@ function RegisterContent() {
       console.warn("API registration persist warning:", apiErr);
     }
 
-    // 3. Persist to Supabase Database if configured
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from("registrations").insert([
-          {
-            match_id: selectedMatch.id,
-            competitor_name: name,
-            competitor_email: email,
-            rifle_division: selectedDivision,
-            squad_flight: `${squadInfo?.name} (${squadInfo?.flight})`,
-            rifle_model: `${rifleModel} | ${optic} | ${ammoLot}`,
-          },
-        ]);
-
-        // Increment registered count in matches table if exists
-        await supabase
-          .from("matches")
-          .update({ registered_count: selectedMatch.registeredCount + 1 })
-          .eq("id", selectedMatch.id);
-      } catch (err) {
-        console.warn("Supabase registration persist note:", err);
-      }
-    }
 
     // 3. Save to localStorage for instant offline access
     if (typeof window !== "undefined") {

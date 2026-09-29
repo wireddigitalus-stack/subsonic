@@ -163,6 +163,7 @@ interface ShooterProfile {
   division: string;
   rifleSetup: string;
   badgeText: string;
+  image?: string;
 }
 
 const DEFAULT_PROFILE: ShooterProfile = {
@@ -1294,134 +1295,64 @@ export default function ChatPage() {
     setTimeout(() => setAuthShake(false), 600);
     playTacticalChirp(300);
   };
-  const handleUnlockRoom = (e: React.FormEvent) => {
+  const handleUnlockRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginCallsign.trim()) {
       triggerAuthError("Callsign required to access the private net.");
       return;
     }
 
-    const cleanCallsign = loginCallsign.trim().toUpperCase();
-    const cleanPass = loginPasscode.trim();
+    try {
+      const res = await fetch("/api/chat/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          callsign: loginCallsign.trim(),
+          pin: loginPasscode.trim(),
+        }),
+      });
 
-    // Specific Executive PINs:
-    // Rob Neilson: "RADAR", "LTDAN", or "ROB" with PIN "2468" (Master Owner, Lead Developer & Tech Advisor)
-    // Allen Hurley: "ALLEN", "AHURLEY", or "ALLEN HURLEY" with PIN "620620" (Owner Admin)
-    const isRob = 
-      cleanCallsign === "RADAR" || 
-      cleanCallsign === "LTDAN" || 
-      cleanCallsign === "ROB" || 
-      cleanPass === "2468" || 
-      cleanCallsign.includes("NEILSON");
+      const data = await res.json();
 
-    const isAllen = 
-      cleanCallsign === "ALLEN" || 
-      cleanCallsign === "AHURLEY" || 
-      cleanCallsign === "HURLEY" ||
-      cleanCallsign.includes("ALLEN") || 
-      cleanCallsign === "620620" ||
-      cleanPass === "620620";
+      if (!res.ok || !data.authenticated) {
+        triggerAuthError(data.error || "Invalid Callsign, Member Key or PIN. If you have an invite code, click 'Claim Member Code' below.");
+        return;
+      }
 
-    const isRobValid = isRob && (cleanPass === "2468" || cleanPass.toLowerCase() === "subsonic2026");
-    const isAllenValid = isAllen && (cleanPass === "620620" || cleanPass.toLowerCase() === "subsonic2026" || cleanCallsign === "620620");
+      const profile: ShooterProfile = {
+        name: data.profile.name,
+        callsign: data.profile.callsign,
+        role: data.profile.role,
+        division: data.profile.division,
+        rifleSetup: data.profile.rifleSetup,
+        badgeText: data.profile.badgeText,
+        image: data.profile.image,
+      };
 
-    // Check if user has a personal PIN stored from their invite onboarding
-    let savedPin: string | null = null;
-    let savedCallsign: string | null = null;
-    if (typeof window !== "undefined") {
-      const savedProfileStr = localStorage.getItem("subsonic_shooter_profile");
-      if (savedProfileStr) {
+      if (data.member) {
+        setMemberId(data.member.member_id);
+        setMemberState(data.member.state || "TN");
+      }
+
+      setShooterProfile(profile);
+      setProfileForm(profile);
+      setAuthError(null);
+      if (typeof window !== "undefined") {
         try {
-          const parsed = JSON.parse(savedProfileStr);
-          if (parsed.pin) savedPin = String(parsed.pin).trim();
-          if (parsed.callsign) savedCallsign = String(parsed.callsign).trim().toUpperCase();
-        } catch {}
-      }
-    }
-
-    const isPersonalPinValid = 
-      (savedPin && cleanPass === savedPin) ||
-      (savedCallsign && cleanCallsign === savedCallsign && cleanPass.length >= 4);
-
-    const isInviteCode = cleanPass.startsWith("SS-") || cleanPass.includes("VIP") || cleanPass.includes("HIDE");
-    const isGeneralValid = isPersonalPinValid || isInviteCode || ["SUBSONIC2026", "subsonic2026", "2468", "620620"].includes(cleanPass);
-
-    if (!isRobValid && !isAllenValid && !isGeneralValid) {
-      triggerAuthError("Invalid Callsign, Member Key or PIN. If you have an invite code, click 'Claim Member Code' below.");
-      return;
-    }
-
-    const profile: ShooterProfile = {
-      name: isRob 
-        ? "Rob Neilson" 
-        : isAllen 
-        ? "Allen Hurley" 
-        : (shooterProfile.name || cleanCallsign),
-      callsign: isAllen ? "ALLEN" : isRob ? "RADAR" : cleanCallsign,
-      role: isRob 
-        ? ("MASTER_OWNER" as const)
-        : isAllen 
-        ? ("OWNER_ADMIN" as const)
-        : (shooterProfile.role || "PRO_COMPETITOR"),
-      division: isRob 
-        ? "Lead Developer & Tech Advisor" 
-        : isAllen 
-        ? "Owner Admin / Executive" 
-        : (shooterProfile.division || "Open Division Pro"),
-      rifleSetup: isRob 
-        ? "Smart Systems Integrations" 
-        : isAllen 
-        ? (shooterProfile.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527") 
-        : (shooterProfile.rifleSetup || "Custom Precision Rimfire"),
-      badgeText: isRob 
-        ? "DEV ADVISOR" 
-        : isAllen 
-        ? "OWNER ADMIN" 
-        : "PRO SHOOTER",
-    };
-
-    if (isRob) {
-      setMemberId("SS-2026-0001");
-      setMemberState("TN");
-    } else if (isAllen) {
-      setMemberId("SS-2026-0002");
-      setMemberState("TN");
-    }
-
-    setShooterProfile(profile);
-    setProfileForm(profile);
-    setAuthError(null);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("subsonic_shooter_profile", JSON.stringify(profile));
-        if (isRob) {
-          localStorage.setItem("subsonic_member_profile", JSON.stringify({
-            member_id: "SS-2026-0001",
-            full_name: "Rob Neilson",
-            callsign: "RADAR",
-            state: "TN",
-            experience_level: "Lead Developer & Tech Advisor",
-            rifle_setup: "Smart Systems Integrations",
-            created_at: "2026-07-04T12:00:00Z"
-          }));
-        } else if (isAllen) {
-          localStorage.setItem("subsonic_member_profile", JSON.stringify({
-            member_id: "SS-2026-0002",
-            full_name: "Allen Hurley",
-            callsign: "ALLEN",
-            state: "TN",
-            experience_level: "Owner Admin / Executive",
-            rifle_setup: profile.rifleSetup,
-            created_at: "2026-07-04T12:00:00Z"
-          }));
+          localStorage.setItem("subsonic_shooter_profile", JSON.stringify(profile));
+          if (data.member) {
+            localStorage.setItem("subsonic_member_profile", JSON.stringify(data.member));
+          }
+          localStorage.setItem("subsonic_chat_authenticated", "true");
+        } catch {
+          // Fallback
         }
-        localStorage.setItem("subsonic_chat_authenticated", "true");
-      } catch {
-        // Fallback
       }
+      setIsAuthenticated(true);
+      playTacticalChirp(1200);
+    } catch (err) {
+      triggerAuthError("Network error. Please try again.");
     }
-    setIsAuthenticated(true);
-    playTacticalChirp(1200);
   };
 
 
