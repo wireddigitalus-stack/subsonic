@@ -1,0 +1,169 @@
+"use client";
+
+import React from "react";
+import { 
+  X, 
+  Lock, 
+  Crosshair, 
+  ShieldCheck, 
+  MapPin, 
+  Sparkles, 
+  MessageSquare, 
+  CheckCircle2, 
+  Compass,
+  ArrowRight
+} from "lucide-react";
+import { DirectPartner } from "@/lib/types";
+
+export interface ShooterDossierModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  shooter: DirectPartner | null;
+  onStartDirectComms: (shooter: DirectPartner) => void;
+}
+
+export function ShooterDossierModal({
+  isOpen,
+  onClose,
+  shooter,
+  onStartDirectComms,
+}: ShooterDossierModalProps) {
+  if (!isOpen || !shooter) return null;
+
+  const isRO = shooter.callsign === "RO" || shooter.name === "RO" || shooter.id === "dm_ro";
+  const isMasterOwner = shooter.role === "MASTER_OWNER" || shooter.callsign === "ROB" || shooter.callsign === "RADAR";
+  const isOwnerAdmin = shooter.role === "OWNER_ADMIN" || shooter.callsign === "ALLEN";
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+      <div 
+        className="ios-glass rounded-2xl md:rounded-3xl max-w-md w-full border border-amber-500/40 shadow-2xl p-5 sm:p-6 space-y-4 max-h-[92dvh] overflow-y-auto no-scrollbar relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header Bar */}
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+            <span className="font-mono text-[11px] font-bold text-amber-400 tracking-wider uppercase">
+              {isRO ? "AI RANGE OFFICER DOSSIER" : "COMPETITOR DOSSIER"}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+            title="Close dossier"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Identity Card */}
+        <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 ${
+            isRO
+              ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+              : isMasterOwner
+              ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+              : isOwnerAdmin
+              ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
+              : "bg-black/60 text-amber-400 border-white/15"
+          }`}>
+            {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-white text-base truncate">
+                {shooter.name}
+              </h3>
+              <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
+                [{shooter.callsign}]
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+              <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-black tracking-wide uppercase ${
+                isRO
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/50"
+                  : isMasterOwner
+                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black border border-amber-300"
+                  : isOwnerAdmin
+                  ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
+                  : "bg-white/10 text-slate-300 border border-white/10"
+              }`}>
+                {shooter.badgeText || (isRO ? "RANGE OFFICER" : shooter.role)}
+              </span>
+
+              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                {shooter.status === "on_range" ? "ON RANGE" : "ONLINE"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Division & Specs */}
+        <div className="space-y-2 text-xs font-mono">
+          {shooter.division && (
+            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between">
+              <span className="text-slate-400 uppercase text-[10px]">Division / Class</span>
+              <span className="font-bold text-slate-200">{shooter.division}</span>
+            </div>
+          )}
+
+          {shooter.rifleSetup && (
+            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
+              <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase">
+                <span className="flex items-center gap-1">
+                  <Crosshair className="w-3 h-3 text-amber-400" />
+                  Primary Rifle Spec
+                </span>
+                <span className="text-emerald-400">Match Ready</span>
+              </div>
+              <p className="text-white text-xs font-bold truncate">{shooter.rifleSetup}</p>
+            </div>
+          )}
+
+          {shooter.bio && (
+            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
+              <span className="text-[10px] text-slate-400 uppercase font-mono">Profile Brief</span>
+              <p className="text-slate-300 text-xs leading-relaxed font-sans">{shooter.bio}</p>
+            </div>
+          )}
+        </div>
+
+        {/* RO Special Capabilities / Direct Prompt shortcuts */}
+        {isRO && (
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-300">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Range Officer Intel Ready</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-normal">
+              Direct comms with RO is private, encrypted, and available 24/7. Ask questions regarding match check-in, Bristol hotels, restaurants, or match rules.
+            </p>
+          </div>
+        )}
+
+        {/* Action Button: Start Direct Comms */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => onStartDirectComms(shooter)}
+            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all active:scale-[0.98]"
+          >
+            <Lock className="w-4 h-4 text-black" />
+            <span>Open Direct Comms with {shooter.callsign}</span>
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </button>
+
+          <p className="text-[10px] text-center text-slate-500 font-mono mt-2 flex items-center justify-center gap-1">
+            <Lock className="w-2.5 h-2.5 text-emerald-400" />
+            <span>Closed Net · Point-to-Point Transmission</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

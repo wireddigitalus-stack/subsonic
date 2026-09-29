@@ -35,6 +35,22 @@ export interface ChannelConfig {
   activeUsers: number;
 }
 
+export interface DirectPartner {
+  id: string; // channel id like dm_ro, dm_allen
+  callsign: string;
+  name: string;
+  role: string;
+  badgeText?: string;
+  division?: string;
+  avatarUrl?: string;
+  rifleSetup?: string;
+  status: "online" | "on_range" | "offline";
+  lastSeen?: string;
+  bio?: string;
+  unreadCount?: number;
+  isBot?: boolean;
+}
+
 export interface MatchEvent {
   id: string;
   title: string;

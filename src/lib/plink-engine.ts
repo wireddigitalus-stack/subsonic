@@ -421,6 +421,14 @@ export function getFaqResponse(content: string): string {
   return `🎯 Range Officer on net! I'm tracking all details for the 2026 Subsonic Society Invitational. Ask me about the match schedule, $2,500 cash side matches, Bristol hotels, restaurants, or local entertainment like South Holston fly fishing and the Hard Rock Casino. Type @ro help for commands!`;
 }
 
+export function getRoDirectAnswer(content: string, callsign: string): string {
+  const lower = content.toLowerCase();
+  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
+    return `Copy that, [${callsign}]. Range Officer standing by on your private point-to-point net. What match ops, Bristol lodging, dining, or side match details can I verify for your squad?`;
+  }
+  return getFaqResponse(content);
+}
+
 // ─── CHANNEL WELCOME ──────────────────────────────────────────────────────────
 
 export function getChannelWelcome(channelId: string, callsign: string): string {

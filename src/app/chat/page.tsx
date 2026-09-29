@@ -5,6 +5,7 @@ import { ChatChannelSidebar } from "@/components/chat/ChatChannelSidebar";
 import { ChatDopeCardModal } from "@/components/chat/ChatDopeCardModal";
 import { ChatInputBar } from "@/components/chat/ChatInputBar";
 import { ChatMessageList } from "@/components/chat/ChatMessageList";
+import { ShooterDossierModal } from "@/components/chat/ShooterDossierModal";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
@@ -36,6 +37,7 @@ import {
   UserCheck,
   ChevronRight,
   ChevronDown,
+  ArrowLeft,
   ExternalLink,
   MessageSquare,
   Maximize2,
@@ -50,13 +52,13 @@ import {
   Activity
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
-import { ChatMessage, DopeCardData } from "@/lib/types";
+import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
 import { evaluateChatMessage } from "@/lib/ai-moderator";
 import { recordTelemetryEvent } from "@/lib/telemetry";
 import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
-import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome } from "@/lib/plink-engine";
+import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome, getRoDirectAnswer } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
@@ -81,6 +83,65 @@ const ALL_CHANNELS: ChannelConfig[] = [
     desc: "The Hideout Invitational: Match Ops, Bristol Lodging, Food & Entertainment",
     netType: "PRO",
     activeUsers: 94,
+  },
+];
+
+const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
+  {
+    id: "dm_ro",
+    callsign: "RO",
+    name: "RO (Range Officer)",
+    role: "OFFICIAL",
+    badgeText: "RANGE OFFICER",
+    division: "The Hideout Match Ops",
+    status: "online",
+    bio: "Official Range Officer for The Hideout Invitational. Expert in Bristol lodging, dining, match schedule, and cash side matches.",
+    rifleSetup: "Official Match Chrono & Target Array Telemetry",
+    isBot: true,
+  },
+  {
+    id: "dm_allen",
+    callsign: "ALLEN",
+    name: "Allen Hurley",
+    role: "OWNER_ADMIN",
+    badgeText: "OWNER ADMIN",
+    division: "Owner Admin / Executive",
+    status: "online",
+    bio: "Executive Match Host & Founder of The Hideout Invitational.",
+    rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+  },
+  {
+    id: "dm_wyatt",
+    callsign: "APEX-22",
+    name: "Wyatt Sterling",
+    role: "PRO_COMPETITOR",
+    badgeText: "PRO SHOOTER",
+    division: "Open Division Pro",
+    status: "on_range",
+    bio: "Rimfire PRS national competitor. Holston Ridge squad leader.",
+    rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
+  },
+  {
+    id: "dm_marcus",
+    callsign: "VIPER-01",
+    name: "Marcus Vance",
+    role: "PRO_COMPETITOR",
+    badgeText: "TOP SQUAD",
+    division: "Production Division",
+    status: "online",
+    bio: "CZ 457 specialist and ballistic data analyst.",
+    rifleSetup: "CZ 457 LRP / Nightforce ATACR 7-35x56",
+  },
+  {
+    id: "dm_kendra",
+    callsign: "BALLISTIC",
+    name: "Kendra Cole",
+    role: "PRO_COMPETITOR",
+    badgeText: "MATCH PRO",
+    division: "Open Division Pro",
+    status: "on_range",
+    bio: "Rimfire precision competitor running Lapua Center-X.",
+    rifleSetup: "RimX Action / Proof Carbon / Tangent Theta 5-25",
   },
 ];
 
@@ -119,6 +180,28 @@ export default function ChatPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<ShooterProfile>(DEFAULT_PROFILE);
 
+  // Direct Comms (1-on-1 Closed Net) State
+  const [directPartners, setDirectPartners] = useState<DirectPartner[]>(INITIAL_DIRECT_PARTNERS);
+  const [selectedDossierShooter, setSelectedDossierShooter] = useState<DirectPartner | null>(null);
+  const [isDossierModalOpen, setIsDossierModalOpen] = useState(false);
+
+  const isDirectMode = currentChannel.startsWith("dm_");
+  const activeDirectPartner = useMemo(() => {
+    if (!isDirectMode) return null;
+    const found = directPartners.find((p) => p.id === currentChannel);
+    if (found) return found;
+    const clean = currentChannel.replace("dm_", "").toUpperCase();
+    return {
+      id: currentChannel,
+      callsign: clean,
+      name: clean,
+      role: "PRO_COMPETITOR" as const,
+      badgeText: "COMPETITOR",
+      status: "online" as const,
+      bio: "Verified competitor on direct encrypted frequency.",
+    };
+  }, [currentChannel, directPartners, isDirectMode]);
+
   // Tactical DOPE Drop Modal State
   const [isDopeModalOpen, setIsDopeModalOpen] = useState(false);
   const [dopeFormData, setDopeFormData] = useState<DopeCardData>({
@@ -142,8 +225,42 @@ export default function ChatPage() {
 
   // Active channel list (Invitational Official Comms)
   const visibleChannels = ALL_CHANNELS;
-  const currentChannelData = ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
+  const currentChannelData = useMemo(() => {
+    if (isDirectMode && activeDirectPartner) {
+      return {
+        id: currentChannel,
+        name: `dm: ${activeDirectPartner.callsign.toLowerCase()}`,
+        badge: "ENCRYPTED",
+        desc: `Closed-net direct transmission with ${activeDirectPartner.name} [${activeDirectPartner.callsign}]`,
+        netType: "PRO" as const,
+        activeUsers: 2,
+      };
+    }
+    return ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
+  }, [currentChannel, isDirectMode, activeDirectPartner]);
+
   const filteredMessages = messages.filter((m) => m.channelId === currentChannel);
+
+  const handleOpenDossier = useCallback((shooter: DirectPartner) => {
+    setSelectedDossierShooter(shooter);
+    setIsDossierModalOpen(true);
+    playTacticalChirp(1100);
+  }, []);
+
+  const handleStartDirectComms = useCallback((shooter: DirectPartner) => {
+    setDirectPartners((prev) => {
+      if (prev.some((p) => p.id === shooter.id)) return prev;
+      return [shooter, ...prev];
+    });
+    setCurrentChannel(shooter.id);
+    setIsDossierModalOpen(false);
+    playTacticalChirp(1200);
+  }, []);
+
+  const handleBackToInvitational = useCallback(() => {
+    setCurrentChannel("invitational");
+    playTacticalChirp(900);
+  }, []);
 
   // Channel engagement & post counters map (dynamic per-room transmission & reaction counts)
   const channelEngagementMap = useMemo(() => {
@@ -913,6 +1030,61 @@ export default function ChatPage() {
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(30);
     }
+
+    // Direct Comms Auto-Responses (Simulated Real-Time Point-to-Point Net)
+    if (currentChannel === "dm_ro") {
+      const delay = 1200 + Math.random() * 800;
+      setTimeout(() => {
+        const roText = getRoDirectAnswer(content, shooterProfile.callsign);
+        const roMsg = buildPlinkMessage(roText, "dm_ro", 0);
+        setMessages((prev) => [...prev, roMsg]);
+        if (soundEnabledRef.current) {
+          playTacticalChirp(1200);
+        }
+        setTimeout(() => scrollContainerToBottom(true), 50);
+      }, delay);
+    } else if (currentChannel.startsWith("dm_")) {
+      const partner = directPartners.find((p) => p.id === currentChannel);
+      const partnerCallsign = partner?.callsign || currentChannel.replace("dm_", "").toUpperCase();
+      const delay = 1800 + Math.random() * 1200;
+      setTimeout(() => {
+        let replyText = `Copy that, [${shooterProfile.callsign}]. Transmission received on private net.`;
+        if (partnerCallsign === "ALLEN") {
+          replyText = `Copy that, [${shooterProfile.callsign}]. Direct transmission received. Staging and dinner operations at The Hideout (111 Hwy 44) are dialed in. Let me know if you need anything before check-in.`;
+        } else if (partnerCallsign === "APEX-22") {
+          replyText = `Roger that, [${shooterProfile.callsign}]. Dialed in on direct net. Let's compare DOPE for Stage 4 Friday afternoon during chrono testing.`;
+        } else if (partnerCallsign === "VIPER-01") {
+          replyText = `Solid copy, [${shooterProfile.callsign}]. I have the CZ 457 running Lapua Center-X on 9-round groups. Holston Ridge looks fast.`;
+        } else if (partnerCallsign === "BALLISTIC") {
+          replyText = `Understood, [${shooterProfile.callsign}]. Tracking your transmission. Good luck on the line this weekend!`;
+        }
+
+        const now = new Date();
+        const autoReply: ChatMessage = {
+          id: "dm_reply_" + Date.now().toString(36),
+          channelId: currentChannel,
+          type: "STANDARD",
+          author: {
+            id: `usr_${partnerCallsign.toLowerCase()}`,
+            name: partner?.name || partnerCallsign,
+            callsign: partnerCallsign,
+            role: (partner?.role as any) || "PRO_COMPETITOR",
+            badgeText: partner?.badgeText || "COMPETITOR",
+            division: partner?.division || "Open Division Pro",
+            rifleSetup: partner?.rifleSetup,
+          },
+          content: replyText,
+          timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          reactions: [],
+          moderationStatus: "APPROVED",
+        };
+        setMessages((prev) => [...prev, autoReply]);
+        if (soundEnabledRef.current) {
+          playRealCommsChirp();
+        }
+        setTimeout(() => scrollContainerToBottom(true), 50);
+      }, delay);
+    }
   };
 
   const handleInputChange = (val: string) => {
@@ -1596,42 +1768,62 @@ export default function ChatPage() {
       <div id="tour-step-channels" className={`shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1 ${isFullscreen ? "hidden md:block" : ""}`}>
         {/* MOBILE TACTICAL FREQUENCY DIAL BUTTON (Fits 100% width, no side-scroll, voice & text searchable) */}
         <div className="md:hidden">
-          <button
-            type="button"
-            onClick={() => {
-              setIsChannelModalOpen(true);
-              playTacticalChirp(1100);
-            }}
-            className="w-full p-2 px-2.5 rounded-xl bg-black/70 border border-amber-500/40 hover:border-amber-400 shadow-tactical-glow flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
-          >
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-6 h-6 rounded-lg bg-amber-500 text-black font-mono font-black text-xs flex items-center justify-center shrink-0">
-                #
-              </div>
-              <div className="min-w-0 text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-white text-xs whitespace-nowrap truncate max-w-[140px]">
-                    {currentChannelData.name}
-                  </span>
-                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 shrink-0">
-                    {currentChannelData.badge}
-                  </span>
+          <div className="flex items-center gap-1.5">
+            {isDirectMode && (
+              <button
+                type="button"
+                onClick={handleBackToInvitational}
+                className="p-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-mono font-black text-xs flex items-center gap-1 shrink-0 shadow-tactical-glow active:scale-95 transition-all"
+                title="Return to #invitational"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>#inv</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setIsChannelModalOpen(true);
+                playTacticalChirp(1100);
+              }}
+              className="w-full p-2 px-2.5 rounded-xl bg-black/70 border border-amber-500/40 hover:border-amber-400 shadow-tactical-glow flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div className={`w-6 h-6 rounded-lg font-mono font-black text-xs flex items-center justify-center shrink-0 ${
+                  isDirectMode ? "bg-emerald-500 text-black" : "bg-amber-500 text-black"
+                }`}>
+                  {isDirectMode ? "🔒" : "#"}
+                </div>
+                <div className="min-w-0 text-left">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-white text-xs whitespace-nowrap truncate max-w-[140px]">
+                      {currentChannelData.name}
+                    </span>
+                    <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded font-bold border shrink-0 ${
+                      isDirectMode
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                        : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    }`}>
+                      {currentChannelData.badge}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
-                <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
-                {currentChannelEngagement.postCount} posts
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 hidden xs:inline">{currentChannelData.activeUsers} online</span>
-              <div className="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-[9px] font-bold text-amber-300 flex items-center gap-1">
-                <span>ROOMS</span>
-                <ChevronDown className="w-3 h-3 text-amber-400" />
+              <div className="flex items-center gap-2 shrink-0">
+                {!isDirectMode && (
+                  <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
+                    <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                    {currentChannelEngagement.postCount} posts
+                  </span>
+                )}
+                <div className="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-[9px] font-bold text-amber-300 flex items-center gap-1">
+                  <span>{isDirectMode ? "SWITCH" : "ROOMS"}</span>
+                  <ChevronDown className="w-3 h-3 text-amber-400" />
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* DESKTOP CHANNEL SELECTOR BAR (Hidden on mobile & small tablets) */}
@@ -1703,6 +1895,24 @@ export default function ChatPage() {
                 </button>
               );
             })}
+
+            {/* Active Direct Comms Pill */}
+            {isDirectMode && activeDirectPartner && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs bg-emerald-950/60 border border-emerald-500/60 text-white shadow-tactical-glow shrink-0 animate-fadeIn">
+                <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="text-emerald-300 font-bold truncate max-w-[200px]">
+                  DM: {activeDirectPartner.name} [{activeDirectPartner.callsign}]
+                </span>
+                <button
+                  type="button"
+                  onClick={handleBackToInvitational}
+                  className="ml-1 p-0.5 rounded hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+                  title="Close direct view and return to #invitational"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1721,6 +1931,9 @@ export default function ChatPage() {
             setCurrentChannel={setCurrentChannel}
             channelEngagementMap={channelEngagementMap}
             setIsDopeModalOpen={setIsDopeModalOpen}
+            directPartners={directPartners}
+            unreadCounts={unreadCounts}
+            onOpenDossier={handleOpenDossier}
           />
         )}
 
@@ -1755,6 +1968,9 @@ export default function ChatPage() {
             aiBlockedNotice={aiBlockedNotice}
             isTyping={isTyping}
             setInputText={setInputText}
+            activeDirectPartner={activeDirectPartner}
+            onBackToInvitational={handleBackToInvitational}
+            onSelectShooter={handleOpenDossier}
           />
           <ChatInputBar
             handleSendMessage={handleSendMessage}
@@ -2020,6 +2236,15 @@ export default function ChatPage() {
         unreadCounts={unreadCounts}
         engagementCounts={channelEngagementMap}
         onPlayChirp={playTacticalChirp}
+        directPartners={directPartners}
+      />
+
+      {/* 7. SHOOTER DOSSIER MODAL */}
+      <ShooterDossierModal
+        isOpen={isDossierModalOpen}
+        onClose={() => setIsDossierModalOpen(false)}
+        shooter={selectedDossierShooter}
+        onStartDirectComms={handleStartDirectComms}
       />
 
       {/* 7. BOT CHATS CARD WITH COUNTS, BOT NAMES & TONE AUDITION */}

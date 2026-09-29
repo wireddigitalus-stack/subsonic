@@ -37,7 +37,15 @@ export function ChatInputBar({
           {/* Main text input */}
           <input
             type="text"
-            placeholder={isListening ? "Listening…" : (typeof window !== "undefined" && window.innerWidth < 768 ? "Message..." : `Broadcast to #${currentChannelData.name}...`)}
+            placeholder={
+              isListening
+                ? "Listening…"
+                : currentChannelData.name.startsWith("dm:")
+                ? `Direct message to ${currentChannelData.name.replace("dm: ", "").toUpperCase()}...`
+                : typeof window !== "undefined" && window.innerWidth < 768
+                ? "Message..."
+                : `Broadcast to #${currentChannelData.name}...`
+            }
             value={inputText}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => {

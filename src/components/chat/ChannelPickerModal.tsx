@@ -10,14 +10,14 @@ import {
   Check, 
   Lock, 
   Users, 
-  ChevronRight,
-  Flame,
-  Wind,
-  Target,
-  Sparkles,
-  MessageSquare
+  ChevronRight, 
+  Flame, 
+  Wind, 
+  Target, 
+  Sparkles, 
+  MessageSquare 
 } from "lucide-react";
-import { ChannelConfig } from "@/lib/types";
+import { ChannelConfig, DirectPartner } from "@/lib/types";
 
 export interface ChannelEngagementInfo {
   postCount: number;
@@ -34,6 +34,7 @@ interface ChannelPickerModalProps {
   unreadCounts?: Record<string, number>;
   engagementCounts?: Record<string, ChannelEngagementInfo>;
   onPlayChirp?: (freq?: number) => void;
+  directPartners?: DirectPartner[];
 }
 
 export function ChannelPickerModal({
@@ -45,9 +46,10 @@ export function ChannelPickerModal({
   unreadCounts = {},
   engagementCounts = {},
   onPlayChirp,
+  directPartners = [],
 }: ChannelPickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilterTab, setActiveFilterTab] = useState<"ALL" | "PRO" | "PUBLIC">("ALL");
+  const [activeFilterTab, setActiveFilterTab] = useState<"ALL" | "MATCH" | "DIRECT">("ALL");
   const [isVoiceListening, setIsVoiceListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,80 +100,85 @@ export function ChannelPickerModal({
       if (onPlayChirp) onPlayChirp(1400);
 
       // Auto-match if exact or close match
-      const matched = channels.find((ch) => 
-        ch.name.toLowerCase().includes(transcript) ||
-        ch.id.toLowerCase().includes(transcript) ||
-        ch.badge.toLowerCase().includes(transcript) ||
-        (transcript.includes("weather") && ch.id.includes("weather")) ||
-        (transcript.includes("bristol") && ch.id.includes("bristol")) ||
-        (transcript.includes("squad") && ch.id.includes("squad")) ||
-        (transcript.includes("general") && ch.id.includes("general")) ||
-        (transcript.includes("gear") && ch.id.includes("gear")) ||
-        (transcript.includes("alert") && ch.id.includes("alert"))
+      const matchedCh = channels.find((c) =>
+        c.name.toLowerCase().includes(transcript) || transcript.includes(c.name.toLowerCase())
       );
-
-      if (matched) {
+      if (matchedCh) {
         setTimeout(() => {
-          onSelectChannel(matched.id);
+          onSelectChannel(matchedCh.id);
           onClose();
-        }, 500);
+        }, 400);
+        return;
+      }
+
+      const matchedPartner = directPartners.find((p) =>
+        p.name.toLowerCase().includes(transcript) ||
+        p.callsign.toLowerCase().includes(transcript) ||
+        transcript.includes(p.callsign.toLowerCase())
+      );
+      if (matchedPartner) {
+        setTimeout(() => {
+          onSelectChannel(matchedPartner.id);
+          onClose();
+        }, 400);
       }
     };
 
-    recognition.onerror = () => setIsVoiceListening(false);
-    recognition.onend = () => setIsVoiceListening(false);
+    recognition.onerror = () => {
+      setIsVoiceListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsVoiceListening(false);
+    };
 
     recognitionRef.current = recognition;
     recognition.start();
-  }, [isVoiceListening, channels, onSelectChannel, onClose, onPlayChirp]);
-
-  // Filter channels based on tab and search query
-  const filteredChannels = channels.filter((ch) => {
-    const matchesTab = 
-      activeFilterTab === "ALL" 
-        ? true 
-        : ch.netType === activeFilterTab;
-
-    if (!matchesTab) return false;
-
-    if (!searchQuery.trim()) return true;
-
-    const q = searchQuery.toLowerCase().trim();
-    return (
-      ch.name.toLowerCase().includes(q) ||
-      ch.id.toLowerCase().includes(q) ||
-      ch.badge.toLowerCase().includes(q) ||
-      ch.desc.toLowerCase().includes(q)
-    );
-  });
+  }, [channels, directPartners, isVoiceListening, onClose, onPlayChirp, onSelectChannel]);
 
   if (!isOpen) return null;
 
+  // Filter channels
+  const filteredChannels = channels.filter((ch) => {
+    if (activeFilterTab === "DIRECT") return false;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return ch.name.toLowerCase().includes(q) || ch.desc.toLowerCase().includes(q) || ch.badge.toLowerCase().includes(q);
+  });
+
+  // Filter direct partners
+  const filteredPartners = directPartners.filter((p) => {
+    if (activeFilterTab === "MATCH") return false;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.callsign.toLowerCase().includes(q) ||
+      (p.role && p.role.toLowerCase().includes(q)) ||
+      (p.division && p.division.toLowerCase().includes(q))
+    );
+  });
+
+  const totalResults = filteredChannels.length + filteredPartners.length;
+
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      {/* Backdrop tap to close */}
-      <div className="fixed inset-0" onClick={onClose} />
-
-      {/* Main Drawer / Modal */}
-      <div className="relative z-10 w-full max-w-lg ios-glass-card bg-[#090C12] border-t sm:border-2 border-amber-500/50 shadow-2xl rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 space-y-4 max-h-[88vh] flex flex-col overflow-hidden animate-scaleUp">
-        {/* Mobile Pull Bar */}
-        <div className="sm:hidden w-12 h-1 bg-white/20 rounded-full mx-auto -mt-1 mb-1" />
-
-        {/* Modal Header */}
+    <div className="fixed inset-0 z-[75] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div 
+        className="ios-glass rounded-3xl max-w-xl w-full border border-amber-500/40 shadow-2xl p-4 sm:p-6 space-y-4 max-h-[92dvh] flex flex-col min-h-0"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              <Radio className="w-4 h-4 text-amber-400 animate-pulse" />
+              <Radio className="w-4 h-4 animate-pulse" />
             </div>
             <div>
-              <h2 className="text-base font-black text-white flex items-center gap-2">
-                <span>SELECT FREQUENCY</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                  {channels.length} ROOMS
-                </span>
-              </h2>
-              <p className="text-[11px] font-mono text-slate-400">
-                Tap or speak to switch active channel
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <span>Tactical Frequency Selector</span>
+              </h3>
+              <p className="text-xs text-slate-400">
+                Switch rooms or engage 1-on-1 direct comms
               </p>
             </div>
           </div>
@@ -179,14 +186,14 @@ export function ChannelPickerModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Search Bar with Voice-to-Text Button */}
-        <div className="relative flex items-center gap-2 shrink-0">
+        {/* Search Input Bar with Voice Dial */}
+        <div className="flex items-center gap-2 shrink-0">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -194,8 +201,8 @@ export function ChannelPickerModal({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search room (e.g. weather, DOPE, squad)..."
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-white text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500"
+              placeholder="Search rooms or shooters (e.g. RO, Allen, Bristol)..."
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-white text-sm focus:border-amber-400 focus:outline-none placeholder:text-slate-500 font-mono"
             />
             {searchQuery && (
               <button
@@ -229,13 +236,13 @@ export function ChannelPickerModal({
           <div className="p-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-mono flex items-center justify-between animate-pulse shrink-0">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-              <span>Say &quot;Weather&quot;, &quot;Bristol&quot;, or &quot;Squad&quot;...</span>
+              <span>Say &quot;Invitational&quot;, &quot;RO&quot;, or &quot;Allen&quot;...</span>
             </span>
             <span className="text-[10px] text-red-400 font-bold uppercase">MIC ACTIVE</span>
           </div>
         )}
 
-        {/* Segmented Filter Tabs: ALL, PRO NET, PUBLIC NET */}
+        {/* Segmented Filter Tabs: ALL, MATCH NET, DIRECT COMMS */}
         <div className="flex items-center gap-1.5 p-1 bg-black/50 border border-white/10 rounded-xl shrink-0">
           <button
             type="button"
@@ -246,42 +253,41 @@ export function ChannelPickerModal({
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            ALL ({channels.length})
+            ALL ({channels.length + directPartners.length})
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveFilterTab("PRO")}
+            onClick={() => setActiveFilterTab("MATCH")}
             className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-              activeFilterTab === "PRO"
+              activeFilterTab === "MATCH"
                 ? "bg-amber-500 text-black shadow-tactical-glow"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <Lock className="w-3 h-3" />
-            <span>PRO NET</span>
+            <span>#MATCH NET ({channels.length})</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setActiveFilterTab("PUBLIC")}
+            onClick={() => setActiveFilterTab("DIRECT")}
             className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-              activeFilterTab === "PUBLIC"
-                ? "bg-blue-600 text-white shadow-lg"
+              activeFilterTab === "DIRECT"
+                ? "bg-emerald-500 text-black shadow-lg"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <Users className="w-3 h-3" />
-            <span>PUBLIC NET</span>
+            <Lock className="w-3 h-3" />
+            <span>DIRECT (1-on-1) ({directPartners.length})</span>
           </button>
         </div>
 
-        {/* Scrollable Channel Cards List */}
+        {/* Scrollable Channel & DM Cards List */}
         <div className="flex-1 overflow-y-auto chat-scroll space-y-2 pr-1 -mr-1">
-          {filteredChannels.length === 0 ? (
+          {totalResults === 0 ? (
             <div className="py-8 text-center space-y-2 text-slate-400 font-mono text-xs">
               <Radio className="w-8 h-8 text-slate-600 mx-auto" />
-              <p>No frequencies found matching &ldquo;{searchQuery}&rdquo;</p>
+              <p>No frequencies or shooters found matching &ldquo;{searchQuery}&rdquo;</p>
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
@@ -291,109 +297,180 @@ export function ChannelPickerModal({
               </button>
             </div>
           ) : (
-            filteredChannels.map((ch) => {
-              const isActive = currentChannel === ch.id;
-              const unread = unreadCounts[ch.id] || 0;
+            <>
+              {/* Channel Items */}
+              {filteredChannels.map((ch) => {
+                const isActive = currentChannel === ch.id;
+                const unread = unreadCounts[ch.id] || 0;
 
-              return (
-                <button
-                  key={ch.id}
-                  type="button"
-                  onClick={() => {
-                    if (onPlayChirp) onPlayChirp(1200);
-                    onSelectChannel(ch.id);
-                    onClose();
-                  }}
-                  className={`w-full p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 group ${
-                    isActive
-                      ? "bg-gradient-to-r from-amber-500/20 via-black to-black/80 border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
-                      : "bg-white/[0.03] border-white/5 hover:border-amber-500/40 hover:bg-white/[0.06]"
-                  }`}
-                >
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-sm shrink-0 border ${
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    onClick={() => {
+                      if (onPlayChirp) onPlayChirp(1200);
+                      onSelectChannel(ch.id);
+                      onClose();
+                    }}
+                    className={`w-full p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 group ${
                       isActive
-                        ? "bg-amber-500 text-black border-amber-400"
-                        : "bg-black/60 text-amber-400 border-white/10 group-hover:border-amber-500/30"
-                    }`}>
-                      #
-                    </div>
+                        ? "bg-gradient-to-r from-amber-500/20 via-black to-black/80 border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+                        : "bg-white/[0.03] border-white/5 hover:border-amber-500/40 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-sm shrink-0 border ${
+                        isActive
+                          ? "bg-amber-500 text-black border-amber-400"
+                          : "bg-black/60 text-amber-400 border-white/10 group-hover:border-amber-500/30"
+                      }`}>
+                        #
+                      </div>
 
-                    <div className="min-w-0 space-y-0.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-sm font-bold truncate ${
-                          isActive ? "text-amber-300" : "text-white group-hover:text-amber-200"
-                        }`}>
-                          {ch.name}
-                        </span>
-
-                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
-                          isActive
-                            ? "bg-amber-500/30 text-amber-300 border border-amber-500/50"
-                            : ch.netType === "PRO"
-                            ? "bg-red-500/10 text-red-300 border border-red-500/20"
-                            : "bg-blue-500/10 text-blue-300 border border-blue-500/20"
-                        }`}>
-                          {ch.badge}
-                        </span>
-
-                        {/* Engagement / Post Counter Badge */}
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1">
-                          <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
-                          <span>{(engagementCounts[ch.id]?.postCount ?? 0)} {(engagementCounts[ch.id]?.postCount === 1 ? "post" : "posts")}</span>
-                        </span>
-
-                        {engagementCounts[ch.id]?.reactionCount ? (
-                          <span className="text-[9px] font-mono text-amber-300/80 flex items-center gap-0.5 font-bold">
-                            <Flame className="w-2.5 h-2.5 text-amber-400" />
-                            {engagementCounts[ch.id]?.reactionCount}
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-sm font-bold truncate ${
+                            isActive ? "text-amber-300" : "text-white group-hover:text-amber-200"
+                          }`}>
+                            {ch.name}
                           </span>
-                        ) : null}
 
-                        {isActive && (
-                          <span className="text-[9px] font-mono text-emerald-400 font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                            ACTIVE
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
+                            isActive
+                              ? "bg-amber-500/30 text-amber-300 border border-amber-500/50"
+                              : "bg-amber-500/10 text-amber-300 border border-amber-500/20"
+                          }`}>
+                            {ch.badge}
                           </span>
-                        )}
-                      </div>
 
-                      <p className="text-xs text-slate-400 line-clamp-1 leading-snug">
-                        {ch.desc}
-                      </p>
-                    </div>
-                  </div>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1">
+                            <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                            <span>{(engagementCounts[ch.id]?.postCount ?? 0)} posts</span>
+                          </span>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {unread > 0 && !isActive && (
-                      <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-mono text-[10px] font-bold animate-pulse">
-                        {unread} new
-                      </span>
-                    )}
+                          {isActive && (
+                            <span className="text-[9px] font-mono text-emerald-400 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                              ACTIVE
+                            </span>
+                          )}
+                        </div>
 
-                    <div className="text-right font-mono text-[11px] text-slate-400 hidden xs:block">
-                      <div className="flex items-center justify-end gap-1 text-slate-200">
-                        <strong className="text-white font-mono">{engagementCounts[ch.id]?.postCount ?? 0}</strong>
-                        <span className="text-slate-400 text-[10px]">posts</span>
-                      </div>
-                      <div className="text-[9px] text-slate-400 hidden sm:block">
-                        {ch.activeUsers} shooters
+                        <p className="text-xs text-slate-400 line-clamp-1 leading-snug">
+                          {ch.desc}
+                        </p>
                       </div>
                     </div>
 
-                    <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
-                      isActive ? "text-amber-400" : "text-slate-500"
-                    }`} />
-                  </div>
-                </button>
-              );
-            })
+                    <div className="flex items-center gap-2 shrink-0">
+                      {unread > 0 && !isActive && (
+                        <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-mono text-[10px] font-bold animate-pulse">
+                          {unread} new
+                        </span>
+                      )}
+
+                      <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
+                        isActive ? "text-amber-400" : "text-slate-500"
+                      }`} />
+                    </div>
+                  </button>
+                );
+              })}
+
+              {/* Direct Partner Items */}
+              {filteredPartners.map((partner) => {
+                const isActive = currentChannel === partner.id;
+                const unread = unreadCounts[partner.id] || 0;
+                const isRO = partner.callsign === "RO" || partner.id === "dm_ro";
+                const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "ALLEN";
+                const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB";
+
+                return (
+                  <button
+                    key={partner.id}
+                    type="button"
+                    onClick={() => {
+                      if (onPlayChirp) onPlayChirp(1200);
+                      onSelectChannel(partner.id);
+                      onClose();
+                    }}
+                    className={`w-full p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 group ${
+                      isActive
+                        ? "bg-gradient-to-r from-emerald-950/40 via-black to-black/80 border-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+                        : "bg-white/[0.03] border-white/5 hover:border-emerald-500/40 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative ${
+                        isRO
+                          ? "bg-amber-500 text-black border-amber-400 font-black"
+                          : isMasterOwner
+                          ? "bg-amber-400 text-black border-amber-300 font-black"
+                          : isOwnerAdmin
+                          ? "bg-emerald-500 text-black border-emerald-300 font-black"
+                          : "bg-black/60 text-amber-400 border-white/10"
+                      }`}>
+                        {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
+                        <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
+                          partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
+                        }`} />
+                      </div>
+
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-sm font-bold truncate ${
+                            isActive ? "text-emerald-300" : "text-white group-hover:text-emerald-200"
+                          }`}>
+                            {partner.name}
+                          </span>
+
+                          <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
+                            [{partner.callsign}]
+                          </span>
+
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <Lock className="w-2.5 h-2.5" />
+                            <span>DIRECT</span>
+                          </span>
+
+                          {isActive && (
+                            <span className="text-[9px] font-mono text-emerald-400 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                              ACTIVE
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-slate-400 line-clamp-1 leading-snug">
+                          {isRO ? "Range Officer · The Hideout Official Guide" : partner.division || partner.rifleSetup || "Verified Competitor"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {unread > 0 && !isActive && (
+                        <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-mono text-[10px] font-bold animate-pulse">
+                          {unread} new
+                        </span>
+                      )}
+
+                      <ChevronRight className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
+                        isActive ? "text-emerald-400" : "text-slate-500"
+                      }`} />
+                    </div>
+                  </button>
+                );
+              })}
+            </>
           )}
         </div>
 
         {/* Modal Footer Note */}
         <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400 shrink-0">
-          <span>Encrypted Subsonic Comms Net</span>
+          <span className="flex items-center gap-1">
+            <Lock className="w-3 h-3 text-emerald-400" />
+            <span>Encrypted Direct & Match Comms</span>
+          </span>
           <span className="text-amber-400 font-bold">Bristol, TN • 3,420 FT</span>
         </div>
       </div>
