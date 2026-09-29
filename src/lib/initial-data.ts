@@ -322,6 +322,36 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     },
   },
   {
+    id: "msg-rob-001",
+    channelId: "invitational",
+    type: "STANDARD",
+    author: {
+      id: "usr_radar",
+      name: "Rob Neilson",
+      callsign: "RADAR",
+      role: "MASTER_OWNER",
+      badgeText: "DEV ADVISOR",
+      division: "Lead Developer & Tech Advisor",
+      rifleSetup: "Smart Systems Integrations",
+    },
+    content:
+      "Telemetry, scoring relays, and point-to-point direct comms are fully online across all 20 stages at The Hideout (3,420 FT). If any squad needs comms assistance or match network support during the weekend, ping me on direct line [RADAR].",
+    timestamp: "09:45 AM",
+    reactions: [
+      { emoji: "👑", count: 31, users: ["u1", "u2", "u3", "u4", "u5"] },
+      { emoji: "⚡", count: 24, users: ["u6", "u7", "u8"] },
+      { emoji: "🎯", count: 19, users: ["u9", "u10"] },
+    ],
+    moderationStatus: "APPROVED",
+    aiModerationReport: {
+      toxicityScore: 0,
+      threatScore: 0,
+      policyScore: 0,
+      sentiment: "POSITIVE",
+      aiEngine: "Google Gemini 2.5 Flash",
+    },
+  },
+  {
     id: "msg-002",
     channelId: "invitational",
     type: "DOPE_DROP",

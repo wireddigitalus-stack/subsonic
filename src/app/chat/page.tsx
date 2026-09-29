@@ -111,6 +111,17 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
   },
   {
+    id: "dm_radar",
+    callsign: "RADAR",
+    name: "Rob Neilson",
+    role: "MASTER_OWNER",
+    badgeText: "DEV ADVISOR",
+    division: "Lead Developer & Tech Advisor",
+    status: "online",
+    bio: "Lead Developer & Tech Advisor for Subsonic Society and The Hideout Invitational. Match systems architecture & network tech.",
+    rifleSetup: "Smart Systems Integrations",
+  },
+  {
     id: "dm_wyatt",
     callsign: "APEX-22",
     name: "Wyatt Sterling",
@@ -1059,6 +1070,8 @@ export default function ChatPage() {
         let replyText = `Copy that, [${shooterProfile.callsign}]. Transmission received on private net.`;
         if (partnerCallsign === "ALLEN") {
           replyText = `Copy that, [${shooterProfile.callsign}]. Direct transmission received. Staging and dinner operations at The Hideout (111 Hwy 44) are dialed in. Let me know if you need anything before check-in.`;
+        } else if (partnerCallsign === "RADAR" || partnerCallsign === "ROB") {
+          replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received on RADAR frequency. Subsonic network, scoring uplinks, and telemetry are running green across The Hideout.`;
         } else if (partnerCallsign === "APEX-22") {
           replyText = `Roger that, [${shooterProfile.callsign}]. Dialed in on direct net. Let's compare DOPE for Stage 4 Friday afternoon during chrono testing.`;
         } else if (partnerCallsign === "VIPER-01") {
