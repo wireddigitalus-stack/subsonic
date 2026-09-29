@@ -42,7 +42,7 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#07090E]/60 via-[#07090E]/85 to-[#07090E]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
         {/* Core Pillars Badge */}
         <div className="flex items-center justify-center sm:justify-start max-w-full">
           <div className="inline-flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[9px] sm:text-xs font-mono max-w-full tracking-tight sm:tracking-normal text-center">
@@ -57,17 +57,13 @@ export function HeroSection() {
         </div>
 
         {/* Hero Headline & Brand Mantra */}
-        <div className="space-y-4 max-w-4xl">
+        <div className="max-w-4xl">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
             SUBSONIC SOCIETY <br />
             <span className="amber-gradient-text">
               PRECISION IS IN OUR DNA.
             </span>
           </h1>
-
-          <p className="text-base sm:text-xl text-slate-300 font-normal leading-relaxed max-w-3xl">
-            A grassroots precision-rimfire community built around real-world ballistic knowledge, extreme 300-yard competition, and figuring out what <strong className="text-white">actually works</strong>.
-          </p>
         </div>
 
         {/* Video Banner Reel -> 3-Sec Crosshair Lock -> Live Animated Tactical Chat Terminal */}
@@ -93,6 +89,11 @@ export function HeroSection() {
             </div>
           )}
         </div>
+
+        {/* Hero Creed & Mission Statement (Positioned under video & chat mockup) */}
+        <p className="text-sm sm:text-lg text-slate-300 font-normal leading-relaxed max-w-3xl">
+          A grassroots precision-rimfire community built around real-world ballistic knowledge, extreme 300-yard competition, and figuring out what <strong className="text-white">actually works</strong>.
+        </p>
 
         {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • CLAIM INVITE */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
