@@ -1,5 +1,11 @@
 "use client";
 
+import { ChatAuthGate } from "@/components/chat/ChatAuthGate";
+import { ChatChannelSidebar } from "@/components/chat/ChatChannelSidebar";
+import { ChatDopeCardModal } from "@/components/chat/ChatDopeCardModal";
+import { ChatInputBar } from "@/components/chat/ChatInputBar";
+import { ChatMessageList } from "@/components/chat/ChatMessageList";
+
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -1238,110 +1244,17 @@ export default function ChatPage() {
   // If not authenticated, render the Private Chat Room Gate
   if (authChecked && !isAuthenticated) {
     return (
-      <div className="min-h-[75vh] flex items-center justify-center px-4 py-8">
-        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
-          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
-            <Image
-              src="/assets/subsonic-coin.jpg"
-              alt="Subsonic Emblem"
-              fill
-              className="object-cover"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono font-bold uppercase tracking-wider">
-              <Lock className="w-3 h-3" />
-              <span>Restricted Network • Member Key Required</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
-              PRIVATE CHAT ROOM
-            </h2>
-            <p className="text-xs text-slate-300">
-              Enter your callsign and member key to access live squad comms and DOPE drops.
-            </p>
-          </div>
-
-          {authError && (
-            <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-300 text-xs font-mono text-left flex items-start gap-2">
-              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-red-400" />
-              <span>{authError}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleUnlockRoom} className="space-y-4 text-left">
-            <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 font-bold">Callsign *</label>
-              <input
-                type="text"
-                required
-                value={loginCallsign}
-                onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
-                placeholder="e.g. ALLEN, ROB, or Callsign"
-                autoComplete="username"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400 transition-colors"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
-                <span>Member Key or Security PIN</span>
-                <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for ALLEN • 2468 for ROB</span>
-              </label>
-              <input
-                type="password"
-                value={loginPasscode}
-                onChange={(e) => setLoginPasscode(e.target.value)}
-                placeholder="Enter PIN (e.g. 620620 or 2468)..."
-                autoComplete="current-password"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400 transition-colors"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
-            >
-              <Unlock className="w-4 h-4 fill-black" />
-              <span>UNLOCK PRIVATE CHAT ROOM</span>
-            </button>
-          </form>
-
-          <div className="pt-3 border-t border-white/10 space-y-3">
-            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
-              <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block tracking-wider">
-                MEMBERSHIP & CHAT BY INVITATION ONLY
-              </span>
-              <p className="text-[11px] text-slate-300">
-                Have an invitation code from Allen or a Range Officer?
-              </p>
-              <div className="flex items-center justify-center gap-2 pt-1">
-                <Link
-                  href="/invite"
-                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 transition-all"
-                >
-                  <span>Claim Member Code</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href="/invite/pro"
-                  className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all"
-                >
-                  <span>Pro VIP Intake</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            <a href="/" className="block text-xs text-slate-500 hover:text-slate-300 transition-colors text-center">
-              ← Return to Main Portal
-            </a>
-          </div>
-        </div>
-      </div>
+      <ChatAuthGate
+        authShake={authShake}
+        authError={authError}
+        loginCallsign={loginCallsign}
+        setLoginCallsign={setLoginCallsign}
+        loginPasscode={loginPasscode}
+        setLoginPasscode={setLoginPasscode}
+        handleUnlockRoom={handleUnlockRoom}
+      />
     );
   }
-
 
   return (
     <div
@@ -1882,91 +1795,15 @@ export default function ChatPage() {
 
         {/* DESKTOP-ONLY Channels Sidebar (Hidden in Fullscreen or Mobile) */}
         {!isFullscreen && (
-          <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
-            <div className="ios-glass rounded-2xl md:rounded-3xl p-4 sm:p-5 border border-white/10 flex flex-col h-full min-h-0">
-              <div className="flex items-center justify-between px-1 mb-3 shrink-0">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                  {activeNetTab === "PRO" ? "Pro Squad Channels" : "Society Channels"}
-                </span>
-                <span className="text-[10px] font-mono text-amber-400">
-                  {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Active Shooters
-                </span>
-              </div>
-
-              {/* Channels List */}
-              <div className="space-y-2 flex-1 min-h-0 overflow-y-auto no-scrollbar pr-0.5">
-                {visibleChannels.map((ch) => {
-                  const isActive = currentChannel === ch.id;
-                  const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
-                  return (
-                    <button
-                      key={ch.id}
-                      type="button"
-                      onClick={() => setCurrentChannel(ch.id)}
-                      data-telemetry={`chat_channel_${ch.id}`}
-                      className={`w-full p-3 rounded-2xl text-left transition-all border ${
-                        isActive
-                          ? "ios-glass bg-amber-500/15 border-amber-500/40 shadow-tactical-glow text-white"
-                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] text-slate-300"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-1.5 font-mono font-bold text-sm">
-                          <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
-                          <span>{ch.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          {/* Post Counter on Channel Card */}
-                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold flex items-center gap-1 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                            <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
-                            <span>{engagement.postCount} {engagement.postCount === 1 ? "post" : "posts"}</span>
-                          </span>
-
-                          <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
-                            isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
-                          }`}>
-                            {ch.badge}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[11px] text-slate-400 line-clamp-1 flex-1">
-                          {ch.desc}
-                        </p>
-                        {engagement.reactionCount > 0 && (
-                          <span className="text-[9px] font-mono text-amber-300/80 flex items-center gap-0.5 shrink-0 font-bold">
-                            <Flame className="w-2.5 h-2.5 text-amber-400" />
-                            {engagement.reactionCount}
-                          </span>
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* DOPE Drop Action Box */}
-              <div className="pt-3 border-t border-white/10 space-y-2 shrink-0 mt-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono uppercase text-slate-300 font-bold flex items-center gap-1.5">
-                    <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-                    Tactical DOPE Card
-                  </span>
-                  <span className="text-[10px] font-mono text-emerald-400">Holston 340y Spec</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsDopeModalOpen(true)}
-                  data-telemetry="chat_open_dope_modal"
-                  className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
-                >
-                  <Crosshair className="w-4 h-4" />
-                  <span>DROP VERIFIED DOPE CARD</span>
-                </button>
-              </div>
-
-            </div>
-          </div>
+          
+          <ChatChannelSidebar
+            activeNetTab={activeNetTab}
+            visibleChannels={visibleChannels}
+            currentChannel={currentChannel}
+            setCurrentChannel={setCurrentChannel}
+            channelEngagementMap={channelEngagementMap}
+            setIsDopeModalOpen={setIsDopeModalOpen}
+          />
         )}
 
         {/* MAIN CHAT STREAM & TRANSMITTER */}
@@ -1975,613 +1812,57 @@ export default function ChatPage() {
             !isFullscreen ? "lg:col-span-8" : ""
           } md:ios-glass rounded-none md:rounded-2xl sm:rounded-3xl border-0 md:border border-white/10 flex flex-col overflow-hidden md:shadow-2xl relative h-full min-h-0`}
         >
-          {/* Pinned Match Director Announcement — desktop only */}
-          {pinnedAnnouncement && (
-            <div
-              className={`shrink-0 border-b border-amber-500/30 transition-all hidden md:flex ${announcementCollapsed ? "py-1" : "py-2 sm:py-2.5"} px-2.5 sm:px-4 bg-amber-950/60 items-center justify-between gap-2 cursor-pointer`}
-              onClick={() => setAnnouncementCollapsed(!announcementCollapsed)}
-            >
-              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-                <Pin className="w-3 h-3 text-amber-400 shrink-0" />
-                <span className={`text-[10px] sm:text-[11px] text-amber-200 font-mono ${announcementCollapsed ? "truncate" : "leading-relaxed"}`}>
-                  {pinnedAnnouncement}
-                </span>
-              </div>
-              {announcementCollapsed
-                ? <ChevronDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                : <ChevronUp className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              }
-            </div>
-          )}
-
-          {/* Messages Stream — flex-1 fills all available space, scrolls internally */}
-          <div
-            ref={messagesContainerRef}
-            onScroll={handleContainerScroll}
-            className="px-2 py-2 md:p-5 space-y-2 md:space-y-4 flex-1 overflow-y-auto chat-scroll overscroll-contain min-h-0"
-          >
-
-            {filteredMessages.length === 0 ? (
-              <div className="text-center py-16 space-y-3">
-                <MessageSquare className="w-10 h-10 text-slate-600 mx-auto" />
-                <div className="text-slate-400 font-mono text-sm">No transmissions in #{currentChannelData.name} yet.</div>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Be the first competitor to broadcast DOPE or stage notes to the squad.
-                </p>
-              </div>
-            ) : (
-              filteredMessages.map((msg) => {
-                const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB";
-                const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
-                const isAdmin = msg.author.role === "ADMIN";
-                const isMod = msg.author.role === "MODERATOR";
-                const isMD = msg.author.role === "MATCH_DIRECTOR" || msg.type === "MATCH_ALERT";
-                const isPro = msg.author.role === "PRO_COMPETITOR";
-                const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
-                const isFlagged = msg.moderationStatus === "FLAGGED";
-                const isPlink = msg.author.id === "plink_ai_moderator";
-                // Plink warning tier from aiEngine field
-                // Derive Plink warning severity: toxicityScore encodes tier * 30
-                const plinkSeverity: "warn" | "alert" | "info" = isPlink
-                  ? msg.aiModerationReport
-                    ? (msg.aiModerationReport.toxicityScore >= 60 ? "alert" : "warn")
-                    : "info"
-                  : "info";
-
-                return (
-                  <div
-                    key={msg.id}
-                    className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 ${
-                      isPlink
-                        ? plinkSeverity === "alert"
-                          ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
-                          : plinkSeverity === "warn"
-                          ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
-                          : "bg-gradient-to-r from-cyan-950/40 to-black/80 border-cyan-500/25"
-                        : isMasterOwner
-                        ? "bg-gradient-to-r from-amber-950/60 via-black/80 to-yellow-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
-                        : isOwnerAdmin
-                        ? "bg-gradient-to-r from-emerald-950/60 via-black/80 to-teal-950/40 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
-                        : isAdmin
-                        ? "bg-gradient-to-r from-cyan-950/60 via-black/80 to-blue-950/40 border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
-                        : isMod
-                        ? "bg-gradient-to-r from-purple-950/60 via-black/80 to-indigo-950/40 border-purple-400/60 shadow-[0_0_20px_rgba(168,85,247,0.25)]"
-                        : isMD
-                        ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
-                        : isDopeDrop
-                        ? "bg-black/70 border-cyan-500/30 shadow-lg"
-                        : isFlagged
-                        ? "bg-amber-500/5 border-amber-500/20"
-                        : "bg-white/[0.02] border-white/5 hover:border-white/10"
-                    }`}
-                  >
-                    {/* Message Header: Author, Badge, Timestamp */}
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                        {/* Avatar — desktop only */}
-                        <div className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 ${
-                          isPlink
-                            ? "bg-cyan-950 text-cyan-300 border-cyan-500/50"
-                            : isMasterOwner
-                            ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
-                            : isOwnerAdmin
-                            ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                            : isAdmin
-                            ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-black border-cyan-300 font-black shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-                            : isMod
-                            ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white border-purple-300 font-black shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-                            : isMD
-                            ? "bg-amber-500 text-black border-amber-400"
-                            : isDopeDrop
-                            ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
-                            : "bg-black/60 text-amber-400 border-white/10"
-                        }`}>
-                          {isPlink ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className={`text-xs md:text-sm font-bold truncate ${isPlink ? "text-cyan-300" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"}`}>
-                              {msg.author.name}
-                            </span>
-                            {/* Callsign brackets — desktop only */}
-                            {msg.author.callsign && !isPlink && (
-                              <span className="hidden md:inline text-xs font-mono text-amber-400 font-bold">
-                                [{msg.author.callsign}]
-                              </span>
-                            )}
-                            <span
-                              className={`text-[8px] md:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
-                                isPlink
-                                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                                  : isMasterOwner
-                                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300"
-                                  : isOwnerAdmin
-                                  ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300"
-                                  : isAdmin
-                                  ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black border border-cyan-300"
-                                  : isMod
-                                  ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black border border-purple-300"
-                                  : isMD
-                                  ? "bg-amber-500 text-black font-extrabold"
-                                  : isPro
-                                  ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
-                                  : "bg-white/10 text-slate-300"
-                              }`}
-                            >
-                              {isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
-                            </span>
-                            {/* Timestamp — inline on mobile */}
-                            <span className="text-[10px] md:hidden text-slate-500 font-mono">{msg.timestamp}</span>
-                          </div>
-                          {/* Rig line — desktop only */}
-                          {msg.author.rifleSetup && (
-                            <div className="hidden md:block text-[10px] font-mono text-slate-400 truncate max-w-md">
-                              Rig: {msg.author.rifleSetup}
-                            </div>
-                          )}
-                          {/* Plink AI label — desktop only */}
-                          {isPlink && (
-                            <div className="hidden md:flex text-[10px] font-mono text-cyan-500 items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
-                              AI-powered · All channels monitored
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Right Meta: Timestamp & Status — desktop only (mobile has it inline) */}
-                      <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-400 font-mono shrink-0">
-                        <span>{msg.timestamp}</span>
-                        {isFlagged ? (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
-                            <AlertTriangle className="w-2.5 h-2.5" />
-                            REVIEW
-                          </span>
-                        ) : isPlink ? (
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 font-bold">AI</span>
-                        ) : (
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        )}
-                      </div>
-                    </div>
-
-
-                    {/* Standard Content */}
-                    {msg.content && (
-                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        {msg.content}
-                      </p>
-                    )}
-
-                    {/* DOPE CARD — compact on mobile */}
-                    {msg.dopeCard && (
-                      <div className="p-2 md:p-3.5 rounded-lg md:rounded-2xl bg-black/85 border border-cyan-500/40 shadow-tactical-glow space-y-1 md:space-y-2.5">
-                        <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20">
-                          <div className="flex items-center gap-1.5 sm:gap-2 font-mono min-w-0">
-                            <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                            <span className="text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
-                              BALLISTIC DOPE
-                            </span>
-                            <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[9px] sm:text-[10px] font-bold shrink-0">
-                              {msg.dopeCard.targetDistance}
-                            </span>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => copyDopeToClipboard(msg.id, msg.dopeCard!)}
-                            className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[9px] sm:text-[10px] font-mono text-slate-300 hover:text-white transition-colors shrink-0"
-                          >
-                            {copiedDopeId === msg.id ? (
-                              <>
-                                <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
-                                <span className="text-emerald-300">COPIED</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                                <span>COPY</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-
-                        {/* DOPE Grid: Single row on all devices */}
-                        <div className="grid grid-cols-4 gap-1 sm:gap-2 font-mono text-center">
-                          <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">ELEV</span>
-                            <div className="text-[11px] sm:text-sm font-bold text-amber-400 truncate">{msg.dopeCard.elevationMils}</div>
-                          </div>
-                          <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">WIND</span>
-                            <div className="text-[11px] sm:text-sm font-bold text-cyan-300 truncate">{msg.dopeCard.windHoldMils}</div>
-                          </div>
-                          <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">SPEED</span>
-                            <div className="text-[10px] sm:text-xs font-semibold text-slate-200 truncate">{msg.dopeCard.windVelocity || "8-14 MPH"}</div>
-                          </div>
-                          <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                            <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">DA</span>
-                            <div className="text-[10px] sm:text-xs font-semibold text-emerald-300 truncate">{msg.dopeCard.densityAltitude || "+2,150 FT"}</div>
-                          </div>
-                        </div>
-
-                        {/* Ammo & Notes — desktop only */}
-                        {(msg.dopeCard.ammo || msg.dopeCard.notes) && (
-                          <div className="hidden md:flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5 gap-2">
-                            {msg.dopeCard.ammo && (
-                              <div className="truncate">Ammo: <strong className="text-slate-200">{msg.dopeCard.ammo}</strong></div>
-                            )}
-                            {msg.dopeCard.notes && (
-                              <div className="text-cyan-300 italic truncate text-right">
-                                &ldquo;{msg.dopeCard.notes}&rdquo;
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Staff Moderation Flag Notice */}
-                    {isFlagged && msg.aiModerationReport?.flagReason && (
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-start gap-2">
-                        <BadgeAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                        <div>
-                          <strong>Moderation Alert:</strong> {msg.aiModerationReport.flagReason}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Reactions Bar — compact on mobile */}
-                    <div className="flex items-center gap-1 md:gap-2 pt-0.5 flex-wrap">
-                      {msg.reactions.map((reaction) => (
-                        <button
-                          key={reaction.emoji}
-                          type="button"
-                          onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                          className="px-1.5 md:px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-[11px] md:text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1 transition-all active:scale-95"
-                        >
-                          <span>{reaction.emoji}</span>
-                          <span className="font-mono text-[10px] font-bold">{reaction.count}</span>
-                        </button>
-                      ))}
-
-                      {/* Quick Reactions Palette — desktop only */}
-                      <div className="hidden md:flex items-center gap-1 pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
-                        {["🎯", "🔥", "⛰️", "💡"].map((emoji) => (
-                          <button
-                            key={emoji}
-                            type="button"
-                            onClick={() => handleAddReaction(msg.id, emoji)}
-                            className="p-1 text-xs hover:scale-125 transition-transform active:scale-95"
-                            title={`React with ${emoji}`}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* New Messages — compact pill on mobile, full banner on desktop */}
-          {showScrollFab && (
-            <button
-              type="button"
-              onClick={() => { scrollContainerToBottom(true); setShowScrollFab(false); }}
-              className="w-full shrink-0 flex items-center justify-center gap-2 py-1.5 md:py-2 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent border-t border-amber-500/20 text-amber-400 hover:text-amber-300 transition-all animate-fadeIn group"
-              title="Jump to latest"
-            >
-              <span className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-0.5 md:py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold">
-                <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
-                <span className="hidden md:inline">New transmissions — tap to jump down</span>
-                <span className="md:hidden">New messages ↓</span>
-              </span>
-            </button>
-          )}
-
-          {/* Blocked Transmission Notice Banner */}
-          {aiBlockedNotice && (
-            <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake shrink-0">
-              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-              <div className="flex-1 font-medium">{aiBlockedNotice}</div>
-            </div>
-          )}
-
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="px-4 py-1.5 bg-black/60 border-t border-white/5 shrink-0 flex items-center gap-2">
-              <div className="flex gap-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
-              </div>
-              <span className="text-[10px] font-mono text-slate-400">[{shooterProfile.callsign}] composing...</span>
-            </div>
-          )}
-
-          {/* Quick Push-To-Talk Radio Chips above input — hidden on mobile to maximize chat window */}
-          <div id="tour-step-plink" className="hidden sm:flex px-3 pt-2 pb-1 bg-black/70 items-center justify-between gap-1.5 border-t border-white/10 shrink-0">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <Radio className="w-3 h-3 text-cyan-400 shrink-0" />
-              <button
-                type="button"
-                onClick={() => {
-                  setInputText("hey plink ");
-                  playTacticalChirp(1100);
-                }}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold shrink-0"
-                title="Chat with Plink AI Range Marshal"
-              >
-                🤖 &ldquo;Hey Plink&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/5 transition-all shrink-0"
-              >
-                🎯 &ldquo;Impact!&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/5 transition-all shrink-0"
-              >
-                🛑 &ldquo;Cold&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-white/5 transition-all shrink-0"
-              >
-                💨 &ldquo;Wind switch 12mph&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("DOPE verified out to 465 yards.")}
-                className="hidden md:inline-block whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-all shrink-0"
-              >
-                📋 &ldquo;DOPE verified&rdquo;
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsChannelModalOpen(true);
-                playTacticalChirp(1000);
-              }}
-              className="text-[10px] font-mono text-amber-400/80 hover:text-amber-300 flex items-center gap-0.5 shrink-0 px-1 py-0.5"
-            >
-              <span className="truncate max-w-[120px]">#{currentChannelData.name}</span>
-            </button>
-          </div>
-
-          {/* TRANSMITTER INPUT BAR */}
-          <form id="tour-step-ptt" onSubmit={handleSendMessage} className="p-2 md:p-4 bg-black/85 shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:pb-[max(0.6rem,env(safe-area-inset-bottom))]">
-            <div className="flex items-center gap-1.5 md:gap-2">
-              {/* Main text input */}
-              <input
-                type="text"
-                placeholder={isListening ? "Listening…" : (typeof window !== "undefined" && window.innerWidth < 768 ? "Message..." : `Broadcast to #${currentChannelData.name}...`)}
-                value={inputText}
-                onChange={(e) => handleInputChange(e.target.value)}
-                onFocus={() => {
-                  // When keyboard opens on mobile, scroll messages to bottom so replies are visible
-                  setTimeout(() => {
-                    if (messagesContainerRef.current) {
-                      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-                    }
-                  }, 300);
-                }}
-                spellCheck={true}
-                autoCorrect="on"
-                autoCapitalize="sentences"
-                autoComplete="off"
-                className="flex-1 min-w-0 px-3 py-2.5 md:px-4 md:py-3 rounded-full md:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-sm md:text-base focus:border-amber-400 focus:outline-none placeholder:text-slate-400 placeholder:text-sm"
-              />
-
-              {/* Push-to-Talk mic button */}
-              <button
-                type="button"
-                onClick={handlePushToTalk}
-                className={`p-2.5 md:p-3 rounded-full md:rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
-                  isListening
-                    ? "bg-red-500 border-red-400 text-white animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.5)]"
-                    : "bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white"
-                }`}
-                title={isListening ? "Listening…" : "Voice input"}
-              >
-                <Mic className={`w-4 h-4 md:w-5 md:h-5 ${isListening ? "text-white" : "text-slate-300"}`} />
-              </button>
-
-              {/* DOPE card button — desktop only */}
-              <button
-                id="tour-step-dope"
-                type="button"
-                onClick={() => setIsDopeModalOpen(true)}
-                className="hidden md:flex p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all items-center gap-1 text-sm font-mono shrink-0"
-                title="Drop DOPE Card"
-              >
-                <Crosshair className="w-4 h-4" />
-                <span>DOPE</span>
-              </button>
-
-              {/* Send */}
-              <button
-                type="submit"
-                disabled={isAiScanning}
-                data-telemetry="chat_send_button"
-                className="p-2.5 md:p-3 md:px-5 rounded-full md:rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-sm font-mono disabled:opacity-50 shrink-0"
-                title="Send"
-              >
-                {isAiScanning ? (
-                  <span className="animate-spin text-sm">⏳</span>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span className="hidden md:inline">TRANSMIT</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Transmitting footer: Hidden on mobile */}
-            <div className="hidden md:flex items-center justify-between text-xs font-mono text-slate-400 px-1 pt-1">
-              <span>
-                Transmitting as: <strong className="text-slate-200">[{shooterProfile.callsign}]</strong>
-              </span>
-              {isListening && (
-                <span className="flex items-center gap-1.5 text-red-400 font-bold animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-red-400" />
-                  LISTENING — speak now
-                </span>
-              )}
-            </div>
-          </form>
+          <ChatMessageList
+            pinnedAnnouncement={pinnedAnnouncement}
+            announcementCollapsed={announcementCollapsed}
+            setAnnouncementCollapsed={setAnnouncementCollapsed}
+            messagesContainerRef={messagesContainerRef}
+            handleContainerScroll={handleContainerScroll}
+            filteredMessages={filteredMessages}
+            currentChannelData={currentChannelData}
+            shooterProfile={shooterProfile}
+            setProfileForm={setProfileForm}
+            setProfileActiveTab={setProfileActiveTab}
+            setIsProfileModalOpen={setIsProfileModalOpen}
+            playTacticalChirp={playTacticalChirp}
+            currentChannel={currentChannel}
+            quickBroadcast={quickBroadcast}
+            setIsChannelModalOpen={setIsChannelModalOpen}
+            copyDopeToClipboard={copyDopeToClipboard}
+            copiedDopeId={copiedDopeId}
+            handleAddReaction={handleAddReaction}
+            showScrollFab={showScrollFab}
+            scrollContainerToBottom={scrollContainerToBottom}
+            setShowScrollFab={setShowScrollFab}
+            aiBlockedNotice={aiBlockedNotice}
+            isTyping={isTyping}
+            setInputText={setInputText}
+          />
+          <ChatInputBar
+            handleSendMessage={handleSendMessage}
+            isListening={isListening}
+            currentChannelData={currentChannelData}
+            inputText={inputText}
+            handleInputChange={handleInputChange}
+            messagesContainerRef={messagesContainerRef}
+            handlePushToTalk={handlePushToTalk}
+            setIsDopeModalOpen={setIsDopeModalOpen}
+            isAiScanning={isAiScanning}
+            shooterProfile={shooterProfile}
+          />
         </div>
       </div>
 
 
       {/* 4. TACTICAL DOPE DROP BUILDER MODAL */}
-      {isDopeModalOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-lg w-full border border-cyan-500/40 shadow-2xl p-5 sm:p-8 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-                  <Crosshair className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">
-                    Broadcast Ballistic DOPE Card
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Transmits target parameters directly to #{currentChannelData.name}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsDopeModalOpen(false)}
-                className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSendDopeCard} className="space-y-3.5 sm:space-y-4">
-              {/* Target Distance & Stage */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Target Distance</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.targetDistance}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, targetDistance: e.target.value })}
-                    placeholder="e.g. 340 YDS"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Target / Stage Name</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.targetDescription}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, targetDescription: e.target.value })}
-                    placeholder="e.g. Stage 4 Diamond KYL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Elevation & Wind Holds */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-amber-400 font-bold">Elevation Dial / Hold</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.elevationMils}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, elevationMils: e.target.value })}
-                    placeholder="e.g. 8.4 MIL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-base sm:text-xs font-bold focus:border-amber-400 focus:outline-none"
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-cyan-400 font-bold">Wind Hold</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.windHoldMils}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, windHoldMils: e.target.value })}
-                    placeholder="e.g. L 0.6 MIL"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-base sm:text-xs font-bold focus:border-cyan-400 focus:outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Wind Speed & Ammo Lot */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Wind Speed & Vector</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.windVelocity}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, windVelocity: e.target.value })}
-                    placeholder="e.g. 9 MPH @ 260° WNW"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Ammunition Lot</label>
-                  <input
-                    type="text"
-                    value={dopeFormData.ammo}
-                    onChange={(e) => setDopeFormData({ ...dopeFormData, ammo: e.target.value })}
-                    placeholder="e.g. Lapua Center-X (1,062 FPS)"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div className="space-y-1">
-                <label className="text-xs font-mono text-slate-300">Tactical Wind / Stage Notes</label>
-                <textarea
-                  rows={2}
-                  value={dopeFormData.notes}
-                  onChange={(e) => setDopeFormData({ ...dopeFormData, notes: e.target.value })}
-                  placeholder="e.g. Watch for downdraft in canyon draw..."
-                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none resize-none"
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsDopeModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow flex items-center gap-2"
-                >
-                  <Crosshair className="w-4 h-4" />
-                  <span>TRANSMIT DOPE</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <ChatDopeCardModal
+        isDopeModalOpen={isDopeModalOpen}
+        setIsDopeModalOpen={setIsDopeModalOpen}
+        currentChannelData={currentChannelData}
+        handleSendDopeCard={handleSendDopeCard}
+        dopeFormData={dopeFormData}
+        setDopeFormData={setDopeFormData}
+      />
 
       {/* 5. SHOOTER PROFILE CUSTOMIZER MODAL */}
       {isProfileModalOpen && (
