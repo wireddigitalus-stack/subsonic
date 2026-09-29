@@ -21,9 +21,10 @@ import {
 import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
 import { HeroVideoBanner } from "./HeroVideoBanner";
+import { HeroCrosshairLoader } from "./HeroCrosshairLoader";
 
 export function HeroSection() {
-  const [heroMode, setHeroMode] = useState<"video" | "chat">("video");
+  const [heroMode, setHeroMode] = useState<"video" | "loading" | "chat">("video");
 
   return (
     <section data-section="hero" className="relative pt-4 pb-16 overflow-hidden">
@@ -69,13 +70,21 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Video Banner Reel -> Live Animated Tactical Chat Terminal */}
+        {/* Video Banner Reel -> 3-Sec Crosshair Lock -> Live Animated Tactical Chat Terminal */}
         <div className="w-full transition-all duration-500">
-          {heroMode === "video" ? (
+          {heroMode === "video" && (
             <div className="animate-fadeIn">
-              <HeroVideoBanner onComplete={() => setHeroMode("chat")} />
+              <HeroVideoBanner onComplete={() => setHeroMode("loading")} />
             </div>
-          ) : (
+          )}
+
+          {heroMode === "loading" && (
+            <div className="animate-fadeIn">
+              <HeroCrosshairLoader onComplete={() => setHeroMode("chat")} />
+            </div>
+          )}
+
+          {heroMode === "chat" && (
             <div className="animate-fadeIn">
               <HeroChatTerminal
                 isActive={heroMode === "chat"}
