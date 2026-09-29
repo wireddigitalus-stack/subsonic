@@ -88,7 +88,7 @@ export function MediaSpotlight() {
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-amber-400/40 shadow-tactical-glow shrink-0">
                   <Image
-                    src="/assets/subsonic-coin.jpg"
+                    src="/images/SS-RWB-LOGO.png"
                     alt="Subsonic Society Emblem"
                     fill
                     className="object-cover"

@@ -1543,7 +1543,7 @@ export default function ChatPage() {
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/80 bg-black shrink-0">
                   <Image
-                    src="/assets/subsonic-coin.jpg"
+                    src="/images/SS-RWB-LOGO.png"
                     alt="Subsonic"
                     width={20}
                     height={20}

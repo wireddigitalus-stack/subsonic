@@ -177,7 +177,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
     likesCount: 312,
     commentsCount: 56,
     sharesCount: 41,
-    imageUrl: "/assets/subsonic-coin.jpg",
+    imageUrl: "/images/SS-RWB-LOGO.png",
     externalUrl: "https://www.facebook.com/p/Subsonic-Society-61578052196057/",
     tags: ["#SubsonicSociety", "#ModacamCustomRifles", "#PrecisionRimfire", "#CashPurse"],
   },
@@ -222,7 +222,7 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
       ammo: "Lapua Center-X 40gr Subsonic",
     },
     quote: "In the Bristol mountains, the wind never blows the same way two seconds in a row. You have to trust your bubble level and read the grass on the draw.",
-    imageUrl: "/assets/subsonic-coin.jpg",
+    imageUrl: "/images/SS-RWB-LOGO.png",
     podiums: 14,
   },
   {
@@ -256,7 +256,7 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
       ammo: "ELEY Tenex 1058 fps Subsonic",
     },
     quote: "You don't need a $10,000 custom rig to win if you master stage timing and barricade stability.",
-    imageUrl: "/assets/subsonic-coin.jpg",
+    imageUrl: "/images/SS-RWB-LOGO.png",
     podiums: 8,
   },
 ];

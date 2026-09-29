@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-coin.jpg?v=3",
+        url: "/images/SS-RWB-LOGO.png",
         width: 600,
         height: 600,
         alt: "Subsonic Society Official Challenge Coin",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Society Armory | Official Gear",
     description: "Official challenge coins, competition apparel, and match gear.",
-    images: ["/assets/subsonic-coin.jpg?v=3"],
+    images: ["/images/SS-RWB-LOGO.png"],
   },
 };
 

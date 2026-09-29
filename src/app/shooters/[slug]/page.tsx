@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         {
           url: shooter.image?.startsWith("http")
             ? shooter.image
-            : `https://subsonic-omega.vercel.app${shooter.image || "/assets/subsonic-coin.jpg"}`,
+            : `https://subsonic-omega.vercel.app${shooter.image || "/images/SS-RWB-LOGO.png"}`,
           width: 1200,
           height: 630,
           alt: `${shooter.name} Marksman Profile`,
@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [
         shooter.image?.startsWith("http")
           ? shooter.image
-          : `https://subsonic-omega.vercel.app${shooter.image || "/assets/subsonic-coin.jpg"}`,
+          : `https://subsonic-omega.vercel.app${shooter.image || "/images/SS-RWB-LOGO.png"}`,
       ],
     },
     alternates: {

@@ -74,14 +74,14 @@ export default function ShooterIntakePage() {
     mount: "Spuhr QDP-4002 0 MOA with Level",
     tuner: "Harrell Precision Custom Rimfire Tuner",
     ammoLot: "Lapua Center-X (1,062 FPS)",
-    headshotUrl: "/assets/subsonic-coin.jpg",
-    actionPhotoUrl: "/assets/subsonic-coin.jpg",
+    headshotUrl: "/images/SS-RWB-LOGO.png",
+    actionPhotoUrl: "/images/SS-RWB-LOGO.png",
     interviewQ1: "In sudden mountain wind shifts, what is your go-to holdover strategy?",
     interviewA1: "",
   });
 
-  const [headshotPreview, setHeadshotPreview] = useState<string>("/assets/subsonic-coin.jpg");
-  const [actionPhotoPreview, setActionPhotoPreview] = useState<string>("/assets/subsonic-coin.jpg");
+  const [headshotPreview, setHeadshotPreview] = useState<string>("/images/SS-RWB-LOGO.png");
+  const [actionPhotoPreview, setActionPhotoPreview] = useState<string>("/images/SS-RWB-LOGO.png");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCallsignValid, setIsCallsignValid] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<any | null>(null);

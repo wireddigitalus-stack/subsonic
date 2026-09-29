@@ -29,7 +29,7 @@ export function ChatAuthGate({
       <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
           <Image
-            src="/assets/subsonic-coin.jpg"
+            src="/images/SS-RWB-LOGO.png"
             alt="Subsonic Emblem"
             fill
             className="object-cover"

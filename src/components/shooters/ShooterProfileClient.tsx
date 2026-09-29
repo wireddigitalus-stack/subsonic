@@ -150,8 +150,8 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 homeRange: "The Hideout, Bristol, TN",
                 podiums: 1,
                 featuredMatch: "The Subsonic Society Invitational 2026",
-                image: parsed.image || "/assets/subsonic-coin.jpg",
-                actionPhoto: parsed.image || "/assets/subsonic-coin.jpg",
+                image: parsed.image || "/images/SS-RWB-LOGO.png",
+                actionPhoto: parsed.image || "/images/SS-RWB-LOGO.png",
                 quote: "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
                 accolades: ["VERIFIED COMPETITOR"],
                 sponsors: ["Subsonic Society"],
@@ -342,7 +342,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               {/* Profile Image with Tactical Ring */}
               <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
                 <img
-                  src={shooter.image || "/assets/subsonic-coin.jpg"}
+                  src={shooter.image || "/images/SS-RWB-LOGO.png"}
                   alt={getShooterDisplayName(shooter)}
                   className="w-full h-full object-cover"
                 />

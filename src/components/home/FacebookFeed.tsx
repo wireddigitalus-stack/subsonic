@@ -401,7 +401,7 @@ export function FacebookFeed() {
                 <div className="flex items-end gap-3 -mt-8 relative z-10">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-amber-400/90 shadow-[0_0_15px_rgba(245,158,11,0.4)] bg-black shrink-0 relative">
                     <Image
-                      src="/assets/subsonic-coin.jpg"
+                      src="/images/SS-RWB-LOGO.png"
                       alt="Subsonic Society"
                       fill
                       className="object-cover"
@@ -603,7 +603,7 @@ export function FacebookFeed() {
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl overflow-hidden border border-blue-500/40 bg-black flex items-center justify-center shrink-0">
                               <Image
-                                src="/assets/subsonic-coin.jpg"
+                                src="/images/SS-RWB-LOGO.png"
                                 alt="Subsonic Society"
                                 width={40}
                                 height={40}

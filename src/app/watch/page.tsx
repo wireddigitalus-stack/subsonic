@@ -61,7 +61,7 @@ const VIDEOS_DATA: VideoItem[] = [
     views: "32.6K",
     published: "2 weeks ago",
     description: "Full empirical testing of Harrell, EC Tuner Brake, and Cortina tuners across 3 custom match barrels with Garmin Xero chronograph validation.",
-    thumbnail: "/assets/subsonic-coin.jpg",
+    thumbnail: "/images/SS-RWB-LOGO.png",
     tags: ["TunerTesting", "SubsonicDNA", "Accuracy", "Chrono"],
   },
   {

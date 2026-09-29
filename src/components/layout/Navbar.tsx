@@ -170,7 +170,7 @@ export function Navbar() {
               className="relative rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_15px_rgba(245,158,11,0.4)] bg-black flex items-center justify-center shrink-0 w-[40px] h-[40px] sm:w-[48px] sm:h-[48px]"
             >
               <Image
-                src="/assets/subsonic-coin.jpg"
+                src="/images/SS-RWB-LOGO.png"
                 alt="Subsonic Society Official Emblem"
                 width={48}
                 height={48}

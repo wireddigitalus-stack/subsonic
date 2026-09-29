@@ -219,8 +219,8 @@ export default function SocietyPage() {
         <div className="ios-glass-card rounded-3xl p-8 sm:p-12 border border-amber-500/30 shadow-tactical-glow space-y-6">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto">
             <Image
-              src="/assets/subsonic-coin.jpg"
-              alt="Subsonic Coin"
+              src="/images/SS-RWB-LOGO.png"
+              alt="Subsonic Society Emblem"
               width={64}
               height={64}
               className="w-full h-full object-cover"

@@ -28,7 +28,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.35)] bg-black/60 flex items-center justify-center shrink-0">
                 <Image
-                  src="/assets/subsonic-coin.jpg"
+                  src="/images/SS-RWB-LOGO.png"
                   alt="Subsonic Society Emblem"
                   width={40}
                   height={40}

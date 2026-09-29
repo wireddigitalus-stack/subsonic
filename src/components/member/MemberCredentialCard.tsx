@@ -91,7 +91,7 @@ export function MemberCredentialCard({
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400/80 shadow-[0_0_12px_rgba(245,158,11,0.35)] relative bg-black shrink-0">
               <Image
-                src="/assets/subsonic-coin.jpg"
+                src="/images/SS-RWB-LOGO.png"
                 alt="Subsonic Emblem"
                 fill
                 sizes="40px"

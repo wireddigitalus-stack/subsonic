@@ -260,7 +260,7 @@ function ProInviteContent() {
     setIsSubmitting(true);
 
     try {
-      const primaryImage = headshotResult?.dataUrl || "/assets/subsonic-coin.jpg";
+      const primaryImage = headshotResult?.dataUrl || "/images/SS-RWB-LOGO.png";
       const secondaryImage = actionPhotoResult?.dataUrl || primaryImage;
 
       const profilePayload = {

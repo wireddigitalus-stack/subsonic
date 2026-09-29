@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Subsonic Society" }],
   icons: {
-    icon: "/assets/subsonic-coin.jpg",
+    icon: "/images/SS-RWB-LOGO.png",
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       { url: "/assets/apple-touch-icon.png" },
@@ -96,7 +96,7 @@ const structuredData = {
         `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
         `${siteUrl}/assets/subsonic-social-share-coin.jpg`,
         `${siteUrl}/assets/subsonic-banner-wide.png`,
-        `${siteUrl}/assets/subsonic-coin.jpg`
+        `${siteUrl}/images/SS-RWB-LOGO.png`
       ],
       "description": "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
       "sameAs": [

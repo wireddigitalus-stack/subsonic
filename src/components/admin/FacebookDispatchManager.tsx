@@ -78,7 +78,7 @@ export function FacebookDispatchManager() {
       setContent(
         "📊 BALLISTICS ADVISORY: Holston Mountain thermal wind shear detected at 270° WNW (12-16 MPH gusts). If shooting Lapua Center-X (1,065 FPS) past 300 yards, add +0.3 MIL right hold for transonic wobble. #DOPE #Ballistics #MountainPrecision"
       );
-      setImageUrl("/assets/subsonic-coin.jpg");
+      setImageUrl("/images/SS-RWB-LOGO.png");
       setCategory("BALLISTICS");
       setLikesCount(42);
       setCommentsCount(12);
@@ -297,7 +297,7 @@ export function FacebookDispatchManager() {
                   <span>•</span>
                   <button
                     type="button"
-                    onClick={() => setImageUrl("/assets/subsonic-coin.jpg")}
+                    onClick={() => setImageUrl("/images/SS-RWB-LOGO.png")}
                     className="hover:text-amber-400 underline"
                   >
                     Minted Coin Photo
