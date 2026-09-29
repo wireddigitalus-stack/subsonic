@@ -107,6 +107,11 @@ export function Footer() {
                   Claim Invitation Code
                 </Link>
               </li>
+              <li>
+                <Link href="/terms" className="hover:text-amber-400 transition-colors">
+                  Terms of Use &amp; Rules
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -209,6 +214,9 @@ export function Footer() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               TELEMETRY & RSS SYNC ACTIVE
             </span>
+            <Link href="/terms" className="hover:text-slate-200">
+              Terms of Use
+            </Link>
             <Link href="/admin" className="hover:text-slate-200">
               Admin Portal
             </Link>

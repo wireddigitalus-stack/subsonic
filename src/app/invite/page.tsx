@@ -40,6 +40,7 @@ function StandardInviteContent() {
   const [email, setEmail] = useState("");
   const [stateCode, setStateCode] = useState("TN");
   const [experienceLevel, setExperienceLevel] = useState("Club Match Competitor");
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -121,6 +122,11 @@ function StandardInviteContent() {
 
     if (pin.trim() !== pinConfirm.trim()) {
       setFormError("Login PIN codes do not match.");
+      return;
+    }
+
+    if (!agreeTerms) {
+      setFormError("You must read and agree to the Terms of Use and platform rules to activate membership.");
       return;
     }
 
@@ -463,9 +469,34 @@ function StandardInviteContent() {
           </div>
         </div>
 
+        {/* Terms of Use & Platform Agreement */}
+        <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              required
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-amber-500/50 bg-black/60 text-amber-500 focus:ring-amber-400 focus:ring-offset-0 cursor-pointer accent-amber-500"
+            />
+            <span className="text-xs text-slate-300 leading-relaxed">
+              I agree to the{" "}
+              <Link 
+                href="/terms" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-amber-400 font-bold hover:underline"
+              >
+                Terms of Use &amp; Code of Conduct
+              </Link>
+              , including Cold Range safety protocols and the strict zero-tolerance policy prohibiting buying, selling, or trading firearms or ammunition on this platform.
+            </span>
+          </label>
+        </div>
+
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !agreeTerms}
           className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-extrabold text-xs uppercase tracking-wider shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
         >
           {isSubmitting ? (

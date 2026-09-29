@@ -104,6 +104,7 @@ function ProInviteContent() {
   const [compressingAction, setCompressingAction] = useState(false);
 
   // Submission State
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<any | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -253,6 +254,12 @@ function ProInviteContent() {
 
     if (pin.trim() !== pinConfirm.trim()) {
       setFormError("Login PIN codes do not match.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!agreeTerms) {
+      setFormError("You must read and agree to the Terms of Use and platform conduct rules to publish your Pro Dossier.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -1094,6 +1101,31 @@ function ProInviteContent() {
           </div>
         </section>
 
+        {/* Terms of Use & Platform Conduct Agreement */}
+        <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              required
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-amber-500/50 bg-black/60 text-amber-500 focus:ring-amber-400 focus:ring-offset-0 cursor-pointer accent-amber-500 shrink-0"
+            />
+            <span className="text-xs text-slate-300 leading-relaxed">
+              I agree to the{" "}
+              <Link 
+                href="/terms" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-amber-400 font-bold hover:underline"
+              >
+                Subsonic Society Terms of Use &amp; Code of Conduct
+              </Link>
+              , including Cold Range safety rules and the strict zero-tolerance policy against buying, selling, or trading firearms or ammunition on this platform.
+            </span>
+          </label>
+        </div>
+
         {/* Submit Bar */}
         <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-black to-zinc-900 border border-amber-500/40 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="space-y-1 text-center sm:text-left">
@@ -1108,7 +1140,7 @@ function ProInviteContent() {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !agreeTerms}
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider shadow-tactical-glow flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 disabled:opacity-50"
           >
             {isSubmitting ? (
