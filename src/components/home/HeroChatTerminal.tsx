@@ -18,7 +18,8 @@ import {
   Flame, 
   Award,
   RefreshCw,
-  Key
+  Key,
+  Play
 } from "lucide-react";
 import { playRealCommsChirp, playBotTelemetryChirp } from "@/lib/chat-audio";
 
@@ -107,7 +108,12 @@ const STREAM_ITEMS: TerminalMessage[] = [
   },
 ];
 
-export function HeroChatTerminal() {
+export interface HeroChatTerminalProps {
+  isActive?: boolean;
+  onReplayVideo?: () => void;
+}
+
+export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTerminalProps) {
   const [messages, setMessages] = useState<TerminalMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingName, setTypingName] = useState<string | null>(null);
@@ -132,6 +138,7 @@ export function HeroChatTerminal() {
 
   // Sequenced message delivery
   useEffect(() => {
+    if (!isActive) return;
     let timers: NodeJS.Timeout[] = [];
     setMessages([]);
     setShowInterceptor(false);
@@ -183,7 +190,7 @@ export function HeroChatTerminal() {
     return () => {
       timers.forEach(clearTimeout);
     };
-  }, [soundEnabled, replayCount]);
+  }, [soundEnabled, replayCount, isActive]);
 
   const handleRestart = () => {
     setReplayCount((c) => c + 1);
@@ -271,6 +278,18 @@ export function HeroChatTerminal() {
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono">
+          {onReplayVideo && (
+            <button
+              type="button"
+              onClick={onReplayVideo}
+              className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-400 font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+              title="Watch Satellite Video Intro"
+            >
+              <Play className="w-3 h-3 fill-amber-400" />
+              <span className="hidden sm:inline">VIDEO INTRO</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleRestart}

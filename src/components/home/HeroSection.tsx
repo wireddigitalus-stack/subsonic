@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
+import { HeroVideoBanner } from "./HeroVideoBanner";
 
 export function HeroSection() {
+  const [heroMode, setHeroMode] = useState<"video" | "chat">("video");
 
   return (
     <section data-section="hero" className="relative pt-4 pb-16 overflow-hidden">
@@ -67,8 +69,21 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Live Animated Tactical Chat Terminal & Guest Clearance Hub */}
-        <HeroChatTerminal />
+        {/* Video Banner Reel -> Live Animated Tactical Chat Terminal */}
+        <div className="w-full transition-all duration-500">
+          {heroMode === "video" ? (
+            <div className="animate-fadeIn">
+              <HeroVideoBanner onComplete={() => setHeroMode("chat")} />
+            </div>
+          ) : (
+            <div className="animate-fadeIn">
+              <HeroChatTerminal
+                isActive={heroMode === "chat"}
+                onReplayVideo={() => setHeroMode("video")}
+              />
+            </div>
+          )}
+        </div>
 
         {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • CLAIM INVITE */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
