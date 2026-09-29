@@ -276,7 +276,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "Official Range Officer • The Hideout Bristol",
     },
     content:
-      "🎯 Welcome competitors to the 2026 Subsonic Society Invitational Money Match at The Hideout (Nov 13–15, 2026)! I am your Range Officer (RO). I have full operational intel on match schedules, the $2,500 cash side matches, the 220-acre facility, 12 Bristol hotel options, top dining spots (Blackbird Bakery is open 24h!), and local entertainment like South Holston River trophy trout fly fishing and the Hard Rock Casino. Say 'hey ro' or ask '@ro help' anytime!",
+      "🎯 Welcome competitors to the 2026 Subsonic Society Invitational Money Match at The Hideout (Nov 13–15, 2026)! I am your Range Officer (RO). I have full operational intel on match schedules, the $2,500 cash side matches, the 220-acre facility, 12 Bristol hotel options, top dining spots (Blackbird Bakery is open 24h!), and local entertainment like South Holston River trophy trout fly fishing and the Hard Rock Casino.\n\n📖 Official Competitor Packet & Match Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\nSay 'hey ro' or ask '@ro help' anytime!",
     timestamp: "09:00 AM",
     reactions: [
       { emoji: "🎯", count: 32, users: ["u1", "u2", "u3", "u4", "u5"] },
@@ -491,7 +491,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
     },
     content:
-      "Welcome to The Hideout, marksmen. Two hundred and twenty acres of Tennessee ridgeline purpose-built for shooters who take precision rimfire seriously. Friday Welcome BBQ starts at 5:30 PM under the main pavilion. Take care of the property, shoot clean, and enjoy everything Bristol has to offer. Said. Done.",
+      "Welcome to The Hideout, marksmen. Two hundred and twenty acres of Tennessee ridgeline purpose-built for shooters who take precision rimfire seriously. Friday Welcome BBQ starts at 5:30 PM under the main pavilion. Take care of the property, shoot clean, and review the full weekend competitor guide at https://subsonic-omega.vercel.app/competitor-packet. Said. Done.",
     timestamp: "02:00 PM",
     reactions: [
       { emoji: "👑", count: 35, users: ["u1", "u2", "u3", "u4", "u5"] },

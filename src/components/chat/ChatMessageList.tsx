@@ -1,7 +1,7 @@
 "use client";
 
 import React, { RefObject } from "react";
-import { MessageSquare, Pin, ChevronDown, ChevronUp, AlertTriangle, Crosshair, Map, Maximize2, Shield, Flame, Wind, ArrowRight, Check, Target, Copy, BadgeAlert, Radio } from "lucide-react";
+import { MessageSquare, Pin, ChevronDown, ChevronUp, AlertTriangle, Crosshair, Map, Maximize2, Shield, Flame, Wind, ArrowRight, Check, Target, Copy, BadgeAlert, Radio, ExternalLink, FileText } from "lucide-react";
 import Image from "next/image";
 import { ChatMessage, DopeCardData } from "@/lib/types";
 
@@ -230,11 +230,45 @@ export function ChatMessageList({
                     </div>
 
 
-                    {/* Standard Content */}
+                    {/* Standard Content with Clickable URLs & Competitor Packet Badge */}
                     {msg.content && (
-                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-                        {msg.content}
-                      </p>
+                      <div className="space-y-2">
+                        <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal whitespace-pre-line">
+                          {msg.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+                            if (part.match(/^https?:\/\//)) {
+                              return (
+                                <a
+                                  key={i}
+                                  href={part}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 font-mono font-bold text-amber-400 hover:text-amber-300 underline underline-offset-4 decoration-amber-500/60 hover:decoration-amber-300 break-all transition-colors"
+                                >
+                                  <span>{part}</span>
+                                  <ExternalLink className="w-3 h-3 inline shrink-0" />
+                                </a>
+                              );
+                            }
+                            return part;
+                          })}
+                        </p>
+
+                        {/* Dedicated Interactive Button if message references the competitor packet */}
+                        {msg.content.includes("competitor-packet") && (
+                          <div className="pt-1">
+                            <a
+                              href="https://subsonic-omega.vercel.app/competitor-packet"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-mono font-bold transition-all shadow-sm active:scale-95"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                              <span>Open 2026 Competitor Packet (Guide & PDF)</span>
+                              <ExternalLink className="w-3 h-3 text-amber-400 shrink-0" />
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {/* DOPE CARD — compact on mobile */}

@@ -149,9 +149,9 @@ const RO_THANKS_RESPONSES = [
 
 const RO_IDENTITY_RESPONSES = [
   (c: string) =>
-    `I'm RO — your official Range Officer for The Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🎯 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Ask me anything!`,
+    `I'm RO — your official Range Officer for The Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🎯 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
   (c: string) =>
-    `I am the Range Officer (RO) for Subsonic Society, ${c}. Think of me as your 24/7 match briefing marshal and Bristol town concierge. From stage briefs and cold range rules to Blackbird Bakery doughnut runs and Downtown State Street hotels, I have you covered.`,
+    `I am the Range Officer (RO) for Subsonic Society, ${c}. Think of me as your 24/7 match briefing marshal and Bristol town concierge. Read our full dossier at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
 ];
 
 const RO_REAL_RESPONSES = [
@@ -427,6 +427,7 @@ export function getChannelWelcome(channelId: string, callsign: string): string {
   return `🎯 Range Officer on net! Welcome to #${channelId}, ${callsign}.\n\n` +
     `This is the official 2026 Subsonic Society Invitational frequency for The Hideout in Bristol, TN (Nov 13–15). ` +
     `Use this channel for match operations, stage DOPE, Bristol hotel coordination, food runs, and local entertainment.\n\n` +
+    `📖 Review the complete 2026 Competitor Packet & Bristol Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\n` +
     `Say "hey ro" or ask me anything about the match schedule, $2,500 cash side matches, Bristol dining (Blackbird Bakery!), lodging, or fly fishing on the South Holston!`;
 }
 
