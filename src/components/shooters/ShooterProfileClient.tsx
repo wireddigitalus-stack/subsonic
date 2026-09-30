@@ -522,7 +522,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 <img
                   src={shooter.image || "/images/SS-RWB-LOGO.png"}
                   alt={displayName}
-                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                 />
 
                 {/* Smoky Bottom Fade Gradient for Text Readability */}
@@ -873,7 +873,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 <img
                   src={shooter.actionPhoto}
                   alt={`${displayName} in competition`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
             </div>

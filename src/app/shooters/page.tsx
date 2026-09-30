@@ -35,8 +35,8 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     homeRange: "National Tour / Pennsylvania",
     podiums: 61,
     featuredMatch: "The Subsonic Society Invitational Money Match 2026",
-    image: "/assets/erich-leipold-poster.jpg",
-    actionPhoto: "/assets/erich-leipold-poster.jpg",
+    image: "/assets/erich-leipold-portrait.jpg",
+    actionPhoto: "/assets/erich-leipold-banner.jpg",
     posterImage: "/assets/erich-leipold-poster.jpg",
     quote: "Consistency isn't an accident. It's the byproduct of testing every variable, knowing your DOPE down to the tenth of a mil, and executing with absolute confidence.",
     signature: "Erich Leipold",
@@ -647,7 +647,7 @@ function ShootersContent() {
                     <img
                       src={selectedShooter.actionPhoto}
                       alt={`${selectedShooter.name} Rifle Rig`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-center"
                     />
                   </div>
                 </div>
