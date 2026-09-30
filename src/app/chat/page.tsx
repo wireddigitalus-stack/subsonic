@@ -120,8 +120,8 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     badgeText: "SYSTEMS ENGINEER",
     division: "Lead Systems Engineer & Master Admin",
     status: "online",
-    bio: "Lead Systems Engineer & Master Owner for Subsonic Society and The Hideout Invitational. Match architecture, network engineering, and telemetry infrastructure.",
-    rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
+    bio: "Lead Systems Engineer & Master Admin",
+    rifleSetup: "Lead Systems Engineer & Master Admin",
   },
   {
     id: "dm_wyatt",

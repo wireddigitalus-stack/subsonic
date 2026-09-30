@@ -127,7 +127,7 @@ export function ShooterDossierModal({
                   </span>
                   <span className="text-emerald-400 font-bold">Non-Shooter • Full Admin</span>
                 </div>
-                <p className="text-white text-xs font-bold truncate">Server Core • Telemetry Uplinks • Encrypted Comms</p>
+                <p className="text-white text-xs font-bold truncate">Lead Systems Engineer &amp; Master Admin</p>
               </div>
             </>
           ) : (
@@ -158,7 +158,7 @@ export function ShooterDossierModal({
             <span className="text-[10px] text-slate-400 uppercase font-mono">Profile Brief</span>
             <p className="text-slate-300 text-xs leading-relaxed font-sans">
               {isMasterOwner
-                ? "Lead Systems Engineer & Master Owner for Subsonic Society and The Hideout Invitational. Match architecture, network engineering, and telemetry infrastructure across the entire system."
+                ? "Lead Systems Engineer & Master Admin"
                 : shooter.bio || "Registered competitor."}
             </p>
           </div>
@@ -166,14 +166,9 @@ export function ShooterDossierModal({
 
         {/* Master Owner Tech Admin Highlight */}
         {isMasterOwner && (
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-300">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>Full System Architecture &amp; Operations</span>
-            </div>
-            <p className="text-[11px] text-slate-300 leading-normal">
-              Rob Neilson oversees all tech, systems engineering, live network infrastructure, database syncing, and system telemetry for the entire Subsonic Society network.
-            </p>
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2.5 text-xs font-mono font-bold text-amber-300">
+            <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Lead Systems Engineer &amp; Master Admin</span>
           </div>
         )}
 
