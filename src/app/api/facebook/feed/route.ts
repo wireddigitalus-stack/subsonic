@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { FacebookPostItem } from "@/lib/types";
 import { INITIAL_FACEBOOK_POSTS } from "@/lib/initial-data";
@@ -18,21 +18,28 @@ function cleanHtml(html: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&#039;/g, "'")
+    .replace(/&nbsp;/g, " ")
     .trim();
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const isFresh = searchParams.get("fresh") === "true";
+
   try {
     const res = await fetch(RSS_FEED_URL, {
-      next: { revalidate: 300 }, // Cache for 5 minutes, auto-revalidate
+      cache: isFresh ? "no-store" : "default",
+      next: isFresh ? undefined : { revalidate: 180 }, // 3 minutes cache revalidation
       headers: {
-        "User-Agent": "SubsonicSocietyBot/1.0",
+        "User-Agent": "Mozilla/5.0 (compatible; SubsonicSocietyBot/1.0)",
+        "Accept": "application/xml, text/xml, */*",
       },
     });
 
     if (!res.ok) {
-      console.warn(`[Facebook RSS] Failed to fetch feed: ${res.status}`);
-      return NextResponse.json({ posts: INITIAL_FACEBOOK_POSTS, source: "fallback" });
+      console.warn(`[Facebook RSS] Failed to fetch feed HTTP ${res.status}, falling back to Supabase...`);
+      return await getFallbackPosts();
     }
 
     const xml = await res.text();
@@ -40,6 +47,7 @@ export async function GET() {
     // Parse RSS items
     const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
     const items: FacebookPostItem[] = [];
+    const dbRecords: any[] = [];
     let match;
 
     while ((match = itemRegex.exec(xml)) !== null) {
@@ -95,61 +103,120 @@ export async function GET() {
         category = "MATCHES";
       } else if (lower.includes("dope") || lower.includes("ballistics") || lower.includes("wind") || lower.includes("benchrest") || lower.includes("muller")) {
         category = "BALLISTICS";
-      } else if (lower.includes("coin") || lower.includes("rifle") || lower.includes("vudoo") || lower.includes("modacam") || lower.includes("stiller")) {
+      } else if (lower.includes("coin") || lower.includes("rifle") || lower.includes("vudoo") || lower.includes("modacam") || lower.includes("stiller") || lower.includes("shirt")) {
         category = "MEDIA";
       }
 
-      items.push({
+      const postItem: FacebookPostItem = {
         id,
         content,
         publishedAt,
         imageUrl: imageUrl || undefined,
         externalUrl,
-        likesCount: 28 + Math.floor(Math.random() * 25),
-        commentsCount: 3 + Math.floor(Math.random() * 8),
-        sharesCount: 2 + Math.floor(Math.random() * 6),
+        likesCount: 30 + Math.floor(Math.random() * 20),
+        commentsCount: 4 + Math.floor(Math.random() * 6),
+        sharesCount: 2 + Math.floor(Math.random() * 5),
         tags,
         category,
+      };
+
+      items.push(postItem);
+
+      dbRecords.push({
+        id: postItem.id,
+        post_id: postItem.id,
+        content: postItem.content,
+        published_at: publishedDate.toISOString(),
+        image_url: postItem.imageUrl || null,
+        external_url: postItem.externalUrl,
+        likes_count: postItem.likesCount,
+        comments_count: postItem.commentsCount,
+        shares_count: postItem.sharesCount,
+        tags: postItem.tags,
+        category: postItem.category,
+        created_at: new Date().toISOString(),
       });
     }
 
-    // Also persist into Supabase asynchronously if configured
-    if (supabase && items.length > 0) {
-      const records = items.map((item) => ({
-        id: item.id,
-        post_id: item.id,
-        platform: "FACEBOOK",
-        content: item.content,
-        published_at: item.publishedAt,
-        image_url: item.imageUrl,
-        external_url: item.externalUrl,
-        likes_count: item.likesCount,
-        comments_count: item.commentsCount,
-        shares_count: item.sharesCount,
-        tags: item.tags,
-        category: item.category,
-        created_at: new Date().toISOString(),
-      }));
+    // Persist into Supabase social_posts table
+    if (supabase && dbRecords.length > 0) {
+      try {
+        const { error: upsertErr } = await supabase
+          .from("social_posts")
+          .upsert(dbRecords, { onConflict: "id" });
 
-      supabase
-        .from("social_posts")
-        .upsert(records, { onConflict: "id" })
-        .then(({ error }) => {
-          if (error) console.error("[Facebook RSS] Supabase sync error:", error.message);
-        });
+        if (upsertErr) {
+          console.error("[Facebook RSS] Supabase sync error:", upsertErr.message);
+        } else {
+          console.log(`[Facebook RSS] Successfully synced ${dbRecords.length} posts to Supabase.`);
+        }
+      } catch (err: any) {
+        console.warn("[Facebook RSS] Supabase sync catch:", err?.message);
+      }
+    }
+
+    if (items.length === 0) {
+      return await getFallbackPosts();
     }
 
     return NextResponse.json({
-      posts: items.length > 0 ? items : INITIAL_FACEBOOK_POSTS,
+      posts: items,
       source: "live_rss",
       count: items.length,
+      feedUrl: RSS_FEED_URL,
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {
     console.error("[Facebook RSS API Error]:", err);
-    return NextResponse.json(
-      { posts: INITIAL_FACEBOOK_POSTS, source: "error_fallback", error: err?.message },
-      { status: 500 }
-    );
+    return await getFallbackPosts();
   }
+}
+
+async function getFallbackPosts() {
+  // 1. Try querying Supabase social_posts
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("social_posts")
+        .select("*")
+        .order("published_at", { ascending: false })
+        .limit(20);
+
+      if (!error && data && data.length > 0) {
+        const mapped: FacebookPostItem[] = data.map((d: any) => ({
+          id: d.id,
+          content: d.content,
+          publishedAt: new Date(d.published_at || d.created_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+          imageUrl: d.image_url || undefined,
+          externalUrl: d.external_url || FB_PAGE_URL,
+          likesCount: d.likes_count || 32,
+          commentsCount: d.comments_count || 4,
+          sharesCount: d.shares_count || 2,
+          tags: Array.isArray(d.tags) ? d.tags : ["SubsonicSociety"],
+          category: d.category || "ALL",
+        }));
+
+        return NextResponse.json({
+          posts: mapped,
+          source: "supabase_cache",
+          count: mapped.length,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (dbErr) {
+      console.warn("[Facebook RSS] Supabase fallback query error:", dbErr);
+    }
+  }
+
+  // 2. Fall back to static initial data
+  return NextResponse.json({
+    posts: INITIAL_FACEBOOK_POSTS,
+    source: "static_seed",
+    count: INITIAL_FACEBOOK_POSTS.length,
+    timestamp: new Date().toISOString(),
+  });
 }

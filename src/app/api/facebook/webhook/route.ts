@@ -31,7 +31,6 @@ export async function POST(req: NextRequest) {
     const postRecord = {
       id: postId,
       post_id: postId,
-      platform: "FACEBOOK",
       content: content.trim(),
       published_at: publishedAt,
       image_url: imageUrl,
@@ -41,7 +40,6 @@ export async function POST(req: NextRequest) {
       shares_count: Number(body.shares_count || body.shares?.count || 1),
       tags,
       category,
-      raw_payload: body,
       created_at: new Date().toISOString()
     };
 

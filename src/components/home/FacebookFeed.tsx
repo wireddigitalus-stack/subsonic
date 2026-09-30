@@ -43,9 +43,10 @@ export function FacebookFeed() {
   const [shareNotice, setShareNotice] = useState<string | null>(null);
 
   // Live Sync with /api/facebook/feed (Direct RSS Engine) & Supabase
-  const fetchLivePosts = async () => {
+  const fetchLivePosts = async (isManual = false) => {
     try {
-      const res = await fetch("/api/facebook/feed");
+      const url = isManual ? `/api/facebook/feed?fresh=true&t=${Date.now()}` : "/api/facebook/feed";
+      const res = await fetch(url);
       if (res.ok) {
         const json = await res.json();
         if (json.posts && json.posts.length > 0) {
@@ -184,11 +185,10 @@ export function FacebookFeed() {
     );
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 750);
+    await fetchLivePosts(true);
+    setIsRefreshing(false);
   };
 
   const handleShare = (post: FacebookPostItem) => {
