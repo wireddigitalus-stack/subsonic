@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { EvoNode, EvoLink, EVO_NODES, EVO_LINKS, EVO_CLUSTERS } from "@/lib/evovision-data";
 
 interface EvoVisionCanvasProps {
@@ -118,6 +119,29 @@ export function EvoVisionCanvas({
   const [hoveredNode, setHoveredNode] = useState<EvoNode | null>(null);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const [hoveredSpaceman, setHoveredSpaceman] = useState(false);
+  const [zoomPercent, setZoomPercent] = useState<number>(100);
+
+  // Dynamic mobile screen detection & auto-fit zoom calculator
+  const getOverviewZoom = useCallback(() => {
+    if (typeof window === "undefined") return 1.0;
+    const canvas = canvasRef.current;
+    const rect = canvas?.getBoundingClientRect();
+    const w = rect?.width || window.innerWidth;
+    const h = rect?.height || window.innerHeight;
+
+    if (w < 768) {
+      // Mobile screen: fit all clusters (-700 to +690 horizontal, -470 to +490 vertical)
+      const scaleX = (w - 24) / 1480;
+      const scaleY = (h - 70) / 1050;
+      return Math.min(Math.max(0.32, Math.min(scaleX, scaleY)), 0.65);
+    } else if (w < 1024) {
+      // Tablet screen
+      const scaleX = (w - 40) / 1480;
+      const scaleY = (h - 80) / 1050;
+      return Math.min(Math.max(0.48, Math.min(scaleX, scaleY)), 0.85);
+    }
+    return 1.0;
+  }, []);
 
   // Keep live refs for uninterrupted 60 FPS animation loop
   const selectedNodeRef = useRef(selectedNode);
@@ -148,6 +172,40 @@ export function EvoVisionCanvas({
     orbit3DRef.current.targetPitch = is3DMode ? 0.95 : 0;
   }, [is3DMode]);
 
+  // Auto-detect mobile screen and size network topology on initial mount & screen changes
+  useEffect(() => {
+    const handleInitialMobileFit = () => {
+      if (typeof window === "undefined") return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width || window.innerWidth;
+      const h = rect.height || window.innerHeight;
+
+      if (w < 768) {
+        const fitScale = Math.min(
+          Math.max(0.32, (w - 24) / 1480),
+          Math.max(0.32, (h - 70) / 1050)
+        );
+        cameraRef.current.x = 0;
+        cameraRef.current.y = 0;
+        cameraRef.current.zoom = fitScale;
+        cameraRef.current.targetX = 0;
+        cameraRef.current.targetY = 0;
+        cameraRef.current.targetZoom = fitScale;
+        setZoomPercent(Math.round(fitScale * 100));
+      }
+    };
+
+    handleInitialMobileFit();
+    window.addEventListener("resize", handleInitialMobileFit);
+    window.addEventListener("orientationchange", handleInitialMobileFit);
+    return () => {
+      window.removeEventListener("resize", handleInitialMobileFit);
+      window.removeEventListener("orientationchange", handleInitialMobileFit);
+    };
+  }, []);
+
   // Handle Recenter signal: smooth camera reset and return to original canonical orientation (0 rad)
   const prevRecenterRef = useRef(recenterSignal);
   useEffect(() => {
@@ -159,12 +217,14 @@ export function EvoVisionCanvas({
       o3d.targetYaw = nearestMultiple * (Math.PI * 2);
       o3d.isResettingYaw = true;
 
-      // Recenter camera smoothly
+      // Recenter camera smoothly with mobile-aware overview fit
       cameraRef.current.targetX = 0;
       cameraRef.current.targetY = 0;
-      cameraRef.current.targetZoom = 1.0;
+      const newZoom = getOverviewZoom();
+      cameraRef.current.targetZoom = newZoom;
+      setZoomPercent(Math.round(newZoom * 100));
     }
-  }, [recenterSignal]);
+  }, [recenterSignal, getOverviewZoom]);
 
   // Projected node coordinates map for 100% accurate hit-testing in 2D or 3D
   const projectedNodeMap = useRef<
@@ -262,15 +322,23 @@ export function EvoVisionCanvas({
   // Smooth camera tween when selectedNode changes
   useEffect(() => {
     if (selectedNode) {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
       cameraRef.current.targetX = -selectedNode.x;
-      cameraRef.current.targetY = -selectedNode.y;
-      cameraRef.current.targetZoom = selectedNode.cluster === "HUB" ? 1.05 : 1.25;
+      // On mobile, offset camera slightly upwards so the node is centered above the bottom card
+      cameraRef.current.targetY = isMobile ? -selectedNode.y - 110 : -selectedNode.y;
+      const targetZ = isMobile
+        ? (selectedNode.cluster === "HUB" ? 0.65 : 0.85)
+        : (selectedNode.cluster === "HUB" ? 1.05 : 1.25);
+      cameraRef.current.targetZoom = targetZ;
+      setZoomPercent(Math.round(targetZ * 100));
     } else {
       cameraRef.current.targetX = 0;
       cameraRef.current.targetY = 0;
-      cameraRef.current.targetZoom = 1.0;
+      const overviewZ = getOverviewZoom();
+      cameraRef.current.targetZoom = overviewZ;
+      setZoomPercent(Math.round(overviewZ * 100));
     }
-  }, [selectedNode]);
+  }, [selectedNode, getOverviewZoom]);
 
   // Main 60 FPS continuous render loop
   useEffect(() => {
@@ -1012,8 +1080,201 @@ export function EvoVisionCanvas({
     };
   }, []); // Run continuously at 60 FPS without tearing down on state changes
 
-  // Pointer drag to Pan
+  // Native touch gestures: buttery-smooth 1-finger pan, 2-finger pinch-to-zoom, and tap detection
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let touchPinchStartDist = 0;
+    let touchPinchStartZoom = 1;
+    let touchPinchStartCamX = 0;
+    let touchPinchStartCamY = 0;
+    let touchPinchStartMidX = 0;
+    let touchPinchStartMidY = 0;
+    let isPinching = false;
+
+    let touchPanStartX = 0;
+    let touchPanStartY = 0;
+    let touchStartTime = 0;
+    let touchHasMoved = false;
+    let isTouchPanning = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        const t = e.touches[0];
+        isTouchPanning = true;
+        isPinching = false;
+        touchHasMoved = false;
+        touchPanStartX = t.clientX;
+        touchPanStartY = t.clientY;
+        touchStartTime = Date.now();
+        cameraRef.current.isPanning = true;
+        cameraRef.current.startX = t.clientX;
+        cameraRef.current.startY = t.clientY;
+      } else if (e.touches.length >= 2) {
+        // Multi-touch pinch-to-zoom initiated
+        e.preventDefault();
+        isPinching = true;
+        isTouchPanning = false;
+        cameraRef.current.isPanning = false;
+
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        touchPinchStartDist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+        touchPinchStartZoom = cameraRef.current.zoom;
+        touchPinchStartMidX = (t0.clientX + t1.clientX) / 2;
+        touchPinchStartMidY = (t0.clientY + t1.clientY) / 2;
+        touchPinchStartCamX = cameraRef.current.x;
+        touchPinchStartCamY = cameraRef.current.y;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isPinching && e.touches.length >= 2) {
+        // Prevent default browser viewport zoom on iOS Safari & Android Chrome
+        e.preventDefault();
+
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        const currentDist = Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
+
+        if (touchPinchStartDist > 0) {
+          const pinchScale = currentDist / touchPinchStartDist;
+          const isMobile = window.innerWidth < 768;
+          const minZoom = isMobile ? 0.22 : 0.35;
+          const maxZoom = 3.5;
+          const newTargetZoom = Math.min(Math.max(touchPinchStartZoom * pinchScale, minZoom), maxZoom);
+
+          // Direct smooth update for 60fps pinch response
+          cameraRef.current.targetZoom = newTargetZoom;
+          cameraRef.current.zoom = newTargetZoom;
+          setZoomPercent(Math.round(newTargetZoom * 100));
+
+          // Two-finger focal pan adjustment alongside pinch
+          const currentMidX = (t0.clientX + t1.clientX) / 2;
+          const currentMidY = (t0.clientY + t1.clientY) / 2;
+          const midDx = currentMidX - touchPinchStartMidX;
+          const midDy = currentMidY - touchPinchStartMidY;
+
+          cameraRef.current.x = touchPinchStartCamX + midDx / newTargetZoom;
+          cameraRef.current.y = touchPinchStartCamY + midDy / newTargetZoom;
+          cameraRef.current.targetX = cameraRef.current.x;
+          cameraRef.current.targetY = cameraRef.current.y;
+        }
+      } else if (isTouchPanning && e.touches.length === 1) {
+        e.preventDefault(); // Prevent page scroll during canvas drag
+        const t = e.touches[0];
+        const dx = t.clientX - touchPanStartX;
+        const dy = t.clientY - touchPanStartY;
+        
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+          touchHasMoved = true;
+        }
+        
+        touchPanStartX = t.clientX;
+        touchPanStartY = t.clientY;
+
+        const cam = cameraRef.current;
+        cam.x += dx / cam.zoom;
+        cam.y += dy / cam.zoom;
+        cam.targetX = cam.x;
+        cam.targetY = cam.y;
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isPinching) {
+        if (e.touches.length === 1) {
+          // Transition back to single-finger pan seamlessly
+          isPinching = false;
+          isTouchPanning = true;
+          const t = e.touches[0];
+          touchPanStartX = t.clientX;
+          touchPanStartY = t.clientY;
+          cameraRef.current.startX = t.clientX;
+          cameraRef.current.startY = t.clientY;
+        } else if (e.touches.length === 0) {
+          isPinching = false;
+          isTouchPanning = false;
+          cameraRef.current.isPanning = false;
+        }
+        return;
+      }
+
+      if (isTouchPanning) {
+        isTouchPanning = false;
+        cameraRef.current.isPanning = false;
+
+        // Check if this was a clean tap (duration < 320ms and did not drag significantly)
+        const duration = Date.now() - touchStartTime;
+        if (!touchHasMoved && duration < 320 && e.changedTouches.length === 1) {
+          const t = e.changedTouches[0];
+          const rect = canvas.getBoundingClientRect();
+          const touchX = t.clientX - rect.left;
+          const touchY = t.clientY - rect.top;
+          const cam = cameraRef.current;
+          const worldX = (touchX - rect.width / 2) / cam.zoom - cam.x;
+          const worldY = (touchY - rect.height / 2) / cam.zoom - cam.y;
+
+          // Check Spaceman hit
+          const sm = spacemanStateRef.current;
+          const smDx = worldX - sm.x;
+          const smDy = worldY - sm.y;
+          const screenSmX = (sm.x + cam.x) * cam.zoom + rect.width / 2;
+          const screenSmY = (sm.y + cam.y) * cam.zoom + rect.height / 2;
+          const isSmVisible = screenSmX > 20 && screenSmX < rect.width - 20 && screenSmY > 20 && screenSmY < rect.height - 20;
+
+          if (sm.active && !sm.isVanishing && isSmVisible && Math.sqrt(smDx * smDx + smDy * smDy) <= 55) {
+            sm.isVanishing = true;
+            for (let i = 0; i < 24; i++) {
+              const a = Math.random() * Math.PI * 2;
+              const s = Math.random() * 3 + 1;
+              sm.sparkles.push({
+                x: sm.x,
+                y: sm.y,
+                vx: Math.cos(a) * s,
+                vy: Math.sin(a) * s,
+                alpha: 1,
+                size: Math.random() * 2.5 + 1.2,
+              });
+            }
+            return;
+          }
+
+          // Check Node hit with generous mobile tap radius (+14px)
+          const hitNode = EVO_NODES.find((node) => {
+            const pn = projectedNodeMap.current.get(node.id);
+            if (!pn) return false;
+            const dx = worldX - pn.px;
+            const dy = worldY - pn.py;
+            return Math.sqrt(dx * dx + dy * dy) <= pn.radius + 14;
+          });
+
+          if (hitNode) {
+            onSelectNode(hitNode);
+          } else if (onDismissSelection) {
+            onDismissSelection();
+          }
+        }
+      }
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+    canvas.addEventListener("touchcancel", handleTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+      canvas.removeEventListener("touchcancel", handleTouchEnd);
+    };
+  }, [onSelectNode, onDismissSelection]);
+
+  // Pointer drag to Pan (Desktop / Mouse)
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.pointerType === "touch") return; // Handled by native touch listener
     cameraRef.current.isPanning = true;
     cameraRef.current.startX = e.clientX;
     cameraRef.current.startY = e.clientY;
@@ -1021,6 +1282,7 @@ export function EvoVisionCanvas({
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.pointerType === "touch") return; // Handled by native touch listener
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -1072,6 +1334,7 @@ export function EvoVisionCanvas({
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.pointerType === "touch") return; // Handled by native touch listener
     cameraRef.current.isPanning = false;
 
     const canvas = canvasRef.current;
@@ -1158,8 +1421,30 @@ export function EvoVisionCanvas({
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.12 : 0.88;
-    const newZoom = Math.min(Math.max(cameraRef.current.targetZoom * zoomFactor, 0.4), 2.8);
+    const newZoom = Math.min(Math.max(cameraRef.current.targetZoom * zoomFactor, 0.22), 3.5);
     cameraRef.current.targetZoom = newZoom;
+    setZoomPercent(Math.round(newZoom * 100));
+  };
+
+  // Tactical HUD Zoom Controls
+  const handleZoomIn = () => {
+    const newZoom = Math.min(cameraRef.current.targetZoom * 1.25, 3.5);
+    cameraRef.current.targetZoom = newZoom;
+    setZoomPercent(Math.round(newZoom * 100));
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = Math.max(cameraRef.current.targetZoom * 0.8, 0.22);
+    cameraRef.current.targetZoom = newZoom;
+    setZoomPercent(Math.round(newZoom * 100));
+  };
+
+  const handleResetZoom = () => {
+    cameraRef.current.targetX = 0;
+    cameraRef.current.targetY = 0;
+    const overviewZ = getOverviewZoom();
+    cameraRef.current.targetZoom = overviewZ;
+    setZoomPercent(Math.round(overviewZ * 100));
   };
 
   return (
@@ -1229,6 +1514,36 @@ export function EvoVisionCanvas({
           </div>
         </div>
       )}
+
+      {/* ─── Floating Tactical Zoom Controls HUD ───────────────── */}
+      <div className="absolute bottom-4 left-4 sm:bottom-36 sm:left-4 z-20 flex items-center gap-1.5 p-1 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.8)]">
+        <button
+          onClick={handleZoomIn}
+          className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/15 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all border border-white/5 cursor-pointer"
+          title="Zoom In (or pinch out on mobile)"
+          aria-label="Zoom In"
+        >
+          <ZoomIn className="w-4 h-4 text-cyan-400" />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/15 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all border border-white/5 cursor-pointer"
+          title="Zoom Out (or pinch in on mobile)"
+          aria-label="Zoom Out"
+        >
+          <ZoomOut className="w-4 h-4 text-cyan-400" />
+        </button>
+        <button
+          onClick={handleResetZoom}
+          className="px-2.5 h-8 rounded-xl bg-cyan-950/50 hover:bg-cyan-900/70 active:scale-95 text-cyan-300 font-mono text-[10px] font-bold flex items-center gap-1.5 transition-all border border-cyan-500/30 cursor-pointer"
+          title="Auto-Fit Network to Screen"
+          aria-label="Auto-Fit Network"
+        >
+          <Maximize2 className="w-3 h-3 text-cyan-400" />
+          <span className="hidden sm:inline">FIT</span>
+          <span className="text-[9px] text-cyan-400/90 font-mono font-bold">{zoomPercent}%</span>
+        </button>
+      </div>
     </div>
   );
 }

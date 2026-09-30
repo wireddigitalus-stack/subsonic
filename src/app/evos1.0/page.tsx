@@ -224,6 +224,61 @@ export default function EvosDashboardPage() {
         </div>
       </header>
 
+      {/* Mobile Horizontal Cluster Filter Strip */}
+      <div className="lg:hidden shrink-0 bg-black/85 backdrop-blur-md border-b border-cyan-500/20 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none z-10 text-[10px]">
+        <span className="text-[8px] text-slate-400 font-bold uppercase shrink-0 pl-1">CLUSTER:</span>
+        <button
+          onClick={() => setActiveClusterFilter(null)}
+          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
+            activeClusterFilter === null
+              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold shadow-[0_0_8px_rgba(6,182,212,0.2)]"
+              : "bg-white/5 text-slate-400 border-white/10"
+          }`}
+        >
+          ALL ({EVO_NODES.length})
+        </button>
+        <button
+          onClick={() => setActiveClusterFilter("USERS")}
+          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
+            activeClusterFilter === "USERS"
+              ? "bg-sky-500/20 text-sky-300 border-sky-500/40 font-bold shadow-[0_0_8px_rgba(56,189,248,0.2)]"
+              : "bg-white/5 text-slate-400 border-white/10"
+          }`}
+        >
+          COMPETITORS (8)
+        </button>
+        <button
+          onClick={() => setActiveClusterFilter("MODS")}
+          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
+            activeClusterFilter === "MODS"
+              ? "bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold shadow-[0_0_8px_rgba(244,63,94,0.2)]"
+              : "bg-white/5 text-slate-400 border-white/10"
+          }`}
+        >
+          MODS (6)
+        </button>
+        <button
+          onClick={() => setActiveClusterFilter("ADMIN")}
+          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
+            activeClusterFilter === "ADMIN"
+              ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40 font-bold shadow-[0_0_8px_rgba(99,102,241,0.2)]"
+              : "bg-white/5 text-slate-400 border-white/10"
+          }`}
+        >
+          ADMIN (6)
+        </button>
+        <button
+          onClick={() => setActiveClusterFilter("BOTS")}
+          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
+            activeClusterFilter === "BOTS"
+              ? "bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+              : "bg-white/5 text-slate-400 border-white/10"
+          }`}
+        >
+          AI BOTS (6)
+        </button>
+      </div>
+
       {/* Toast Notice */}
       {transmissionSuccessNotice && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-cyan-950/90 border border-cyan-400/60 text-cyan-200 text-xs font-mono font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] z-40 animate-fadeIn flex items-center gap-2">
@@ -234,6 +289,15 @@ export default function EvosDashboardPage() {
 
       {/* ─── MAIN INTERACTIVE CANVAS VIEWPORT ────────────────────────── */}
       <main className="relative flex-1 w-full h-full overflow-hidden">
+        {/* Mobile Touch Guidance Pill */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-cyan-500/30 text-[9px] text-cyan-300 font-mono pointer-events-none md:hidden z-10 flex items-center gap-1.5 shadow-lg">
+          <span>🤏 Pinch to zoom</span>
+          <span className="text-slate-500">•</span>
+          <span>👆 Drag to pan</span>
+          <span className="text-slate-500">•</span>
+          <span>🎯 Tap to inspect</span>
+        </div>
+
         <EvoVisionCanvas
           selectedNode={selectedNode}
           onSelectNode={(node) => setSelectedNode(node)}
@@ -278,7 +342,7 @@ export default function EvosDashboardPage() {
 
         {/* Floating Quick Hint (Bottom Center) */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
-          Drag to pan • Scroll to zoom • Double-click blank space to close card
+          Drag to pan • Pinch / Scroll to zoom • Double-click blank space to close card
         </div>
 
         {/* Subtle Spaceman Toggle Button (Bottom Right) */}
@@ -300,9 +364,10 @@ export default function EvosDashboardPage() {
           </button>
         </div>
 
-        {/* ─── RICH NODE INSPECTOR CARD (Right Side) ──────────────────── */}
+        {/* ─── RICH NODE INSPECTOR CARD (Right Side / Mobile Bottom Sheet) ──── */}
         {selectedNode && (
-          <aside className="absolute top-4 right-4 w-84 sm:w-96 max-h-[calc(100%-2rem)] flex flex-col rounded-3xl bg-[#090D18]/95 backdrop-blur-2xl border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.18)] overflow-hidden z-30 animate-fadeIn">
+          <aside className="fixed inset-x-2 bottom-2 max-h-[72vh] sm:static sm:absolute sm:inset-auto sm:top-4 sm:right-4 sm:w-96 sm:max-h-[calc(100%-2rem)] flex flex-col rounded-3xl bg-[#090D18]/98 backdrop-blur-2xl border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.25)] overflow-hidden z-30 animate-fadeIn">
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-2 sm:hidden shrink-0" />
             {/* 1. Card Top Brand Bar */}
             <div className="shrink-0 p-4 border-b border-white/10 bg-gradient-to-r from-cyan-950/50 via-black to-slate-900/60 flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
