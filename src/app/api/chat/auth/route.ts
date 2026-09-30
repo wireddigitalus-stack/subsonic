@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
     
     // 1. Executive override check (site owners)
     const execOverrides: Record<string, { pin: string; memberId: string; name: string; role: string; division: string; rifleSetup: string; badgeText: string }> = {
-      'RADAR': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Lead Systems Engineer & Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'SYSTEMS ENGINEER' },
-      'ROB': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Lead Systems Engineer & Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'SYSTEMS ENGINEER' },
-      'LTDAN': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Lead Systems Engineer & Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'SYSTEMS ENGINEER' },
+      'RADAR': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
+      'ROB': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
+      'LTDAN': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
       'ALLEN': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
       'AHURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
       'HURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       rifleSetup: shooter?.rifleSetup 
         ? `${shooter.rifleSetup.action || 'Precision Rig'} / ${shooter.rifleSetup.optic || 'Optic'}` 
         : member?.rifle_setup || 'Precision Rimfire',
-      badgeText: member?.role === 'MASTER_OWNER' ? 'DEV ADVISOR' 
+      badgeText: member?.role === 'MASTER_OWNER' ? 'MASTER ADMIN' 
         : member?.role === 'OWNER_ADMIN' ? 'OWNER ADMIN' 
         : shooter ? 'PRO SHOOTER' : 'SOCIETY MEMBER',
       image: shooter?.image,

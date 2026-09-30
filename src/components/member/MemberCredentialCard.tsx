@@ -158,7 +158,7 @@ export function MemberCredentialCard({
                   <span className="text-[9px] text-slate-400 block uppercase">ACCESS LEVEL</span>
                   <span className="font-bold text-emerald-400 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    <span>{isMasterOwner ? "MASTER OWNER & ADMIN" : accessLevel}</span>
+                    <span>{isMasterOwner ? "MASTER ADMIN" : accessLevel}</span>
                   </span>
                 </div>
 

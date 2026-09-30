@@ -49,7 +49,7 @@ export function ShooterDossierModal({
               {isRO 
                 ? "AUTONOMOUS AI RANGE OFFICER DOSSIER" 
                 : isMasterOwner 
-                ? "LEAD SYSTEMS ENGINEER & MASTER ADMIN" 
+                ? "MASTER ADMIN DOSSIER" 
                 : isOwnerAdmin 
                 ? "OWNER ADMIN DOSSIER" 
                 : "COMPETITOR DOSSIER"}
@@ -99,7 +99,7 @@ export function ShooterDossierModal({
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "💻 LEAD SYSTEMS ENGINEER" : shooter.badgeText || shooter.role}
+                {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "⚡ MASTER ADMIN" : shooter.badgeText || shooter.role}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
@@ -116,7 +116,7 @@ export function ShooterDossierModal({
             <>
               <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 flex items-center justify-between">
                 <span className="text-amber-400 font-bold uppercase text-[10px]">Role / System Function</span>
-                <span className="font-bold text-white">Lead Systems Engineer &amp; Master Admin</span>
+                <span className="font-bold text-white">Master Admin</span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 space-y-1">
@@ -127,7 +127,7 @@ export function ShooterDossierModal({
                   </span>
                   <span className="text-emerald-400 font-bold">Non-Shooter • Full Admin</span>
                 </div>
-                <p className="text-white text-xs font-bold truncate">Lead Systems Engineer &amp; Master Admin</p>
+                <p className="text-white text-xs font-bold truncate">Master Admin</p>
               </div>
             </>
           ) : (
@@ -158,17 +158,17 @@ export function ShooterDossierModal({
             <span className="text-[10px] text-slate-400 uppercase font-mono">Profile Brief</span>
             <p className="text-slate-300 text-xs leading-relaxed font-sans">
               {isMasterOwner
-                ? "Lead Systems Engineer & Master Admin"
+                ? "Master Admin"
                 : shooter.bio || "Registered competitor."}
             </p>
           </div>
         </div>
 
-        {/* Master Owner Tech Admin Highlight */}
+        {/* Master Admin Highlight */}
         {isMasterOwner && (
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2.5 text-xs font-mono font-bold text-amber-300">
             <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Lead Systems Engineer &amp; Master Admin</span>
+            <span>Master Admin</span>
           </div>
         )}
 

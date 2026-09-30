@@ -99,13 +99,13 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     callsign: "RADAR",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Lead Systems Engineer & Master Admin",
+    experience_level: "Master Admin",
     rifle_setup: "Systems & Infrastructure Architecture (Non-Shooter)",
     interests: ["Systems Engineering", "Network Infrastructure", "Telemetry Uplinks", "Private Encrypted Comms", "Server Architecture", "Smart Systems Integrations"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner, Lead Systems Engineer & Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)",
+    notes: "Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -1371,7 +1371,7 @@ export default function AdminDashboardPage() {
                   ? "bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
                   : "bg-white/10 text-slate-300 border-white/20"
               }`}>
-                <span>{adminSession.role === "MASTER_OWNER" ? "👑 MASTER OWNER:" : adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "🛡️ ADMIN:"}</span>
+                <span>{adminSession.role === "MASTER_OWNER" ? "⚡ MASTER ADMIN:" : adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "🛡️ ADMIN:"}</span>
                 <span className="text-white font-extrabold">{adminSession.name} [{adminSession.callsign}]</span>
                 <span className="text-[9px] opacity-75 font-normal">({adminSession.memberId})</span>
               </span>
@@ -2752,7 +2752,7 @@ export default function AdminDashboardPage() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
                     {[
-                      { role: "MASTER_OWNER" as const, label: "👑 Master Owner", desc: "Root / Dev Admin", color: "from-amber-400 to-yellow-500", text: "text-black" },
+                      { role: "MASTER_OWNER" as const, label: "⚡ Master Admin", desc: "Root / Systems Admin", color: "from-amber-400 to-yellow-500", text: "text-black" },
                       { role: "OWNER_ADMIN" as const, label: "🎖️ Owner Admin", desc: "Executive Lead", color: "from-emerald-400 to-teal-500", text: "text-black" },
                       { role: "ADMIN" as const, label: "🛡️ Admin", desc: "System Ops", color: "from-cyan-500 to-blue-600", text: "text-black" },
                       { role: "MODERATOR" as const, label: "⚖️ Moderator", desc: "Comms & Chat", color: "from-purple-500 to-indigo-600", text: "text-white" },

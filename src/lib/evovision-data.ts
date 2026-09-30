@@ -196,7 +196,7 @@ export const EVO_CLUSTERS = {
   },
   ADMIN: {
     title: "ADMIN CONTROLS",
-    subtitle: "Master Owner & Core Security",
+    subtitle: "Master Admin & Core Security",
     color: "#06B6D4",
     accent: "#6366F1",
     glow: "rgba(99, 102, 241, 0.4)",
@@ -785,12 +785,12 @@ export const EVO_NODES: EvoNode[] = [
   {
     id: "admin-rob",
     label: "Rob Neilson",
-    sublabel: "Master Owner • Systems Engineer",
+    sublabel: "Master Admin • Systems Architecture",
     cluster: "ADMIN",
     role: "MASTER_OWNER",
     callsign: "RADAR",
     memberId: "SS-2026-0001",
-    division: "Lead Systems Engineer & Master Admin",
+    division: "Master Admin",
     homeRange: "Systems Engineering & Infrastructure Hub",
     rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
     x: -680,
@@ -825,7 +825,7 @@ export const EVO_NODES: EvoNode[] = [
       lastSeen: "Active Master Session",
     },
     details: {
-      joinDate: "Founding Master Owner (Jan 2026)",
+      joinDate: "Founding Master Admin (Jan 2026)",
       protocol: "Superuser Master Credential (Passkey 2468 / 620620)",
       tools: ["Telemetry JSONL Stream", "Supabase Sync", "Member Management", "Panic Lock"],
     },
@@ -1176,7 +1176,7 @@ export const EVO_LINKS: EvoLink[] = [
   { id: "link-sentinel-marcus", sourceId: "mod-sentinel", targetId: "bot-marcus-badactor", color: "#EF4444", latencyLabel: "SENTINEL WATCH", curvature: -0.35, pulseSpeed: 0.03 },
   // Wyatt Sterling leads Host Room 1:
   { id: "link-wyatt-host1", sourceId: "user-wyatt", targetId: "mod-host-1", color: "#38BDF8", latencyLabel: "SQUAD LEAD", curvature: -0.25, pulseSpeed: 0.012 },
-  // Master Owner Rob oversees Telemetry & Plink Sentinel:
+  // Master Admin Rob oversees Telemetry & Plink Sentinel:
   { id: "link-rob-telemetry", sourceId: "admin-rob", targetId: "admin-telemetry-db", color: "#F59E0B", latencyLabel: "AUDIT", curvature: 0.1, pulseSpeed: 0.02 },
   { id: "link-rob-sentinel", sourceId: "admin-rob", targetId: "mod-sentinel", color: "#F59E0B", latencyLabel: "ROOT OVERRIDE", curvature: 0.4, pulseSpeed: 0.015 },
 ];

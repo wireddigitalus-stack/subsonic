@@ -268,7 +268,7 @@ export default function EvosDashboardPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_6px_#818CF8]" />
-            <span className="text-slate-300">Master Owner (RADAR) & Admin Engine</span>
+            <span className="text-slate-300">Master Admin (RADAR) & Admin Engine</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_#F59E0B]" />
@@ -844,7 +844,7 @@ export default function EvosDashboardPage() {
                 </div>
               )}
 
-              {/* Master Telemetry Stats (For Master Owner or Core DB) */}
+              {/* Master Telemetry Stats (For Master Admin or Core DB) */}
               {selectedNode.telemetryStats && (
                 <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2">
                   <div className="text-[10px] text-cyan-300 font-bold uppercase flex items-center gap-1.5">

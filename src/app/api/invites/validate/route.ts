@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         valid: true,
         tier: "PRO",
-        recipientName: "Rob Neilson (Lead Systems Engineer & Master Admin)",
+        recipientName: "Rob Neilson (Master Admin)",
         isMaster: true,
       });
     }

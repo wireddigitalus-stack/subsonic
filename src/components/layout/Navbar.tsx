@@ -59,8 +59,8 @@ export function Navbar() {
           ) {
             parsed.callsign = "RADAR";
             parsed.rifleSetup = "Systems & Infrastructure Architecture (Non-Shooter)";
-            parsed.division = "Lead Systems Engineer & Master Admin";
-            parsed.badgeText = "SYSTEMS ENGINEER";
+            parsed.division = "Master Admin";
+            parsed.badgeText = "MASTER ADMIN";
             parsed.member_id = "SS-2026-0001";
             parsed.role = "MASTER_OWNER";
             try {

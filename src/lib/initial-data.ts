@@ -330,8 +330,8 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       name: "Rob Neilson",
       callsign: "RADAR",
       role: "MASTER_OWNER",
-      badgeText: "SYSTEMS ENGINEER",
-      division: "Lead Systems Engineer & Master Admin",
+      badgeText: "MASTER ADMIN",
+      division: "Master Admin",
       rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
     },
     content:

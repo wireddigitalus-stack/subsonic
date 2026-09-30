@@ -117,11 +117,11 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     callsign: "RADAR",
     name: "Rob Neilson",
     role: "MASTER_OWNER",
-    badgeText: "SYSTEMS ENGINEER",
-    division: "Lead Systems Engineer & Master Admin",
+    badgeText: "MASTER ADMIN",
+    division: "Master Admin",
     status: "online",
-    bio: "Lead Systems Engineer & Master Admin",
-    rifleSetup: "Lead Systems Engineer & Master Admin",
+    bio: "Master Admin",
+    rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
   },
   {
     id: "dm_wyatt",
@@ -514,8 +514,8 @@ export default function ChatPage() {
               parsedShooter.name = "Rob Neilson";
               parsedShooter.callsign = "RADAR";
               parsedShooter.role = "MASTER_OWNER";
-              parsedShooter.division = "Lead Systems Engineer & Master Admin";
-              parsedShooter.badgeText = "SYSTEMS ENGINEER";
+              parsedShooter.division = "Master Admin";
+              parsedShooter.badgeText = "MASTER ADMIN";
               parsedShooter.rifleSetup = "Systems & Infrastructure Architecture (Non-Shooter)";
               try {
                 localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
@@ -524,7 +524,7 @@ export default function ChatPage() {
                   full_name: "Rob Neilson",
                   callsign: "RADAR",
                   state: "TN",
-                  experience_level: "Lead Systems Engineer & Master Admin",
+                  experience_level: "Master Admin",
                   rifle_setup: "Systems & Infrastructure Architecture (Non-Shooter)",
                   created_at: "2026-07-04T12:00:00Z"
                 }));
@@ -1238,15 +1238,15 @@ export default function ChatPage() {
       ...profileForm,
       role: isMasterOwner ? "MASTER_OWNER" : profileForm.role,
       division: isMasterOwner
-        ? profileForm.division || "Lead Systems Engineer & Master Admin"
+        ? profileForm.division || "Master Admin"
         : profileForm.division,
       rifleSetup: isMasterOwner
         ? profileForm.rifleSetup || "Systems & Infrastructure Architecture (Non-Shooter)"
         : profileForm.rifleSetup,
       badgeText: isMasterOwner
-        ? "SYSTEMS ENGINEER"
+        ? "MASTER ADMIN"
         : profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN"
-        ? "MASTER OWNER"
+        ? "MASTER ADMIN"
         : profileForm.role === "OWNER_ADMIN"
         ? "OWNER ADMIN"
         : profileForm.role === "ADMIN"
@@ -2169,7 +2169,7 @@ export default function ChatPage() {
                     state={memberState}
                     experienceLevel={shooterProfile.division}
                     rifleSetup={shooterProfile.rifleSetup}
-                    accessLevel={isMasterOwner ? "MASTER OWNER & ADMIN" : shooterProfile.role === "PRO_COMPETITOR" ? "PRO COMPETITOR" : "CHAT ACCESS"}
+                    accessLevel={isMasterOwner ? "MASTER ADMIN" : shooterProfile.role === "PRO_COMPETITOR" ? "PRO COMPETITOR" : "CHAT ACCESS"}
                     showDownload={true}
                   />
 
@@ -2224,7 +2224,7 @@ export default function ChatPage() {
                       </label>
                       <input
                         type="text"
-                        value={profileForm.division || "Lead Systems Engineer & Master Admin"}
+                        value={profileForm.division || "Master Admin"}
                         onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
                         className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-base sm:text-xs font-bold focus:border-cyan-400 focus:outline-none"
                       />
@@ -2300,14 +2300,14 @@ export default function ChatPage() {
                         <div>
                           <div className="font-extrabold text-xs">
                             {profileForm.role === "MASTER_OWNER" || isMasterOwner
-                              ? "LEAD SYSTEMS ENGINEER & MASTER ADMIN (ROOT CLEARANCE)"
+                              ? "MASTER ADMIN (ROOT CLEARANCE)"
                               : profileForm.role === "OWNER_ADMIN"
                               ? "OWNER ADMIN (EXECUTIVE CLEARANCE)"
                               : profileForm.role === "ADMIN"
                               ? "SYSTEM ADMINISTRATOR (COMMAND)"
                               : profileForm.role === "MODERATOR"
                               ? "COMMS MODERATOR (CHAT DEFENSE)"
-                              : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
+                              : "MASTER ADMIN (ROOT ACCESS)"}
                           </div>
                           <div className="text-[10px] text-slate-400">
                             {profileForm.role === "MASTER_OWNER" || isMasterOwner

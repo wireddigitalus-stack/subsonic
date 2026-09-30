@@ -328,7 +328,7 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
                             : "bg-white/10 text-slate-300 border-white/20"
                         }`}>
                           {isMasterOwner
-                            ? "👑 MASTER OWNER"
+                            ? "⚡ MASTER ADMIN"
                             : isOwnerAdmin
                             ? "🎖️ OWNER ADMIN"
                             : isAdmin
@@ -400,7 +400,7 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
                             </span>
                             {m.role === "MASTER_OWNER" && (
                               <span className="text-[9px] font-mono font-black px-2 py-0.5 rounded bg-gradient-to-r from-amber-400 to-yellow-500 text-black border border-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.5)] shrink-0">
-                                👑 MASTER OWNER
+                                ⚡ MASTER ADMIN
                               </span>
                             )}
                             {m.role === "OWNER_ADMIN" && (
