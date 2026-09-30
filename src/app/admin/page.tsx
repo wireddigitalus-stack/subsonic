@@ -993,6 +993,60 @@ export default function AdminDashboardPage() {
           setIsAuthenticated(true);
           setAdminSession(data.session);
           setDetectedNonAdmin(null);
+
+          // Synchronize localStorage with active server session
+          if (typeof window !== "undefined") {
+            try {
+              if (data.session.callsign === "ALLEN" || data.session.role === "OWNER_ADMIN") {
+                const allenProfile = {
+                  name: "Allen Hurley",
+                  callsign: "ALLEN",
+                  role: "OWNER_ADMIN",
+                  division: "Owner Admin / Executive",
+                  rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+                  badgeText: "OWNER ADMIN",
+                  member_id: "SS-2026-0002",
+                };
+                const allenMember = {
+                  member_id: "SS-2026-0002",
+                  full_name: "Allen Hurley",
+                  callsign: "ALLEN",
+                  state: "TN",
+                  experience_level: "Owner Admin / Executive",
+                  rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
+                  role: "OWNER_ADMIN",
+                  created_at: "2026-07-04T12:00:00Z",
+                };
+                localStorage.setItem("subsonic_shooter_profile", JSON.stringify(allenProfile));
+                localStorage.setItem("subsonic_member_profile", JSON.stringify(allenMember));
+                localStorage.setItem("subsonic_chat_authenticated", "true");
+              } else if (data.session.callsign === "RADAR" || data.session.role === "MASTER_OWNER") {
+                const radarProfile = {
+                  name: "Rob Neilson",
+                  callsign: "RADAR",
+                  role: "MASTER_OWNER",
+                  division: "Master Admin",
+                  rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
+                  badgeText: "MASTER ADMIN",
+                  member_id: "SS-2026-0001",
+                };
+                const radarMember = {
+                  member_id: "SS-2026-0001",
+                  full_name: "Rob Neilson",
+                  callsign: "RADAR",
+                  state: "TN",
+                  experience_level: "Master Admin",
+                  rifle_setup: "Smart Systems Integrations",
+                  role: "MASTER_OWNER",
+                  created_at: "2026-07-04T12:00:00Z",
+                };
+                localStorage.setItem("subsonic_shooter_profile", JSON.stringify(radarProfile));
+                localStorage.setItem("subsonic_member_profile", JSON.stringify(radarMember));
+                localStorage.setItem("subsonic_chat_authenticated", "true");
+              }
+              window.dispatchEvent(new Event("storage"));
+            } catch {}
+          }
         } else {
           setIsAuthenticated(false);
           setAdminSession(null);
@@ -1072,6 +1126,7 @@ export default function AdminDashboardPage() {
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
     const clean = passkeyInput.trim();
+    if (!clean) return;
     
     try {
       const res = await fetch("/api/admin/auth", {
@@ -1081,11 +1136,66 @@ export default function AdminDashboardPage() {
       });
       
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.success && data.session) {
         setIsAuthenticated(true);
         setPasskeyError(false);
         setAdminSession(data.session);
         setDetectedNonAdmin(null);
+        setPasskeyInput("");
+
+        // Immediate synchronization of client profile so Dashboard & Navbar show Allen or Rob
+        if (typeof window !== "undefined") {
+          try {
+            if (data.session.callsign === "ALLEN" || data.session.role === "OWNER_ADMIN") {
+              const allenProfile = {
+                name: "Allen Hurley",
+                callsign: "ALLEN",
+                role: "OWNER_ADMIN",
+                division: "Owner Admin / Executive",
+                rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+                badgeText: "OWNER ADMIN",
+                member_id: "SS-2026-0002",
+              };
+              const allenMember = {
+                member_id: "SS-2026-0002",
+                full_name: "Allen Hurley",
+                callsign: "ALLEN",
+                state: "TN",
+                experience_level: "Owner Admin / Executive",
+                rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
+                role: "OWNER_ADMIN",
+                created_at: "2026-07-04T12:00:00Z",
+              };
+              localStorage.setItem("subsonic_shooter_profile", JSON.stringify(allenProfile));
+              localStorage.setItem("subsonic_member_profile", JSON.stringify(allenMember));
+              localStorage.setItem("subsonic_chat_authenticated", "true");
+            } else if (data.session.callsign === "RADAR" || data.session.role === "MASTER_OWNER") {
+              const radarProfile = {
+                name: "Rob Neilson",
+                callsign: "RADAR",
+                role: "MASTER_OWNER",
+                division: "Master Admin",
+                rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
+                badgeText: "MASTER ADMIN",
+                member_id: "SS-2026-0001",
+              };
+              const radarMember = {
+                member_id: "SS-2026-0001",
+                full_name: "Rob Neilson",
+                callsign: "RADAR",
+                state: "TN",
+                experience_level: "Master Admin",
+                rifle_setup: "Smart Systems Integrations",
+                role: "MASTER_OWNER",
+                created_at: "2026-07-04T12:00:00Z",
+              };
+              localStorage.setItem("subsonic_shooter_profile", JSON.stringify(radarProfile));
+              localStorage.setItem("subsonic_member_profile", JSON.stringify(radarMember));
+              localStorage.setItem("subsonic_chat_authenticated", "true");
+            }
+            window.dispatchEvent(new Event("storage"));
+          } catch {}
+        }
       } else {
         setPasskeyError(true);
       }
@@ -1100,6 +1210,15 @@ export default function AdminDashboardPage() {
     } catch (e) {}
     setIsAuthenticated(false);
     setAdminSession(null);
+    setPasskeyInput("");
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("subsonic_chat_authenticated");
+        localStorage.removeItem("subsonic_shooter_profile");
+        localStorage.removeItem("subsonic_member_profile");
+        window.dispatchEvent(new Event("storage"));
+      } catch {}
+    }
   };
 
   const handleClearTelemetry = async () => {
@@ -1367,14 +1486,13 @@ export default function AdminDashboardPage() {
               Live Site Intelligence & Admin Hub
             </span>
             {adminSession && (
-              <span className={`text-[11px] px-3 py-1 rounded-full font-mono font-bold flex items-center gap-1.5 border shadow-sm ${
-                adminSession.role === "MASTER_OWNER"
-                  ? "bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
-                  : adminSession.role === "OWNER_ADMIN"
+              <span className={`text-[11px] px-3.5 py-1.5 rounded-full font-mono font-bold flex items-center gap-1.5 border shadow-sm ${
+                adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN"
                   ? "bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
-                  : "bg-white/10 text-slate-300 border-white/20"
+                  : "bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
               }`}>
-                <span>{adminSession.role === "MASTER_OWNER" ? "⚡ MASTER ADMIN:" : adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "🛡️ ADMIN:"}</span>
+                <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "#10b981" : "#f59e0b" }} />
+                <span>{adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "⚡ MASTER ADMIN:"}</span>
                 <span className="text-white font-extrabold">{adminSession.name} [{adminSession.callsign}]</span>
                 <span className="text-[9px] opacity-75 font-normal">({adminSession.memberId})</span>
               </span>
@@ -1474,6 +1592,15 @@ export default function AdminDashboardPage() {
           >
             <Key className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">Admin Passkeys</span>
+          </button>
+
+          <button
+            onClick={handleLock}
+            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-mono font-bold text-slate-200 hover:text-white flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+            title="Switch admin session (Sign out & enter new passkey)"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-400" />
+            <span>Switch Admin ⇄</span>
           </button>
 
           <button

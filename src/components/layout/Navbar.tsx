@@ -44,7 +44,20 @@ export function Navbar() {
   // Track private chat room auth state & callsign
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const checkAuth = () => {
+    const checkAuth = async () => {
+      // First check if there is an active server admin session (Allen or Rob)
+      try {
+        const res = await fetch("/api/admin/session");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated && data.session) {
+            setIsAuthenticated(true);
+            setCallsign(data.session.callsign || "RADAR");
+            return;
+          }
+        }
+      } catch {}
+
       const isAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
       setIsAuthenticated(isAuth);
       const profile = localStorage.getItem("subsonic_shooter_profile");
@@ -95,9 +108,14 @@ export function Navbar() {
     return () => window.removeEventListener("storage", checkAuth);
   }, [pathname]);
 
-  const handleLockChat = () => {
+  const handleLockChat = async () => {
     if (typeof window !== "undefined") {
+      try {
+        await fetch("/api/admin/logout", { method: "POST" });
+      } catch {}
       localStorage.removeItem("subsonic_chat_authenticated");
+      localStorage.removeItem("subsonic_shooter_profile");
+      localStorage.removeItem("subsonic_member_profile");
       setIsAuthenticated(false);
       window.location.reload();
     }
