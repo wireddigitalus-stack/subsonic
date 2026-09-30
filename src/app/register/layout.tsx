@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "Subsonic Society Match Registration",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Match Registration | Subsonic Society",
     description: "Register for the Subsonic Society Invitational and regional rimfire matches.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

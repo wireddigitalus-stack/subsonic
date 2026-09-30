@@ -58,8 +58,8 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
-        secureUrl: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
+        url: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=4`,
+        secureUrl: `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=4`,
         width: 1200,
         height: 630,
         type: "image/jpeg",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     title: "Subsonic Society | Precision Rimfire Media & Mountain Pro Championship",
     description:
       "High-stakes precision rimfire shooting media, pro competitions in Bristol, TN mountains, and tactical community.",
-    images: [`${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`],
+    images: [`${siteUrl}/assets/subsonic-social-share-clean.jpg?v=4`],
   },
 };
 
@@ -93,7 +93,7 @@ const structuredData = {
         "caption": "Subsonic Society Official Logo"
       },
       "image": [
-        `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=3`,
+        `${siteUrl}/assets/subsonic-social-share-clean.jpg?v=4`,
         `${siteUrl}/assets/subsonic-social-share-coin.jpg`,
         `${siteUrl}/assets/subsonic-banner-wide.png`,
         `${siteUrl}/images/SS-RWB-LOGO.png`

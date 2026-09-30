@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "Subsonic Society Manifesto & 4 Pillars",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: "The Society Manifesto | Subsonic Society",
     description:
       "Precision Is In Our DNA. Discover our 4 foundational pillars and marksman creed.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "Subsonic Society Precision Rimfire Competitors",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     title: "Precision Rimfire Competitors | Subsonic Society",
     description:
       "Athlete profiles, championship standings, and rifle build specifications.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

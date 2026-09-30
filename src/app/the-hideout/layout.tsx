@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "The Hideout Range at 3,420 FT Elevation - Bristol, TN",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "The Hideout Range | 3,420 FT Topography",
     description:
       "Bristol, Tennessee's premier mountain rimfire complex. Cross-canyon steel to 465 yards.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

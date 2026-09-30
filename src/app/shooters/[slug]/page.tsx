@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         description: `Official Subsonic Society Pro Competitor Profile dossier for ${formattedName}. Precision rimfire optics, action specs, and match accolades.`,
         images: [
           {
-            url: "https://subsonic-omega.vercel.app/assets/subsonic-invite-social-share.jpg",
+            url: "https://subsonic-omega.vercel.app/assets/subsonic-invite-social-share.jpg?v=4",
             width: 1200,
             height: 630,
             alt: `${formattedName} Profile`,

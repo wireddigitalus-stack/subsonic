@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "Contact Subsonic Society",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Contact Subsonic Society | Range Inquiries",
     description: "Reach the Subsonic Society team for match, media, and sponsor support.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

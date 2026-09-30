@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg",
+        url: "/assets/subsonic-invite-social-share.jpg?v=4",
         width: 1280,
         height: 720,
         alt: "The Subsonic Society - Membership By Invitation Only - Claim & Activate Profile",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: "Claim Your Invitation & Activate Marksman Profile | Subsonic Society",
     description:
       "Membership by invitation only. Redeem your invitation key to unlock verified shooter credentials and private squad comms.",
-    images: ["/assets/subsonic-invite-social-share.jpg"],
+    images: ["/assets/subsonic-invite-social-share.jpg?v=4"],
   },
 };
 

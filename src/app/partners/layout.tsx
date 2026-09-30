@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-social-share-clean.jpg?v=3",
+        url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
         alt: "Subsonic Society Industry Partners",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     title: "Industry Partners | Subsonic Society",
     description:
       "Featuring Title Sponsor Modacam Custom Rifles, Lapua, Vortex Optics, Vudoo Gun Works, and MDT.",
-    images: ["/assets/subsonic-social-share-clean.jpg?v=3"],
+    images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
 

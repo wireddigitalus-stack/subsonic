@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg",
+        url: "/assets/subsonic-invite-social-share.jpg?v=4",
         width: 1280,
         height: 720,
         alt: "The Subsonic Society - Membership By Invitation Only",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Membership By Invitation Only | The Subsonic Society",
     description: "Log in with your invitation credentials or enter your invite code.",
-    images: ["/assets/subsonic-invite-social-share.jpg"],
+    images: ["/assets/subsonic-invite-social-share.jpg?v=4"],
   },
 };
 

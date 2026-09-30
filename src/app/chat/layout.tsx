@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-chat-social-share.jpg",
+        url: "/assets/subsonic-chat-social-share.jpg?v=4",
         width: 1280,
         height: 720,
         alt: "Subsonic Society Tactical Comms Network & Live Squad Chat",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tactical Comms Network | Subsonic Society",
     description: "Live marksman communications, verified DOPE cards, and firing line intel.",
-    images: ["/assets/subsonic-chat-social-share.jpg"],
+    images: ["/assets/subsonic-chat-social-share.jpg?v=4"],
   },
 };
 
