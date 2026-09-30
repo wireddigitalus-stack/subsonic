@@ -460,7 +460,10 @@ export function Navbar() {
                 {pathname !== "/chat" && (
                   <Link
                     href="/chat"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 shadow-tactical-glow"
+                    title="Open Live Comms Room in New Tab"
                   >
                     <MessageSquare className="w-3.5 h-3.5 fill-black" />
                     <span>Enter Room</span>

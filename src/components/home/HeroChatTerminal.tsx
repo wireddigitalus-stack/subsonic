@@ -323,7 +323,10 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
 
           <Link
             href="/chat"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[10px] flex items-center gap-1 transition-all active:scale-95 shadow-tactical-glow"
+            title="Launch Full Live Comms Terminal in New Tab"
           >
             <span>ENTER ROOM</span>
             <ChevronRight className="w-3 h-3" />
