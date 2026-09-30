@@ -26,19 +26,22 @@ function cleanHtml(html: string): string {
 function getContextualFallback(content: string, category: string): string {
   const lower = content.toLowerCase();
   if (lower.includes("shirt") || lower.includes("apparel") || lower.includes("merch") || lower.includes("out the door")) {
-    return "/assets/789564177_122193647960935073_1361705736026468060_n.jpg";
+    return "/assets/fb-event-shirts.jpg";
   }
-  if (lower.includes("invitational") || lower.includes("7,500") || lower.includes("purse") || lower.includes("history")) {
-    return "/assets/subsonic-facebook-cover.jpg";
+  if (lower.includes("7,500") || lower.includes("cash purse")) {
+    return "/assets/fb-invitational-purse.jpg";
   }
-  if (lower.includes("red line") || lower.includes("yellow line") || lower.includes("stage") || lower.includes("mountain")) {
-    return "/assets/subsonic-competition-mountain.png";
+  if (lower.includes("invitational") || lower.includes("inaugural") || lower.includes("history")) {
+    return "/assets/fb-invitational-inaugural.jpg";
   }
-  if (lower.includes("abra") || lower.includes("nationals") || lower.includes("benchrest") || lower.includes("muller")) {
-    return "/assets/subsonic-banner-wide.png";
+  if (lower.includes("red line") || lower.includes("yellow line")) {
+    return "/assets/fb-red-line.jpg";
+  }
+  if (lower.includes("abra") || lower.includes("nationals") || lower.includes("benchrest") || lower.includes("commence")) {
+    return "/assets/fb-abra-nationals.jpg";
   }
   if (lower.includes("big news") || lower.includes("custom") || lower.includes("rifle")) {
-    return "/assets/subsonic-social-share-black.jpg";
+    return "/assets/fb-big-news-rifles.jpg";
   }
   return "/assets/subsonic-facebook-cover.jpg";
 }
@@ -129,11 +132,14 @@ export async function GET(req: NextRequest) {
 
       const fallbackImage = getContextualFallback(content, category);
 
+      // Prioritize our pristine local photos so images never fail with 403 or broken tokens
+      const resolvedImage = fallbackImage || imageUrl;
+
       const postItem: FacebookPostItem = {
         id,
         content,
         publishedAt,
-        imageUrl: imageUrl || undefined,
+        imageUrl: resolvedImage || undefined,
         fallbackImageUrl: fallbackImage,
         externalUrl,
         likesCount: 30 + Math.floor(Math.random() * 20),
@@ -206,23 +212,27 @@ async function getFallbackPosts() {
         .limit(20);
 
       if (!error && data && data.length > 0) {
-        const mapped: FacebookPostItem[] = data.map((d: any) => ({
-          id: d.id,
-          content: d.content,
-          publishedAt: new Date(d.published_at || d.created_at).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          }),
-          imageUrl: d.image_url || undefined,
-          fallbackImageUrl: getContextualFallback(d.content || "", d.category || "ALL"),
-          externalUrl: d.external_url || FB_PAGE_URL,
-          likesCount: d.likes_count || 32,
-          commentsCount: d.comments_count || 4,
-          sharesCount: d.shares_count || 2,
-          tags: Array.isArray(d.tags) ? d.tags : ["SubsonicSociety"],
-          category: d.category || "ALL",
-        }));
+        const mapped: FacebookPostItem[] = data.map((d: any) => {
+          const fallback = getContextualFallback(d.content || "", d.category || "ALL");
+          const img = (d.image_url && !d.image_url.includes("fbcdn.net")) ? d.image_url : fallback;
+          return {
+            id: d.id,
+            content: d.content,
+            publishedAt: new Date(d.published_at || d.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            imageUrl: img,
+            fallbackImageUrl: fallback,
+            externalUrl: d.external_url || FB_PAGE_URL,
+            likesCount: d.likes_count || 32,
+            commentsCount: d.comments_count || 4,
+            sharesCount: d.shares_count || 2,
+            tags: Array.isArray(d.tags) ? d.tags : ["SubsonicSociety"],
+            category: d.category || "ALL",
+          };
+        });
 
         return NextResponse.json({
           posts: mapped,
