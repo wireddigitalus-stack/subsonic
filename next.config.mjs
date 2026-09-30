@@ -10,6 +10,22 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "**.fbcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "*.fbcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "*.xx.fbcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "scontent*.xx.fbcdn.net",
+      },
+      {
+        protocol: "https",
         hostname: "scontent.xx.fbcdn.net",
       },
       {
@@ -18,7 +34,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "*.fbcdn.net",
+        hostname: "**.facebook.com",
       },
     ],
   },

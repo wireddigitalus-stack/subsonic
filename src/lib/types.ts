@@ -143,6 +143,7 @@ export interface FacebookPostItem {
   commentsCount: number;
   sharesCount: number;
   imageUrl?: string;
+  fallbackImageUrl?: string;
   videoUrl?: string;
   externalUrl: string;
   tags: string[];

@@ -24,13 +24,78 @@ import {
   Sliders,
   ChevronUp,
   ChevronDown,
-  ArrowUp
+  ArrowUp,
+  Play,
+  Camera
 } from "lucide-react";
 import { INITIAL_FACEBOOK_POSTS } from "@/lib/initial-data";
 import { FacebookPostItem } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 
 const FB_PAGE_URL = "https://www.facebook.com/p/Subsonic-Society-61578052196057/";
+
+function FeedMediaItem({
+  post,
+  onLightbox,
+}: {
+  post: FacebookPostItem;
+  onLightbox: () => void;
+}) {
+  const defaultFallback = post.fallbackImageUrl || "/assets/subsonic-facebook-cover.jpg";
+  const [imgSrc, setImgSrc] = useState<string>(post.imageUrl || defaultFallback);
+  const [hasError, setHasError] = useState(false);
+  const isReel = Boolean(post.externalUrl && post.externalUrl.includes("/reel/"));
+
+  useEffect(() => {
+    setImgSrc(post.imageUrl || defaultFallback);
+    setHasError(false);
+  }, [post.imageUrl, defaultFallback]);
+
+  return (
+    <div
+      onClick={onLightbox}
+      className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-white/10 bg-black/60 cursor-pointer group/media mt-2 select-none"
+    >
+      <Image
+        src={hasError ? defaultFallback : imgSrc}
+        alt="Subsonic Society Media"
+        fill
+        unoptimized
+        onError={() => {
+          setHasError(true);
+          setImgSrc(defaultFallback);
+        }}
+        className="object-cover group-hover/media:scale-105 transition-transform duration-500"
+      />
+      <div className="absolute inset-0 bg-black/20 group-hover/media:bg-transparent transition-colors" />
+
+      {/* Reel or Video Indicator */}
+      {isReel ? (
+        <a
+          href={post.externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-blue-600/90 hover:bg-blue-500 backdrop-blur-md border border-white/20 text-[10px] font-mono font-bold text-white flex items-center gap-1.5 shadow-[0_0_12px_rgba(37,99,235,0.5)] transition-all z-10"
+        >
+          <Play className="w-3 h-3 fill-white" />
+          <span>WATCH REEL ON FB</span>
+        </a>
+      ) : (
+        <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[9px] font-mono text-slate-300 flex items-center gap-1 z-10">
+          <Camera className="w-3 h-3 text-blue-400" />
+          <span>FB DISPATCH</span>
+        </div>
+      )}
+
+      {/* Bottom Right Expand Button */}
+      <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 text-[10px] font-mono text-white flex items-center gap-1 opacity-90 group-hover/media:opacity-100 transition-opacity">
+        <Eye className="w-3 h-3 text-blue-400" />
+        <span>Click to Expand</span>
+      </div>
+    </div>
+  );
+}
 
 export function FacebookFeed() {
   const [posts, setPosts] = useState<FacebookPostItem[]>(INITIAL_FACEBOOK_POSTS);
@@ -655,24 +720,10 @@ export function FacebookFeed() {
                         </div>
 
                         {/* High-Res Media Container */}
-                        {post.imageUrl && (
-                          <div 
-                            onClick={() => setActiveLightboxPost(post)}
-                            className="relative w-full h-52 sm:h-64 rounded-xl overflow-hidden border border-white/10 bg-black/60 cursor-pointer group/media mt-2"
-                          >
-                            <Image
-                              src={post.imageUrl}
-                              alt="Subsonic Society Media"
-                              fill
-                              className="object-cover group-hover/media:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-black/20 group-hover/media:bg-transparent transition-colors" />
-                            <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 text-[10px] font-mono text-white flex items-center gap-1 opacity-90 group-hover/media:opacity-100 transition-opacity">
-                              <Eye className="w-3 h-3 text-blue-400" />
-                              <span>Click to Expand</span>
-                            </div>
-                          </div>
-                        )}
+                        <FeedMediaItem 
+                          post={post} 
+                          onLightbox={() => setActiveLightboxPost(post)} 
+                        />
                       </div>
 
                       {/* Action & Engagement Strip */}
@@ -799,14 +850,17 @@ export function FacebookFeed() {
 
               {/* Modal Image */}
               <div className="relative w-full h-80 sm:h-[420px] bg-black">
-                {activeLightboxPost.imageUrl && (
-                  <Image
-                    src={activeLightboxPost.imageUrl}
-                    alt="Subsonic Media Lightbox"
-                    fill
-                    className="object-contain"
-                  />
-                )}
+                <Image
+                  src={
+                    activeLightboxPost.imageUrl ||
+                    activeLightboxPost.fallbackImageUrl ||
+                    "/assets/subsonic-facebook-cover.jpg"
+                  }
+                  alt="Subsonic Media Lightbox"
+                  fill
+                  unoptimized
+                  className="object-contain"
+                />
               </div>
 
               {/* Modal Details */}

@@ -23,6 +23,26 @@ function cleanHtml(html: string): string {
     .trim();
 }
 
+function getContextualFallback(content: string, category: string): string {
+  const lower = content.toLowerCase();
+  if (lower.includes("shirt") || lower.includes("apparel") || lower.includes("merch") || lower.includes("out the door")) {
+    return "/assets/789564177_122193647960935073_1361705736026468060_n.jpg";
+  }
+  if (lower.includes("invitational") || lower.includes("7,500") || lower.includes("purse") || lower.includes("history")) {
+    return "/assets/subsonic-facebook-cover.jpg";
+  }
+  if (lower.includes("red line") || lower.includes("yellow line") || lower.includes("stage") || lower.includes("mountain")) {
+    return "/assets/subsonic-competition-mountain.png";
+  }
+  if (lower.includes("abra") || lower.includes("nationals") || lower.includes("benchrest") || lower.includes("muller")) {
+    return "/assets/subsonic-banner-wide.png";
+  }
+  if (lower.includes("big news") || lower.includes("custom") || lower.includes("rifle")) {
+    return "/assets/subsonic-social-share-black.jpg";
+  }
+  return "/assets/subsonic-facebook-cover.jpg";
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const isFresh = searchParams.get("fresh") === "true";
@@ -107,11 +127,14 @@ export async function GET(req: NextRequest) {
         category = "MEDIA";
       }
 
+      const fallbackImage = getContextualFallback(content, category);
+
       const postItem: FacebookPostItem = {
         id,
         content,
         publishedAt,
         imageUrl: imageUrl || undefined,
+        fallbackImageUrl: fallbackImage,
         externalUrl,
         likesCount: 30 + Math.floor(Math.random() * 20),
         commentsCount: 4 + Math.floor(Math.random() * 6),
@@ -192,6 +215,7 @@ async function getFallbackPosts() {
             year: "numeric",
           }),
           imageUrl: d.image_url || undefined,
+          fallbackImageUrl: getContextualFallback(d.content || "", d.category || "ALL"),
           externalUrl: d.external_url || FB_PAGE_URL,
           likesCount: d.likes_count || 32,
           commentsCount: d.comments_count || 4,
