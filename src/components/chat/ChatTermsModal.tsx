@@ -85,7 +85,7 @@ export function ChatTermsModal({
             <span className="amber-gradient-text">CODE OF CONDUCT</span>
           </h2>
           <p className="text-xs text-slate-300 font-mono leading-relaxed">
-            All competitors, Range Officers, and guests accessing the Subsonic Society comms net operate under strict community standards and range safety rules.
+            All competitors, Range Officers, and guests accessing Subsonic Society comms net operate under strict community standards and range safety rules.
           </p>
         </div>
 

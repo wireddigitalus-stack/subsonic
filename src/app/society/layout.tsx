@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "The Society Manifesto & 4 Pillars | Subsonic Society",
   description:
-    "The Subsonic Society manifesto: Precision Is In Our DNA. Discover our 4 foundational pillars—Sanctioned Competition, Empirical Ballistics Testing, Marksmanship Education, and Marksman Fraternity.",
+    "Subsonic Society manifesto: Precision Is In Our DNA. Discover our 4 foundational pillars—Sanctioned Competition, Empirical Ballistics Testing, Marksmanship Education, and Marksman Fraternity.",
   keywords: [
     "Subsonic Society manifesto",
     "Precision rimfire culture",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     canonical: "https://subsonicsociety.com/society",
   },
   openGraph: {
-    title: "The Subsonic Society Manifesto | Precision Is In Our DNA",
+    title: "Subsonic Society Manifesto | Precision Is In Our DNA",
     description:
       "We exist to push the mechanical and human frontiers of .22LR rimfire marksmanship through data, discipline, and fellowship.",
     url: "https://subsonicsociety.com/society",

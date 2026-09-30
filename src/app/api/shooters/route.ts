@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       ranking: body.ranking || "Appalachian Rimfire Competitor",
       homeRange: body.homeRange || "The Hideout, Bristol, TN",
       podiums: typeof body.podiums === "number" ? body.podiums : parseInt(body.podiums, 10) || 0,
-      featuredMatch: body.featuredMatch || "The Subsonic Society Invitational 2026",
+      featuredMatch: body.featuredMatch || "Subsonic Society Invitational 2026",
       image: body.image || "/images/SS-RWB-LOGO.png",
       actionPhoto: body.actionPhoto || body.image || "/images/SS-RWB-LOGO.png",
       quote: body.quote || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",

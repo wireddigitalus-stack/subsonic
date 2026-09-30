@@ -67,7 +67,7 @@ const partnersSchema = {
       "@type": "Organization",
       "@id": "https://subsonicsociety.com/partners#modacam",
       "name": "Modacam Custom Rifles",
-      "description": "Title Sponsor of the Subsonic Society Invitational and master builder of custom match-grade precision rimfire and centerfire rifles.",
+      "description": "Title Sponsor of Subsonic Society Invitational and master builder of custom match-grade precision rimfire and centerfire rifles.",
       "url": "https://modacamrifles.com"
     },
     {

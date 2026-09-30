@@ -32,7 +32,7 @@ export function FullHomePage() {
       {/* 1. Cinematic Video Hero & Brand Statement */}
       <HeroSection />
 
-      {/* 2. Upcoming Match Spotlight: The Subsonic Society Invitational */}
+      {/* 2. Upcoming Match Spotlight: Subsonic Society Invitational */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="ios-glass rounded-3xl p-6 sm:p-10 border-2 border-amber-500/50 shadow-tactical-glow relative overflow-hidden bg-gradient-to-r from-amber-500/15 via-black/40 to-black/70">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -57,7 +57,7 @@ export function FullHomePage() {
               </div>
 
               <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
-                THE SUBSONIC SOCIETY INVITATIONAL
+                SUBSONIC SOCIETY INVITATIONAL
               </h2>
 
               <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono flex items-center gap-2">

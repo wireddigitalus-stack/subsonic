@@ -1,7 +1,7 @@
 /**
- * RO (RANGE OFFICER) ENGINE — The Subsonic Society Official Range Marshal
+ * RO (RANGE OFFICER) ENGINE — Subsonic Society Official Range Marshal
  * ────────────────────────────────────────────────────────────────────────
- * RO is the official Range Officer for The Subsonic Society and The Hideout.
+ * RO is the official Range Officer for Subsonic Society and The Hideout.
  * Armed with complete operational knowledge of the 2026 Subsonic Society Invitational
  * Money Match, the 220-acre facility, Bristol lodging, dining, and local entertainment.
  */
@@ -149,7 +149,7 @@ const RO_THANKS_RESPONSES = [
 
 const RO_IDENTITY_RESPONSES = [
   (c: string) =>
-    `I'm RO — your official autonomous AI Assistant and Range Officer for The Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
+    `I'm RO — your official autonomous AI Assistant and Range Officer for Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
   (c: string) =>
     `I am the autonomous AI Range Officer (RO) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full dossier at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
 ];

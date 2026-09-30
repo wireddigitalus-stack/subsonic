@@ -331,7 +331,7 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-sofia": [
       "First time at Bristol! Flying in from Texas. Any restaurant recommendations near the range?",
       "Who else is running production class? Would love to meet up and compare notes before the match.",
-      "The Subsonic Society merch is 🔥. Just ordered the tactical cap and the range bag patch.",
+      "Subsonic Society merch is 🔥. Just ordered the tactical cap and the range bag patch.",
       "My husband thinks I'm crazy for flying across the country to shoot .22s at tiny plates. He's not wrong. 😂",
     ],
     "bot-kendra": [

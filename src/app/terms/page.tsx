@@ -16,7 +16,7 @@ import {
 
 export const metadata = {
   title: "Terms of Use & Code of Conduct | Subsonic Society",
-  description: "Official terms of service, platform rules, and competitor code of conduct for the Subsonic Society precision rimfire network.",
+  description: "Official terms of service, platform rules, and competitor code of conduct for Subsonic Society precision rimfire network.",
 };
 
 export default function TermsPage() {
@@ -60,7 +60,7 @@ export default function TermsPage() {
           <span>STRICT PROHIBITION ON FIREARM &amp; AMMUNITION COMMERCE</span>
         </div>
         <p className="text-xs sm:text-sm text-red-200/90 leading-relaxed">
-          The Subsonic Society is an educational, athletic, and ballistic research community. 
+          Subsonic Society is an educational, athletic, and ballistic research community. 
           <strong className="text-white font-bold"> Under no circumstances may this platform, its private chat channels, or its direct messaging be used to buy, sell, trade, broker, or solicit the transfer of firearms, ammunition, serialized firearm receivers, or restricted components.</strong> Any attempt to conduct commercial transactions for regulated items will result in immediate permanent account termination, forfeiture of invitation credentials, and notification of the appropriate authorities.
         </p>
       </section>

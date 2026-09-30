@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg?v=4",
+        url: "/assets/subsonic-invite-social-share.jpg?v=5",
         width: 1280,
         height: 720,
         alt: "Subsonic Society Pro VIP Invitation & Profile Setup",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
     description: "Activate your VIP marksman dossier, rifle blueprint, and squad comms.",
-    images: ["/assets/subsonic-invite-social-share.jpg?v=4"],
+    images: ["/assets/subsonic-invite-social-share.jpg?v=5"],
   },
 };
 

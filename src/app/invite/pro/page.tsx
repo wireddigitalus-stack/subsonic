@@ -278,7 +278,7 @@ function ProInviteContent() {
         homeRange,
         podiums: Number(podiums) || 0,
         ranking: ranking.trim() || `${division} Competitor`,
-        featuredMatch: "The Subsonic Society Invitational 2026",
+        featuredMatch: "Subsonic Society Invitational 2026",
         quote: quote.trim() || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
         accolades: accolades.length > 0 ? accolades : ["VIP COMPETITOR"],
         sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],

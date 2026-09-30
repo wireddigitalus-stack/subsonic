@@ -219,7 +219,7 @@ export default function JoinSocietyGatePage() {
           <span>SUBSONIC SOCIETY ACCESS POLICY</span>
         </div>
         <p className="text-xs text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          The Subsonic Society maintains an invitation-only membership model to guarantee high-integrity ballistics data, authentic competitor interactions, and an uncompromised precision rifle environment. Invitations are issued directly by match directors, regional pros, and society leadership.
+          Subsonic Society maintains an invitation-only membership model to guarantee high-integrity ballistics data, authentic competitor interactions, and an uncompromised precision rifle environment. Invitations are issued directly by match directors, regional pros, and society leadership.
         </p>
       </section>
     </div>

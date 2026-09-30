@@ -30,7 +30,7 @@ const SEED_LEADS: ContactLead[] = [
     phone: "(540) 555-3392",
     category: "MATCH_HOST",
     subject: "Hosting a Subsonic Society Regional Qualifier in Virginia",
-    message: "We have a 450-yard ridgeline facility with 14 PRS barricades in Harrisonburg, VA. We would like to sanction a regional qualifier with the Subsonic Society in Spring 2027.",
+    message: "We have a 450-yard ridgeline facility with 14 PRS barricades in Harrisonburg, VA. We would like to sanction a regional qualifier with Subsonic Society in Spring 2027.",
     created_at: "2026-09-08T15:20:10Z",
     status: "IN_REVIEW",
   },
@@ -223,7 +223,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       lead: newLead,
-      message: "Your inquiry has been dispatched to the Subsonic Society match directorate!",
+      message: "Your inquiry has been dispatched to Subsonic Society match directorate!",
     });
   } catch (error) {
     console.error("Error creating contact lead:", error);

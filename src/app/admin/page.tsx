@@ -259,7 +259,7 @@ export default function AdminDashboardPage() {
   }>({
     title: "",
     category: "COF",
-    matchTitle: "The Subsonic Society Invitational 2026",
+    matchTitle: "Subsonic Society Invitational 2026",
     description: "",
     fileName: "",
     fileUrl: "",
@@ -601,7 +601,7 @@ export default function AdminDashboardPage() {
                     ranking: "Appalachian Rimfire Competitor",
                     homeRange: "The Hideout, Bristol, TN",
                     podiums: 1,
-                    featuredMatch: "The Subsonic Society Invitational 2026",
+                    featuredMatch: "Subsonic Society Invitational 2026",
                     image: cur.image || "/images/SS-RWB-LOGO.png",
                     actionPhoto: cur.image || "/images/SS-RWB-LOGO.png",
                     quote: "Precision rimfire demands absolute trust in your elevation DOPE and wind read.",
@@ -686,7 +686,7 @@ export default function AdminDashboardPage() {
         setNewDocForm({
           title: "",
           category: "COF",
-          matchTitle: "The Subsonic Society Invitational 2026",
+          matchTitle: "Subsonic Society Invitational 2026",
           description: "",
           fileName: "",
           fileUrl: "",
@@ -2390,7 +2390,7 @@ export default function AdminDashboardPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. The Subsonic Society Invitational 2026"
+                  placeholder="e.g. Subsonic Society Invitational 2026"
                   value={newDocForm.matchTitle}
                   onChange={(e) => setNewDocForm((p) => ({ ...p, matchTitle: e.target.value }))}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-white text-xs focus:outline-none focus:border-cyan-400"

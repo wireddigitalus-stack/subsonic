@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Membership By Invitation Only | The Subsonic Society",
+  title: "Membership By Invitation Only | Subsonic Society",
   description:
     "Subsonic Society membership and private squad comms are strictly by invitation only. Log in with the invitation credentials sent to you, or enter your invite code to activate your profile.",
   keywords: [
@@ -15,17 +15,17 @@ export const metadata: Metadata = {
     canonical: "https://subsonicsociety.com/join",
   },
   openGraph: {
-    title: "Membership By Invitation Only | The Subsonic Society",
+    title: "Membership By Invitation Only | Subsonic Society",
     description:
       "Membership and private comms are by invitation only. Log in with your credentials or claim your invitation code.",
     url: "https://subsonicsociety.com/join",
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg?v=4",
+        url: "/assets/subsonic-invite-social-share.jpg?v=5",
         width: 1280,
         height: 720,
-        alt: "The Subsonic Society - Membership By Invitation Only",
+        alt: "Subsonic Society - Membership By Invitation Only",
       },
     ],
     locale: "en_US",
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Membership By Invitation Only | The Subsonic Society",
+    title: "Membership By Invitation Only | Subsonic Society",
     description: "Log in with your invitation credentials or enter your invite code.",
-    images: ["/assets/subsonic-invite-social-share.jpg?v=4"],
+    images: ["/assets/subsonic-invite-social-share.jpg?v=5"],
   },
 };
 

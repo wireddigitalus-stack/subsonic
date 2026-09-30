@@ -7,7 +7,7 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Claim Invitation & Profile Setup | The Subsonic Society",
+  title: "Claim Invitation & Profile Setup | Subsonic Society",
   description:
     "Membership by invitation only. Enter your serialized invitation key to claim your tactical callsign, set your 6-digit access PIN, and activate your verified marksman dossier and squad comms.",
   keywords: [
@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg?v=4",
+        url: "/assets/subsonic-invite-social-share.jpg?v=5",
         width: 1280,
         height: 720,
-        alt: "The Subsonic Society - Membership By Invitation Only - Claim & Activate Profile",
+        alt: "Subsonic Society - Membership By Invitation Only - Claim & Activate Profile",
       },
     ],
     locale: "en_US",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: "Claim Your Invitation & Activate Marksman Profile | Subsonic Society",
     description:
       "Membership by invitation only. Redeem your invitation key to unlock verified shooter credentials and private squad comms.",
-    images: ["/assets/subsonic-invite-social-share.jpg?v=4"],
+    images: ["/assets/subsonic-invite-social-share.jpg?v=5"],
   },
 };
 

@@ -94,7 +94,7 @@ export function AdminRegistrationsTab(props: AdminRegistrationsTabProps) {
                   className="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:outline-none focus:border-amber-400"
                 >
                   <option value="ALL">All Matches</option>
-                  <option value="subsonic-invitational-2026">The Subsonic Society Invitational ($7,500 Purse)</option>
+                  <option value="subsonic-invitational-2026">Subsonic Society Invitational ($7,500 Purse)</option>
                   <option value="300x-long-gong-challenge">300X Long Gong Challenge</option>
                   <option value="200x-mountain-match">200X Mountain Match</option>
                 </select>

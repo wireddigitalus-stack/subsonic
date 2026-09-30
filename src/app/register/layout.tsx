@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Match Registration & Squad Sign-Up | Subsonic Society",
     description:
-      "Lock in your spot on the firing line. Secure registration for the Subsonic Society Invitational.",
+      "Lock in your spot on the firing line. Secure registration for Subsonic Society Invitational.",
     url: "https://subsonicsociety.com/register",
     siteName: "Subsonic Society",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Match Registration | Subsonic Society",
-    description: "Register for the Subsonic Society Invitational and regional rimfire matches.",
+    description: "Register for Subsonic Society Invitational and regional rimfire matches.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };

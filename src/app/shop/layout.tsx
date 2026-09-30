@@ -64,7 +64,7 @@ const shopSchema = {
       "@type": "Store",
       "@id": "https://subsonicsociety.com/shop#store",
       "name": "Subsonic Society Armory",
-      "description": "Official outfitter of the Subsonic Society precision rimfire community.",
+      "description": "Official outfitter of Subsonic Society precision rimfire community.",
       "url": "https://subsonicsociety.com/shop"
     }
   ]

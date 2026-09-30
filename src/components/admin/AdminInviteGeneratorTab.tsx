@@ -636,8 +636,8 @@ export function AdminInviteGeneratorTab() {
                   ? `${baseUrl}/invite/pro?code=${inv.code}`
                   : `${baseUrl}/invite?code=${inv.code}`;
                 const smsText = isPro
-                  ? `You're invited as a VIP Pro Competitor to The Subsonic Society! Your invite code is: ${inv.code}. Build your marksman dossier here: ${inviteUrl}`
-                  : `You're invited to join The Subsonic Society! Your access code is: ${inv.code}. Set up your profile here: ${inviteUrl}`;
+                  ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${inv.code}. Build your marksman dossier here: ${inviteUrl}`
+                  : `You're invited to join Subsonic Society! Your access code is: ${inv.code}. Set up your profile here: ${inviteUrl}`;
 
                 const copyIdSms = `table-sms-${inv.id}`;
                 const copyIdUrl = `table-url-${inv.id}`;
@@ -755,8 +755,8 @@ export function AdminInviteGeneratorTab() {
           ? `${baseUrl}/invite/pro?code=${cardModalInvite.code}`
           : `${baseUrl}/invite?code=${cardModalInvite.code}`;
         const smsText = isPro
-          ? `You're invited as a VIP Pro Competitor to The Subsonic Society! Your invite code is: ${cardModalInvite.code}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
-          : `You're invited to join The Subsonic Society! Your private access code is: ${cardModalInvite.code}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
+          ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${cardModalInvite.code}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
+          : `You're invited to join Subsonic Society! Your private access code is: ${cardModalInvite.code}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
 
         return (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">

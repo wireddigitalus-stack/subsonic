@@ -24,7 +24,7 @@ import { recordTelemetryEvent } from "@/lib/telemetry";
 
 const INQUIRY_CATEGORIES = [
   { id: "GENERAL", label: "General & Membership", desc: "Questions about Society passes, rules, or range procedures." },
-  { id: "SPONSORSHIP", label: "Sponsorship & Prize Table", desc: "Partner with The Subsonic Society or contribute to match prize tables." },
+  { id: "SPONSORSHIP", label: "Sponsorship & Prize Table", desc: "Partner with Subsonic Society or contribute to match prize tables." },
   { id: "MATCH_HOST", label: "Host a Regional Qualifier", desc: "Inquire about sanctioning an official qualifier at your home club." },
   { id: "SUBSONIC_DNA", label: "Subsonic DNA Lab Submissions", desc: "Submit ammunition lots or barrel harmonic tuners for Doppler testing." },
   { id: "MEDIA", label: "Media & Press Credentials", desc: "Request photographer, videographer, or journalist credentials for matches." },
@@ -152,7 +152,7 @@ export default function ContactPage() {
                   Thank you, {name}.
                 </h3>
                 <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                  Your transmission regarding <strong>{category.replace("_", " ")}</strong> has been received by the Subsonic Society match directorate. We typically respond within 24 hours to <strong>{email}</strong>.
+                  Your transmission regarding <strong>{category.replace("_", " ")}</strong> has been received by Subsonic Society match directorate. We typically respond within 24 hours to <strong>{email}</strong>.
                 </p>
                 <div className="pt-4">
                   <button

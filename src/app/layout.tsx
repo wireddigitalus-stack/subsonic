@@ -178,10 +178,10 @@ const structuredData = {
         },
         {
           "@type": "Question",
-          "name": "What is the Subsonic Society Invitational and what is the cash purse?",
+          "name": "What is Subsonic Society Invitational and what is the cash purse?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The Subsonic Society Invitational is a premier two-day, 18-stage national precision rimfire championship taking place October 17–18, 2026 at The Hideout in Bristol, TN (3,420 FT elevation). It features an unprecedented $7,500 guaranteed cash purse presented by Modacam Custom Rifles, alongside over $15,000 in sponsor prize table gear."
+            "text": "Subsonic Society Invitational is a premier two-day, 18-stage national precision rimfire championship taking place October 17–18, 2026 at The Hideout in Bristol, TN (3,420 FT elevation). It features an unprecedented $7,500 guaranteed cash purse presented by Modacam Custom Rifles, alongside over $15,000 in sponsor prize table gear."
           }
         },
         {
@@ -202,7 +202,7 @@ const structuredData = {
         },
         {
           "@type": "Question",
-          "name": "Who is the title sponsor of the Subsonic Society Invitational?",
+          "name": "Who is the title sponsor of Subsonic Society Invitational?",
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Modacam Custom Rifles is the presenting title sponsor of the 2026 Subsonic Society Invitational, providing the $7,500 cash purse and presenting custom match-grade precision rimfire hardware on the championship prize table."

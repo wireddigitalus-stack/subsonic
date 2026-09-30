@@ -41,7 +41,7 @@ const ALL_18_STAGES = [
   { num: 15, name: "Support-Side Weak Hand Transition", dist: "90 YDS", rounds: 10, time: "90s", prop: "Standard PRS 2x4 Barricade", notes: "Shoot 5 strong side, 5 weak side. Zero support hand cant." },
   { num: 16, name: "Iron Maiden Flasher Matrix", dist: "160 – 250 YDS", rounds: 12, time: "90s", prop: "Low Window Prop", notes: "Engage 4 reactive steel flashers in left-to-right sequence." },
   { num: 17, name: "Steep Gully Prone Drop", dist: "380 YDS", rounds: 10, time: "90s", prop: "Down-Angle Prone Berm (-24° drop)", notes: "Calculate cosine angle reduction on your Kestrel ballistic profile." },
-  { num: 18, name: "The Subsonic Society Cup Finale", dist: "465 YDS", rounds: 10, time: "100s", prop: "Championship Finalist Platform", notes: "The ultimate proving ground. The round that rings this steel clinches the Subsonic Society Championship Cup." },
+  { num: 18, name: "Subsonic Society Cup Finale", dist: "465 YDS", rounds: 10, time: "100s", prop: "Championship Finalist Platform", notes: "The ultimate proving ground. The round that rings this steel clinches Subsonic Society Championship Cup." },
 ];
 
 const MOCK_LEADERBOARD = [

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
                 {
                   parts: [
                     {
-                      text: `You are the Subsonic Society AI Sentinel, an elite safety & policy moderation system for a precision rimfire shooting competition community.
+                      text: `You are Subsonic Society AI Sentinel, an elite safety & policy moderation system for a precision rimfire shooting competition community.
 Analyze this chat message from author role "${authorRole || "MEMBER"}":
 "${content}"
 

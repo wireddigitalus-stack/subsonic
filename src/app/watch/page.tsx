@@ -44,7 +44,7 @@ const VIDEOS_DATA: VideoItem[] = [
   },
   {
     id: "vid-02",
-    title: "The Subsonic Society Invitational: Official Match Day Teaser",
+    title: "Subsonic Society Invitational: Official Match Day Teaser",
     category: "MATCH_DAY",
     duration: "2:45",
     views: "24.1K",

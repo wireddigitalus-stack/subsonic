@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Contact Subsonic Society | Range Inquiries",
-    description: "Reach the Subsonic Society team for match, media, and sponsor support.",
+    description: "Reach Subsonic Society team for match, media, and sponsor support.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };

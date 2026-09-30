@@ -194,7 +194,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 ranking: "Appalachian Rimfire Competitor",
                 homeRange: "The Hideout, Bristol, TN",
                 podiums: 1,
-                featuredMatch: "The Subsonic Society Invitational 2026",
+                featuredMatch: "Subsonic Society Invitational 2026",
                 image: parsed.image || "/images/SS-RWB-LOGO.png",
                 actionPhoto: parsed.image || "/images/SS-RWB-LOGO.png",
                 quote: "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
@@ -334,7 +334,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
     jobTitle: shooter.division,
     memberOf: {
       "@type": "SportsOrganization",
-      name: "The Subsonic Society",
+      name: "Subsonic Society",
       url: "https://subsonic-omega.vercel.app",
     },
     award: shooter.accolades,

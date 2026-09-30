@@ -432,7 +432,7 @@ export function CommsAbuseModerator() {
               Live Comms Abuse Incidents ({filteredAlerts.length})
             </h3>
             <p className="text-xs text-slate-300 mt-0.5">
-              Audited real-time transmissions flagged or terminated by the Subsonic Society AI Sentinel.
+              Audited real-time transmissions flagged or terminated by Subsonic Society AI Sentinel.
             </p>
           </div>
 

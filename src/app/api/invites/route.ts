@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
 
     const smsText =
       tier === "PRO"
-        ? `You're invited as a VIP Pro Competitor to The Subsonic Society! Your invite code is: ${finalCode}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
-        : `You're invited to join The Subsonic Society! Your private access code is: ${finalCode}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
+        ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${finalCode}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
+        : `You're invited to join Subsonic Society! Your private access code is: ${finalCode}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
 
     return NextResponse.json({
       success: true,
@@ -167,8 +167,8 @@ export async function PUT(req: NextRequest) {
 
     const smsText =
       updatedInvite.tier === "PRO"
-        ? `You're invited as a VIP Pro Competitor to The Subsonic Society! Your invite code is: ${updatedInvite.code}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
-        : `You're invited to join The Subsonic Society! Your private access code is: ${updatedInvite.code}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
+        ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${updatedInvite.code}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
+        : `You're invited to join Subsonic Society! Your private access code is: ${updatedInvite.code}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
 
     return NextResponse.json({
       success: true,

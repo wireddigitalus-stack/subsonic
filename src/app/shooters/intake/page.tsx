@@ -60,7 +60,7 @@ export default function ShooterIntakePage() {
     homeRange: "Holston Range, Bristol, TN",
     podiums: 0,
     ranking: "",
-    featuredMatch: "The Subsonic Society Invitational 2026",
+    featuredMatch: "Subsonic Society Invitational 2026",
     quote: "",
     accolades: [] as string[],
     sponsors: [] as string[],
@@ -718,7 +718,7 @@ export default function ShooterIntakePage() {
             <ArrowRight className="w-5 h-5" />
           </button>
           <p className="text-[11px] font-mono text-slate-500 mt-3">
-            Submissions are instantly published to the Subsonic Society public roster.
+            Submissions are instantly published to Subsonic Society public roster.
           </p>
         </div>
       </form>

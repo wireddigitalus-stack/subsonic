@@ -23,7 +23,7 @@ export function VenueGuide() {
             THE BRISTOL, TENNESSEE <span className="amber-gradient-text">MOUNTAIN RIDGELINE</span>
           </h2>
           <p className="text-sm text-slate-300">
-            Set in the rugged Appalachian foothills of Sullivan County, the Subsonic Society range presents one of the most demanding wind and elevation proving grounds in North America.
+            Set in the rugged Appalachian foothills of Sullivan County, Subsonic Society range presents one of the most demanding wind and elevation proving grounds in North America.
           </p>
         </div>
 

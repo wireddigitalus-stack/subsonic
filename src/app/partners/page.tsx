@@ -32,7 +32,7 @@ const PARTNERS_DATA: Partner[] = [
   {
     id: "modacam-custom-rifles",
     name: "Modacam Custom Rifles",
-    role: "Presenting Partner — The Subsonic Society Invitational ($7,500 Cash Purse)",
+    role: "Presenting Partner — Subsonic Society Invitational ($7,500 Cash Purse)",
     badge: "Official Presenting Sponsor",
     description: "Modacam Custom Rifles represents the absolute zenith of precision rimfire gunsmithing. Hand-crafted in America with blueprinted actions, single-point cut-rifled match barrels, and meticulous chamber leades, Modacam rifles are engineered to dominate high-stakes PRS and NRL22 podiums.",
     tier: "PRESENTING",
@@ -174,7 +174,7 @@ export default function PartnersPage() {
               </h2>
 
               <p className="text-sm font-mono text-amber-400 font-bold">
-                Presenting Sponsor of The Subsonic Society Invitational $7,500 Cash Purse
+                Presenting Sponsor of Subsonic Society Invitational $7,500 Cash Purse
               </p>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
@@ -348,7 +348,7 @@ export default function PartnersPage() {
               <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
               <h4 className="text-base font-bold text-white">Partnership Inquiry Dispatched!</h4>
               <p className="text-xs text-slate-300 max-w-md mx-auto">
-                Thank you for supporting precision rimfire sports. A member of the Subsonic Society match directorate will contact you at <strong>{inquiryEmail}</strong> within 24 hours.
+                Thank you for supporting precision rimfire sports. A member of Subsonic Society match directorate will contact you at <strong>{inquiryEmail}</strong> within 24 hours.
               </p>
             </div>
           ) : (

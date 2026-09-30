@@ -43,7 +43,7 @@ interface MatchCard {
 const MATCHES_DATA: MatchCard[] = [
   {
     id: "subsonic-invitational-2026",
-    title: "The Subsonic Society Invitational",
+    title: "Subsonic Society Invitational",
     subtitle: "The Premier $7,500 Cash Purse Championship Presented by Modacam Custom Rifles",
     date: "November 13–15, 2026",
     location: "The Hideout Ridge Complex, Bristol, TN",
@@ -56,7 +56,7 @@ const MATCHES_DATA: MatchCard[] = [
     presentingPartner: "Modacam Custom Rifles",
     status: "FILLING",
     tier: "INVITATIONAL",
-    description: "The crown jewel of the Subsonic Society calendar. 18 stages across steep Appalachian terrain with extreme long-range subsonic engagements out to 465 yards. Solid cash purse payouts for Top 5 Open, Top Production, and Senior Divisions.",
+    description: "The crown jewel of Subsonic Society calendar. 18 stages across steep Appalachian terrain with extreme long-range subsonic engagements out to 465 yards. Solid cash purse payouts for Top 5 Open, Top Production, and Senior Divisions.",
     featured: true,
   },
   {
@@ -193,7 +193,7 @@ export default function MatchesPage() {
             </div>
           </div>
 
-          {/* Marquee Featured Match: The Subsonic Society Invitational */}
+          {/* Marquee Featured Match: Subsonic Society Invitational */}
           <div className="pt-4">
             <div className="ios-glass rounded-3xl p-6 sm:p-8 border-2 border-amber-500/50 shadow-tactical-glow relative overflow-hidden bg-gradient-to-r from-amber-500/10 via-black/40 to-black/60">
               <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
@@ -218,7 +218,7 @@ export default function MatchesPage() {
                 </div>
 
                 <h2 className="text-2xl sm:text-4xl font-black text-white leading-tight">
-                  THE SUBSONIC SOCIETY INVITATIONAL
+                  SUBSONIC SOCIETY INVITATIONAL
                 </h2>
 
                 <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono flex items-center gap-2">
