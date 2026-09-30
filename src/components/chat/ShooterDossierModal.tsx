@@ -46,7 +46,13 @@ export function ShooterDossierModal({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
             <span className="font-mono text-[11px] font-bold text-amber-400 tracking-wider uppercase">
-              {isRO ? "AUTONOMOUS AI RANGE OFFICER DOSSIER" : "COMPETITOR DOSSIER"}
+              {isRO 
+                ? "AUTONOMOUS AI RANGE OFFICER DOSSIER" 
+                : isMasterOwner 
+                ? "LEAD SYSTEMS ENGINEER & MASTER ADMIN" 
+                : isOwnerAdmin 
+                ? "OWNER ADMIN DOSSIER" 
+                : "COMPETITOR DOSSIER"}
             </span>
           </div>
           <button
@@ -70,7 +76,7 @@ export function ShooterDossierModal({
               ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
               : "bg-black/60 text-amber-400 border-white/15"
           }`}>
-            {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
+            {isRO ? "🤖" : isMasterOwner ? "⚡" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
           </div>
 
           <div className="min-w-0 flex-1">
@@ -93,7 +99,7 @@ export function ShooterDossierModal({
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {isRO ? "🤖 AI RANGE OFFICER" : shooter.badgeText || shooter.role}
+                {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "💻 LEAD SYSTEMS ENGINEER" : shooter.badgeText || shooter.role}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
@@ -104,35 +110,72 @@ export function ShooterDossierModal({
           </div>
         </div>
 
-        {/* Division & Specs */}
+        {/* Division & Tech / Rifle Specs */}
         <div className="space-y-2 text-xs font-mono">
-          {shooter.division && (
-            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between">
-              <span className="text-slate-400 uppercase text-[10px]">Division / Class</span>
-              <span className="font-bold text-slate-200">{shooter.division}</span>
-            </div>
-          )}
-
-          {shooter.rifleSetup && (
-            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-              <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase">
-                <span className="flex items-center gap-1">
-                  <Crosshair className="w-3 h-3 text-amber-400" />
-                  Primary Rifle Spec
-                </span>
-                <span className="text-emerald-400">Match Ready</span>
+          {isMasterOwner ? (
+            <>
+              <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 flex items-center justify-between">
+                <span className="text-amber-400 font-bold uppercase text-[10px]">Role / System Function</span>
+                <span className="font-bold text-white">Lead Systems Engineer &amp; Master Admin</span>
               </div>
-              <p className="text-white text-xs font-bold truncate">{shooter.rifleSetup}</p>
-            </div>
+
+              <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-amber-400 uppercase">
+                  <span className="flex items-center gap-1 font-bold">
+                    <ShieldCheck className="w-3 h-3 text-amber-400" />
+                    Infrastructure &amp; Tech Stack
+                  </span>
+                  <span className="text-emerald-400 font-bold">Non-Shooter • Full Admin</span>
+                </div>
+                <p className="text-white text-xs font-bold truncate">Server Core • Scoring Relays • Telemetry Uplinks • Encrypted Comms</p>
+              </div>
+            </>
+          ) : (
+            <>
+              {shooter.division && (
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between">
+                  <span className="text-slate-400 uppercase text-[10px]">Division / Class</span>
+                  <span className="font-bold text-slate-200">{shooter.division}</span>
+                </div>
+              )}
+
+              {shooter.rifleSetup && (
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase">
+                    <span className="flex items-center gap-1">
+                      <Crosshair className="w-3 h-3 text-amber-400" />
+                      Primary Rifle Spec
+                    </span>
+                    <span className="text-emerald-400">Match Ready</span>
+                  </div>
+                  <p className="text-white text-xs font-bold truncate">{shooter.rifleSetup}</p>
+                </div>
+              )}
+            </>
           )}
 
-          {shooter.bio && (
-            <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-              <span className="text-[10px] text-slate-400 uppercase font-mono">Profile Brief</span>
-              <p className="text-slate-300 text-xs leading-relaxed font-sans">{shooter.bio}</p>
-            </div>
-          )}
+          <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
+            <span className="text-[10px] text-slate-400 uppercase font-mono">Profile Brief</span>
+            <p className="text-slate-300 text-xs leading-relaxed font-sans">
+              {isMasterOwner
+                ? "Lead Systems Engineer & Master Owner for Subsonic Society and The Hideout Invitational. Match architecture, network engineering, and telemetry infrastructure across the entire system."
+                : shooter.bio || "Registered competitor."}
+            </p>
+          </div>
         </div>
+
+        {/* Master Owner Tech Admin Highlight */}
+        {isMasterOwner && (
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-300">
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span>Full System Architecture &amp; Operations</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-normal">
+              Rob Neilson oversees all tech, systems engineering, live network infrastructure, database syncing, and scoring telemetry for the entire Subsonic Society network.
+            </p>
+          </div>
+        )}
 
         {/* RO Special Capabilities / Direct Prompt shortcuts */}
         {isRO && (

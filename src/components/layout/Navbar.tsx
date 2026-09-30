@@ -58,9 +58,9 @@ export function Navbar() {
             (parsed.name && parsed.name.toLowerCase().includes("neilson"))
           ) {
             parsed.callsign = "RADAR";
-            parsed.rifleSetup = "Smart Systems Integrations";
-            parsed.division = "Lead Developer & Tech Advisor";
-            parsed.badgeText = "DEV ADVISOR";
+            parsed.rifleSetup = "Systems & Infrastructure Architecture (Non-Shooter)";
+            parsed.division = "Lead Systems Engineer & Master Admin";
+            parsed.badgeText = "SYSTEMS ENGINEER";
             parsed.member_id = "SS-2026-0001";
             parsed.role = "MASTER_OWNER";
             try {

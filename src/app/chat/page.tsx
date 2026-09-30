@@ -117,11 +117,11 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     callsign: "RADAR",
     name: "Rob Neilson",
     role: "MASTER_OWNER",
-    badgeText: "DEV ADVISOR",
-    division: "Lead Developer & Tech Advisor",
+    badgeText: "SYSTEMS ENGINEER",
+    division: "Lead Systems Engineer & Master Admin",
     status: "online",
-    bio: "Lead Developer & Tech Advisor for Subsonic Society and The Hideout Invitational. Match systems architecture & network tech.",
-    rifleSetup: "Smart Systems Integrations",
+    bio: "Lead Systems Engineer & Master Owner for Subsonic Society and The Hideout Invitational. Match architecture, network engineering, and telemetry infrastructure.",
+    rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
   },
   {
     id: "dm_wyatt",
@@ -514,9 +514,9 @@ export default function ChatPage() {
               parsedShooter.name = "Rob Neilson";
               parsedShooter.callsign = "RADAR";
               parsedShooter.role = "MASTER_OWNER";
-              parsedShooter.division = "Lead Developer & Tech Advisor";
-              parsedShooter.badgeText = "DEV ADVISOR";
-              parsedShooter.rifleSetup = "Smart Systems Integrations";
+              parsedShooter.division = "Lead Systems Engineer & Master Admin";
+              parsedShooter.badgeText = "SYSTEMS ENGINEER";
+              parsedShooter.rifleSetup = "Systems & Infrastructure Architecture (Non-Shooter)";
               try {
                 localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
                 localStorage.setItem("subsonic_member_profile", JSON.stringify({
@@ -524,8 +524,8 @@ export default function ChatPage() {
                   full_name: "Rob Neilson",
                   callsign: "RADAR",
                   state: "TN",
-                  experience_level: "Lead Developer & Tech Advisor",
-                  rifle_setup: "Smart Systems Integrations",
+                  experience_level: "Lead Systems Engineer & Master Admin",
+                  rifle_setup: "Systems & Infrastructure Architecture (Non-Shooter)",
                   created_at: "2026-07-04T12:00:00Z"
                 }));
               } catch {}

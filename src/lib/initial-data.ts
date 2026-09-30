@@ -330,9 +330,9 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       name: "Rob Neilson",
       callsign: "RADAR",
       role: "MASTER_OWNER",
-      badgeText: "DEV ADVISOR",
-      division: "Lead Developer & Tech Advisor",
-      rifleSetup: "Smart Systems Integrations",
+      badgeText: "SYSTEMS ENGINEER",
+      division: "Lead Systems Engineer & Master Admin",
+      rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
     },
     content:
       "Telemetry, scoring relays, and point-to-point direct comms are fully online across all 20 stages at The Hideout (3,420 FT). If any squad needs comms assistance or match network support during the weekend, ping me on direct line [RADAR].",

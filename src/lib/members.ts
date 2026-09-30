@@ -22,13 +22,13 @@ export const SEED_MEMBERS: SocietyMember[] = [
     callsign: "RADAR",
     email: "rob@subsonicsociety.com",
     state: "TN",
-    experience_level: "Lead Developer & Tech Advisor",
-    rifle_setup: "Smart Systems Integrations",
-    interests: ["Smart Systems Integrations", "Dev Operations", "AI & Telemetry", "Private Comms", "Tech Advisory"],
+    experience_level: "Lead Systems Engineer & Master Admin",
+    rifle_setup: "Systems & Infrastructure Architecture (Non-Shooter)",
+    interests: ["Systems Engineering", "Network Infrastructure", "Telemetry Uplinks", "Private Encrypted Comms", "Server Architecture", "Smart Systems Integrations"],
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "MASTER_OWNER",
-    notes: "Master Owner, Lead Developer & Tech Advisor — Smart Systems Integrations (Callsign: RADAR)",
+    notes: "Master Owner, Lead Systems Engineer & Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)",
   },
   {
     member_id: "SS-2026-0002",
@@ -275,8 +275,9 @@ export function getMembersFromStorage(): SocietyMember[] {
       rob.full_name = "Rob Neilson";
       rob.role = "MASTER_OWNER";
       rob.callsign = "RADAR";
-      rob.rifle_setup = "Smart Systems Integrations";
-      rob.experience_level = "Lead Developer & Tech Advisor";
+      rob.rifle_setup = "Systems & Infrastructure Architecture (Non-Shooter)";
+      rob.experience_level = "Lead Systems Engineer & Master Admin";
+      rob.notes = "Master Owner, Lead Systems Engineer & Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)";
       memberMap.set(rob.member_id.toLowerCase(), rob);
     }
 
