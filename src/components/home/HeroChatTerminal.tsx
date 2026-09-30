@@ -151,11 +151,9 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
       scrollRef.current.scrollTop = 0;
     }
 
+    // Sequence: Stream Allen Hurley's welcome message, reveal the Claim Invitation card, and stop on that card
     const sequence = [
-      { delay: 100, typingDelay: 500, msg: STREAM_ITEMS[0], typingWho: "Match Director Allen Hurley" },
-      { delay: 2400, typingDelay: 700, msg: STREAM_ITEMS[1], typingWho: "Wyatt 'Ghost' Sterling" },
-      { delay: 4400, typingDelay: 700, msg: STREAM_ITEMS[2], typingWho: "Kendra 'Coldbore' Cross" },
-      { delay: 6400, typingDelay: 800, msg: STREAM_ITEMS[3], typingWho: "Subsonic Sentinel AI" },
+      { delay: 100, typingDelay: 600, msg: STREAM_ITEMS[0], typingWho: "Match Director Allen Hurley" },
     ];
 
     sequence.forEach(({ delay, typingDelay, msg, typingWho }) => {
@@ -172,11 +170,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
         setTypingName(null);
         setMessages((prev) => [...prev, msg]);
         if (soundEnabled) {
-          if (msg.sender.role === "AI_ASSISTANT") {
-            playBotTelemetryChirp();
-          } else {
-            playRealCommsChirp();
-          }
+          playRealCommsChirp();
         }
       }, delay + typingDelay);
       timers.push(t2);
@@ -186,7 +180,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
     const tInterceptor = setTimeout(() => {
       setShowInterceptor(true);
       if (soundEnabled) playBotTelemetryChirp();
-    }, 1000);
+    }, 850);
     timers.push(tInterceptor);
 
     return () => {
