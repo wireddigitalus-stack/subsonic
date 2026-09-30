@@ -127,7 +127,7 @@ export function ShooterDossierModal({
                   </span>
                   <span className="text-emerald-400 font-bold">Non-Shooter • Full Admin</span>
                 </div>
-                <p className="text-white text-xs font-bold truncate">Server Core • Scoring Relays • Telemetry Uplinks • Encrypted Comms</p>
+                <p className="text-white text-xs font-bold truncate">Server Core • Telemetry Uplinks • Encrypted Comms</p>
               </div>
             </>
           ) : (
@@ -172,7 +172,7 @@ export function ShooterDossierModal({
               <span>Full System Architecture &amp; Operations</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-normal">
-              Rob Neilson oversees all tech, systems engineering, live network infrastructure, database syncing, and scoring telemetry for the entire Subsonic Society network.
+              Rob Neilson oversees all tech, systems engineering, live network infrastructure, database syncing, and system telemetry for the entire Subsonic Society network.
             </p>
           </div>
         )}

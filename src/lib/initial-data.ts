@@ -335,7 +335,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
       rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
     },
     content:
-      "Telemetry, scoring relays, and point-to-point direct comms are fully online across all 20 stages at The Hideout (3,420 FT). If any squad needs comms assistance or match network support during the weekend, ping me on direct line [RADAR].",
+      "Telemetry relays and point-to-point direct comms are fully online across all 20 stages at The Hideout (3,420 FT). If any squad needs comms assistance or match network support during the weekend, ping me on direct line [RADAR].",
     timestamp: "09:45 AM",
     reactions: [
       { emoji: "👑", count: 31, users: ["u1", "u2", "u3", "u4", "u5"] },
