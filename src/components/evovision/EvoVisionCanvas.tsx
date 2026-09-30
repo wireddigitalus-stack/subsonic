@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize2, X, Activity } from "lucide-react";
 import { EvoNode, EvoLink, EVO_NODES, EVO_LINKS, EVO_CLUSTERS } from "@/lib/evovision-data";
 import {
   REAL_STARS,
@@ -138,6 +138,20 @@ export function EvoVisionCanvas({
   });
   const showConstellationsRef = useRef<boolean>(showConstellations);
   showConstellationsRef.current = showConstellations;
+
+  // Real Constellation Stars toggle
+  const [showStars, setShowStars] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("subsonic_show_stars");
+      if (saved !== null) return saved === "true";
+    }
+    return true;
+  });
+  const showStarsRef = useRef<boolean>(showStars);
+  showStarsRef.current = showStars;
+
+  // Live Constellation & Celestial Stats HUD overlay toggle
+  const [showConstellationStats, setShowConstellationStats] = useState<boolean>(false);
 
   // Live Eastern Time tracking (updates every 1s for the UI meter)
   const [etInfo, setEtInfo] = useState<EasternTimeInfo>(() => getEasternTimeInfo());
@@ -541,7 +555,8 @@ export function EvoVisionCanvas({
       }
 
       // 2. Draw Real Constellation Stars with Accurate Magnitudes & Spectral Colors
-      REAL_STARS.forEach((star) => {
+      if (showStarsRef.current) {
+        REAL_STARS.forEach((star) => {
         const pStar = rotateCelestialStar(star.x, star.y);
         // Magnitude formula: magnitude 0 is largest, magnitude 4.5 is smallest
         const baseRadius = Math.max(1.3, (4.5 - star.magnitude) * 0.95 + 1.2) * pStar.scale;
@@ -579,6 +594,7 @@ export function EvoVisionCanvas({
         ctx.arc(pStar.px, pStar.py, r, 0, Math.PI * 2);
         ctx.fill();
       });
+      }
 
       // ─── 1B. Periodic Shooting Stars ──────────────────────────────
       if (time >= nextShootingStarTimeRef.current) {
@@ -1637,74 +1653,200 @@ export function EvoVisionCanvas({
         </div>
       )}
 
-      {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Toggle ─── */}
-      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
-        {/* Day/Night Solar & Lunar Track */}
-        <div className="flex items-center gap-2.5">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold tracking-wider">
-              <span className={`w-1.5 h-1.5 rounded-full ${etInfo.isDaylight ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"}`} />
-              <span className={etInfo.isDaylight ? "text-amber-300 font-extrabold" : "text-indigo-300 font-extrabold"}>
-                {etInfo.isDaylight ? "☀️ DAYLIGHT GLIDE" : `🌙 NIGHT GLIDE (${etInfo.moonPhaseIcon})`}
-              </span>
-              <span className="text-slate-400 font-normal">| {etInfo.timeString24}</span>
-            </div>
-
-            {/* 24-Hour Orbital Meter Bar */}
-            <div className="relative w-36 sm:w-44 h-2 mt-1 rounded-full bg-slate-900 border border-white/10 overflow-hidden flex items-center">
-              {/* Day / Night zones gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-amber-950/70 to-indigo-950 opacity-60" />
-              {/* Midday guide line (12:00) */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
-
-              {/* Sun Marker */}
-              <div
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
-                style={{ left: `${Math.max(4, Math.min(96, etInfo.sunProgress * 100))}%` }}
-                title={`Sun Position: ${Math.round(etInfo.sunProgress * 24)}h (${etInfo.isDaylight ? "Day" : "Night"})`}
-              >
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] border border-yellow-200" />
+      {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Controls ─── */}
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[calc(100vw-24px)] pointer-events-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+          {/* Day/Night Solar & Lunar Track */}
+          <div className="flex items-center gap-2.5">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold tracking-wider">
+                <span className={`w-1.5 h-1.5 rounded-full ${etInfo.isDaylight ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"}`} />
+                <span className={etInfo.isDaylight ? "text-amber-300 font-extrabold" : "text-indigo-300 font-extrabold"}>
+                  {etInfo.isDaylight ? "☀️ DAYLIGHT GLIDE" : `🌙 NIGHT GLIDE (${etInfo.moonPhaseIcon})`}
+                </span>
+                <span className="text-slate-400 font-normal">| {etInfo.timeString24}</span>
               </div>
 
-              {/* Moon Marker */}
-              <div
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
-                style={{ left: `${Math.max(4, Math.min(96, etInfo.moonProgress * 100))}%` }}
-                title={`Moon Position: ${etInfo.moonPhaseName}`}
-              >
-                <div className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_6px_#e2e8f0] border border-cyan-300/60" />
+              {/* 24-Hour Orbital Meter Bar */}
+              <div className="relative w-36 sm:w-44 h-2 mt-1 rounded-full bg-slate-900 border border-white/10 overflow-hidden flex items-center">
+                {/* Day / Night zones gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-amber-950/70 to-indigo-950 opacity-60" />
+                {/* Midday guide line (12:00) */}
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
+
+                {/* Sun Marker */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
+                  style={{ left: `${Math.max(4, Math.min(96, etInfo.sunProgress * 100))}%` }}
+                  title={`Sun Position: ${Math.round(etInfo.sunProgress * 24)}h (${etInfo.isDaylight ? "Day" : "Night"})`}
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] border border-yellow-200" />
+                </div>
+
+                {/* Moon Marker */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
+                  style={{ left: `${Math.max(4, Math.min(96, etInfo.moonProgress * 100))}%` }}
+                  title={`Moon Position: ${etInfo.moonPhaseName}`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_6px_#e2e8f0] border border-cyan-300/60" />
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Celestial Controls: LINES, STARS, STATS */}
+          <div className="border-t sm:border-t-0 sm:border-l border-white/10 pt-1.5 sm:pt-0 sm:pl-2.5 flex items-center gap-1.5 flex-wrap">
+            {/* Lines Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowConstellations((prev) => {
+                  const next = !prev;
+                  try {
+                    localStorage.setItem("subsonic_show_constellations", String(next));
+                  } catch {}
+                  return next;
+                });
+              }}
+              className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                showConstellations
+                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+              }`}
+              title="Toggle Constellation connect-the-dots lines and names"
+            >
+              <span className="text-[11px]">✨</span>
+              <span>LINES:</span>
+              <span className={showConstellations ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
+                {showConstellations ? "ON" : "OFF"}
+              </span>
+            </button>
+
+            {/* Stars Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowStars((prev) => {
+                  const next = !prev;
+                  try {
+                    localStorage.setItem("subsonic_show_stars", String(next));
+                  } catch {}
+                  return next;
+                });
+              }}
+              className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                showStars
+                  ? "bg-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+              }`}
+              title="Toggle Real Constellation Stars layer on or off"
+            >
+              <span className="text-[11px]">⭐</span>
+              <span>STARS:</span>
+              <span className={showStars ? "text-amber-300 font-extrabold" : "text-slate-500"}>
+                {showStars ? "ON" : "OFF"}
+              </span>
+            </button>
+
+            {/* Constellation Stats Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowConstellationStats((prev) => !prev)}
+              className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                showConstellationStats
+                  ? "bg-purple-500/25 text-purple-200 border-purple-400/60 shadow-[0_0_14px_rgba(168,85,247,0.35)]"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+              }`}
+              title="Toggle Constellation & Celestial Live Astronomical Stats Panel"
+            >
+              <Activity className="w-3 h-3 text-purple-400" />
+              <span>STATS:</span>
+              <span className={showConstellationStats ? "text-purple-300 font-extrabold" : "text-slate-500"}>
+                {showConstellationStats ? "ON" : "OFF"}
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Constellation "Connect the Dots" Toggle */}
-        <div className="border-t sm:border-t-0 sm:border-l border-white/10 pt-1.5 sm:pt-0 sm:pl-2.5 flex items-center">
-          <button
-            type="button"
-            onClick={() => {
-              setShowConstellations((prev) => {
-                const next = !prev;
-                try {
-                  localStorage.setItem("subsonic_show_constellations", String(next));
-                } catch {}
-                return next;
-              });
-            }}
-            className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
-              showConstellations
-                ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-            title="Toggle Constellation connect-the-dots lines and names"
-          >
-            <span className="text-xs">✨</span>
-            <span>LINES:</span>
-            <span className={showConstellations ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
-              {showConstellations ? "ON" : "OFF"}
-            </span>
-          </button>
-        </div>
+        {/* Live Constellation & Celestial Telemetry Popover Card */}
+        {showConstellationStats && (
+          <div className="w-80 sm:w-[380px] p-3 rounded-2xl bg-black/95 backdrop-blur-2xl border border-purple-500/30 shadow-[0_0_35px_rgba(168,85,247,0.25)] text-white space-y-2.5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                <span className="text-[11px] font-mono font-extrabold tracking-wider text-purple-200">
+                  CONSTELLATION & CELESTIAL TELEMETRY
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowConstellationStats(false)}
+                className="w-5 h-5 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer"
+                title="Close Stats"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Telemetry Metric Grid */}
+            <div className="grid grid-cols-2 gap-2 font-mono text-[10px]">
+              <div className="p-2 rounded-xl bg-purple-950/20 border border-purple-500/20">
+                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Cataloged Formations</div>
+                <div className="text-sm font-extrabold text-purple-300 mt-0.5">11 Major Constellations</div>
+                <div className="text-[8px] text-slate-400 mt-0.5">Orion, Ursa Major, Cassiopeia, etc.</div>
+              </div>
+
+              <div className="p-2 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
+                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Navigational Beacons</div>
+                <div className="text-sm font-extrabold text-cyan-300 mt-0.5">52 Calibrated Stars</div>
+                <div className="text-[8px] text-slate-400 mt-0.5">Magnitudes 0.0 to 4.5 • Spectral Class</div>
+              </div>
+
+              <div className="p-2 rounded-xl bg-amber-950/20 border border-amber-500/20">
+                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Diurnal Earth Velocity</div>
+                <div className="text-sm font-extrabold text-amber-300 mt-0.5">15.041° / Hour</div>
+                <div className="text-[8px] text-slate-400 mt-0.5">Angle: {((etInfo.celestialAngleRad * 180 / Math.PI) % 360).toFixed(1)}° RA Synced</div>
+              </div>
+
+              <div className="p-2 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
+                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Celestial Pivot Point</div>
+                <div className="text-sm font-extrabold text-indigo-300 mt-0.5">Polaris (α UMi)</div>
+                <div className="text-[8px] text-slate-400 mt-0.5">Dec +89° 15′ 51″ • True North</div>
+              </div>
+            </div>
+
+            {/* Constellation Index List */}
+            <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10 space-y-1">
+              <div className="text-[9px] font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                <span>Active Tracked Constellations</span>
+                <span className="text-purple-400">11 Cataloged</span>
+              </div>
+              <div className="flex flex-wrap gap-1 pt-1">
+                {[
+                  "Ursa Major", "Orion", "Cassiopeia", "Cygnus",
+                  "Lyra", "Taurus", "Canis Major", "Leo",
+                  "Pegasus", "Boötes", "Polaris"
+                ].map((name) => (
+                  <span
+                    key={name}
+                    className="px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[9px] font-mono text-purple-200"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Real-time Status Footer */}
+            <div className="text-[9px] font-mono text-slate-400 flex items-center justify-between border-t border-white/5 pt-1.5 px-0.5">
+              <span>Time Datum: <span className="text-white font-bold">{etInfo.timeString24} ET</span> (Bristol, TN)</span>
+              <span className={etInfo.isDaylight ? "text-amber-400" : "text-indigo-400"}>
+                {etInfo.isDaylight ? "☀️ Daylight" : "🌙 Nighttime"}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ─── Floating Tactical Zoom Controls HUD ───────────────── */}
