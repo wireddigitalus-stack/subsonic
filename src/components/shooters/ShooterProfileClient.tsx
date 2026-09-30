@@ -448,8 +448,8 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/[0.05] rounded-full blur-[120px] pointer-events-none" />
 
           {/* 1. Official Tournament Header Ribbon (Print-Exact) */}
-          <div className="relative z-10 border-b border-amber-500/30 bg-black/70 backdrop-blur-md px-6 py-4 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+          <div className="relative z-10 border-b border-amber-500/30 bg-black/70 backdrop-blur-md px-4 sm:px-6 py-3.5 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 text-center md:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 sm:gap-4">
               <div className="w-10 h-10 rounded-full border border-amber-400/40 overflow-hidden bg-black p-1 shrink-0 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
                 <img
                   src="/images/SS-RWB-LOGO.png"
@@ -458,26 +458,26 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 />
               </div>
               <div>
-                <div className="text-[10px] sm:text-xs font-mono font-bold tracking-[0.25em] text-amber-400 uppercase">
+                <div className="text-[10px] sm:text-xs font-mono font-bold tracking-[0.18em] sm:tracking-[0.25em] text-amber-400 uppercase">
                   SUBSONIC SOCIETY INVITATIONAL
                 </div>
-                <div className="text-xl sm:text-2xl font-black italic tracking-wider chrome-metallic-text uppercase">
+                <div className="text-lg sm:text-2xl font-black italic tracking-wider chrome-metallic-text uppercase">
                   SHOOTER SPOTLIGHT
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-mono tracking-widest text-slate-400 uppercase border border-white/10 px-4 py-1.5 rounded-full bg-white/[0.02]">
+            <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 text-[9px] sm:text-xs font-mono tracking-wider sm:tracking-widest text-slate-300 uppercase border border-white/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/[0.03] max-w-full text-center">
               <span className="text-amber-400 font-bold">PRECISION</span>
-              <span>•</span>
+              <span className="text-slate-600">•</span>
               <span className="text-white font-bold">COMMUNITY</span>
-              <span>•</span>
-              <span className="text-blue-400 font-bold">A HIGHER STANDARD</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-blue-400 font-bold whitespace-nowrap">A HIGHER STANDARD</span>
             </div>
           </div>
 
           {/* Main Poster Body Grid */}
-          <div className="relative z-10 p-6 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="relative z-10 p-4 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
             
             {/* ─── LEFT FLANK: Watermark Badge + Vertical Tactical Rail ───── */}
             <div className="hidden lg:flex lg:col-span-2 flex-col items-center justify-between self-stretch py-4 border-r border-white/10 relative">
@@ -513,7 +513,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             </div>
 
             {/* ─── CENTER STAGE: Shooter Portrait / Card Showcase ─────────── */}
-            <div className="lg:col-span-4 flex flex-col items-center justify-center relative">
+            <div className="lg:col-span-4 flex flex-col items-center justify-center relative w-full">
               
               {/* Outer Golden / Metallic Rim Frame */}
               <div className="relative w-full max-w-sm sm:max-w-md aspect-[3/4] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.35)] bg-gradient-to-b from-zinc-900 to-black group">
@@ -546,11 +546,11 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
                 {/* Bottom Overlay on Photo: Callsign + Verified Division */}
                 <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-amber-500 text-black font-mono font-black text-xs uppercase tracking-wider">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-amber-500 text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider">
                       CALLSIGN: {shooter.callsign}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-md bg-blue-500/30 border border-blue-400/40 text-blue-300 font-mono text-[11px]">
+                    <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-blue-500/30 border border-blue-400/40 text-blue-300 font-mono text-[10px] sm:text-[11px] truncate max-w-[200px]">
                       {shooter.division}
                     </span>
                   </div>
