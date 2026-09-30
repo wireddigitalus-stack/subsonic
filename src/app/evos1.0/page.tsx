@@ -82,16 +82,30 @@ export default function EvosDashboardPage() {
   return (
     <div spellCheck={false} className="relative w-screen h-screen overflow-hidden bg-[#020409] text-white font-mono flex flex-col select-none">
       {/* ─── TOP CYBER HEADER BAR ────────────────────────────────────── */}
-      <header className="shrink-0 h-14 border-b border-cyan-500/20 bg-black/70 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between z-20">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <Link
-            href="/chat"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 hover:text-white transition-all group"
-            title="Return to SubSonic Live Chat"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline font-bold">Back to Chat</span>
-          </Link>
+      <header className="shrink-0 min-h-14 pt-[env(safe-area-inset-top,0px)] border-b border-cyan-500/20 bg-black/70 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between z-20 py-2 sm:py-0">
+        <div className="flex items-center gap-2.5 sm:gap-4 flex-wrap">
+          {/* Breadcrumb Navigation: Home & Chat */}
+          <div className="flex items-center gap-1.5">
+            <Link
+              href="/"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 hover:text-white transition-all group active:scale-95"
+              title="Return to Main Portal"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span className="font-bold">HOME</span>
+            </Link>
+
+            <span className="text-white/20 text-xs">/</span>
+
+            <Link
+              href="/chat"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs text-amber-300 hover:text-amber-200 transition-all active:scale-95"
+              title="Open Squad Comms"
+            >
+              <span className="text-amber-400 text-[10px]">💬</span>
+              <span className="font-bold">COMMS</span>
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#06B6D4]" />

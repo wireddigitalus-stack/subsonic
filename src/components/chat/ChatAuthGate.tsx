@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, AlertTriangle, Unlock, ChevronRight, Scale } from "lucide-react";
+import { Lock, AlertTriangle, Unlock, ChevronRight, ChevronLeft, Scale } from "lucide-react";
 
 export interface ChatAuthGateProps {
   authShake: boolean;
@@ -25,8 +25,27 @@ export function ChatAuthGate({
   handleUnlockRoom,
 }: ChatAuthGateProps) {
   return (
-    <div className="min-h-[75vh] flex items-center justify-center px-4 py-8">
-      <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
+    <div className="min-h-screen flex flex-col justify-between px-4 py-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
+      {/* Top Mobile/Headless PWA Breadcrumb Navigation */}
+      <div className="w-full max-w-md mx-auto mb-3 flex items-center justify-between">
+        <Link
+          href="/"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-mono text-slate-300 hover:text-white transition-all group"
+          title="Return to Main Portal"
+        >
+          <ChevronLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+          <span className="font-bold">HOME</span>
+          <span className="text-white/30">/</span>
+          <span className="text-amber-400 font-extrabold">COMMS</span>
+        </Link>
+
+        <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest px-2.5 py-1 rounded-lg bg-black/40 border border-white/5">
+          RESTRICTED NET
+        </span>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center">
+        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
           <Image
             src="/images/SS-RWB-LOGO.png"
@@ -136,6 +155,7 @@ export function ChatAuthGate({
             </Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

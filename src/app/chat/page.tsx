@@ -38,6 +38,7 @@ import {
   Sliders,
   UserCheck,
   ChevronRight,
+  ChevronLeft,
   ChevronDown,
   ArrowLeft,
   ExternalLink,
@@ -1419,19 +1420,56 @@ export default function ChatPage() {
           : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden bg-[#07090E]"
       }
     >
+      {/* Floating Escape Breadcrumb for Fullscreen Handheld Mode */}
+      {isFullscreen && (
+        <div className="fixed top-[max(0.6rem,env(safe-area-inset-top,0px))] left-3 z-[80] flex items-center gap-2 pointer-events-auto">
+          <Link
+            href="/"
+            className="px-2.5 py-1.5 rounded-xl bg-black/90 backdrop-blur-xl border border-white/20 text-slate-200 hover:text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-2xl active:scale-95 transition-all"
+            title="Return to Main Portal"
+          >
+            <ChevronLeft className="w-4 h-4 text-amber-400" />
+            <span>HOME</span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(false)}
+            className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 backdrop-blur-xl border border-amber-400/50 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-2xl active:scale-95 transition-all"
+            title="Exit Fullscreen Mode"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+            <span>EXIT FULL</span>
+          </button>
+        </div>
+      )}
+
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
-        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-2 sm:pt-3">
-        <div className="ios-glass rounded-2xl p-2.5 sm:p-3 border border-amber-500/20 shadow-tactical-glow">
-          {/* Mobile Top Bar: Single clean, zero-clutter row */}
-          <div className="flex sm:hidden items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
+        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] sm:pt-3">
+        <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-amber-500/20 shadow-tactical-glow">
+          {/* Mobile Top Bar: Tactical Breadcrumbs + Quick Hub Switcher + Callsign + Actions */}
+          <div className="flex sm:hidden items-center justify-between gap-1.5">
+            <div className="flex items-center gap-1 min-w-0">
+              {/* Tactical Breadcrumb Trail: Direct Home Back Navigation */}
               <Link
                 href="/"
-                title="Return to Main Site"
-                className="w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0 transition-colors"
+                title="Return to Main Portal"
+                className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all shrink-0"
               >
-                <ChevronDown className="w-4 h-4 text-amber-400 -rotate-90" />
+                <ChevronLeft className="w-4 h-4 text-amber-400 -mr-0.5" />
+                <span className="font-extrabold text-[11px] text-slate-200">HOME</span>
+                <span className="text-white/30 text-[10px]">/</span>
+                <span className="text-amber-400 font-extrabold text-[11px]">COMMS</span>
+              </Link>
+
+              {/* Quick Link to EVOS Holographic Net */}
+              <Link
+                href="/evos1.0"
+                className="hidden xs:flex items-center gap-1 px-1.5 py-1 rounded-xl bg-cyan-950/50 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold shrink-0 transition-all active:scale-95"
+                title="Switch to EVOS 1.0 Holographic Net"
+              >
+                <span className="text-cyan-400 text-xs">⚡</span>
+                <span>EVOS</span>
               </Link>
 
               {/* Shooter Callsign & Pass Pill */}
@@ -1444,41 +1482,41 @@ export default function ChatPage() {
                   setIsProfileModalOpen(true);
                 }}
                 data-telemetry="chat_mobile_view_pass"
-                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0"
+                className="flex items-center gap-1 px-1.5 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
+                title="View Shooter Pass"
               >
-                <div className="w-5 h-5 rounded-md bg-amber-500 text-black font-bold flex items-center justify-center text-[10px] shrink-0">
+                <div className="w-4 h-4 rounded bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] shrink-0">
                   {shooterProfile.callsign.slice(0, 2)}
                 </div>
-                <span className="font-mono font-bold text-amber-300 text-xs truncate max-w-[80px]">
+                <span className="font-mono font-bold text-amber-300 text-[10px] truncate max-w-[62px]">
                   {shooterProfile.callsign}
                 </span>
-                <QrCode className="w-3 h-3 text-emerald-400 shrink-0" />
+                <QrCode className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
               </button>
             </div>
 
             {/* Mobile Actions: Terms, Fullscreen, Audio, Lock */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => {
                   setIsTermsModalOpen(true);
                   playTacticalChirp(1100);
                 }}
-                className="h-7 px-2 rounded-lg bg-black/50 hover:bg-amber-500/10 border border-white/15 hover:border-amber-400/40 text-amber-400 font-mono text-[10px] flex items-center gap-1 transition-all"
+                className="h-7 w-7 rounded-lg bg-black/50 hover:bg-amber-500/10 border border-white/15 text-amber-400 flex items-center justify-center transition-all"
                 title="Terms of Use & Code of Conduct"
               >
-                <Scale className="w-3 h-3 text-amber-400 shrink-0" />
-                <span className="hidden xs:inline text-[9px] text-slate-300">TERMS</span>
+                <Scale className="w-3.5 h-3.5 text-amber-400" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setIsFullscreen(true)}
-                className="h-7 px-2 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-bold flex items-center gap-1 hover:bg-amber-500/25 transition-all"
+                className="h-7 px-1.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[9px] font-bold flex items-center gap-1 hover:bg-amber-500/25 transition-all"
                 title="Fullscreen Hand Mode"
               >
                 <Maximize2 className="w-3 h-3 text-amber-400" />
-                <span>FULL</span>
+                <span className="hidden xs:inline">FULL</span>
               </button>
 
               <button
@@ -1533,10 +1571,12 @@ export default function ChatPage() {
                     className="w-full h-full object-cover"
                   />
                 </div>
+                <ChevronLeft className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
                 <span className="font-extrabold text-[11px] font-mono tracking-wider text-slate-200 group-hover:text-amber-400">
-                  SUBSONIC
+                  PORTAL
                 </span>
-                <ChevronDown className="w-3 h-3 text-slate-400 -rotate-90 group-hover:translate-x-0.5 transition-transform" />
+                <span className="text-white/20">/</span>
+                <span className="text-amber-400 font-bold">COMMS</span>
               </Link>
 
               <div className="flex items-center gap-1.5 sm:gap-2">
