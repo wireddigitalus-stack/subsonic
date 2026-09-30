@@ -112,9 +112,10 @@ const STREAM_ITEMS: TerminalMessage[] = [
 export interface HeroChatTerminalProps {
   isActive?: boolean;
   onReplayVideo?: () => void;
+  onReplayLock?: () => void;
 }
 
-export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTerminalProps) {
+export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock }: HeroChatTerminalProps) {
   const [messages, setMessages] = useState<TerminalMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [typingName, setTypingName] = useState<string | null>(null);
@@ -288,6 +289,18 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
             >
               <Play className="w-3 h-3 fill-amber-400" />
               <span className="hidden sm:inline">VIDEO INTRO</span>
+            </button>
+          )}
+
+          {onReplayLock && (
+            <button
+              type="button"
+              onClick={onReplayLock}
+              className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-400 font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+              title="Calibrate Crosshair Reticle & Telemetry"
+            >
+              <Target className="w-3 h-3 text-cyan-400" />
+              <span className="hidden sm:inline">RETICLE LOCK</span>
             </button>
           )}
 

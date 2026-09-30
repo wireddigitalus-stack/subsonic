@@ -81,6 +81,7 @@ export function HeroSection() {
               <HeroChatTerminal
                 isActive={heroMode === "chat"}
                 onReplayVideo={() => setHeroMode("video")}
+                onReplayLock={() => setHeroMode("loading")}
               />
             </div>
           )}

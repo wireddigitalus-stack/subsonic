@@ -19,7 +19,7 @@ interface HeroCrosshairLoaderProps {
 
 export function HeroCrosshairLoader({ 
   onComplete, 
-  durationMs = 1400 
+  durationMs = 2200 
 }: HeroCrosshairLoaderProps) {
   const [progress, setProgress] = useState(0);
 
@@ -72,7 +72,7 @@ export function HeroCrosshairLoader({
             <span className="text-slate-500">•</span>
             <span className="text-amber-400 font-bold">CALIBRATING</span>
             <span className="text-slate-500 hidden sm:inline">•</span>
-            <span className="text-cyan-400 font-semibold hidden sm:inline">1.4s PROTOCOL</span>
+            <span className="text-cyan-400 font-semibold hidden sm:inline">2.2s PROTOCOL</span>
           </div>
         </div>
 
@@ -96,13 +96,30 @@ export function HeroCrosshairLoader({
         <div className="relative w-40 h-40 sm:w-72 sm:h-72 flex items-center justify-center">
           
           {/* Static Corner Tactical Brackets */}
-          <div className="absolute -top-1 -left-1 w-4 h-4 sm:w-6 sm:h-6 border-t-2 border-l-2 border-amber-400/80" />
-          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 border-t-2 border-r-2 border-amber-400/80" />
-          <div className="absolute -bottom-1 -left-1 w-4 h-4 sm:w-6 sm:h-6 border-b-2 border-l-2 border-amber-400/80" />
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 border-b-2 border-r-2 border-amber-400/80" />
+          <div className="absolute -top-1 -left-1 w-4 h-4 sm:w-6 sm:h-6 border-t-2 border-l-2 border-amber-400/80 z-20 pointer-events-none" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 border-t-2 border-r-2 border-amber-400/80 z-20 pointer-events-none" />
+          <div className="absolute -bottom-1 -left-1 w-4 h-4 sm:w-6 sm:h-6 border-b-2 border-l-2 border-amber-400/80 z-20 pointer-events-none" />
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-6 sm:h-6 border-b-2 border-r-2 border-amber-400/80 z-20 pointer-events-none" />
+
+          {/* Ghosted White Round Logo Behind Reticle Rings */}
+          <div
+            className="absolute rounded-full overflow-hidden pointer-events-none select-none z-0 transition-opacity duration-200 flex items-center justify-center"
+            style={{
+              width: "82.14%",
+              height: "82.14%",
+              opacity: 0.30 + (progress / 100) * 0.35,
+              filter: "drop-shadow(0 0 16px rgba(245, 158, 11, 0.45))",
+            }}
+          >
+            <img
+              src="/images/SS-RWB-LOGO.png"
+              alt="Subsonic Society Emblem"
+              className="w-full h-full object-contain"
+            />
+          </div>
 
           <svg
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
             viewBox="0 0 280 280"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -255,10 +272,10 @@ export function HeroCrosshairLoader({
           </svg>
 
           {/* Center Coordinates & Mil Display */}
-          <div className="absolute top-2 right-2 font-mono text-[9px] text-amber-400/90 font-bold bg-black/60 px-1.5 py-0.5 rounded border border-amber-500/30">
+          <div className="absolute top-2 right-2 font-mono text-[9px] text-amber-400/90 font-bold bg-black/60 px-1.5 py-0.5 rounded border border-amber-500/30 z-20 pointer-events-none">
             0.1 MIL / CLK
           </div>
-          <div className="absolute bottom-2 left-2 font-mono text-[9px] text-cyan-400/90 font-bold bg-black/60 px-1.5 py-0.5 rounded border border-cyan-500/30">
+          <div className="absolute bottom-2 left-2 font-mono text-[9px] text-cyan-400/90 font-bold bg-black/60 px-1.5 py-0.5 rounded border border-cyan-500/30 z-20 pointer-events-none">
             AZ: 285° MAG
           </div>
         </div>
