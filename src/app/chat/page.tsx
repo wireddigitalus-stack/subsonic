@@ -1658,15 +1658,20 @@ export default function ChatPage() {
                 <span className="font-bold">EVOS 1.0</span>
               </Link>
 
-              <Link
-                href="/admin"
-                target="_blank"
-                title="Open Staff Admin & Comms Moderation Dashboard"
-                className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
-              >
-                <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-                <span>Admin / Moderation</span>
-              </Link>
+              {(shooterProfile?.role === "MASTER_OWNER" || 
+                shooterProfile?.role === "OWNER_ADMIN" || 
+                shooterProfile?.callsign === "RADAR" || 
+                shooterProfile?.callsign === "ALLEN") && (
+                <Link
+                  href="/admin"
+                  target="_blank"
+                  title="Open Staff Admin & Comms Moderation Dashboard"
+                  className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
+                >
+                  <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
+                  <span>Admin / Moderation</span>
+                </Link>
+              )}
 
               <button
                 type="button"

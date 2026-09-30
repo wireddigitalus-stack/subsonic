@@ -205,11 +205,11 @@ export default function EvosDashboardPage() {
           )}
 
           <Link
-            href="/admin"
+            href="/shooters"
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] text-emerald-300 hover:bg-emerald-900/60 transition-colors"
           >
-            <ShieldAlert className="w-3 h-3 text-emerald-400" />
-            <span className="hidden sm:inline">Admin Hub</span>
+            <ShieldCheck className="w-3 h-3 text-emerald-400" />
+            <span className="hidden sm:inline">Shooters</span>
           </Link>
           <button
             onClick={() => {
@@ -925,11 +925,11 @@ export default function EvosDashboardPage() {
                   </Link>
 
                   <Link
-                    href="/admin"
+                    href="/shooters"
                     className="py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-center"
                   >
-                    <Shield className="w-3 h-3 text-emerald-400" />
-                    <span>Admin Hub</span>
+                    <Trophy className="w-3 h-3 text-emerald-400" />
+                    <span>Shooter Profiles</span>
                   </Link>
                 </div>
               </div>

@@ -229,6 +229,7 @@ export default function AdminDashboardPage() {
   } | null>(null);
   const [passkeyInput, setPasskeyInput] = useState("");
   const [passkeyError, setPasskeyError] = useState(false);
+  const [detectedNonAdmin, setDetectedNonAdmin] = useState<{ callsign: string; role: string } | null>(null);
 
   const [events, setEvents] = useState<TelemetryEvent[]>([]);
   const [abuseAlerts, setAbuseAlerts] = useState<CommsAbuseAlert[]>([]);
@@ -888,14 +889,47 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // Active account check: if user is logged into the client as a non-admin (e.g. TEST-Pro, competitor, member)
+        if (typeof window !== "undefined") {
+          const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+          const rawMember = localStorage.getItem("subsonic_member_profile");
+          const p = rawShooter ? JSON.parse(rawShooter) : rawMember ? JSON.parse(rawMember) : null;
+          
+          if (p) {
+            const role = (p.role || "").toUpperCase();
+            const callsign = (p.callsign || "").toUpperCase();
+            const isExec = 
+              role === "MASTER_OWNER" || 
+              role === "OWNER_ADMIN" || 
+              role === "DEV_ADMIN" || 
+              role === "ADMIN" ||
+              ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY"].includes(callsign);
+
+            if (!isExec) {
+              setDetectedNonAdmin({ callsign: p.callsign || "Competitor", role: p.role || "PRO_COMPETITOR" });
+              // Force invalidate any lingering server admin session cookie so non-admin cannot inherit it
+              await fetch("/api/admin/logout", { method: "POST" });
+              setIsAuthenticated(false);
+              setAdminSession(null);
+              return;
+            }
+          }
+        }
+
         const res = await fetch("/api/admin/session");
         const data = await res.json();
-        if (res.ok && data.authenticated) {
+        if (res.ok && data.authenticated && data.session) {
           setIsAuthenticated(true);
           setAdminSession(data.session);
+          setDetectedNonAdmin(null);
+        } else {
+          setIsAuthenticated(false);
+          setAdminSession(null);
         }
       } catch (e) {
         console.error("Session check failed", e);
+        setIsAuthenticated(false);
+        setAdminSession(null);
       }
     };
     checkSession();
@@ -966,7 +1000,7 @@ export default function AdminDashboardPage() {
 
   const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = passkeyInput.trim().toLowerCase();
+    const clean = passkeyInput.trim();
     
     try {
       const res = await fetch("/api/admin/auth", {
@@ -980,6 +1014,7 @@ export default function AdminDashboardPage() {
         setIsAuthenticated(true);
         setPasskeyError(false);
         setAdminSession(data.session);
+        setDetectedNonAdmin(null);
       } else {
         setPasskeyError(true);
       }
@@ -1080,18 +1115,33 @@ export default function AdminDashboardPage() {
               ADMIN TELEMETRY PORTAL
             </h1>
             <p className="text-xs text-slate-300">
-              Enter authorized security passkey to view clickstream telemetry, visitor dwell times, and AI moderation queues.
+              Restricted executive system. Enter authorized Master Owner or Owner Admin security passkey to access.
             </p>
           </div>
+
+          {detectedNonAdmin && (
+            <div className="p-3.5 rounded-2xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs font-mono text-left space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-red-400">
+                <ShieldAlert className="w-4 h-4 shrink-0" />
+                <span>RESTRICTED ACCESS</span>
+              </div>
+              <p>
+                Currently authenticated on site as <strong className="text-white">[{detectedNonAdmin.callsign}]</strong> ({detectedNonAdmin.role}).
+              </p>
+              <p className="text-[11px] text-slate-400">
+                Competitor and standard membership profiles cannot view the intelligence telemetry dashboard. Enter an authorized Master Owner or Owner Admin passkey to elevate clearance.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleUnlock} className="space-y-4 text-left">
             <div className="space-y-1">
               <label className="text-[11px] font-mono text-slate-400 uppercase">
-                Security Passkey
+                Owner / Master Admin Passkey
               </label>
               <input
                 type="password"
-                placeholder="Enter admin security passkey..."
+                placeholder="Enter owner passkey..."
                 value={passkeyInput}
                 onChange={(e) => {
                   setPasskeyInput(e.target.value);
@@ -1101,7 +1151,7 @@ export default function AdminDashboardPage() {
               />
               {passkeyError && (
                 <div className="text-[11px] text-red-400 font-mono mt-1">
-                  Invalid security passkey. Contact an administrator for access credentials.
+                  Access Denied. Only authorized Master Owner & Owner Admin passkeys are accepted.
                 </div>
               )}
             </div>
@@ -1111,7 +1161,7 @@ export default function AdminDashboardPage() {
               className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-sm flex items-center justify-center gap-2 shadow-tactical-glow transition-all"
             >
               <Unlock className="w-4 h-4" />
-              <span>Unlock Dashboard</span>
+              <span>Authenticate & Unlock Dashboard</span>
             </button>
 
 

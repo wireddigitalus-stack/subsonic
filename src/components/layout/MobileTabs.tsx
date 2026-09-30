@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
   CalendarDays, 
   MessageSquare, 
-  BarChart3, 
-  Radio
+  Trophy,
+  Radio,
+  BarChart3
 } from "lucide-react";
 
 interface TabItem {
@@ -20,6 +21,31 @@ interface TabItem {
 
 export function MobileTabs() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+      const rawMember = localStorage.getItem("subsonic_member_profile");
+      const p = rawShooter ? JSON.parse(rawShooter) : rawMember ? JSON.parse(rawMember) : null;
+      if (p) {
+        const role = (p.role || "").toUpperCase();
+        const callsign = (p.callsign || "").toUpperCase();
+        if (
+          role === "MASTER_OWNER" ||
+          role === "OWNER_ADMIN" ||
+          role === "DEV_ADMIN" ||
+          role === "ADMIN" ||
+          ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY"].includes(callsign)
+        ) {
+          setIsAdmin(true);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [pathname]);
 
   // Hide floating bottom sheet on chat screen so it doesn't obstruct keyboard and message input
   if (pathname === "/chat" || pathname.startsWith("/chat/")) return null;
@@ -28,8 +54,9 @@ export function MobileTabs() {
     { name: "Home", href: "/", icon: Home },
     { name: "Calendar", href: "/calendar", icon: CalendarDays },
     { name: "Chat", href: "/chat", icon: MessageSquare },
+    { name: "Shooters", href: "/shooters", icon: Trophy },
     { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
-    { name: "Admin", href: "/admin", icon: BarChart3 },
+    ...(isAdmin ? [{ name: "Admin", href: "/admin", icon: BarChart3 }] : []),
   ];
 
   return (

@@ -217,8 +217,8 @@ export function Footer() {
             <Link href="/terms" className="hover:text-slate-200">
               Terms of Use
             </Link>
-            <Link href="/admin" className="hover:text-slate-200">
-              Admin Portal
+            <Link href="/shooters" className="hover:text-slate-200">
+              Shooter Profiles
             </Link>
           </div>
         </div>
