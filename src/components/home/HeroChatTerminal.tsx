@@ -48,7 +48,20 @@ interface TerminalMessage {
 
 const STREAM_ITEMS: TerminalMessage[] = [
   {
-    id: "msg-1",
+    id: "msg-allen",
+    sender: {
+      name: "Allen Hurley",
+      callsign: "DIRECTOR",
+      role: "MATCH_DIRECTOR",
+      roleBadge: "EXECUTIVE / MD",
+      avatar: "/assets/subsonic-logo-round.png",
+      color: "border-amber-400 text-amber-400 bg-amber-500/15",
+    },
+    text: "Welcome marksmen. Squad registration for the 2026 Subsonic Invitational at The Hideout is live ($7,500 Cash Purse). If you received an invitation or squad pass, claim your credentials below to unlock private comms and stage DOPE.",
+    timestamp: "10:41 AM",
+  },
+  {
+    id: "msg-ghost",
     sender: {
       name: "Wyatt Sterling",
       callsign: "GHOST",
@@ -61,7 +74,7 @@ const STREAM_ITEMS: TerminalMessage[] = [
     timestamp: "10:42 AM",
   },
   {
-    id: "msg-2",
+    id: "msg-coldbore",
     sender: {
       name: "Kendra Cross",
       callsign: "COLDBORE",
@@ -74,7 +87,7 @@ const STREAM_ITEMS: TerminalMessage[] = [
     timestamp: "10:43 AM",
   },
   {
-    id: "msg-3",
+    id: "msg-sentinel",
     sender: {
       name: "Subsonic Sentinel",
       callsign: "AI-BALLISTICS",
@@ -84,7 +97,7 @@ const STREAM_ITEMS: TerminalMessage[] = [
       color: "border-cyan-400 text-cyan-300 bg-cyan-500/15",
     },
     text: "📡 [VERIFIED DOPE DROP] Atmospheric Density Altitude calculated at +2,150 FT. High mirage boiling horizontal.",
-    timestamp: "10:43 AM",
+    timestamp: "10:44 AM",
     dopeCard: {
       stage: "Stage 4 • Diamond KYL",
       distance: "340 YARDS",
@@ -93,19 +106,6 @@ const STREAM_ITEMS: TerminalMessage[] = [
       velocity: "1,062 FPS",
       hitProb: "94% FIRST ROUND",
     },
-  },
-  {
-    id: "msg-4",
-    sender: {
-      name: "Allen Hurley",
-      callsign: "DIRECTOR",
-      role: "MATCH_DIRECTOR",
-      roleBadge: "EXECUTIVE / MD",
-      avatar: "/assets/subsonic-logo-round.png",
-      color: "border-emerald-400 text-emerald-300 bg-emerald-500/15",
-    },
-    text: "Squad 3 on deck at Barricade 6. Invitational purse stands at $7,500 cash. Range is HOT—run your stages clean, marksmen.",
-    timestamp: "10:44 AM",
   },
 ];
 
@@ -121,13 +121,12 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
   const [showInterceptor, setShowInterceptor] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [replayCount, setReplayCount] = useState(0);
-  const [mobileExpandedChat, setMobileExpandedChat] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Smooth scroll to keep newest message in view
+  // Smooth scroll logic: keep Allen's welcome & Claim bubble anchored at top for quick interaction
   useEffect(() => {
     if (scrollRef.current) {
-      if (messages.length <= 1 && !showInterceptor) {
+      if (messages.length <= 2) {
         scrollRef.current.scrollTop = 0;
       } else {
         scrollRef.current.scrollTo({
@@ -152,10 +151,10 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
     }
 
     const sequence = [
-      { delay: 300, typingDelay: 800, msg: STREAM_ITEMS[0], typingWho: "Wyatt 'Ghost' Sterling" },
-      { delay: 2200, typingDelay: 800, msg: STREAM_ITEMS[1], typingWho: "Kendra 'Coldbore' Cross" },
-      { delay: 4500, typingDelay: 900, msg: STREAM_ITEMS[2], typingWho: "Subsonic Sentinel AI" },
-      { delay: 7200, typingDelay: 800, msg: STREAM_ITEMS[3], typingWho: "Match Director Allen" },
+      { delay: 100, typingDelay: 500, msg: STREAM_ITEMS[0], typingWho: "Match Director Allen Hurley" },
+      { delay: 2400, typingDelay: 700, msg: STREAM_ITEMS[1], typingWho: "Wyatt 'Ghost' Sterling" },
+      { delay: 4400, typingDelay: 700, msg: STREAM_ITEMS[2], typingWho: "Kendra 'Coldbore' Cross" },
+      { delay: 6400, typingDelay: 800, msg: STREAM_ITEMS[3], typingWho: "Subsonic Sentinel AI" },
     ];
 
     sequence.forEach(({ delay, typingDelay, msg, typingWho }) => {
@@ -182,12 +181,12 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
       timers.push(t2);
     });
 
-    // Reveal interceptor invitation AFTER all messages have animated in
-    const tFinal = setTimeout(() => {
+    // Reveal Claim Your Invite action bubble right after Allen's welcome message
+    const tInterceptor = setTimeout(() => {
       setShowInterceptor(true);
       if (soundEnabled) playBotTelemetryChirp();
-    }, 9400);
-    timers.push(tFinal);
+    }, 1000);
+    timers.push(tInterceptor);
 
     return () => {
       timers.forEach(clearTimeout);
@@ -325,107 +324,11 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
         </div>
       </div>
 
-      {/* MOBILE COMPACT VIEW: Match Director Allen's Final Welcome & Redeem Invite Code */}
-      {!mobileExpandedChat && (
-        <div className="md:hidden p-3.5 sm:p-4 space-y-3 animate-fadeIn">
-          {/* Dispatch Header with Allen's Profile */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.4)] relative bg-black shrink-0">
-                <Image
-                  src="/images/SS-RWB-LOGO.png"
-                  alt="Allen Hurley - Subsonic Match Director"
-                  fill
-                  sizes="40px"
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-xs text-white">Allen Hurley</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold">
-                    MD / EXEC
-                  </span>
-                </div>
-                <div className="font-mono text-[10px] text-amber-400 font-bold flex items-center gap-1">
-                  <span>CALLSIGN: DIRECTOR</span>
-                  <span>•</span>
-                  <span>THE HIDEOUT</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>LIVE</span>
-            </div>
-          </div>
-
-          {/* Official Welcome Message Box */}
-          <div className="p-3 rounded-2xl bg-black/60 border border-amber-500/30 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono text-amber-400 font-black uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Executive Welcome Dispatch</span>
-            </div>
-            <p className="text-xs text-slate-200 leading-relaxed font-sans">
-              Welcome marksman. Squad registration for the 2026 Subsonic Invitational at The Hideout is <strong className="text-amber-400">78% full ($7,500 Cash Purse)</strong>. If you received an invitation or squad pass, redeem your credentials below to unlock private comms, live DOPE drops, and competitor clearance.
-            </p>
-          </div>
-
-          {/* Primary Action Button: Redeem Invite Code */}
-          <Link
-            href="/invite"
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow active:scale-95 transition-all"
-          >
-            <Key className="w-4 h-4 fill-black" />
-            <span>REDEEM INVITE CODE &amp; CLAIM PASS</span>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-
-          {/* Secondary Action Strip */}
-          <div className="flex items-center gap-2 pt-0.5">
-            <Link
-              href="/chat"
-              className="flex-1 py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all text-center"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Enter Comms Room</span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setMobileExpandedChat(true)}
-              className="flex-1 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all"
-            >
-              <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
-              <span>Live Feed (4)</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* DESKTOP STREAM VIEW & MOBILE EXPANDED VIEW */}
-      <div className={!mobileExpandedChat ? "hidden md:block" : "block"}>
-        {mobileExpandedChat && (
-          <div className="md:hidden px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between">
-            <span className="text-[10px] font-mono text-amber-400 font-bold">
-              STREAMING STAGE NET CHATTER
-            </span>
-            <button
-              type="button"
-              onClick={() => setMobileExpandedChat(false)}
-              className="text-[10px] font-mono text-slate-300 hover:text-white underline"
-            >
-              ← Back to Welcome
-            </button>
-          </div>
-        )}
-
-        {/* 2. Messages Display Viewport — starts cleanly from top */}
-        <div 
-          ref={scrollRef}
-          className="p-4 sm:p-6 space-y-3.5 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
-        >
+      {/* 2. Messages Display Viewport — unified responsive animated stream for both mobile and desktop */}
+      <div 
+        ref={scrollRef}
+        className="p-3.5 sm:p-6 space-y-3 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
+      >
         {messages.length === 0 && !isTyping && (
           <div className="py-12 text-center space-y-2">
             <Radio className="w-6 h-6 text-amber-400 animate-pulse mx-auto" />
@@ -434,74 +337,135 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
         )}
 
         {messages.map((msg, index) => (
-          <div 
-            key={msg.id} 
-            className="space-y-1.5 max-w-2xl transition-all duration-300"
-            style={{
-              animation: "fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-            }}
-          >
-            {/* Sender Metadata Bar */}
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-black relative shrink-0">
-                <Image
-                  src={msg.sender.avatar}
-                  alt={msg.sender.name}
-                  fill
-                  className="object-cover"
-                />
+          <React.Fragment key={msg.id}>
+            <div 
+              className="space-y-1.5 max-w-2xl transition-all duration-300"
+              style={{
+                animation: "fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+              }}
+            >
+              {/* Sender Metadata Bar */}
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 bg-black relative shrink-0">
+                  <Image
+                    src={msg.sender.avatar}
+                    alt={msg.sender.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <span className="font-black text-white text-xs sm:text-sm">
+                  {msg.sender.name}
+                </span>
+
+                <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold border ${msg.sender.color}`}>
+                  {msg.sender.callsign}
+                </span>
+
+                <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-slate-400">
+                  {msg.sender.roleBadge}
+                </span>
+
+                <span className="text-[10px] font-mono text-slate-400 ml-auto sm:ml-0">
+                  {msg.timestamp}
+                </span>
               </div>
 
-              <span className="font-black text-white text-xs sm:text-sm">
-                {msg.sender.name}
-              </span>
+              {/* Message Body Bubble with subtle neon edge glow */}
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed shadow-sm hover:border-white/20 transition-all">
+                <p>{msg.text}</p>
 
-              <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold border ${msg.sender.color}`}>
-                {msg.sender.callsign}
-              </span>
+                {/* Dope Card Rich Visualizer */}
+                {msg.dopeCard && (
+                  <div className="mt-2.5 p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/40 text-cyan-200 font-mono space-y-2 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                    <div className="flex items-center justify-between text-[11px] pb-1 border-b border-cyan-500/20">
+                      <span className="font-bold text-white flex items-center gap-1.5">
+                        <Target className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>{msg.dopeCard.stage}</span>
+                      </span>
+                      <span className="text-amber-400 font-bold">{msg.dopeCard.distance}</span>
+                    </div>
 
-              <span className="text-[10px] font-mono text-slate-400">
-                {msg.timestamp}
-              </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                      <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-slate-400 block text-[9px]">ELEVATION</span>
+                        <span className="text-white font-bold">{msg.dopeCard.elev}</span>
+                      </div>
+                      <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-slate-400 block text-[9px]">WIND HOLD</span>
+                        <span className="text-amber-400 font-bold">{msg.dopeCard.wind}</span>
+                      </div>
+                      <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-slate-400 block text-[9px]">MUZZLE VEL</span>
+                        <span className="text-white font-bold">{msg.dopeCard.velocity}</span>
+                      </div>
+                      <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
+                        <span className="text-emerald-400 block text-[9px]">CONFIDENCE</span>
+                        <span className="text-emerald-400 font-bold">{msg.dopeCard.hitProb}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Message Body Bubble with subtle neon edge glow */}
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/60 border border-white/10 text-xs sm:text-sm text-slate-200 leading-relaxed shadow-sm hover:border-white/20 transition-all">
-              <p>{msg.text}</p>
-
-              {/* Dope Card Rich Visualizer */}
-              {msg.dopeCard && (
-                <div className="mt-2.5 p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/40 text-cyan-200 font-mono space-y-2 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                  <div className="flex items-center justify-between text-[11px] pb-1 border-b border-cyan-500/20">
-                    <span className="font-bold text-white flex items-center gap-1.5">
-                      <Target className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>{msg.dopeCard.stage}</span>
-                    </span>
-                    <span className="text-amber-400 font-bold">{msg.dopeCard.distance}</span>
+            {/* INSTANT CLAIM YOUR INVITE BUBBLE: Rendered right after Allen's welcome message */}
+            {index === 0 && showInterceptor && (
+              <div 
+                className="p-3.5 sm:p-4.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-black/85 to-amber-500/10 border-2 border-amber-400 shadow-tactical-glow space-y-3 my-2 transition-all"
+                style={{
+                  animation: "fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                        <Sparkles className="w-3 h-3 fill-black" />
+                        OFFICIAL SQUAD PASS
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        INVITATION ONLY
+                      </span>
+                    </div>
+                    <h4 className="text-sm sm:text-base font-black text-white leading-tight">
+                      CLAIM YOUR INVITATION &amp; ACTIVATE CALLSIGN
+                    </h4>
+                    <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
+                      Squad slots for the 2026 Subsonic Invitational ($7,500 Cash Purse) are strictly limited. Claim your code below to unlock private comms, stage DOPE drops, and competitor clearance.
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
-                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
-                      <span className="text-slate-400 block text-[9px]">ELEVATION</span>
-                      <span className="text-white font-bold">{msg.dopeCard.elev}</span>
-                    </div>
-                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
-                      <span className="text-slate-400 block text-[9px]">WIND HOLD</span>
-                      <span className="text-amber-400 font-bold">{msg.dopeCard.wind}</span>
-                    </div>
-                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
-                      <span className="text-slate-400 block text-[9px]">MUZZLE VEL</span>
-                      <span className="text-white font-bold">{msg.dopeCard.velocity}</span>
-                    </div>
-                    <div className="bg-black/50 p-1.5 rounded-lg border border-white/5">
-                      <span className="text-slate-400 block text-[9px]">CONFIDENCE</span>
-                      <span className="text-emerald-400 font-bold">{msg.dopeCard.hitProb}</span>
+                  <div className="hidden sm:block shrink-0">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-tactical-glow">
+                      <Award className="w-5 h-5" />
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
+                  <Link
+                    href="/invite"
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow active:scale-95 transition-all text-center"
+                  >
+                    <Key className="w-4 h-4 fill-black" />
+                    <span>CLAIM YOUR INVITE</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+
+                  <Link
+                    href="/chat"
+                    className="py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all text-center"
+                  >
+                    <Users className="w-4 h-4" />
+                    <span>Member Login</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </React.Fragment>
         ))}
 
         {/* Dynamic In-Line Typing Indicator right below latest message */}
@@ -513,60 +477,6 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
             </span>
             <span>{typingName || "Competitor"} is keying mic...</span>
-          </div>
-        )}
-
-        {/* 3. The Conversion Trigger: Appears seamlessly AFTER messages have arrived */}
-        {showInterceptor && (
-          <div 
-            className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-black/80 to-emerald-500/15 border-2 border-amber-400/70 shadow-glow space-y-3.5 my-2 transition-all"
-            style={{
-              animation: "fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-            }}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 fill-black" />
-                    GUEST MONITOR MODE ACTIVE
-                  </span>
-                  <span className="text-[10px] font-mono text-emerald-400 font-semibold">
-                    COMMS LINK OPEN
-                  </span>
-                </div>
-                <h4 className="text-sm sm:text-base font-black text-white leading-tight">
-                  CLAIM YOUR CALLSIGN &amp; JOIN THE CONVERSATION
-                </h4>
-                <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
-                  You are monitoring squad radio in read-only mode. Claim your official marksman callsign, access private squad DOPE drops, and auto-generate your competitor profile card.
-                </p>
-              </div>
-
-              <div className="hidden sm:block shrink-0">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-glow">
-                  <Award className="w-6 h-6" />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <Link
-                href="/invite"
-                className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-95"
-              >
-                <Key className="w-4 h-4 fill-black" />
-                <span>Claim Invite &amp; Activate Callsign</span>
-              </Link>
-
-              <Link
-                href="/chat"
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all"
-              >
-                <Users className="w-4 h-4" />
-                <span>Member Login</span>
-              </Link>
-            </div>
           </div>
         )}
       </div>
@@ -626,7 +536,6 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo }: HeroChatTer
         >
           <Key className="w-4 h-4" />
         </Link>
-      </div>
       </div>
     </div>
   );

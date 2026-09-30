@@ -19,7 +19,7 @@ interface HeroCrosshairLoaderProps {
 
 export function HeroCrosshairLoader({ 
   onComplete, 
-  durationMs = 3000 
+  durationMs = 1400 
 }: HeroCrosshairLoaderProps) {
   const [progress, setProgress] = useState(0);
 
@@ -39,23 +39,21 @@ export function HeroCrosshairLoader({
         }
         setTimeout(() => {
           onComplete();
-        }, 150);
+        }, 120);
       }
-    }, 30);
+    }, 25);
 
     return () => clearInterval(interval);
   }, [durationMs, onComplete]);
 
   // Telemetry status text based on progress
   const getStatusText = () => {
-    if (progress < 35) {
+    if (progress < 40) {
       return "ACQUIRING ENCRYPTED STAGE NET (462.5625 MHz)...";
-    } else if (progress < 75) {
+    } else if (progress < 80) {
       return "TRUEING BALLISTIC TELEMETRY & ATMOSPHERICS...";
-    } else if (progress < 95) {
-      return "STAGE CLEARANCE VERIFIED • DECRYPTING FEED...";
     } else {
-      return "HANDSHAKE LOCKED • ENTERING ROOM";
+      return "STAGE CLEARANCE VERIFIED • ENTERING TERMINAL";
     }
   };
 
@@ -74,7 +72,7 @@ export function HeroCrosshairLoader({
             <span className="text-slate-500">•</span>
             <span className="text-amber-400 font-bold">CALIBRATING</span>
             <span className="text-slate-500 hidden sm:inline">•</span>
-            <span className="text-cyan-400 font-semibold hidden sm:inline">3.0s PROTOCOL</span>
+            <span className="text-cyan-400 font-semibold hidden sm:inline">1.4s PROTOCOL</span>
           </div>
         </div>
 
