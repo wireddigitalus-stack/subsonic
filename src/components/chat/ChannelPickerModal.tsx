@@ -15,7 +15,8 @@ import {
   Wind, 
   Target, 
   Sparkles, 
-  MessageSquare 
+  MessageSquare,
+  Bot
 } from "lucide-react";
 import { ChannelConfig, DirectPartner } from "@/lib/types";
 
@@ -403,14 +404,14 @@ export function ChannelPickerModal({
                     <div className="flex items-start gap-3 min-w-0">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative ${
                         isRO
-                          ? "bg-amber-500 text-black border-amber-400 font-black"
+                          ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                           : isMasterOwner
                           ? "bg-amber-400 text-black border-amber-300 font-black"
                           : isOwnerAdmin
                           ? "bg-emerald-500 text-black border-emerald-300 font-black"
                           : "bg-black/60 text-amber-400 border-white/10"
                       }`}>
-                        {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
+                        {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
                         <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
                           partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
                         }`} />
@@ -442,7 +443,7 @@ export function ChannelPickerModal({
                         </div>
 
                         <p className="text-xs text-slate-400 line-clamp-1 leading-snug">
-                          {isRO ? "Range Officer · The Hideout Official Guide" : partner.division || partner.rifleSetup || "Verified Competitor"}
+                          {isRO ? "🤖 Autonomous AI Assistant · Range Officer & Bristol Intel" : partner.division || partner.rifleSetup || "Verified Competitor"}
                         </p>
                       </div>
                     </div>

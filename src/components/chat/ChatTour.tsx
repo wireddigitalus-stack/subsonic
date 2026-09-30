@@ -60,11 +60,11 @@ const TOUR_STEPS: TourStep[] = [
   {
     id: "plink",
     targetId: "tour-step-plink",
-    badge: "04 / RANGE OFFICER",
-    title: "RO (Range Officer) Intelligence",
+    badge: "04 / AI RANGE OFFICER",
+    title: "RO — 24/7 Autonomous AI Agent",
     description:
-      "Meet RO 🎯, your official Range Officer for The Hideout Invitational. RO knows all details from the Competitor Packet: match schedules, side matches, Bristol hotels, dining, and local entertainment. Say 'hey ro' or ask '@ro help' anytime.",
-    proTip: "Type @ro help or ask naturally about Bristol hotels, BBQ, or fly fishing.",
+      "Meet RO 🤖, your official 24/7 Autonomous AI Assistant and Range Officer for The Hideout Invitational. RO knows all details from the Competitor Packet: match schedules, side matches, Bristol hotels, dining, and local entertainment. Say 'hey ro' or ask '@ro help' anytime.",
+    proTip: "Ask RO naturally about Bristol hotels, BBQ, stage timing, or fly fishing.",
     icon: <Bot className="w-5 h-5 text-amber-400" />,
   },
   {

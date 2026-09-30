@@ -25,7 +25,8 @@ import {
   Lock,
   Sparkles,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Bot
 } from "lucide-react";
 import Image from "next/image";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -99,14 +100,14 @@ export function ChatMessageList({
     const partner: DirectPartner = {
       id: isRO ? "dm_ro" : `dm_${(author.callsign || author.id).toLowerCase()}`,
       callsign: isRO ? "RO" : (author.callsign || "MARKS"),
-      name: isRO ? "RO (Range Officer)" : author.name,
+      name: isRO ? "RO (AI Range Officer)" : author.name,
       role: author.role,
-      badgeText: isRO ? "RANGE OFFICER" : (author.badgeText || author.role),
-      division: author.division,
-      rifleSetup: author.rifleSetup,
+      badgeText: isRO ? "AI RANGE OFFICER" : (author.badgeText || author.role),
+      division: isRO ? "Autonomous AI Match Assistant" : author.division,
+      rifleSetup: isRO ? "Autonomous AI Agent • Match Ops & Safety" : author.rifleSetup,
       status: isRO ? "online" : "online",
       bio: isRO 
-        ? "Official Range Officer for The Hideout Invitational. Match rules, Bristol lodging & dining expert." 
+        ? "Official Autonomous AI Range Officer & Match Assistant for The Hideout. 24/7 intel on match schedules, Bristol lodging, dining, and range safety." 
         : `Verified Subsonic Society competitor in ${author.division || "Open Division"}.`,
     };
     onSelectShooter(partner);
@@ -153,8 +154,8 @@ export function ChatMessageList({
                   </span>
                   <span className="text-slate-500">·</span>
                   <span className="text-amber-400 font-bold flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/25">
-                    <ShieldCheck className="w-2.5 h-2.5 text-amber-400" />
-                    <span>RO Monitored</span>
+                    <Bot className="w-2.5 h-2.5 text-cyan-400" />
+                    <span>AI Range Officer Monitored</span>
                   </span>
                 </div>
               </div>
@@ -212,16 +213,16 @@ export function ChatMessageList({
                   Direct communication channel with <strong className="text-white">{activeDirectPartner?.name || "this competitor"}</strong>. Messages are private to this net.
                 </p>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-[10px] font-mono text-amber-300">
-                  <ShieldCheck className="w-3 h-3 text-amber-400 shrink-0" />
-                  <span>Monitored by RO · Range Safety & Code of Conduct Active</span>
+                  <Bot className="w-3 h-3 text-cyan-400 shrink-0" />
+                  <span>Monitored by RO · Autonomous AI Match & Safety Agent</span>
                 </div>
               </div>
 
               {activeDirectPartner?.callsign === "RO" && (
                 <div className="p-3.5 rounded-2xl bg-black/60 border border-amber-500/30 text-left space-y-2.5">
                   <div className="text-[11px] font-mono text-amber-400 font-bold flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Range Officer Intel Quick Inquiries:</span>
+                    <Bot className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Autonomous AI Assistant Quick Inquiries:</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                     {[
@@ -323,7 +324,7 @@ export function ChatMessageList({
                           : "bg-black/60 text-amber-400 border-white/10"
                       }`}
                     >
-                      {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
+                      {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
                     </button>
 
                     <div className="min-w-0">
@@ -334,10 +335,20 @@ export function ChatMessageList({
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Dossier & Direct Comms`}
                           className={`text-xs md:text-sm font-bold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
-                            isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
+                            isRO ? "text-amber-300 font-black inline-flex items-center gap-1.5" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
-                          {isRO ? "RO" : msg.author.name}
+                          {isRO ? (
+                            <>
+                              <span>RO</span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 inline-flex items-center gap-1">
+                                <Bot className="w-2.5 h-2.5 text-cyan-400" />
+                                <span>AI AGENT</span>
+                              </span>
+                            </>
+                          ) : (
+                            msg.author.name
+                          )}
                         </button>
 
                         {/* Callsign brackets */}
@@ -355,7 +366,7 @@ export function ChatMessageList({
                         <span
                           className={`text-[8px] md:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
                             isRO
-                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/50"
+                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 font-black"
                               : isMasterOwner
                               ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300"
                               : isOwnerAdmin
@@ -371,7 +382,7 @@ export function ChatMessageList({
                               : "bg-white/10 text-slate-300"
                           }`}
                         >
-                          {isRO ? "RANGE OFFICER" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
+                          {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
                         </span>
 
                         {/* Timestamp — inline on mobile */}
@@ -381,8 +392,8 @@ export function ChatMessageList({
                       {/* Rig line or RO Subtitle */}
                       {isRO ? (
                         <div className="hidden md:flex text-[10px] font-mono text-amber-400/90 items-center gap-1.5 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse inline-block" />
-                          <span>Range Officer · The Hideout Official</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
+                          <span>Autonomous AI Match Assistant · The Hideout Official Guide</span>
                         </div>
                       ) : msg.author.rifleSetup ? (
                         <div className="hidden md:block text-[10px] font-mono text-slate-400 truncate max-w-md">

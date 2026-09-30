@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info } from "lucide-react";
+import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
 export interface ChatChannelSidebarProps {
@@ -145,14 +145,14 @@ export function ChatChannelSidebar({
                         <div className="relative shrink-0">
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs border ${
                             isRO
-                              ? "bg-amber-500 text-black border-amber-400"
+                              ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                               : isMasterOwner
                               ? "bg-amber-400 text-black border-amber-300"
                               : isOwnerAdmin
                               ? "bg-emerald-500 text-black border-emerald-300"
                               : "bg-black/60 text-amber-400 border-white/10"
                           }`}>
-                            {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
+                            {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
                           </div>
                           <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black ${
                             partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
@@ -169,8 +169,15 @@ export function ChatChannelSidebar({
                               [{partner.callsign}]
                             </span>
                           </div>
-                          <div className="text-[10px] font-mono text-slate-400 truncate">
-                            {isRO ? "Range Officer · The Hideout" : partner.division || partner.badgeText || "Competitor"}
+                          <div className="text-[10px] font-mono text-slate-400 truncate flex items-center gap-1">
+                            {isRO ? (
+                              <span className="text-cyan-300 font-bold flex items-center gap-1">
+                                <Bot className="w-2.5 h-2.5 text-cyan-400" />
+                                <span>AI Assistant · 24/7 Intel</span>
+                              </span>
+                            ) : (
+                              partner.division || partner.badgeText || "Competitor"
+                            )}
                           </div>
                         </div>
                       </button>

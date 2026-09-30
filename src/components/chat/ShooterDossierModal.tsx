@@ -11,7 +11,8 @@ import {
   MessageSquare, 
   CheckCircle2, 
   Compass,
-  ArrowRight
+  ArrowRight,
+  Bot
 } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
@@ -45,7 +46,7 @@ export function ShooterDossierModal({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
             <span className="font-mono text-[11px] font-bold text-amber-400 tracking-wider uppercase">
-              {isRO ? "AI RANGE OFFICER DOSSIER" : "COMPETITOR DOSSIER"}
+              {isRO ? "AUTONOMOUS AI RANGE OFFICER DOSSIER" : "COMPETITOR DOSSIER"}
             </span>
           </div>
           <button
@@ -62,23 +63,30 @@ export function ShooterDossierModal({
         <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 ${
             isRO
-              ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+              ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
               : isMasterOwner
               ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
               : isOwnerAdmin
               ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
               : "bg-black/60 text-amber-400 border-white/15"
           }`}>
-            {isRO ? "🎯" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
+            {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-white text-base truncate">
-                {shooter.name}
+                {isRO ? "RO (Range Officer)" : shooter.name}
               </h3>
-              <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
-                [{shooter.callsign}]
+              <span className={`font-mono text-xs font-bold shrink-0 ${isRO ? "text-cyan-400 bg-cyan-500/20 px-1.5 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1" : "text-amber-400"}`}>
+                {isRO ? (
+                  <>
+                    <Bot className="w-3 h-3 text-cyan-400" />
+                    <span>AI AGENT</span>
+                  </>
+                ) : (
+                  `[${shooter.callsign}]`
+                )}
               </span>
             </div>
 
@@ -92,12 +100,12 @@ export function ShooterDossierModal({
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {shooter.badgeText || (isRO ? "RANGE OFFICER" : shooter.role)}
+                {isRO ? "🤖 AI RANGE OFFICER" : shooter.badgeText || shooter.role}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                {shooter.status === "on_range" ? "ON RANGE" : "ONLINE"}
+                {shooter.status === "on_range" ? "ON RANGE" : "ONLINE 24/7"}
               </span>
             </div>
           </div>
@@ -135,13 +143,13 @@ export function ShooterDossierModal({
 
         {/* RO Special Capabilities / Direct Prompt shortcuts */}
         {isRO && (
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
-            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-300">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Range Officer Intel Ready</span>
+          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-300">
+              <Bot className="w-4 h-4 text-cyan-400" />
+              <span>Autonomous AI Match Assistant · 24/7 Intel</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-normal">
-              Direct comms with RO is private, encrypted, and available 24/7. Ask questions regarding match check-in, Bristol hotels, restaurants, or match rules.
+              RO is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 on private encrypted comms to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
             </p>
           </div>
         )}
