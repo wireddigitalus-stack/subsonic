@@ -73,7 +73,7 @@ export default function EvosDashboardPage() {
   }, [selectedNode]);
 
   const handleSimulateTransmission = (node: EvoNode) => {
-    setTransmissionSuccessNotice(`Dispatched live packet from [${node.callsign || node.label}] to Central Hub`);
+    setTransmissionSuccessNotice(`Comms ping dispatched to [${node.callsign || node.label}] • Signal Acknowledged (${node.latencyMs || 1}ms)`);
     setTimeout(() => {
       setTransmissionSuccessNotice(null);
     }, 3500);
@@ -227,7 +227,7 @@ export default function EvosDashboardPage() {
       {/* Toast Notice */}
       {transmissionSuccessNotice && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl bg-cyan-950/90 border border-cyan-400/60 text-cyan-200 text-xs font-mono font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)] z-40 animate-fadeIn flex items-center gap-2">
-          <Zap className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />
+          <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
           <span>{transmissionSuccessNotice}</span>
         </div>
       )}
@@ -909,9 +909,10 @@ export default function EvosDashboardPage() {
                 <button
                   onClick={() => handleSimulateTransmission(selectedNode)}
                   className="w-full py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_12px_rgba(6,182,212,0.2)]"
+                  title="Send a real-time comms check to this node"
                 >
-                  <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Transmit Synaptic Pulse</span>
+                  <Radio className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Ping Comms Link</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
