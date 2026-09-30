@@ -335,20 +335,10 @@ export function ChatMessageList({
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Dossier & Direct Comms`}
                           className={`text-xs md:text-sm font-bold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
-                            isRO ? "text-amber-300 font-black inline-flex items-center gap-1.5" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
+                            isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
-                          {isRO ? (
-                            <>
-                              <span>RO</span>
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 inline-flex items-center gap-1">
-                                <Bot className="w-2.5 h-2.5 text-cyan-400" />
-                                <span>AI AGENT</span>
-                              </span>
-                            </>
-                          ) : (
-                            msg.author.name
-                          )}
+                          {isRO ? "RO" : msg.author.name}
                         </button>
 
                         {/* Callsign brackets */}

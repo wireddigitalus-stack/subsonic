@@ -78,15 +78,8 @@ export function ShooterDossierModal({
               <h3 className="font-bold text-white text-base truncate">
                 {isRO ? "RO (Range Officer)" : shooter.name}
               </h3>
-              <span className={`font-mono text-xs font-bold shrink-0 ${isRO ? "text-cyan-400 bg-cyan-500/20 px-1.5 py-0.5 rounded border border-cyan-500/30 flex items-center gap-1" : "text-amber-400"}`}>
-                {isRO ? (
-                  <>
-                    <Bot className="w-3 h-3 text-cyan-400" />
-                    <span>AI AGENT</span>
-                  </>
-                ) : (
-                  `[${shooter.callsign}]`
-                )}
+              <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
+                [{shooter.callsign}]
               </span>
             </div>
 
