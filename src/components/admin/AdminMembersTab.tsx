@@ -465,8 +465,12 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
                           <span className="text-slate-300">{m.email}</span>
                         </div>
                         <div className="text-[11px] text-slate-300 break-words">
-                          <span className="text-slate-500 font-mono mr-1">RIG:</span>
-                          <span className="text-slate-200">{m.rifle_setup || "Custom Precision Rimfire"}</span>
+                          <span className="text-slate-500 font-mono mr-1">
+                            {m.member_id === "SS-2026-0001" || m.callsign === "RADAR" || m.role === "MASTER_OWNER" ? "TECH STACK:" : "RIG:"}
+                          </span>
+                          <span className="text-slate-200">
+                            {m.rifle_setup || (m.role === "MASTER_OWNER" ? "Systems & Infrastructure Architecture (Non-Shooter)" : "Custom Precision Rimfire")}
+                          </span>
                         </div>
                       </div>
                     </div>

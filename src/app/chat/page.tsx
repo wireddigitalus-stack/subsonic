@@ -1227,28 +1227,60 @@ export default function ChatPage() {
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
+    const isMasterOwner =
+      profileForm.role === "MASTER_OWNER" ||
+      profileForm.callsign === "RADAR" ||
+      profileForm.callsign === "ROB" ||
+      profileForm.callsign === "LTDAN" ||
+      (profileForm.name && profileForm.name.toLowerCase().includes("neilson"));
+
     const updated = {
       ...profileForm,
-      badgeText:
-        profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN"
-          ? "MASTER OWNER"
-          : profileForm.role === "OWNER_ADMIN"
-          ? "OWNER ADMIN"
-          : profileForm.role === "ADMIN"
-          ? "ADMIN"
-          : profileForm.role === "MODERATOR"
-          ? "MODERATOR"
-          : profileForm.role === "MATCH_DIRECTOR"
-          ? "MATCH DIRECTOR"
-          : profileForm.role === "OFFICIAL"
-          ? "OFFICIAL"
-          : profileForm.role === "PRO_COMPETITOR"
-          ? profileForm.division.toUpperCase().includes("PRO") ? "OPEN PRO" : "PRO SHOOTER"
-          : "MEMBER",
+      role: isMasterOwner ? "MASTER_OWNER" : profileForm.role,
+      division: isMasterOwner
+        ? profileForm.division || "Lead Systems Engineer & Master Admin"
+        : profileForm.division,
+      rifleSetup: isMasterOwner
+        ? profileForm.rifleSetup || "Systems & Infrastructure Architecture (Non-Shooter)"
+        : profileForm.rifleSetup,
+      badgeText: isMasterOwner
+        ? "SYSTEMS ENGINEER"
+        : profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN"
+        ? "MASTER OWNER"
+        : profileForm.role === "OWNER_ADMIN"
+        ? "OWNER ADMIN"
+        : profileForm.role === "ADMIN"
+        ? "ADMIN"
+        : profileForm.role === "MODERATOR"
+        ? "MODERATOR"
+        : profileForm.role === "MATCH_DIRECTOR"
+        ? "MATCH DIRECTOR"
+        : profileForm.role === "OFFICIAL"
+        ? "OFFICIAL"
+        : profileForm.role === "PRO_COMPETITOR"
+        ? profileForm.division.toUpperCase().includes("PRO") ? "OPEN PRO" : "PRO SHOOTER"
+        : "MEMBER",
     };
     setShooterProfile(updated);
     if (typeof window !== "undefined") {
-      localStorage.setItem("subsonic_shooter_profile", JSON.stringify(updated));
+      try {
+        localStorage.setItem("subsonic_shooter_profile", JSON.stringify(updated));
+        if (isMasterOwner) {
+          const mem = localStorage.getItem("subsonic_member_profile");
+          const parsed = mem ? JSON.parse(mem) : {};
+          localStorage.setItem(
+            "subsonic_member_profile",
+            JSON.stringify({
+              ...parsed,
+              member_id: "SS-2026-0001",
+              full_name: updated.name,
+              callsign: updated.callsign,
+              experience_level: updated.division,
+              rifle_setup: updated.rifleSetup,
+            })
+          );
+        }
+      } catch {}
     }
     // Show saved confirmation then close
     setProfileSaved(true);
@@ -2053,225 +2085,293 @@ export default function ChatPage() {
       />
 
       {/* 5. SHOOTER PROFILE CUSTOMIZER MODAL */}
-      {isProfileModalOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-          <div className="ios-glass rounded-3xl max-w-lg w-full border border-amber-500/40 shadow-2xl p-5 sm:p-7 space-y-4 max-h-[92dvh] overflow-y-auto ios-scrollbar">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                  <UserCheck className="w-4 h-4" />
+      {isProfileModalOpen && (() => {
+        const isMasterOwner =
+          shooterProfile.role === "MASTER_OWNER" ||
+          shooterProfile.callsign === "RADAR" ||
+          shooterProfile.callsign === "ROB" ||
+          shooterProfile.callsign === "LTDAN" ||
+          (shooterProfile.name && shooterProfile.name.toLowerCase().includes("neilson"));
+
+        return (
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+            <div className="ios-glass rounded-3xl max-w-lg w-full border border-amber-500/40 shadow-2xl p-5 sm:p-7 space-y-4 max-h-[92dvh] overflow-y-auto ios-scrollbar">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                    isMasterOwner
+                      ? "bg-cyan-500/20 border border-cyan-500/40 text-cyan-400"
+                      : "bg-amber-500/20 border border-amber-500/40 text-amber-400"
+                  }`}>
+                    {isMasterOwner ? <Activity className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">
+                      {isMasterOwner ? "Systems Engineer Profile & Credential" : "Marksman Profile & Credential"}
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      {isMasterOwner ? "Your verified callsign, pass, and infrastructure architecture" : "Your verified callsign, pass, and rig specs"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">
-                    Marksman Profile & Credential
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Your verified callsign, pass, and rig specs
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsProfileModalOpen(false)}
+                  className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsProfileModalOpen(false)}
-                className="p-1.5 rounded-xl bg-white/10 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            {/* Modal Tabs: Pass vs Edit */}
-            <div className="flex items-center gap-2 p-1 bg-black/40 border border-white/10 rounded-2xl">
-              <button
-                type="button"
-                onClick={() => setProfileActiveTab("PASS")}
-                className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  profileActiveTab === "PASS"
-                    ? "bg-emerald-500 text-black shadow-tactical-glow"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <QrCode className="w-3.5 h-3.5" />
-                <span>Digital Member Pass</span>
-              </button>
+              {/* Modal Tabs: Pass vs Edit */}
+              <div className="flex items-center gap-2 p-1 bg-black/40 border border-white/10 rounded-2xl">
+                <button
+                  type="button"
+                  onClick={() => setProfileActiveTab("PASS")}
+                  className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    profileActiveTab === "PASS"
+                      ? "bg-emerald-500 text-black shadow-tactical-glow"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span>Digital Member Pass</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setProfileActiveTab("EDIT")}
-                className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  profileActiveTab === "EDIT"
-                    ? "bg-amber-500 text-black shadow-tactical-glow"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <Sliders className="w-3.5 h-3.5" />
-                <span>Edit Callsign & Rig</span>
-              </button>
-            </div>
-
-            {/* Tab 1: Live Digital Member Pass with Scannable QR & Barcode */}
-            {profileActiveTab === "PASS" ? (
-              <div className="space-y-4 pt-1 animate-fadeIn">
-                <MemberCredentialCard
-                  memberId={memberId}
-                  fullName={shooterProfile.name}
-                  callsign={shooterProfile.callsign}
-                  state={memberState}
-                  experienceLevel={shooterProfile.division}
-                  rifleSetup={shooterProfile.rifleSetup}
-                  accessLevel={shooterProfile.role === "PRO_COMPETITOR" ? "PRO COMPETITOR" : "CHAT ACCESS"}
-                  showDownload={true}
-                />
-
-                <div className="text-center pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setProfileActiveTab("EDIT")}
-                    className="text-xs font-mono text-slate-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>Need to change your callsign or rifle build? Edit Profile →</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setProfileActiveTab("EDIT")}
+                  className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    profileActiveTab === "EDIT"
+                      ? isMasterOwner
+                        ? "bg-cyan-500 text-black shadow-tactical-glow"
+                        : "bg-amber-500 text-black shadow-tactical-glow"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Sliders className="w-3.5 h-3.5" />
+                  <span>{isMasterOwner ? "Edit Systems Profile" : "Edit Callsign & Rig"}</span>
+                </button>
               </div>
-            ) : (
-              /* Tab 2: Edit Callsign & Shooter Settings Form */
-              <form onSubmit={handleSaveProfile} className="space-y-3 sm:space-y-4 animate-fadeIn">
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Shooter Full Name</label>
-                  <input
-                    type="text"
-                    value={profileForm.name}
-                    onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                    required
+
+              {/* Tab 1: Live Digital Member Pass with Scannable QR & Barcode */}
+              {profileActiveTab === "PASS" ? (
+                <div className="space-y-4 pt-1 animate-fadeIn">
+                  <MemberCredentialCard
+                    memberId={memberId}
+                    fullName={shooterProfile.name}
+                    callsign={shooterProfile.callsign}
+                    state={memberState}
+                    experienceLevel={shooterProfile.division}
+                    rifleSetup={shooterProfile.rifleSetup}
+                    accessLevel={isMasterOwner ? "MASTER OWNER & ADMIN" : shooterProfile.role === "PRO_COMPETITOR" ? "PRO COMPETITOR" : "CHAT ACCESS"}
+                    showDownload={true}
                   />
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-amber-400 font-bold">Tactical Callsign</label>
-                  <input
-                    type="text"
-                    value={profileForm.callsign}
-                    onChange={(e) => setProfileForm({ ...profileForm, callsign: e.target.value.toUpperCase() })}
-                    placeholder="e.g. APEX-22"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-amber-500/40 text-amber-300 font-mono text-base sm:text-xs font-bold focus:border-amber-400 focus:outline-none"
-                    required
-                  />
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setProfileActiveTab("EDIT")}
+                      className="text-xs font-mono text-slate-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
+                    >
+                      <span>{isMasterOwner ? "Need to update system credentials or tech architecture? Edit Profile →" : "Need to change your callsign or rifle build? Edit Profile →"}</span>
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                /* Tab 2: Edit Callsign & Shooter/Systems Settings Form */
+                <form onSubmit={handleSaveProfile} className="space-y-3 sm:space-y-4 animate-fadeIn">
+                  <div className="space-y-1">
+                    <label className="text-xs font-mono text-slate-300">
+                      {isMasterOwner ? "Systems Architect Full Name" : "Shooter Full Name"}
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Competition Division</label>
-                  <select
-                    value={profileForm.division}
-                    onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                  >
-                    <option value="Open Division Pro">Open Division Pro</option>
-                    <option value="Production Division">Production Division</option>
-                    <option value="Senior Division 55+">Senior Division 55+</option>
-                    <option value="Ladies Rimfire Pro">Ladies Rimfire Pro</option>
-                    <option value="Junior Division">Junior Division</option>
-                  </select>
-                </div>
+                  <div className="space-y-1">
+                    <label className={`text-xs font-mono font-bold ${isMasterOwner ? "text-cyan-400" : "text-amber-400"}`}>
+                      {isMasterOwner ? "Systems Callsign" : "Tactical Callsign"}
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.callsign}
+                      onChange={(e) => setProfileForm({ ...profileForm, callsign: e.target.value.toUpperCase() })}
+                      placeholder={isMasterOwner ? "RADAR" : "e.g. APEX-22"}
+                      className={`w-full px-3 py-2 rounded-xl bg-black/50 border font-mono text-base sm:text-xs font-bold focus:outline-none ${
+                        isMasterOwner
+                          ? "border-cyan-500/40 text-cyan-300 focus:border-cyan-400"
+                          : "border-amber-500/40 text-amber-300 focus:border-amber-400"
+                      }`}
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">Rifle & Optic Setup</label>
-                  <input
-                    type="text"
-                    value={profileForm.rifleSetup}
-                    onChange={(e) => setProfileForm({ ...profileForm, rifleSetup: e.target.value })}
-                    placeholder="e.g. Vudoo V-22 / Bartlein MTU / ZCO 527"
-                    className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-mono text-slate-300">System Role</label>
-                  {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN" || profileForm.role === "ADMIN" || profileForm.role === "MODERATOR") ? (
-                    <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2.5 ${
-                      profileForm.role === "OWNER_ADMIN"
-                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                        : profileForm.role === "ADMIN"
-                        ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
-                        : profileForm.role === "MODERATOR"
-                        ? "bg-purple-500/10 border-purple-500/30 text-purple-300"
-                        : "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                    }`}>
-                      <span className="text-xl shrink-0">
-                        {profileForm.role === "OWNER_ADMIN" ? "🎖️" : profileForm.role === "ADMIN" ? "🛡️" : profileForm.role === "MODERATOR" ? "⚖️" : "👑"}
-                      </span>
-                      <div>
-                        <div className="font-extrabold text-xs">
-                          {profileForm.role === "OWNER_ADMIN"
-                            ? "OWNER ADMIN (EXECUTIVE CLEARANCE)"
-                            : profileForm.role === "ADMIN"
-                            ? "SYSTEM ADMINISTRATOR (COMMAND)"
-                            : profileForm.role === "MODERATOR"
-                            ? "COMMS MODERATOR (CHAT DEFENSE)"
-                            : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
-                        </div>
-                        <div className="text-[10px] text-slate-400">
-                          {profileForm.role === "OWNER_ADMIN"
-                            ? "Verified Society Leadership Authority"
-                            : profileForm.role === "ADMIN"
-                            ? "Full Operations & Management Clearance"
-                            : profileForm.role === "MODERATOR"
-                            ? "Authorized Comms Moderation & Safety Clearance"
-                            : "Full Administrative & Security Authority"}
-                        </div>
-                      </div>
+                  {isMasterOwner ? (
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono text-cyan-400 font-bold">
+                        System Role & Authority
+                      </label>
+                      <input
+                        type="text"
+                        value={profileForm.division || "Lead Systems Engineer & Master Admin"}
+                        onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-base sm:text-xs font-bold focus:border-cyan-400 focus:outline-none"
+                      />
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                      {(["PRO_COMPETITOR", "MATCH_DIRECTOR", "MEMBER"] as const).map((r) => (
-                        <button
-                          key={r}
-                          type="button"
-                          onClick={() => setProfileForm({ ...profileForm, role: r })}
-                          className={`py-1.5 px-2 rounded-xl border text-center transition-all text-xs ${
-                            profileForm.role === r
-                              ? "bg-amber-500 text-black font-bold border-amber-400"
-                              : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                          }`}
-                        >
-                          {r === "PRO_COMPETITOR" ? "PRO" : r === "MATCH_DIRECTOR" ? "DIRECTOR" : "MEMBER"}
-                        </button>
-                      ))}
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono text-slate-300">Competition Division</label>
+                      <select
+                        value={profileForm.division}
+                        onChange={(e) => setProfileForm({ ...profileForm, division: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/80 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
+                      >
+                        <option value="Open Division Pro">Open Division Pro</option>
+                        <option value="Production Division">Production Division</option>
+                        <option value="Senior Division 55+">Senior Division 55+</option>
+                        <option value="Ladies Rimfire Pro">Ladies Rimfire Pro</option>
+                        <option value="Junior Division">Junior Division</option>
+                      </select>
                     </div>
                   )}
-                </div>
 
-                <div className="flex items-center justify-end gap-3 pt-2">
-                  {profileSaved && (
-                    <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 animate-fadeIn">
-                      <CheckCircle2 className="w-4 h-4" />
-                      PROFILE SAVED!
-                    </span>
+                  {isMasterOwner ? (
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono text-cyan-400 font-bold">
+                        Infrastructure & Tech Stack
+                      </label>
+                      <input
+                        type="text"
+                        value={profileForm.rifleSetup}
+                        onChange={(e) => setProfileForm({ ...profileForm, rifleSetup: e.target.value })}
+                        placeholder="e.g. Server Core • Telemetry Relays • Encrypted Comms (Non-Shooter)"
+                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-cyan-500/40 text-cyan-300 font-mono text-base sm:text-xs focus:border-cyan-400 focus:outline-none"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono text-slate-300">Rifle & Optic Setup</label>
+                      <input
+                        type="text"
+                        value={profileForm.rifleSetup}
+                        onChange={(e) => setProfileForm({ ...profileForm, rifleSetup: e.target.value })}
+                        placeholder="e.g. Vudoo V-22 / Bartlein MTU / ZCO 527"
+                        className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
+                      />
+                    </div>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileModalOpen(false)}
-                    disabled={profileSaved}
-                    className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold disabled:opacity-40"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={profileSaved}
-                    className={`px-5 py-2 rounded-xl font-mono font-bold text-xs shadow-tactical-glow transition-all ${
-                      profileSaved
-                        ? "bg-emerald-500 text-white scale-105"
-                        : "bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110"
-                    }`}
-                  >
-                    {profileSaved ? "✓ SAVED!" : "SAVE PROFILE"}
-                  </button>
-                </div>
-              </form>
-            )}
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-mono text-slate-300">System Role</label>
+                    {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN" || profileForm.role === "ADMIN" || profileForm.role === "MODERATOR" || isMasterOwner) ? (
+                      <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2.5 ${
+                        profileForm.role === "MASTER_OWNER" || isMasterOwner
+                          ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
+                          : profileForm.role === "OWNER_ADMIN"
+                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                          : profileForm.role === "ADMIN"
+                          ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
+                          : profileForm.role === "MODERATOR"
+                          ? "bg-purple-500/10 border-purple-500/30 text-purple-300"
+                          : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                      }`}>
+                        <span className="text-xl shrink-0">
+                          {profileForm.role === "MASTER_OWNER" || isMasterOwner
+                            ? "💻"
+                            : profileForm.role === "OWNER_ADMIN"
+                            ? "🎖️"
+                            : profileForm.role === "ADMIN"
+                            ? "🛡️"
+                            : profileForm.role === "MODERATOR"
+                            ? "⚖️"
+                            : "👑"}
+                        </span>
+                        <div>
+                          <div className="font-extrabold text-xs">
+                            {profileForm.role === "MASTER_OWNER" || isMasterOwner
+                              ? "LEAD SYSTEMS ENGINEER & MASTER ADMIN (ROOT CLEARANCE)"
+                              : profileForm.role === "OWNER_ADMIN"
+                              ? "OWNER ADMIN (EXECUTIVE CLEARANCE)"
+                              : profileForm.role === "ADMIN"
+                              ? "SYSTEM ADMINISTRATOR (COMMAND)"
+                              : profileForm.role === "MODERATOR"
+                              ? "COMMS MODERATOR (CHAT DEFENSE)"
+                              : "MASTER OWNER / DEV ADMIN (ROOT ACCESS)"}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {profileForm.role === "MASTER_OWNER" || isMasterOwner
+                              ? "Full Systems Architecture, Comms Relays & Root Administrative Authority (Non-Shooter)"
+                              : profileForm.role === "OWNER_ADMIN"
+                              ? "Verified Society Leadership Authority"
+                              : profileForm.role === "ADMIN"
+                              ? "Full Operations & Management Clearance"
+                              : profileForm.role === "MODERATOR"
+                              ? "Authorized Comms Moderation & Safety Clearance"
+                              : "Full Administrative & Security Authority"}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+                        {(["PRO_COMPETITOR", "MATCH_DIRECTOR", "MEMBER"] as const).map((r) => (
+                          <button
+                            key={r}
+                            type="button"
+                            onClick={() => setProfileForm({ ...profileForm, role: r })}
+                            className={`py-1.5 px-2 rounded-xl border text-center transition-all text-xs ${
+                              profileForm.role === r
+                                ? "bg-amber-500 text-black font-bold border-amber-400"
+                                : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+                            }`}
+                          >
+                            {r === "PRO_COMPETITOR" ? "PRO" : r === "MATCH_DIRECTOR" ? "DIRECTOR" : "MEMBER"}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 pt-2">
+                    {profileSaved && (
+                      <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 animate-fadeIn">
+                        <CheckCircle2 className="w-4 h-4" />
+                        PROFILE SAVED!
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsProfileModalOpen(false)}
+                      disabled={profileSaved}
+                      className="px-4 py-2 rounded-xl bg-white/10 text-slate-300 hover:text-white text-xs font-semibold disabled:opacity-40"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={profileSaved}
+                      className={`px-5 py-2 rounded-xl font-mono font-bold text-xs shadow-tactical-glow transition-all ${
+                        profileSaved
+                          ? "bg-emerald-500 text-white scale-105"
+                          : isMasterOwner
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:brightness-110"
+                          : "bg-gradient-to-r from-amber-500 to-amber-600 text-black hover:brightness-110"
+                      }`}
+                    >
+                      {profileSaved ? "✓ SAVED!" : "SAVE PROFILE"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 5. INTERACTIVE GUIDED CHAT TOUR */}
       <ChatTour

@@ -116,60 +116,69 @@ export function MemberCredentialCard({
         </div>
 
         {/* Member Callsign & Core Data */}
-        <div className="space-y-4 relative z-10">
-          <div className="bg-black/40 rounded-2xl p-3 border border-white/5 flex items-center justify-between">
-            <div>
-              <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block">
-                TACTICAL CALLSIGN
-              </span>
-              <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 tracking-wider">
-                [{callsign || "MARKSMAN"}]
+        {(() => {
+          const isMasterOwner = memberId === "SS-2026-0001" || callsign === "RADAR" || (fullName && fullName.toLowerCase().includes("neilson"));
+          return (
+            <div className="space-y-4 relative z-10">
+              <div className="bg-black/40 rounded-2xl p-3 border border-white/5 flex items-center justify-between">
+                <div>
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block">
+                    {isMasterOwner ? "SYSTEMS CALLSIGN" : "TACTICAL CALLSIGN"}
+                  </span>
+                  <div className="text-xl sm:text-2xl font-black font-mono text-emerald-400 tracking-wider">
+                    [{callsign || (isMasterOwner ? "RADAR" : "MARKSMAN")}]
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block">
+                    SERIAL NUMBER
+                  </span>
+                  <div className="text-sm font-bold font-mono text-amber-400">
+                    {memberId}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="text-right">
-              <span className="text-[9px] font-mono uppercase tracking-widest text-slate-400 block">
-                SERIAL NUMBER
-              </span>
-              <div className="text-sm font-bold font-mono text-amber-400">
-                {memberId}
+              {/* Grid Meta */}
+              <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[9px] text-slate-400 block uppercase">
+                    {isMasterOwner ? "SYSTEMS ARCHITECT" : "MARKSMAN"}
+                  </span>
+                  <span className="font-bold text-white truncate block">{fullName || "Verified Member"}</span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[9px] text-slate-400 block uppercase">REGION / STATE</span>
+                  <span className="font-bold text-white">{state}</span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[9px] text-slate-400 block uppercase">ACCESS LEVEL</span>
+                  <span className="font-bold text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <span>{isMasterOwner ? "MASTER OWNER & ADMIN" : accessLevel}</span>
+                  </span>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-[9px] text-slate-400 block uppercase">ISSUED</span>
+                  <span className="font-bold text-slate-300">{issuedDate}</span>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Grid Meta */}
-          <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[9px] text-slate-400 block uppercase">MARKSMAN</span>
-              <span className="font-bold text-white truncate block">{fullName || "Verified Member"}</span>
+              {rifleSetup && (
+                <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-[11px] font-mono">
+                  <span className="text-slate-400 block text-[9px] uppercase tracking-wider">
+                    {isMasterOwner ? "INFRASTRUCTURE & TECH STACK" : "REGISTERED RIG"}
+                  </span>
+                  <span className="text-slate-200 truncate block font-bold">{rifleSetup}</span>
+                </div>
+              )}
             </div>
-
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[9px] text-slate-400 block uppercase">REGION / STATE</span>
-              <span className="font-bold text-white">{state}</span>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[9px] text-slate-400 block uppercase">ACCESS LEVEL</span>
-              <span className="font-bold text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                <span>{accessLevel}</span>
-              </span>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[9px] text-slate-400 block uppercase">ISSUED</span>
-              <span className="font-bold text-slate-300">{issuedDate}</span>
-            </div>
-          </div>
-
-          {rifleSetup && (
-            <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 text-[11px] font-mono">
-              <span className="text-slate-400 block text-[9px] uppercase tracking-wider">REGISTERED RIG</span>
-              <span className="text-slate-200 truncate block font-bold">{rifleSetup}</span>
-            </div>
-          )}
-        </div>
+          );
+        })()}
 
         {/* Real Functional Barcode (Code 128) & Scannable QR Code */}
         <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3 relative z-10">
