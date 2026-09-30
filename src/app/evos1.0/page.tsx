@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { EvoVisionCanvas } from "@/components/evovision/EvoVisionCanvas";
-import { EvoNode, EVO_CLUSTERS, EVO_NODES } from "@/lib/evovision-data";
+import { EvoNode, EVO_CLUSTERS, EVO_NODES, EVO_LINKS } from "@/lib/evovision-data";
 import {
   Activity,
   AlertTriangle,
@@ -15,14 +15,18 @@ import {
   Crosshair,
   ExternalLink,
   Flame,
+  History,
   Layers,
   Lock,
+  MapPin,
   Maximize2,
   MessageSquare,
   Minimize2,
+  Network,
   Radio,
   RefreshCw,
   Search,
+  Server,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -30,6 +34,8 @@ import {
   Sparkles,
   Target,
   Terminal,
+  TrendingUp,
+  Trophy,
   Users,
   Volume2,
   Wifi,
@@ -45,6 +51,26 @@ export default function EvosDashboardPage() {
   const [is3DMode, setIs3DMode] = useState<boolean>(false);
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [recenterSignal, setRecenterSignal] = useState<number>(0);
+
+  // Directly linked synaptic peers for the active node
+  const connectedNodes = useMemo(() => {
+    if (!selectedNode) return [];
+    const links = EVO_LINKS.filter(
+      (l) => l.sourceId === selectedNode.id || l.targetId === selectedNode.id
+    );
+    return links
+      .map((l) => {
+        const peerId = l.sourceId === selectedNode.id ? l.targetId : l.sourceId;
+        const peerNode = EVO_NODES.find((n) => n.id === peerId);
+        return {
+          link: l,
+          peer: peerNode,
+        };
+      })
+      .filter((item): item is { link: typeof item.link; peer: NonNullable<typeof item.peer> } =>
+        Boolean(item.peer)
+      );
+  }, [selectedNode]);
 
   const handleSimulateTransmission = (node: EvoNode) => {
     setTransmissionSuccessNotice(`Dispatched live packet from [${node.callsign || node.label}] to Central Hub`);
@@ -347,6 +373,36 @@ export default function EvosDashboardPage() {
                 </div>
               </div>
 
+              {/* Activity Sparkline */}
+              {selectedNode.metrics?.sparkline && (
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-cyan-300 font-bold uppercase flex items-center gap-1.5">
+                      <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Activity & Synaptic Velocity</span>
+                    </span>
+                    <span className="text-slate-400">7-Day Trend</span>
+                  </div>
+                  <div className="flex items-end gap-1.5 h-10 pt-1 px-1 bg-black/40 rounded-xl border border-white/5">
+                    {selectedNode.metrics.sparkline.map((val, idx) => (
+                      <div key={idx} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                        <div
+                          className="w-full rounded-t bg-gradient-to-t from-cyan-500/40 to-cyan-400 transition-all duration-300"
+                          style={{ height: `${Math.max(15, val)}%` }}
+                          title={`Period ${idx + 1}: ${val}%`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-[8px] text-slate-500 font-mono px-0.5">
+                    <span>-6D</span>
+                    <span>-4D</span>
+                    <span>-2D</span>
+                    <span className="text-cyan-400 font-bold">LIVE</span>
+                  </div>
+                </div>
+              )}
+
               {/* Sublabel / Role Description */}
               {selectedNode.sublabel && (
                 <div className="p-2.5 rounded-xl bg-cyan-950/20 border border-cyan-500/20 text-[11px] text-cyan-200 flex items-start gap-2">
@@ -355,6 +411,85 @@ export default function EvosDashboardPage() {
                     <span className="text-slate-400 block text-[9px] uppercase font-bold">Deployment</span>
                     <span>{selectedNode.sublabel}</span>
                   </div>
+                </div>
+              )}
+
+              {/* Competitive Standing & Rank Badge */}
+              {selectedNode.rankBadge && (
+                <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/30 via-black/40 to-slate-900/40 border border-amber-500/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-amber-300 font-bold text-[10px] uppercase flex items-center gap-1.5">
+                      <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Competitive Standing</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-black text-[9px] border border-amber-500/30">
+                      {selectedNode.rankBadge.tier}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block uppercase">Rating</span>
+                      <span className="text-sm font-black text-amber-300 font-mono">
+                        {selectedNode.rankBadge.rating}
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block uppercase">Standing</span>
+                      <span className="text-sm font-black text-sky-300 font-mono">
+                        {selectedNode.rankBadge.percentile}
+                      </span>
+                    </div>
+                  </div>
+                  {selectedNode.rankBadge.regionalRank && (
+                    <div className="text-[9px] text-amber-200/90 text-center font-bold">
+                      🏆 {selectedNode.rankBadge.regionalRank}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Recent Verified Matches */}
+              {selectedNode.matchHistory && selectedNode.matchHistory.length > 0 && (
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-sky-300 font-bold uppercase flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Recent Verified Matches</span>
+                    </span>
+                    <span className="text-slate-400">{selectedNode.matchHistory.length} Matches</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {selectedNode.matchHistory.map((m, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-[10px]"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="font-bold text-white truncate">{m.matchName}</div>
+                          <div className="text-[9px] text-slate-400">
+                            {m.date} • {m.division}
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="font-black text-emerald-400">{m.finish}</div>
+                          <div className="text-[9px] text-slate-400 font-mono">{m.points}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Home Range & Territory */}
+              {selectedNode.homeRange && (
+                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-[10px]">
+                  <span className="text-slate-400 uppercase flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3 text-rose-400" />
+                    <span>Home Range</span>
+                  </span>
+                  <span className="font-semibold text-white truncate max-w-[200px] text-right">
+                    {selectedNode.homeRange}
+                  </span>
                 </div>
               )}
 
@@ -532,6 +667,59 @@ export default function EvosDashboardPage() {
                 </div>
               )}
 
+              {/* Enforcement Metrics (Moderation Sentinel Engine) */}
+              {selectedNode.enforcementStats && (
+                <div className="p-3 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-rose-300 font-bold uppercase flex items-center gap-1.5">
+                      <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                      <span>Sentinel Enforcement Metrics</span>
+                    </span>
+                    <span className="text-[9px] text-rose-200 bg-rose-500/20 px-1.5 py-0.5 rounded font-bold border border-rose-500/30">
+                      {selectedNode.enforcementStats.cleanRate} Clean
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[8px] text-slate-400 block uppercase">Flags</span>
+                      <span className="font-black text-rose-300">{selectedNode.enforcementStats.flagsProcessed}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[8px] text-slate-400 block uppercase">Warnings</span>
+                      <span className="font-black text-amber-300">{selectedNode.enforcementStats.warnings}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[8px] text-slate-400 block uppercase">Mutes</span>
+                      <span className="font-black text-slate-300">{selectedNode.enforcementStats.mutesIssued}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Monitored Comms Rooms */}
+              {selectedNode.channelCoverage && selectedNode.channelCoverage.length > 0 && (
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-rose-300 font-bold uppercase flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-rose-400" />
+                      <span>Monitored Comms Rooms</span>
+                    </span>
+                    <span className="text-slate-400">{selectedNode.channelCoverage.length} Rooms</span>
+                  </div>
+                  <div className="space-y-1">
+                    {selectedNode.channelCoverage.map((c, idx) => (
+                      <div
+                        key={idx}
+                        className="p-1.5 px-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-[10px]"
+                      >
+                        <span className="text-slate-200">#{c.roomName}</span>
+                        <span className="text-[9px] text-cyan-300 font-mono">{c.activeShooters} marksmen</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Bot Persona Engine Readout */}
               {selectedNode.botSpecs && (
                 <div className="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2">
@@ -575,6 +763,87 @@ export default function EvosDashboardPage() {
                 </div>
               )}
 
+              {/* Autonomous Simulation Event Stream */}
+              {selectedNode.simulationTimeline && selectedNode.simulationTimeline.length > 0 && (
+                <div className="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-amber-300 font-bold uppercase flex items-center gap-1.5">
+                      <History className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Autonomous Event Stream</span>
+                    </span>
+                    <span className="text-[9px] text-amber-300 font-bold">Sim Loop</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {selectedNode.simulationTimeline.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-[10px] gap-2"
+                      >
+                        <div className="text-slate-200 leading-snug">{item.event}</div>
+                        <span className="text-[9px] text-slate-400 shrink-0 font-mono">{item.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* System Health & Node Engine */}
+              {selectedNode.systemHealth && (
+                <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-cyan-300 font-bold uppercase flex items-center gap-1.5">
+                      <Server className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>System Health & Node Engine</span>
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#10B981]" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[10px]">
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block">Uptime</span>
+                      <span className="font-bold text-emerald-300">{selectedNode.systemHealth.uptime}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block">Throughput</span>
+                      <span className="font-bold text-cyan-300">{selectedNode.systemHealth.throughput}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block">Memory</span>
+                      <span className="font-bold text-amber-300">{selectedNode.systemHealth.memoryUsed}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[9px] text-slate-400 block">DB Latency</span>
+                      <span className="font-bold text-sky-300">{selectedNode.systemHealth.dbLag}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Security Audit Trail */}
+              {selectedNode.securityLog && selectedNode.securityLog.length > 0 && (
+                <div className="p-3 rounded-2xl bg-indigo-950/20 border border-indigo-500/30 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-indigo-300 font-bold uppercase flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Security Audit Trail</span>
+                    </span>
+                    <span className="text-[9px] text-indigo-200 bg-indigo-500/20 px-1.5 py-0.5 rounded font-bold border border-indigo-500/30">
+                      PASSKEY
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {selectedNode.securityLog.map((log, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-[10px] gap-2"
+                      >
+                        <div className="text-slate-200">{log.event}</div>
+                        <span className="text-[9px] text-slate-400 shrink-0 font-mono">{log.timestamp}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Master Telemetry Stats (For Master Owner or Core DB) */}
               {selectedNode.telemetryStats && (
                 <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2">
@@ -599,6 +868,38 @@ export default function EvosDashboardPage() {
                         </span>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Direct Synaptic Connections (Interactive Map) */}
+              {connectedNodes.length > 0 && (
+                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-cyan-300 font-bold uppercase flex items-center gap-1.5">
+                      <Network className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Synaptic Peer Links</span>
+                    </span>
+                    <span className="text-slate-400">{connectedNodes.length} Links</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {connectedNodes.map(({ link, peer }) => (
+                      <button
+                        key={peer.id}
+                        onClick={() => setSelectedNode(peer)}
+                        className="px-2.5 py-1.5 rounded-xl bg-black/50 hover:bg-white/10 border border-white/10 hover:border-cyan-400/50 text-[10px] text-slate-300 hover:text-white flex items-center gap-1.5 transition-all group shadow-sm"
+                        title={`Jump camera to [${peer.callsign || peer.label}]`}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ backgroundColor: peer.color }}
+                        />
+                        <span className="font-bold">{peer.callsign || peer.label}</span>
+                        <span className="text-[9px] text-slate-500 font-mono group-hover:text-cyan-300">
+                          {link.latencyLabel || "2ms"}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}

@@ -50,6 +50,58 @@ export interface EvoTelemetryStats {
   favoriteRoute?: string;
 }
 
+export interface EvoMatchResult {
+  matchName: string;
+  date: string;
+  finish: string;
+  points: string;
+  division: string;
+  percentile?: string;
+}
+
+export interface EvoRankBadge {
+  tier: "GRANDMASTER" | "MASTER" | "EXPERT" | "PRO" | "MARKSMAN";
+  rating: number;
+  percentile: string;
+  regionalRank?: string;
+}
+
+export interface EvoChannelCoverage {
+  roomName: string;
+  activeShooters: number;
+  health: "NOMINAL" | "HIGH_LOAD" | "FLAGGED";
+  lastAudit?: string;
+}
+
+export interface EvoEnforcementStats {
+  flagsProcessed: number;
+  mutesIssued: number;
+  warnings: number;
+  cleanRate: string;
+  aiSentinelUptime: string;
+}
+
+export interface EvoSimTimelineEvent {
+  time: string;
+  event: string;
+  type: "chat" | "dope" | "flag" | "ping";
+}
+
+export interface EvoSystemHealth {
+  uptime: string;
+  throughput: string;
+  memoryUsed: string;
+  activeSockets: number;
+  dbLag: string;
+}
+
+export interface EvoSecurityLogEntry {
+  timestamp: string;
+  event: string;
+  level: "info" | "warning" | "alert";
+  ipMasked?: string;
+}
+
 export interface EvoNode {
   id: string;
   label: string;
@@ -76,6 +128,16 @@ export interface EvoNode {
   moderationData?: EvoModerationData;
   botSpecs?: EvoBotSpecs;
   telemetryStats?: EvoTelemetryStats;
+
+  // Rich Dossier & Deep Inspection Data
+  matchHistory?: EvoMatchResult[];
+  rankBadge?: EvoRankBadge;
+  channelCoverage?: EvoChannelCoverage[];
+  enforcementStats?: EvoEnforcementStats;
+  simulationTimeline?: EvoSimTimelineEvent[];
+  systemHealth?: EvoSystemHealth;
+  securityLog?: EvoSecurityLogEntry[];
+  connectedNodeIds?: string[];
 
   // Spatial canvas properties
   x: number;
@@ -170,6 +232,14 @@ export const EVO_NODES: EvoNode[] = [
       responseTimeMs: 1,
       accuracy: 99.9,
       learningProgress: 94,
+      sparkline: [42, 58, 64, 78, 85, 92, 98],
+    },
+    systemHealth: {
+      uptime: "99.98% (24d 14h)",
+      throughput: "1,420 packets/sec",
+      memoryUsed: "148 MB / 512 MB",
+      activeSockets: 94,
+      dbLag: "1.2 ms",
     },
     details: {
       protocol: "WebSocket / Supabase Realtime Stream",
@@ -277,7 +347,40 @@ export const EVO_NODES: EvoNode[] = [
     metrics: {
       accuracy: 98,
       responseTimeMs: 8,
+      sparkline: [92, 95, 94, 98, 97, 99, 98],
     },
+    rankBadge: {
+      tier: "GRANDMASTER",
+      rating: 2410,
+      percentile: "Top 0.4%",
+      regionalRank: "Appalachian Rimfire #1",
+    },
+    matchHistory: [
+      {
+        matchName: "Smoky Mountain Rimfire Classic",
+        date: "Sep 2026",
+        finish: "1st of 82",
+        points: "98.4 / 100",
+        division: "Open Division Pro",
+        percentile: "100th",
+      },
+      {
+        matchName: "Bristol Fall Steel Challenge",
+        date: "Aug 2026",
+        finish: "2nd of 74",
+        points: "96.2 / 100",
+        division: "Open Division Pro",
+        percentile: "98th",
+      },
+      {
+        matchName: "Blue Ridge PRS Qualifier",
+        date: "Jul 2026",
+        finish: "1st of 95",
+        points: "99.1 / 100",
+        division: "Open Division Pro",
+        percentile: "100th",
+      },
+    ],
     dopeCard: {
       targetDistance: "340 YDS",
       targetDescription: "Stage 4 • Diamond KYL Rack",
@@ -553,7 +656,21 @@ export const EVO_NODES: EvoNode[] = [
     metrics: {
       accuracy: 99.9,
       responseTimeMs: 6,
+      sparkline: [99, 100, 98, 100, 99, 100, 100],
     },
+    enforcementStats: {
+      flagsProcessed: 184,
+      mutesIssued: 4,
+      warnings: 12,
+      cleanRate: "99.8%",
+      aiSentinelUptime: "99.99%",
+    },
+    channelCoverage: [
+      { roomName: "bristol-pro-shootout", activeShooters: 48, health: "NOMINAL", lastAudit: "30s ago" },
+      { roomName: "ballistics-and-gear", activeShooters: 24, health: "NOMINAL", lastAudit: "1m ago" },
+      { roomName: "general-society", activeShooters: 38, health: "NOMINAL", lastAudit: "15s ago" },
+      { roomName: "trade-and-classifieds", activeShooters: 14, health: "NOMINAL", lastAudit: "45s ago" },
+    ],
     moderationData: {
       standing: "SENTINEL",
       toxicityScore: 0,
@@ -687,7 +804,20 @@ export const EVO_NODES: EvoNode[] = [
     metrics: {
       accuracy: 100,
       responseTimeMs: 1,
+      sparkline: [98, 99, 100, 100, 100, 100, 100],
     },
+    systemHealth: {
+      uptime: "99.99% • Master Host Online",
+      throughput: "3,840 events/min",
+      memoryUsed: "210 MB / 1024 MB",
+      activeSockets: 94,
+      dbLag: "0.8 ms",
+    },
+    securityLog: [
+      { timestamp: "12m ago", event: "Master PIN validated (2468)", level: "info" },
+      { timestamp: "1h ago", event: "Automated Supabase sync verified clean", level: "info" },
+      { timestamp: "3h ago", event: "Zero threat escalations in triage queue", level: "info" },
+    ],
     telemetryStats: {
       totalClicks: 1420,
       dwellSeconds: 5200,
@@ -820,7 +950,14 @@ export const EVO_NODES: EvoNode[] = [
     metrics: {
       accuracy: 94,
       responseTimeMs: 18,
+      sparkline: [62, 70, 85, 74, 91, 88, 94],
     },
+    simulationTimeline: [
+      { time: "2m ago", event: "Transmitted stage condition briefing", type: "chat" },
+      { time: "14m ago", event: "Calculated dummy DOPE drop (1062 fps)", type: "dope" },
+      { time: "42m ago", event: "Generated boundary edge case for Plink AI Sentinel", type: "flag" },
+      { time: "1h ago", event: "Simulated peer ping response (12ms)", type: "ping" },
+    ],
     botSpecs: {
       personality: "veteran-tactical",
       primaryChannels: ["bristol-pro-shootout", "range-conditions-weather", "squad-briefings"],

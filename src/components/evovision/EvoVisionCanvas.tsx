@@ -116,6 +116,7 @@ export function EvoVisionCanvas({
   });
 
   const [hoveredNode, setHoveredNode] = useState<EvoNode | null>(null);
+  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const [hoveredSpaceman, setHoveredSpaceman] = useState(false);
 
   // Keep live refs for uninterrupted 60 FPS animation loop
@@ -753,56 +754,72 @@ export function EvoVisionCanvas({
         const isSelected = selectedNodeVal?.id === node.id;
         const isHovered = hoveredNodeVal?.id === node.id;
 
-        const nodeR = node.radius * scale;
+        // Unique organic phase per node to eliminate synchronized pulsing
+        let charSum = 0;
+        for (let i = 0; i < node.id.length; i++) charSum += node.id.charCodeAt(i);
+        const nodePhase = (charSum * 13) % 100;
+
+        // Subtle organic breathing oscillation (±2.5%)
+        const breath = Math.sin(time * 1.5 + nodePhase) * 0.026;
+        const baseR = node.radius * scale;
+        const nodeR = baseR * (1 + breath);
 
         ctx.globalAlpha = (isDimmed ? 0.2 : 1) * alphaFactor;
 
-        // Multi-layer glowing halo
+        // ── A. Multi-layer Glowing Halo ─────────────────────────────
         const haloGrad = ctx.createRadialGradient(
           px,
           py,
           nodeR * 0.4,
           px,
           py,
-          nodeR * (isSelected ? 2.4 : isHovered ? 2.0 : 1.7)
+          nodeR * (isSelected ? 2.5 : isHovered ? 2.2 : 1.85)
         );
-        haloGrad.addColorStop(0, node.glowColor || "rgba(6, 182, 212, 0.4)");
+        haloGrad.addColorStop(0, node.glowColor || "rgba(6, 182, 212, 0.45)");
+        haloGrad.addColorStop(0.6, `${node.color}25`);
         haloGrad.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = haloGrad;
         ctx.beginPath();
-        ctx.arc(px, py, nodeR * 2.2, 0, Math.PI * 2);
+        ctx.arc(px, py, nodeR * 2.4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Node Inner Sphere Body
+        // ── B. Translucent Glass Orb Base Shell ───────────────────────
         const bodyGrad = ctx.createRadialGradient(
-          px - nodeR * 0.35,
-          py - nodeR * 0.35,
-          nodeR * 0.1,
+          px - nodeR * 0.32,
+          py - nodeR * 0.36,
+          nodeR * 0.05,
           px,
           py,
           nodeR
         );
 
         if (node.id === "hub-main") {
-          bodyGrad.addColorStop(0, "#E0F2FE");
-          bodyGrad.addColorStop(0.35, "#38BDF8");
-          bodyGrad.addColorStop(0.7, "#0284C7");
-          bodyGrad.addColorStop(1, "#082F49");
+          bodyGrad.addColorStop(0, "rgba(224, 242, 254, 0.85)");
+          bodyGrad.addColorStop(0.3, "rgba(56, 189, 248, 0.52)");
+          bodyGrad.addColorStop(0.7, "rgba(2, 132, 199, 0.40)");
+          bodyGrad.addColorStop(1, "rgba(8, 47, 73, 0.72)");
         } else if (node.cluster === "MODS") {
-          bodyGrad.addColorStop(0, "#FFE4E6");
-          bodyGrad.addColorStop(0.4, "#F43F5E");
-          bodyGrad.addColorStop(0.8, "#9F1239");
-          bodyGrad.addColorStop(1, "#4C0519");
+          bodyGrad.addColorStop(0, "rgba(255, 228, 230, 0.82)");
+          bodyGrad.addColorStop(0.35, "rgba(244, 63, 94, 0.52)");
+          bodyGrad.addColorStop(0.75, "rgba(159, 18, 57, 0.40)");
+          bodyGrad.addColorStop(1, "rgba(76, 5, 25, 0.72)");
         } else if (node.cluster === "BOTS") {
-          bodyGrad.addColorStop(0, "#FEF3C7");
-          bodyGrad.addColorStop(0.4, node.status === "ALERT" ? "#EF4444" : "#F59E0B");
-          bodyGrad.addColorStop(0.8, node.status === "ALERT" ? "#991B1B" : "#B45309");
-          bodyGrad.addColorStop(1, "#451A03");
+          const isAlert = node.status === "ALERT";
+          bodyGrad.addColorStop(0, "rgba(254, 243, 199, 0.82)");
+          bodyGrad.addColorStop(0.35, isAlert ? "rgba(239, 68, 68, 0.58)" : "rgba(245, 158, 11, 0.52)");
+          bodyGrad.addColorStop(0.75, isAlert ? "rgba(153, 27, 27, 0.40)" : "rgba(180, 83, 9, 0.40)");
+          bodyGrad.addColorStop(1, "rgba(69, 26, 3, 0.72)");
+        } else if (node.cluster === "ADMIN") {
+          bodyGrad.addColorStop(0, "rgba(224, 231, 255, 0.85)");
+          bodyGrad.addColorStop(0.35, "rgba(99, 102, 241, 0.52)");
+          bodyGrad.addColorStop(0.75, "rgba(67, 56, 202, 0.40)");
+          bodyGrad.addColorStop(1, "rgba(30, 27, 75, 0.72)");
         } else {
-          bodyGrad.addColorStop(0, "#CFFAFE");
-          bodyGrad.addColorStop(0.4, node.color);
-          bodyGrad.addColorStop(0.8, "#0369A1");
-          bodyGrad.addColorStop(1, "#082F49");
+          // USERS & default
+          bodyGrad.addColorStop(0, "rgba(207, 250, 254, 0.82)");
+          bodyGrad.addColorStop(0.35, "rgba(56, 189, 248, 0.52)");
+          bodyGrad.addColorStop(0.75, "rgba(3, 105, 161, 0.40)");
+          bodyGrad.addColorStop(1, "rgba(8, 47, 73, 0.72)");
         }
 
         ctx.fillStyle = bodyGrad;
@@ -810,15 +827,106 @@ export function EvoVisionCanvas({
         ctx.arc(px, py, nodeR, 0, Math.PI * 2);
         ctx.fill();
 
-        // Specular highlight rim
+        // ── C. Slick Organic Fluid Animations Inside Orb (Clipped) ─────
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(1, nodeR - 0.5), 0, Math.PI * 2);
+        ctx.clip();
+
+        // 1. Swirling Organic Plasma Fluid 1
+        const swirl1Angle = time * 0.75 + nodePhase;
+        const swirl1Dist = nodeR * 0.35;
+        const s1X = px + Math.cos(swirl1Angle) * swirl1Dist;
+        const s1Y = py + Math.sin(swirl1Angle) * swirl1Dist;
+        const plasmaGrad1 = ctx.createRadialGradient(s1X, s1Y, 0, s1X, s1Y, nodeR * 0.9);
+        plasmaGrad1.addColorStop(0, `${node.color}55`);
+        plasmaGrad1.addColorStop(0.5, `${node.color}20`);
+        plasmaGrad1.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = plasmaGrad1;
+        ctx.fillRect(px - nodeR, py - nodeR, nodeR * 2, nodeR * 2);
+
+        // 2. Counter-Rotating Organic Swirl 2 (Liquid mixing effect)
+        const swirl2Angle = -time * 0.55 + nodePhase * 1.35;
+        const swirl2Dist = nodeR * 0.3;
+        const s2X = px + Math.cos(swirl2Angle) * swirl2Dist;
+        const s2Y = py + Math.sin(swirl2Angle) * swirl2Dist;
+        const plasmaGrad2 = ctx.createRadialGradient(s2X, s2Y, 0, s2X, s2Y, nodeR * 0.8);
+        plasmaGrad2.addColorStop(0, "rgba(255, 255, 255, 0.32)");
+        plasmaGrad2.addColorStop(0.45, `${node.color}28`);
+        plasmaGrad2.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = plasmaGrad2;
+        ctx.fillRect(px - nodeR, py - nodeR, nodeR * 2, nodeR * 2);
+
+        // 3. Subtle Undulating Aurora Wave Contour (for medium & large orbs)
+        if (nodeR >= 16) {
+          const waveT = time * 1.15 + nodePhase;
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
+          ctx.lineWidth = Math.max(0.8, 1.4 * scale);
+          ctx.beginPath();
+          const waveY = py + Math.sin(waveT) * (nodeR * 0.22);
+          ctx.moveTo(px - nodeR, waveY);
+          ctx.bezierCurveTo(
+            px - nodeR * 0.45,
+            waveY - Math.cos(waveT) * (nodeR * 0.38),
+            px + nodeR * 0.45,
+            waveY + Math.sin(waveT * 0.8) * (nodeR * 0.38),
+            px + nodeR,
+            waveY
+          );
+          ctx.stroke();
+        }
+
+        // 4. Internal Drifting Luminous Micro-Sparks Mist (2-4 harmonic particles)
+        const sparkCount = node.radius >= 40 ? 4 : node.radius >= 26 ? 3 : 2;
+        for (let sp = 0; sp < sparkCount; sp++) {
+          const spPhase = nodePhase + sp * 1.7;
+          const spOrbitR = (nodeR * 0.22) + ((sp * 7 + 3) % 10) * 0.05 * nodeR;
+          const spX = px + Math.cos(time * (0.8 + sp * 0.3) + spPhase) * spOrbitR;
+          const spY = py + Math.sin(time * (0.6 + sp * 0.25) + spPhase * 1.2) * spOrbitR;
+          const spSize = Math.max(0.8, (1.1 + Math.sin(time * 2 + spPhase) * 0.4) * scale);
+          const spAlpha = 0.32 + Math.sin(time * 2.2 + spPhase) * 0.26;
+          ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.08, spAlpha)})`;
+          ctx.beginPath();
+          ctx.arc(spX, spY, spSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore(); // Restore out of clipped orb interior
+
+        // ── D. Glass Fresnel Edge Rim (Refraction Ring) ───────────────
         ctx.strokeStyle = isSelected ? "#FFFFFF" : node.color;
-        ctx.lineWidth = Math.max(1, (isSelected ? 3 : 1.5) * scale);
+        ctx.lineWidth = Math.max(1.2, (isSelected ? 3.0 : 1.6) * scale);
         ctx.shadowColor = node.color;
-        ctx.shadowBlur = (isSelected ? 18 : 8) * scale;
+        ctx.shadowBlur = (isSelected ? 18 : isHovered ? 14 : 8) * scale;
         ctx.beginPath();
         ctx.arc(px, py, nodeR, 0, Math.PI * 2);
         ctx.stroke();
         ctx.shadowBlur = 0;
+
+        // ── E. Curved Glass Specular Highlight (Lens Reflection) ──────
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(
+          px - nodeR * 0.28,
+          py - nodeR * 0.36,
+          nodeR * 0.42,
+          nodeR * 0.22,
+          -Math.PI / 4,
+          0,
+          Math.PI * 2
+        );
+        const specGrad = ctx.createLinearGradient(
+          px - nodeR * 0.48,
+          py - nodeR * 0.48,
+          px,
+          py
+        );
+        specGrad.addColorStop(0, "rgba(255, 255, 255, 0.70)");
+        specGrad.addColorStop(0.4, "rgba(255, 255, 255, 0.18)");
+        specGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.fillStyle = specGrad;
+        ctx.fill();
+        ctx.restore();
 
         // Center callsign inside orb
         if (nodeR >= 14) {
@@ -909,6 +1017,7 @@ export function EvoVisionCanvas({
     cameraRef.current.isPanning = true;
     cameraRef.current.startX = e.clientX;
     cameraRef.current.startY = e.clientY;
+    setHoverPos(null);
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -942,6 +1051,12 @@ export function EvoVisionCanvas({
     });
 
     setHoveredNode(hit || null);
+    if (hit && !cameraRef.current.isPanning) {
+      setHoverPos({ x: e.clientX, y: e.clientY });
+    } else {
+      setHoverPos(null);
+    }
+
     canvas.style.cursor = isSmHovered || hit ? "pointer" : cam.isPanning ? "grabbing" : "grab";
 
     if (cameraRef.current.isPanning) {
@@ -1054,10 +1169,66 @@ export function EvoVisionCanvas({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerLeave={() => {
+          setHoveredNode(null);
+          setHoverPos(null);
+        }}
         onDoubleClick={handleDoubleClick}
         onWheel={handleWheel}
         className="w-full h-full block touch-none"
       />
+
+      {/* ─── Hover Preview HUD Tooltip ───────────────────────── */}
+      {hoveredNode && hoverPos && !selectedNode && !cameraRef.current.isPanning && (
+        <div
+          className="fixed pointer-events-none z-40 px-3.5 py-2.5 rounded-2xl bg-[#090D18]/95 backdrop-blur-xl border border-cyan-400/40 text-xs font-mono shadow-[0_0_24px_rgba(6,182,212,0.35)] transition-opacity duration-150 flex flex-col gap-1 min-w-[200px] max-w-[260px] animate-fadeIn"
+          style={{
+            left: Math.min(typeof window !== "undefined" ? window.innerWidth - 275 : 800, hoverPos.x + 14),
+            top: Math.max(68, Math.min(typeof window !== "undefined" ? window.innerHeight - 130 : 600, hoverPos.y - 48)),
+          }}
+        >
+          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0 shadow-[0_0_8px_currentColor]"
+                style={{ backgroundColor: hoveredNode.color, color: hoveredNode.color }}
+              />
+              <span className="font-black text-white truncate text-[12px]">{hoveredNode.label}</span>
+            </div>
+            {hoveredNode.callsign && (
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-amber-300 font-bold shrink-0">
+                [{hoveredNode.callsign}]
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-slate-300 pt-0.5">
+            <span className="text-cyan-300 uppercase font-bold text-[9px]">{hoveredNode.cluster}</span>
+            <span
+              className={`px-1.5 py-0.5 rounded font-bold text-[9px] border ${
+                hoveredNode.status === "ALERT"
+                  ? "bg-red-500/20 text-red-300 border-red-500/30"
+                  : hoveredNode.status === "AWAY"
+                  ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                  : "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+              }`}
+            >
+              {hoveredNode.status || "ACTIVE"} • {hoveredNode.latencyMs || 1}ms
+            </span>
+          </div>
+
+          {hoveredNode.sublabel && (
+            <div className="text-[10px] text-slate-300 truncate">
+              {hoveredNode.sublabel}
+            </div>
+          )}
+
+          <div className="text-[8px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-1 mt-0.5 font-bold">
+            <span className="tracking-wider">CLICK TO INSPECT DOSSIER</span>
+            <span className="text-cyan-400 text-xs">➔</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
