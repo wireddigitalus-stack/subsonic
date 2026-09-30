@@ -515,55 +515,71 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             {/* ─── CENTER STAGE: Shooter Portrait / Card Showcase ─────────── */}
             <div className="lg:col-span-4 flex flex-col items-center justify-center relative w-full">
               
-              {/* Outer Golden / Metallic Rim Frame */}
-              <div className="relative w-full max-w-sm sm:max-w-md aspect-[3/4] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.35)] bg-gradient-to-b from-zinc-900 to-black group">
-                
-                {/* Background Image / Portrait */}
-                <img
-                  src={shooter.image || "/images/SS-RWB-LOGO.png"}
-                  alt={displayName}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                />
-
-                {/* Smoky Bottom Fade Gradient for Text Readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
-
-                {/* Top Corner Badges */}
-                <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-20">
-                  <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] font-mono font-bold tracking-wider flex items-center gap-1.5 shadow-lg">
-                    <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    <span>INVITATIONAL PRO</span>
-                  </span>
-
+              {/* If shooter has full tournament poster graphic, display in natural ratio (aspect-[682/1024]) */}
+              {shooter.posterImage ? (
+                <div className="relative w-full max-w-sm sm:max-w-md aspect-[682/1024] rounded-3xl overflow-hidden border-2 border-amber-500/60 shadow-[0_0_60px_rgba(245,158,11,0.4)] bg-black group">
+                  <img
+                    src={shooter.posterImage}
+                    alt={`${displayName} Official Tournament Graphic`}
+                    className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+                  />
                   <button
                     onClick={() => setShowPosterModal(true)}
-                    className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
-                    title="Expand Full Print Poster"
+                    className="absolute top-3.5 right-3.5 p-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg z-20"
+                    title="Expand Full Resolution Poster"
                   >
                     <Maximize2 className="w-4 h-4 text-amber-400" />
                   </button>
                 </div>
-
-                {/* Bottom Overlay on Photo: Callsign + Verified Division */}
-                <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-amber-500 text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider">
-                      CALLSIGN: {shooter.callsign}
+              ) : (
+                /* Outer Golden / Metallic Rim Frame for standard portraits */
+                <div className="relative w-full max-w-sm sm:max-w-md aspect-[3/4] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.35)] bg-gradient-to-b from-zinc-900 to-black group">
+                  <img
+                    src={shooter.image || "/images/SS-RWB-LOGO.png"}
+                    alt={displayName}
+                    className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-20">
+                    <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] font-mono font-bold tracking-wider flex items-center gap-1.5 shadow-lg">
+                      <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span>INVITATIONAL PRO</span>
                     </span>
-                    <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-blue-500/30 border border-blue-400/40 text-blue-300 font-mono text-[10px] sm:text-[11px] truncate max-w-[200px]">
-                      {shooter.division}
-                    </span>
+                    <button
+                      onClick={() => setShowPosterModal(true)}
+                      className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+                      title="Expand Full Print Poster"
+                    >
+                      <Maximize2 className="w-4 h-4 text-amber-400" />
+                    </button>
                   </div>
-                  <p className="text-xs font-mono text-slate-300 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{shooter.homeRange}</span>
-                  </p>
+                  <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-amber-500 text-black font-mono font-black text-[10px] sm:text-xs uppercase tracking-wider">
+                        CALLSIGN: {shooter.callsign}
+                      </span>
+                      <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-blue-500/30 border border-blue-400/40 text-blue-300 font-mono text-[10px] sm:text-[11px] truncate max-w-[200px]">
+                        {shooter.division}
+                      </span>
+                    </div>
+                    <p className="text-xs font-mono text-slate-300 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                      <span>{shooter.homeRange}</span>
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Mobile Quick Action under photo */}
-              <div className="mt-3 lg:hidden flex items-center justify-center gap-2">
-                <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-widest">
+              {/* Quick Action under image */}
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  onClick={() => setShowPosterModal(true)}
+                  className="px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <Maximize2 className="w-3 h-3 text-amber-400" />
+                  <span>View Full Poster Graphic</span>
+                </button>
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
                   PRECISION IS IN OUR DNA
                 </span>
               </div>

@@ -35,8 +35,8 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     homeRange: "National Tour / Pennsylvania",
     podiums: 61,
     featuredMatch: "The Subsonic Society Invitational Money Match 2026",
-    image: "/assets/erich-leipold-portrait.jpg",
-    actionPhoto: "/assets/erich-leipold-banner.jpg",
+    image: "/assets/erich-leipold-poster.jpg",
+    actionPhoto: "/assets/erich-leipold-poster.jpg",
     posterImage: "/assets/erich-leipold-poster.jpg",
     quote: "Consistency isn't an accident. It's the byproduct of testing every variable, knowing your DOPE down to the tenth of a mil, and executing with absolute confidence.",
     signature: "Erich Leipold",
@@ -102,8 +102,8 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     homeRange: "Great Lakes Region / National Tour",
     podiums: 52,
     featuredMatch: "The Subsonic Society Invitational Money Match 2026",
-    image: "/assets/ron-verran-portrait.jpg",
-    actionPhoto: "/assets/ron-verran-banner.jpg",
+    image: "/assets/ron-verran-poster.jpg",
+    actionPhoto: "/assets/ron-verran-poster.jpg",
     posterImage: "/assets/ron-verran-poster.jpg",
     quote: "It's not luck. It's a process.",
     signature: "Ron Verran",
@@ -704,8 +704,31 @@ function ShootersContent() {
                 </div>
               )}
 
-              {/* Action / Rig Photo (if present) */}
-              {selectedShooter.actionPhoto && (
+              {/* Official Tournament Spotlight Poster Graphic or Action Rig */}
+              {selectedShooter.posterImage ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase text-amber-400 tracking-wider font-bold flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Official Tournament Spotlight Poster</span>
+                    </span>
+                    <Link
+                      href={`/shooters/${selectedShooter.id}`}
+                      className="text-[11px] font-mono text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-1"
+                    >
+                      <span>Full SEO Profile</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                  <div className="w-full max-w-md mx-auto aspect-[682/1024] rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-2xl bg-black relative">
+                    <img
+                      src={selectedShooter.posterImage}
+                      alt={`${selectedShooter.name} Spotlight Poster`}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                </div>
+              ) : selectedShooter.actionPhoto ? (
                 <div className="space-y-2">
                   <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider flex items-center gap-1">
                     <Camera className="w-3 h-3 text-cyan-400" />
@@ -719,7 +742,7 @@ function ShootersContent() {
                     />
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {/* Quote */}
               <div className="relative p-5 rounded-2xl bg-black/40 border border-white/5 italic text-slate-200 text-sm leading-relaxed">
