@@ -200,4 +200,29 @@ body.chat-active main {
   animation: spinSlow 12s linear infinite;
 }
 
+/* ─── SHOOTER SPOTLIGHT POSTER STYLES ──────────────────────────────────────── */
+.chrome-metallic-text {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 20%, #E2E8F0 40%, #94A3B8 65%, #64748B 90%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
+}
+
+.silver-metallic-text {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 45%, #94A3B8 75%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-metallic-text {
+  background: linear-gradient(180deg, #FEF08A 0%, #FBBF24 35%, #F59E0B 65%, #B45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+.font-signature {
+  font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', 'Caveat', cursive;
+}
+
 

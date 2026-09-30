@@ -247,9 +247,21 @@ export interface ShooterProfile {
   featuredMatch?: string;
   image: string; // Headshot / profile photo
   actionPhoto?: string; // Secondary rifle rig / action photo
+  posterImage?: string; // High-res official tournament print poster artwork
   quote: string;
+  signature?: string; // Shooter's cursive script signature
   accolades: string[]; // e.g. ["TEAM USA 🇺🇸", "NATIONAL CHAMPION", "APPALACHIAN CUP 1ST"]
   sponsors: string[]; // e.g. ["Modacam Custom Rifles", "Vudoo Gun Works", "Lapua"]
+  careerStats?: {
+    matches?: number;
+    states?: number;
+    countries?: number;
+    wins?: number;
+    top3?: number;
+    top5?: number;
+    top10?: number;
+    nationalPlacements?: string[];
+  };
   rifleSetup: {
     action: string;
     barrel: string;
