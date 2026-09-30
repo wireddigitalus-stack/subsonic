@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, AlertTriangle, Unlock, ChevronRight } from "lucide-react";
+import { Lock, AlertTriangle, Unlock, ChevronRight, Scale } from "lucide-react";
 
 export interface ChatAuthGateProps {
   authShake: boolean;
@@ -120,9 +120,21 @@ export function ChatAuthGate({
             </div>
           </div>
 
-          <a href="/" className="block text-xs text-slate-500 hover:text-slate-300 transition-colors text-center">
-            ← Return to Main Portal
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1 font-mono">
+            <Link href="/" className="hover:text-slate-300 transition-colors">
+              ← Return to Main Portal
+            </Link>
+            <span className="hidden sm:inline text-slate-700">•</span>
+            <Link 
+              href="/terms" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-amber-400/80 hover:text-amber-300 transition-colors inline-flex items-center gap-1"
+            >
+              <Scale className="w-3 h-3 text-amber-400" />
+              <span>Terms of Use &amp; Code of Conduct</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
