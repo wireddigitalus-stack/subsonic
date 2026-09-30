@@ -4,9 +4,10 @@ import { SocietyMember } from "@/lib/types";
 import { 
   getMembersFromStorage, 
   addOrUpdateMember, 
-  deleteMemberFromStorage,
+  deleteMemberFromStorage, 
   saveAllMembersToStorage 
 } from "@/lib/members";
+import { getShootersFromStorage, saveShooterToStorage } from "@/lib/shooters";
 import { checkCallsignAvailability } from "@/lib/callsigns";
 
 export const dynamic = "force-dynamic";
@@ -177,7 +178,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { member_id, full_name, callsign, email, state, experience_level, rifle_setup, status, role, notes } = body;
+    const { member_id, full_name, callsign, email, state, experience_level, rifle_setup, status, role, notes, pin } = body;
 
     if (!member_id) {
       return NextResponse.json({ error: "member_id is required." }, { status: 400 });
@@ -222,9 +223,28 @@ export async function PATCH(req: NextRequest) {
       ...(status !== undefined && { status }),
       ...(role !== undefined && { role }),
       ...(notes !== undefined && { notes }),
+      ...(pin !== undefined && { pin: pin ? String(pin).trim() : undefined }),
     };
 
     const saved = addOrUpdateMember(updatedMember);
+
+    // Cross-sync PIN to shooter record if linked shooter exists
+    if (pin !== undefined && saved.callsign) {
+      try {
+        const shooters = getShootersFromStorage();
+        const matchingShooter = shooters.find(
+          (s) =>
+            (s.callsign && s.callsign.toUpperCase() === saved.callsign?.toUpperCase()) ||
+            s.id.toLowerCase() === saved.member_id.toLowerCase()
+        );
+        if (matchingShooter) {
+          matchingShooter.pin = pin ? String(pin).trim() : undefined;
+          saveShooterToStorage(matchingShooter);
+        }
+      } catch (syncErr) {
+        console.warn("Could not sync pin to shooter record:", syncErr);
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -303,6 +303,7 @@ export default function AdminDashboardPage() {
     status: "ACTIVE" | "PAUSED" | "BANNED" | "PROVISIONAL" | "HONORARY";
     role?: SocietyMember["role"];
     notes: string;
+    pin?: string;
   }>({
     member_id: "",
     full_name: "",
@@ -313,11 +314,21 @@ export default function AdminDashboardPage() {
     rifle_setup: "",
     status: "ACTIVE",
     notes: "",
+    pin: "",
   });
   const [memberModalTab, setMemberModalTab] = useState<"DETAILS" | "PASS">("DETAILS");
   const [isSavingMember, setIsSavingMember] = useState(false);
   const [memberActionNotice, setMemberActionNotice] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [copiedCredentialMemberId, setCopiedCredentialMemberId] = useState<string | null>(null);
+
+  // Admin Passkeys Security Management Modal State
+  const [isAdminPasskeyModalOpen, setIsAdminPasskeyModalOpen] = useState(false);
+  const [adminPasskeyAccounts, setAdminPasskeyAccounts] = useState<any[]>([]);
+  const [loadingPasskeys, setLoadingPasskeys] = useState(false);
+  const [updatingPasskeyCallsign, setUpdatingPasskeyCallsign] = useState<string | null>(null);
+  const [newPasskeyInputs, setNewPasskeyInputs] = useState<Record<string, string>>({});
+  const [passkeyNotice, setPasskeyNotice] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   const [regSearch, setRegSearch] = useState("");
   const [regMatchFilter, setRegMatchFilter] = useState("ALL");
@@ -736,6 +747,62 @@ export default function AdminDashboardPage() {
     window.open("/api/join?export=csv", "_blank");
   };
 
+  const handleOpenPasskeysModal = async () => {
+    setIsAdminPasskeyModalOpen(true);
+    setLoadingPasskeys(true);
+    setPasskeyNotice(null);
+    try {
+      const res = await fetch("/api/admin/passkeys");
+      const data = await res.json();
+      if (res.ok && data.accounts) {
+        setAdminPasskeyAccounts(data.accounts);
+      } else {
+        setPasskeyNotice({ msg: data.error || "Failed to load admin passkey data.", type: "error" });
+      }
+    } catch (e: any) {
+      setPasskeyNotice({ msg: "Failed to load admin passkey data: " + e.message, type: "error" });
+    } finally {
+      setLoadingPasskeys(false);
+    }
+  };
+
+  const handleUpdateAdminPasskey = async (targetCallsign: string) => {
+    const val = (newPasskeyInputs[targetCallsign] || "").trim();
+    if (!val || val.length < 4) {
+      setPasskeyNotice({ msg: "Passkey must be at least 4 characters long.", type: "error" });
+      return;
+    }
+
+    setUpdatingPasskeyCallsign(targetCallsign);
+    setPasskeyNotice(null);
+
+    try {
+      const res = await fetch("/api/admin/passkeys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetCallsign, newPasskey: val }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPasskeyNotice({ msg: data.message, type: "success" });
+        // Refresh passkeys list
+        const refRes = await fetch("/api/admin/passkeys");
+        const refData = await refRes.json();
+        if (refRes.ok && refData.accounts) {
+          setAdminPasskeyAccounts(refData.accounts);
+        }
+        setNewPasskeyInputs((prev) => ({ ...prev, [targetCallsign]: "" }));
+      } else {
+        setPasskeyNotice({ msg: data.error || "Update failed.", type: "error" });
+      }
+    } catch (err: any) {
+      setPasskeyNotice({ msg: err.message || "Network error updating passkey.", type: "error" });
+    } finally {
+      setUpdatingPasskeyCallsign(null);
+    }
+  };
+
   const handleOpenMemberModal = (member: SocietyMember) => {
     setSelectedMember(member);
     setMemberForm({
@@ -749,6 +816,7 @@ export default function AdminDashboardPage() {
       status: member.status || "ACTIVE",
       role: member.role,
       notes: member.notes || "",
+      pin: member.pin || "",
     });
     setMemberModalTab("DETAILS");
     setShowDeleteConfirm(false);
@@ -1382,6 +1450,15 @@ export default function AdminDashboardPage() {
             title="Clear Local Event Buffer"
           >
             <Trash2 className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={handleOpenPasskeysModal}
+            className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+            title="Configure Master Owner & Admin Passkeys"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Admin Passkeys</span>
           </button>
 
           <button
@@ -2769,6 +2846,62 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
+                {/* Member Password / Access PIN Reset Section */}
+                <div className="space-y-2 p-3.5 rounded-2xl bg-black/50 border border-amber-500/30">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-mono text-amber-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                      <Key className="w-4 h-4 text-amber-400" />
+                      <span>Member Password / Access PIN</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      Chat &amp; Stage Comms Login Key
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="sm:col-span-2">
+                      <input
+                        type="text"
+                        value={memberForm.pin || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, pin: e.target.value }))}
+                        placeholder="Set 4-6 digit numeric or secret PIN..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-sm focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const randomPin = String(Math.floor(100000 + Math.random() * 900000));
+                        setMemberForm((prev) => ({ ...prev, pin: randomPin }));
+                      }}
+                      className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Generate PIN</span>
+                    </button>
+                  </div>
+
+                  {memberForm.pin && (
+                    <div className="flex flex-wrap items-center justify-between pt-1 gap-2 border-t border-white/5">
+                      <span className="text-[11px] font-mono text-emerald-400">
+                        Configured PIN: <strong className="text-white tracking-widest bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">{memberForm.pin}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const textToCopy = `SUBSONIC SOCIETY ACCESS CREDENTIALS\nMember ID: ${memberForm.member_id}\nCallsign: ${memberForm.callsign}\nLogin PIN: ${memberForm.pin}\nComms Net: https://subsonicsociety.com/chat`;
+                          navigator.clipboard.writeText(textToCopy);
+                          setCopiedCredentialMemberId(memberForm.member_id);
+                          setTimeout(() => setCopiedCredentialMemberId(null), 3000);
+                        }}
+                        className="text-[11px] font-mono font-bold text-amber-400 hover:text-amber-300 underline"
+                      >
+                        {copiedCredentialMemberId === memberForm.member_id ? "✓ Copied to Clipboard!" : "Copy Credential Card"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Admin Internal Notes */}
                 <div className="space-y-1">
                   <label className="text-[11px] font-mono text-slate-300 uppercase">
@@ -2856,6 +2989,161 @@ export default function AdminDashboardPage() {
                 />
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* 5. ADMIN PASSKEY MANAGEMENT MODAL */}
+      {/* ==================================================================== */}
+      {isAdminPasskeyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="w-full max-w-xl max-h-[92vh] overflow-y-auto ios-glass-card rounded-3xl p-5 sm:p-7 border border-amber-500/40 shadow-tactical-glow relative space-y-5 my-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-white/10 pb-4 gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400">
+                    <Key className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-white">
+                      ADMIN SECURITY PASSKEYS
+                    </h3>
+                    <p className="text-xs text-slate-300">
+                      Configure master executive security passkeys for Rob Neilson and Allen Hurley.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAdminPasskeyModalOpen(false)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {passkeyNotice && (
+              <div
+                className={`p-3.5 rounded-2xl text-xs font-mono border animate-fadeIn ${
+                  passkeyNotice.type === "success"
+                    ? "bg-emerald-950/60 border-emerald-500/50 text-emerald-300"
+                    : "bg-red-950/60 border-red-500/50 text-red-300"
+                }`}
+              >
+                {passkeyNotice.type === "success" ? "✓ " : "⚠️ "}
+                {passkeyNotice.msg}
+              </div>
+            )}
+
+            {loadingPasskeys ? (
+              <div className="py-12 text-center space-y-2 font-mono text-xs text-slate-400">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto text-amber-400" />
+                <p>Loading encrypted passkey registry...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {adminPasskeyAccounts.map((account) => {
+                  const isUpdating = updatingPasskeyCallsign === account.callsign;
+                  const currentInput = newPasskeyInputs[account.callsign] || "";
+
+                  return (
+                    <div
+                      key={account.callsign}
+                      className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">
+                              {account.name}
+                            </span>
+                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              [{account.callsign}]
+                            </span>
+                            <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                              {account.role}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-400">
+                            Member ID: {account.memberId}
+                          </span>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-[10px] font-mono text-slate-400 block">
+                            Active Passkey:
+                          </span>
+                          <span className="text-xs font-mono font-bold text-amber-400 tracking-wider">
+                            {account.currentPasskey || "••••"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Passkey Input & Update Trigger */}
+                      <div className="pt-2 border-t border-white/5 space-y-2">
+                        <label className="text-[11px] font-mono text-slate-300 uppercase block">
+                          Set New Passkey for {account.name.split(" ")[0]}
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <input
+                            type="text"
+                            value={currentInput}
+                            onChange={(e) =>
+                              setNewPasskeyInputs((prev) => ({
+                                ...prev,
+                                [account.callsign]: e.target.value,
+                              }))
+                            }
+                            placeholder="Min 4 digits/characters..."
+                            className="sm:col-span-2 px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
+                          />
+                          <button
+                            type="button"
+                            disabled={isUpdating || !currentInput.trim()}
+                            onClick={() => handleUpdateAdminPasskey(account.callsign)}
+                            className="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs font-mono flex items-center justify-center gap-1.5 transition-all shadow-tactical-glow disabled:opacity-50"
+                          >
+                            <Save className="w-3.5 h-3.5" />
+                            <span>{isUpdating ? "Saving..." : "Update Key"}</span>
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+                          <span>Last updated: {new Date(account.updatedAt).toLocaleDateString()}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const rand = String(Math.floor(1000 + Math.random() * 9000));
+                              setNewPasskeyInputs((prev) => ({
+                                ...prev,
+                                [account.callsign]: rand,
+                              }));
+                            }}
+                            className="text-amber-400 hover:underline"
+                          >
+                            Generate 4-Digit PIN
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="pt-2 border-t border-white/10 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsAdminPasskeyModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-bold transition-all"
+              >
+                Close Security Panel
+              </button>
+            </div>
           </div>
         </div>
       )}

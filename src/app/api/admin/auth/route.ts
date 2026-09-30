@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyAdminPasskey } from "@/lib/admin-passkeys";
 
 export const dynamic = "force-dynamic";
 
@@ -11,49 +12,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Admin passkey is required." }, { status: 400 });
     }
 
-    // STRICT OWNER & MASTER ADMIN KEYS ONLY:
-    // 1. Rob Neilson (RADAR) -> 2468 (MASTER_OWNER)
-    // 2. Allen Hurley (ALLEN) -> 620620 (OWNER_ADMIN)
-    let session: {
-      name: string;
-      callsign: string;
-      role: "MASTER_OWNER" | "OWNER_ADMIN" | "ADMIN";
-      memberId: string;
-    } | null = null;
+    const { valid, session } = verifyAdminPasskey(clean);
 
-    if (clean === "2468") {
-      session = {
-        name: "Rob Neilson",
-        callsign: "RADAR",
-        role: "MASTER_OWNER",
-        memberId: "SS-2026-0001",
-      };
-    } else if (clean === "620620") {
-      session = {
-        name: "Allen Hurley",
-        callsign: "ALLEN",
-        role: "OWNER_ADMIN",
-        memberId: "SS-2026-0002",
-      };
-    } else {
-      const adminEnvKey = process.env.ADMIN_PASSKEY ? process.env.ADMIN_PASSKEY.trim() : null;
-      // Do NOT allow generic or beta strings like subsonic2026 or admin to grant admin access
-      if (
-        adminEnvKey && 
-        adminEnvKey !== "subsonic2026" && 
-        adminEnvKey !== "admin" && 
-        clean === adminEnvKey
-      ) {
-        session = {
-          name: "Administrator",
-          callsign: "ADMIN",
-          role: "ADMIN",
-          memberId: "SS-ADMIN",
-        };
-      }
-    }
-
-    if (!session) {
+    if (!valid || !session) {
       return NextResponse.json(
         { error: "Access Denied: Invalid Master Owner or Administrator passkey." }, 
         { status: 401 }

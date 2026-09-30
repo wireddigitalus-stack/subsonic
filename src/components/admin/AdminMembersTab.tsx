@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Download, Trash2, Lock, Play, UserCheck, Search, Filter, Sparkles, Pause, Ban, Edit3, AlertTriangle, QrCode, ShieldCheck, UserPlus, Shield } from "lucide-react";
+import { Download, Trash2, Lock, Play, UserCheck, Search, Filter, Sparkles, Pause, Ban, Edit3, AlertTriangle, QrCode, ShieldCheck, UserPlus, Shield, Key } from "lucide-react";
 import { SocietyMember } from "@/lib/types";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 
@@ -563,6 +563,21 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
                         >
                           <Shield className="w-3 h-3 text-blue-400" />
                           <span>Clearance</span>
+                        </button>
+
+                        {/* Quick PIN Reset Trigger */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenMemberModal(m);
+                            setMemberModalTab("DETAILS");
+                          }}
+                          className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                          title="Reset Member Password / Access PIN"
+                        >
+                          <Key className="w-3 h-3 text-amber-400" />
+                          <span>PIN</span>
                         </button>
 
                         {/* 2-Step Card Delete Button or Root Protection */}

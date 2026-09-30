@@ -77,6 +77,16 @@ export async function POST(req: NextRequest) {
         pinValid = cleanPin === storedPin;
       }
     }
+
+    // Check member's configured PIN
+    if (!pinValid && member?.pin) {
+      const storedPin = String(member.pin);
+      if (isHashedPin(storedPin)) {
+        pinValid = await verifyPin(cleanPin, storedPin);
+      } else {
+        pinValid = cleanPin === storedPin;
+      }
+    }
     
     // Check if member exists even without shooter profile
     if (!pinValid && member) {
