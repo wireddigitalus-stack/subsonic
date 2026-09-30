@@ -11,6 +11,11 @@ import {
   Radio,
   BarChart3
 } from "lucide-react";
+import { 
+  getCommsStatus, 
+  subscribeToCommsStatus, 
+  CommsStatusState 
+} from "@/lib/comms-status";
 
 interface TabItem {
   name: string;
@@ -22,9 +27,16 @@ interface TabItem {
 export function MobileTabs() {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [commsStatus, setCommsStatusState] = useState<CommsStatusState>(getCommsStatus());
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Subscribe to real-time comms alert level & message status
+    const unsubscribe = subscribeToCommsStatus((status) => {
+      setCommsStatusState(status);
+    });
+
     try {
       const rawShooter = localStorage.getItem("subsonic_shooter_profile");
       const rawMember = localStorage.getItem("subsonic_member_profile");
@@ -45,6 +57,10 @@ export function MobileTabs() {
     } catch {
       // ignore
     }
+
+    return () => {
+      unsubscribe();
+    };
   }, [pathname]);
 
   // Hide floating bottom sheet on chat screen so it doesn't obstruct keyboard and message input
@@ -53,11 +69,30 @@ export function MobileTabs() {
   const tabs: TabItem[] = [
     { name: "Home", href: "/", icon: Home },
     { name: "Calendar", href: "/calendar", icon: CalendarDays },
-    { name: "Chat", href: "/chat", icon: MessageSquare },
+    { name: "Comms", href: "/chat", icon: MessageSquare },
     { name: "Shooters", href: "/shooters", icon: Trophy },
     { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
     ...(isAdmin ? [{ name: "Admin", href: "/admin", icon: BarChart3 }] : []),
   ];
+
+  // Visual configuration for color-coded pulsing beacon
+  const alertConfig = commsStatus.level !== "none" ? {
+    red: {
+      core: "bg-red-500 shadow-[0_0_8px_#EF4444]",
+      ping: "bg-red-500",
+      label: "Red Alert Notice: Safety / Weather Hold",
+    },
+    amber: {
+      core: "bg-amber-400 shadow-[0_0_8px_#F59E0B]",
+      ping: "bg-amber-400",
+      label: "Attention Notice: Priority Match Briefing",
+    },
+    green: {
+      core: "bg-emerald-400 shadow-[0_0_8px_#10B981]",
+      ping: "bg-emerald-400",
+      label: "New Messages: Live Stage Net Chatter",
+    },
+  }[commsStatus.level] : null;
 
   return (
     <div 
@@ -68,6 +103,7 @@ export function MobileTabs() {
         {tabs.map((tab) => {
           const isActive = pathname === tab.href || (tab.href.startsWith("/#") && pathname === "/" && typeof window !== "undefined" && window.location.hash === tab.href.slice(1));
           const Icon = tab.icon;
+          const isComms = tab.name === "Comms";
 
           return (
             <Link
@@ -87,9 +123,23 @@ export function MobileTabs() {
               
               <div className="relative">
                 <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? "scale-110 text-amber-400" : ""}`} />
+                
+                {/* Standard Tab Count Badge */}
                 {tab.badge && (
                   <span className="absolute -top-1.5 -right-2.5 text-[8px] font-mono font-bold bg-amber-500 text-black px-1 rounded-full leading-tight">
                     {tab.badge}
+                  </span>
+                )}
+
+                {/* Live Color-Coded Pulsing Beacon for Comms */}
+                {isComms && alertConfig && (
+                  <span 
+                    className="absolute -top-1 -right-1 flex h-2.5 w-2.5"
+                    title={commsStatus.noticeTitle || alertConfig.label}
+                    aria-label={alertConfig.label}
+                  >
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-80 ${alertConfig.ping}`} />
+                    <span className={`relative inline-flex rounded-full h-2.5 w-2.5 border border-black/90 ${alertConfig.core}`} />
                   </span>
                 )}
               </div>

@@ -66,6 +66,7 @@ import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
 import { BotRosterCard } from "@/components/chat/BotRosterCard";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
+import { clearCommsAlert } from "@/lib/comms-status";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -578,6 +579,8 @@ export default function ChatPage() {
         setIsAuthenticated(true);
         setAuthChecked(true);
       }
+      // When user enters chat room, clear green unread messages indicator
+      clearCommsAlert("green");
     }
   }, []);
 

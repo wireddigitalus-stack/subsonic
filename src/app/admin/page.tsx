@@ -91,6 +91,7 @@ import { AdminShootersTab } from "@/components/admin/AdminShootersTab";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { AdminInviteGeneratorTab } from "@/components/admin/AdminInviteGeneratorTab";
 import { CallsignInput } from "@/components/common/CallsignInput";
+import { setCommsAlertLevel, clearCommsAlert, getCommsStatus, CommsAlertLevel } from "@/lib/comms-status";
 
 const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
@@ -240,6 +241,7 @@ export default function AdminDashboardPage() {
   const [flaggedMessages, setFlaggedMessages] = useState<ChatMessage[]>([]);
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
+  const [commsBeaconLevel, setCommsBeaconLevel] = useState<CommsAlertLevel>("green");
 
   // Shooter Profiles & Competition Vault state
   const [shooterProfiles, setShooterProfiles] = useState<ShooterProfile[]>([]);
@@ -397,6 +399,7 @@ export default function AdminDashboardPage() {
 
     const alerts = getCommsAbuseAlerts();
     setAbuseAlerts(alerts);
+    setCommsBeaconLevel(getCommsStatus().level);
 
     // Populate flagged chat transmissions from live abuse alerts queue
     const flaggedFromAlerts: ChatMessage[] = alerts.map((a) => ({
@@ -2190,6 +2193,113 @@ export default function AdminDashboardPage() {
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className="text-2xl font-black text-red-400">{flaggedMessages.length}</div>
                 <div className="text-[10px] font-mono text-slate-400 uppercase">Flagged Messages</div>
+              </div>
+            </div>
+
+            {/* Live Mobile Comms Beacon Controller & Broadcast Tester */}
+            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                    Mobile Lower Nav Comms Beacon (Live State: <span className={
+                      commsBeaconLevel === "red" ? "text-red-400 font-black" :
+                      commsBeaconLevel === "amber" ? "text-amber-400 font-black" :
+                      commsBeaconLevel === "green" ? "text-emerald-400 font-black" :
+                      "text-slate-400 font-bold"
+                    }>{commsBeaconLevel.toUpperCase()}</span>)
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Controls color-coded pulsing dot on mobile navigation bar
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCommsAlertLevel("green", "Live Stage Net Chatter", "Squad competitors are transmitting in active channels.");
+                    setCommsBeaconLevel("green");
+                  }}
+                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2 ${
+                    commsBeaconLevel === "green"
+                      ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white truncate">🟢 New Messages</div>
+                    <div className="text-[9px] text-slate-400 font-mono truncate">Green Pulsing Dot</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCommsAlertLevel("amber", "Match Director Notice", "Stage 8 wind hold and COF briefing update posted.");
+                    setCommsBeaconLevel("amber");
+                  }}
+                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2 ${
+                    commsBeaconLevel === "amber"
+                      ? "bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white truncate">🟡 Attention Notice</div>
+                    <div className="text-[9px] text-slate-400 font-mono truncate">Amber Pulsing Dot</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCommsAlertLevel("red", "Range Safety Freeze", "Critical safety hold called across all stages.");
+                    setCommsBeaconLevel("red");
+                  }}
+                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2 ${
+                    commsBeaconLevel === "red"
+                      ? "bg-red-500/20 border-red-400 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="relative flex h-3 w-3 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white truncate">🔴 Red Alert</div>
+                    <div className="text-[9px] text-slate-400 font-mono truncate">Red Pulsing Dot</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearCommsAlert();
+                    setCommsBeaconLevel("none");
+                  }}
+                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2 ${
+                    commsBeaconLevel === "none"
+                      ? "bg-white/15 border-white/40 text-white"
+                      : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="w-3 h-3 rounded-full border border-slate-500 shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-white truncate">⚪ Clear Beacon</div>
+                    <div className="text-[9px] text-slate-400 font-mono truncate">Idle / Read State</div>
+                  </div>
+                </button>
               </div>
             </div>
           </div>
