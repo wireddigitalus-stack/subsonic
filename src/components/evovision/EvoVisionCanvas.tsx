@@ -3,6 +3,13 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { EvoNode, EvoLink, EVO_NODES, EVO_LINKS, EVO_CLUSTERS } from "@/lib/evovision-data";
+import {
+  REAL_STARS,
+  CONSTELLATION_CONNECTIONS,
+  CONSTELLATION_LABELS,
+  getEasternTimeInfo,
+  EasternTimeInfo,
+} from "@/lib/evovision-constellations";
 
 interface EvoVisionCanvasProps {
   selectedNode: EvoNode | null;
@@ -120,6 +127,26 @@ export function EvoVisionCanvas({
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const [hoveredSpaceman, setHoveredSpaceman] = useState(false);
   const [zoomPercent, setZoomPercent] = useState<number>(100);
+
+  // Real Constellations & "Connect the Dots" toggle
+  const [showConstellations, setShowConstellations] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("subsonic_show_constellations");
+      if (saved !== null) return saved === "true";
+    }
+    return true;
+  });
+  const showConstellationsRef = useRef<boolean>(showConstellations);
+  showConstellationsRef.current = showConstellations;
+
+  // Live Eastern Time tracking (updates every 1s for the UI meter)
+  const [etInfo, setEtInfo] = useState<EasternTimeInfo>(() => getEasternTimeInfo());
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setEtInfo(getEasternTimeInfo());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Dynamic mobile screen detection & auto-fit zoom calculator
   const getOverviewZoom = useCallback(() => {
@@ -455,6 +482,101 @@ export function EvoVisionCanvas({
         ctx.fillStyle = `rgba(186, 230, 253, ${Math.max(0.1, currentAlpha)})`;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // ─── 1A. Real Celestial Constellations (Rotating with Eastern Time) ──
+      const liveEt = getEasternTimeInfo();
+      const celestialAngle = liveEt.celestialAngleRad;
+      const cosC = Math.cos(celestialAngle);
+      const sinC = Math.sin(celestialAngle);
+
+      // Rotates around Polaris (0, -40) with real Earth rotation in Eastern Time
+      const rotateCelestialStar = (px: number, py: number) => {
+        const ox = 0;
+        const oy = -40;
+        const dx = px - ox;
+        const dy = py - oy;
+        const rx = ox + (dx * cosC - dy * sinC);
+        const ry = oy + (dx * sinC + dy * cosC);
+        return project3D(rx, ry, -80);
+      };
+
+      // 1. Draw "Connect the Dots" Filament Lines (if toggled ON)
+      if (showConstellationsRef.current) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(103, 232, 249, 0.22)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 4]); // Tactical starry dotted filaments
+
+        const starProjectedMap = new Map<string, { px: number; py: number; scale: number }>();
+        REAL_STARS.forEach((s) => {
+          starProjectedMap.set(s.id, rotateCelestialStar(s.x, s.y));
+        });
+
+        CONSTELLATION_CONNECTIONS.forEach((c) => {
+          const pA = starProjectedMap.get(c.starA);
+          const pB = starProjectedMap.get(c.starB);
+          if (pA && pB) {
+            ctx.beginPath();
+            ctx.moveTo(pA.px, pA.py);
+            ctx.lineTo(pB.px, pB.py);
+            ctx.stroke();
+          }
+        });
+
+        ctx.setLineDash([]);
+
+        // Subtle Constellation Names
+        ctx.font = "8px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "rgba(147, 197, 253, 0.35)";
+        CONSTELLATION_LABELS.forEach((lbl) => {
+          const rPos = rotateCelestialStar(lbl.x, lbl.y);
+          ctx.fillText(lbl.name, rPos.px, rPos.py);
+        });
+
+        ctx.restore();
+      }
+
+      // 2. Draw Real Constellation Stars with Accurate Magnitudes & Spectral Colors
+      REAL_STARS.forEach((star) => {
+        const pStar = rotateCelestialStar(star.x, star.y);
+        // Magnitude formula: magnitude 0 is largest, magnitude 4.5 is smallest
+        const baseRadius = Math.max(1.3, (4.5 - star.magnitude) * 0.95 + 1.2) * pStar.scale;
+        const pulse = 1 + Math.sin(time * 3 + star.x * 0.1) * 0.12;
+        const r = baseRadius * pulse;
+
+        // Soft atmospheric starlight flare
+        const glowR = r * 3.6;
+        const glow = ctx.createRadialGradient(pStar.px, pStar.py, 0, pStar.px, pStar.py, glowR);
+        glow.addColorStop(0, star.glowColor);
+        glow.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(pStar.px, pStar.py, glowR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4-point diffraction spike for prominent navigational beacons
+        if (star.hasSpike) {
+          ctx.save();
+          ctx.strokeStyle = star.glowColor;
+          ctx.lineWidth = 0.8;
+          const spikeLen = r * 4.5;
+          ctx.beginPath();
+          ctx.moveTo(pStar.px - spikeLen, pStar.py);
+          ctx.lineTo(pStar.px + spikeLen, pStar.py);
+          ctx.moveTo(pStar.px, pStar.py - spikeLen);
+          ctx.lineTo(pStar.px, pStar.py + spikeLen);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Solid star core
+        ctx.fillStyle = star.color;
+        ctx.beginPath();
+        ctx.arc(pStar.px, pStar.py, r, 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -1514,6 +1636,76 @@ export function EvoVisionCanvas({
           </div>
         </div>
       )}
+
+      {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Toggle ─── */}
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+        {/* Day/Night Solar & Lunar Track */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold tracking-wider">
+              <span className={`w-1.5 h-1.5 rounded-full ${etInfo.isDaylight ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"}`} />
+              <span className={etInfo.isDaylight ? "text-amber-300 font-extrabold" : "text-indigo-300 font-extrabold"}>
+                {etInfo.isDaylight ? "☀️ DAYLIGHT GLIDE" : `🌙 NIGHT GLIDE (${etInfo.moonPhaseIcon})`}
+              </span>
+              <span className="text-slate-400 font-normal">| {etInfo.timeString24}</span>
+            </div>
+
+            {/* 24-Hour Orbital Meter Bar */}
+            <div className="relative w-36 sm:w-44 h-2 mt-1 rounded-full bg-slate-900 border border-white/10 overflow-hidden flex items-center">
+              {/* Day / Night zones gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-950 via-amber-950/70 to-indigo-950 opacity-60" />
+              {/* Midday guide line (12:00) */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/20" />
+
+              {/* Sun Marker */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
+                style={{ left: `${Math.max(4, Math.min(96, etInfo.sunProgress * 100))}%` }}
+                title={`Sun Position: ${Math.round(etInfo.sunProgress * 24)}h (${etInfo.isDaylight ? "Day" : "Night"})`}
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24] border border-yellow-200" />
+              </div>
+
+              {/* Moon Marker */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center transition-all duration-1000"
+                style={{ left: `${Math.max(4, Math.min(96, etInfo.moonProgress * 100))}%` }}
+                title={`Moon Position: ${etInfo.moonPhaseName}`}
+              >
+                <div className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_6px_#e2e8f0] border border-cyan-300/60" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Constellation "Connect the Dots" Toggle */}
+        <div className="border-t sm:border-t-0 sm:border-l border-white/10 pt-1.5 sm:pt-0 sm:pl-2.5 flex items-center">
+          <button
+            type="button"
+            onClick={() => {
+              setShowConstellations((prev) => {
+                const next = !prev;
+                try {
+                  localStorage.setItem("subsonic_show_constellations", String(next));
+                } catch {}
+                return next;
+              });
+            }}
+            className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
+              showConstellations
+                ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+            }`}
+            title="Toggle Constellation connect-the-dots lines and names"
+          >
+            <span className="text-xs">✨</span>
+            <span>LINES:</span>
+            <span className={showConstellations ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
+              {showConstellations ? "ON" : "OFF"}
+            </span>
+          </button>
+        </div>
+      </div>
 
       {/* ─── Floating Tactical Zoom Controls HUD ───────────────── */}
       <div className="absolute bottom-4 left-4 sm:bottom-36 sm:left-4 z-20 flex items-center gap-1.5 p-1 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.8)]">
