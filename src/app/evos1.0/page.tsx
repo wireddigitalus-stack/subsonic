@@ -60,6 +60,8 @@ export default function EvosDashboardPage() {
   const [nexusVoiceState, setNexusVoiceState] = useState<NexusVoiceState>("idle");
   const [externalVoiceTrigger, setExternalVoiceTrigger] = useState<number>(0);
   const [mobileControlsOpen, setMobileControlsOpen] = useState<boolean>(false);
+  const [constellationsEnabled, setConstellationsEnabled] = useState<boolean>(false);
+  const [starsEnabled, setStarsEnabled] = useState<boolean>(false);
   const [expandStats, setExpandStats] = useState({
     expandedCount: 1,
     totalCount: EVO_NODES.length,
@@ -426,6 +428,50 @@ export default function EvosDashboardPage() {
             </Link>
           </div>
 
+          {/* Celestial & Constellation Layer Toggles */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1 border-t border-white/10">
+            <span className="text-[9px] text-slate-400 font-bold uppercase shrink-0">CELESTIAL:</span>
+            <button
+              onClick={() => setConstellationsEnabled(!constellationsEnabled)}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold flex items-center gap-1 ${
+                constellationsEnabled
+                  ? "bg-cyan-500/25 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              <span>✨ LINES:</span>
+              <span className={constellationsEnabled ? "text-cyan-300" : "text-slate-500"}>
+                {constellationsEnabled ? "ON" : "OFF"}
+              </span>
+            </button>
+            <button
+              onClick={() => setStarsEnabled(!starsEnabled)}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold flex items-center gap-1 ${
+                starsEnabled
+                  ? "bg-amber-500/25 text-amber-300 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              <span>⭐ STARS:</span>
+              <span className={starsEnabled ? "text-amber-300" : "text-slate-500"}>
+                {starsEnabled ? "ON" : "OFF"}
+              </span>
+            </button>
+            <button
+              onClick={() => setSpacemanActive(!spacemanActive)}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold flex items-center gap-1 ${
+                spacemanActive
+                  ? "bg-cyan-500/25 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              <span>👨‍🚀 ASTRONAUT:</span>
+              <span className={spacemanActive ? "text-cyan-300" : "text-slate-500"}>
+                {spacemanActive ? "ON" : "OFF"}
+              </span>
+            </button>
+          </div>
+
           {/* 3D Revolution Control (if in 3D Mode) */}
           {is3DMode && (
             <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px]">
@@ -508,21 +554,16 @@ export default function EvosDashboardPage() {
 
       {/* ─── MAIN INTERACTIVE CANVAS VIEWPORT ────────────────────────── */}
       <main className="relative flex-1 w-full h-full overflow-hidden">
-        {/* Mobile Touch Guidance Pill */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-cyan-500/30 text-[9px] text-cyan-300 font-mono pointer-events-none md:hidden z-10 flex items-center gap-1.5 shadow-lg">
-          <span>⊕ Tap sphere to expand</span>
-          <span className="text-slate-500">•</span>
-          <span>🎯 Double-tap for card</span>
-          <span className="text-slate-500">•</span>
-          <span>🤏 Pinch zoom</span>
-        </div>
-
         <EvoVisionCanvas
           selectedNode={selectedNode}
           onSelectNode={(node) => setSelectedNode(node)}
           activeFilter={activeClusterFilter}
           spacemanEnabled={spacemanActive}
           onToggleSpaceman={setSpacemanActive}
+          showConstellations={constellationsEnabled}
+          onToggleConstellations={setConstellationsEnabled}
+          showStars={starsEnabled}
+          onToggleStars={setStarsEnabled}
           is3DMode={is3DMode}
           autoRotate={autoRotate}
           onToggle3D={setIs3DMode}

@@ -18,6 +18,10 @@ interface EvoVisionCanvasProps {
   activeFilter: string | null;
   spacemanEnabled?: boolean;
   onToggleSpaceman?: (enabled: boolean) => void;
+  showConstellations?: boolean;
+  onToggleConstellations?: (enabled: boolean) => void;
+  showStars?: boolean;
+  onToggleStars?: (enabled: boolean) => void;
   is3DMode?: boolean;
   autoRotate?: boolean;
   onToggle3D?: (active: boolean) => void;
@@ -139,6 +143,10 @@ export function EvoVisionCanvas({
   activeFilter,
   spacemanEnabled = true,
   onToggleSpaceman,
+  showConstellations: propShowConstellations,
+  onToggleConstellations,
+  showStars: propShowStars,
+  onToggleStars,
   is3DMode = false,
   autoRotate = true,
   onToggle3D,
@@ -212,8 +220,9 @@ export function EvoVisionCanvas({
     }
     return false;
   });
-  const showConstellationsRef = useRef<boolean>(showConstellations);
-  showConstellationsRef.current = showConstellations;
+  const effectiveShowConstellations = propShowConstellations !== undefined ? propShowConstellations : showConstellations;
+  const showConstellationsRef = useRef<boolean>(effectiveShowConstellations);
+  showConstellationsRef.current = effectiveShowConstellations;
 
   // Real Constellation Stars toggle (Default: OFF)
   const [showStars, setShowStars] = useState<boolean>(() => {
@@ -223,8 +232,27 @@ export function EvoVisionCanvas({
     }
     return false;
   });
-  const showStarsRef = useRef<boolean>(showStars);
-  showStarsRef.current = showStars;
+  const effectiveShowStars = propShowStars !== undefined ? propShowStars : showStars;
+  const showStarsRef = useRef<boolean>(effectiveShowStars);
+  showStarsRef.current = effectiveShowStars;
+
+  const handleToggleConstellations = () => {
+    const next = !effectiveShowConstellations;
+    setShowConstellations(next);
+    if (onToggleConstellations) onToggleConstellations(next);
+    try {
+      localStorage.setItem("subsonic_show_constellations", String(next));
+    } catch {}
+  };
+
+  const handleToggleStars = () => {
+    const next = !effectiveShowStars;
+    setShowStars(next);
+    if (onToggleStars) onToggleStars(next);
+    try {
+      localStorage.setItem("subsonic_show_stars", String(next));
+    } catch {}
+  };
 
   // Live Constellation & Celestial Stats HUD overlay toggle
   const [showConstellationStats, setShowConstellationStats] = useState<boolean>(false);
@@ -2166,37 +2194,9 @@ export function EvoVisionCanvas({
         </div>
       )}
 
-      {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Controls ─── */}
-      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[calc(100vw-24px)] pointer-events-auto">
-        {/* Mobile Collapsed Mini-Badge */}
-        {!celestialExpandedMobile && (
-          <button
-            type="button"
-            onClick={() => setCelestialExpandedMobile(true)}
-            className="sm:hidden flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.7)] text-[10px] font-mono font-bold text-slate-300 active:scale-95 transition-transform"
-            title="Expand Celestial & Constellation Controls"
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                etInfo.isDaylight
-                  ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]"
-                  : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"
-              }`}
-            />
-            <span className={etInfo.isDaylight ? "text-amber-300" : "text-indigo-300"}>
-              {etInfo.isDaylight ? "☀️ DAYLIGHT" : `🌙 NIGHT (${etInfo.moonPhaseIcon})`}
-            </span>
-            <span className="text-slate-400 font-normal">| {etInfo.timeString24}</span>
-            <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
-          </button>
-        )}
-
-        {/* Full Celestial Bar (always visible on desktop sm+, expandable on mobile) */}
-        <div
-          className={`${
-            celestialExpandedMobile ? "flex" : "hidden sm:flex"
-          } flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]`}
-        >
+      {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Controls (Desktop Only; on mobile it lives inside the header Controls drawer) ─── */}
+      <div className="hidden sm:flex absolute top-4 left-4 z-20 flex-col gap-2 max-w-[calc(100vw-24px)] pointer-events-auto">
+        <div className="flex flex-row items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
           {/* Day/Night Solar & Lunar Track */}
           <div className="flex items-center justify-between gap-2.5">
             <div className="flex flex-col">
@@ -2240,34 +2240,16 @@ export function EvoVisionCanvas({
                 </div>
               </div>
             </div>
-
-            {/* Mobile close/collapse button */}
-            <button
-              type="button"
-              onClick={() => setCelestialExpandedMobile(false)}
-              className="sm:hidden p-1 text-slate-400 hover:text-white"
-              title="Collapse"
-            >
-              <ChevronUp className="w-3.5 h-3.5" />
-            </button>
           </div>
 
           {/* Celestial Controls: LINES, STARS, STATS */}
-          <div className="border-t sm:border-t-0 sm:border-l border-white/10 pt-1.5 sm:pt-0 sm:pl-2.5 flex items-center gap-1.5 flex-wrap">
+          <div className="border-l border-white/10 pl-2.5 flex items-center gap-1.5 flex-wrap">
             {/* Lines Toggle */}
             <button
               type="button"
-              onClick={() => {
-                setShowConstellations((prev) => {
-                  const next = !prev;
-                  try {
-                    localStorage.setItem("subsonic_show_constellations", String(next));
-                  } catch {}
-                  return next;
-                });
-              }}
+              onClick={handleToggleConstellations}
               className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
-                showConstellations
+                effectiveShowConstellations
                   ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
                   : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
               }`}
@@ -2275,25 +2257,17 @@ export function EvoVisionCanvas({
             >
               <span className="text-[11px]">✨</span>
               <span>LINES:</span>
-              <span className={showConstellations ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
-                {showConstellations ? "ON" : "OFF"}
+              <span className={effectiveShowConstellations ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
+                {effectiveShowConstellations ? "ON" : "OFF"}
               </span>
             </button>
 
             {/* Stars Toggle */}
             <button
               type="button"
-              onClick={() => {
-                setShowStars((prev) => {
-                  const next = !prev;
-                  try {
-                    localStorage.setItem("subsonic_show_stars", String(next));
-                  } catch {}
-                  return next;
-                });
-              }}
+              onClick={handleToggleStars}
               className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
-                showStars
+                effectiveShowStars
                   ? "bg-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]"
                   : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
               }`}
@@ -2301,8 +2275,8 @@ export function EvoVisionCanvas({
             >
               <span className="text-[11px]">⭐</span>
               <span>STARS:</span>
-              <span className={showStars ? "text-amber-300 font-extrabold" : "text-slate-500"}>
-                {showStars ? "ON" : "OFF"}
+              <span className={effectiveShowStars ? "text-amber-300 font-extrabold" : "text-slate-500"}>
+                {effectiveShowStars ? "ON" : "OFF"}
               </span>
             </button>
 
@@ -2432,8 +2406,8 @@ export function EvoVisionCanvas({
         )}
       </div>
 
-      {/* ─── Floating Tactical Zoom Controls HUD ───────────────── */}
-      <div className="absolute bottom-4 left-4 sm:bottom-36 sm:left-4 z-20 flex items-center gap-1.5 p-1 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.8)]">
+      {/* ─── Floating Tactical Zoom Controls HUD (Desktop Only; on mobile pinch-to-zoom is native) ───────────────── */}
+      <div className="hidden sm:flex absolute bottom-36 left-4 z-20 items-center gap-1.5 p-1 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_25px_rgba(0,0,0,0.8)]">
         <button
           onClick={handleZoomIn}
           className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/15 active:scale-95 text-slate-200 hover:text-white flex items-center justify-center transition-all border border-white/5 cursor-pointer"

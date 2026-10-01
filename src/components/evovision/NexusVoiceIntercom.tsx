@@ -320,7 +320,7 @@ export function NexusVoiceIntercom({
             setHudVisible(true);
             handlePttDown();
           }}
-          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-[#070D18]/90 hover:bg-[#0A1628] backdrop-blur-md border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 font-mono text-xs font-bold flex items-center gap-2.5 shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] active:scale-95 transition-all select-none group cursor-pointer"
+          className="hidden sm:flex fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-[#070D18]/90 hover:bg-[#0A1628] backdrop-blur-md border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 font-mono text-xs font-bold items-center gap-2.5 shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] active:scale-95 transition-all select-none group cursor-pointer"
           title="Open NEXUS Holographic Voice Terminal"
         >
           <div className="relative flex items-center justify-center">
