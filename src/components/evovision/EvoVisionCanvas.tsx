@@ -178,14 +178,17 @@ export function EvoVisionCanvas({
   const lastClickedNodeIdRef = useRef<string | null>(null);
   const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Camera viewport transform
+  // Camera viewport transform - on mobile start zoomed in on NEXUS (138%)
+  const isMobileClient = typeof window !== "undefined" && window.innerWidth < 768;
+  const initialZoom = isMobileClient ? 1.38 : 1;
+
   const cameraRef = useRef({
     x: 0,
     y: 0,
-    zoom: 1,
+    zoom: initialZoom,
     targetX: 0,
     targetY: 0,
-    targetZoom: 1,
+    targetZoom: initialZoom,
     isPanning: false,
     startX: 0,
     startY: 0,
@@ -194,7 +197,10 @@ export function EvoVisionCanvas({
   const [hoveredNode, setHoveredNode] = useState<EvoNode | null>(null);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const [hoveredSpaceman, setHoveredSpaceman] = useState(false);
-  const [zoomPercent, setZoomPercent] = useState<number>(100);
+  const [zoomPercent, setZoomPercent] = useState<number>(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) return 138;
+    return 100;
+  });
 
   // Real Constellations & "Connect the Dots" toggle
   const [showConstellations, setShowConstellations] = useState<boolean>(() => {
@@ -238,18 +244,24 @@ export function EvoVisionCanvas({
     const w = rect?.width || window.innerWidth;
     const h = rect?.height || window.innerHeight;
 
+    const isOnlyNexus = expandedNodeIdsRef.current.size === 0;
+
     if (w < 768) {
+      if (isOnlyNexus) {
+        // Mobile screen zoomed in on NEXUS like user screenshot (138%)
+        return 1.38;
+      }
       // Mobile screen: fit all clusters (-700 to +690 horizontal, -470 to +490 vertical)
       const scaleX = (w - 24) / 1480;
       const scaleY = (h - 70) / 1050;
-      return Math.min(Math.max(0.32, Math.min(scaleX, scaleY)), 0.65);
+      return Math.min(Math.max(0.36, Math.min(scaleX, scaleY)), 0.65);
     } else if (w < 1024) {
-      // Tablet screen
+      if (isOnlyNexus) return 1.25;
       const scaleX = (w - 40) / 1480;
       const scaleY = (h - 80) / 1050;
       return Math.min(Math.max(0.48, Math.min(scaleX, scaleY)), 0.85);
     }
-    return 1.0;
+    return isOnlyNexus ? 1.15 : 1.0;
   }, []);
 
   // Update stats notification to parent
@@ -277,17 +289,31 @@ export function EvoVisionCanvas({
   // Toggle single sphere expand / collapse
   const toggleNodeExpand = useCallback((nodeId: string) => {
     const set = expandedNodeIdsRef.current;
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
     if (set.has(nodeId)) {
       set.delete(nodeId);
       const childIds = PARENT_CHILD_MAP.get(nodeId);
       if (childIds) {
         childIds.forEach((cId) => set.delete(cId));
       }
+      // If collapsed back to only NEXUS on mobile, zoom back in to 138%
+      if (set.size === 0 && isMobile) {
+        cameraRef.current.targetX = 0;
+        cameraRef.current.targetY = 0;
+        cameraRef.current.targetZoom = 1.38;
+        setZoomPercent(138);
+      }
     } else {
       set.add(nodeId);
       const node = NODE_LOOKUP_MAP.get(nodeId);
       if (node?.parentId) {
         set.add(node.parentId);
+      }
+      // When expanding from NEXUS on mobile, zoom out to show clusters
+      if (nodeId === "hub-main" && isMobile) {
+        cameraRef.current.targetZoom = 0.58;
+        setZoomPercent(58);
       }
     }
     updateExpandStats();
@@ -298,14 +324,26 @@ export function EvoVisionCanvas({
     const set = expandedNodeIdsRef.current;
     const allParentIds = Array.from(PARENT_CHILD_MAP.keys());
     const isAllExpanded = allParentIds.length > 0 && allParentIds.every((id) => set.has(id));
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     if (isAllExpanded) {
       set.clear();
+      if (isMobile) {
+        cameraRef.current.targetX = 0;
+        cameraRef.current.targetY = 0;
+        cameraRef.current.targetZoom = 1.38;
+        setZoomPercent(138);
+      }
     } else {
       allParentIds.forEach((id) => set.add(id));
+      if (isMobile) {
+        const overviewZ = getOverviewZoom();
+        cameraRef.current.targetZoom = overviewZ;
+        setZoomPercent(Math.round(overviewZ * 100));
+      }
     }
     updateExpandStats();
-  }, [updateExpandStats]);
+  }, [getOverviewZoom, updateExpandStats]);
 
   // High-precision interaction dispatcher (single click = expand, double click = data card, triple click = toggle all)
   const handleNodeInteraction = useCallback((node: EvoNode) => {
@@ -464,10 +502,13 @@ export function EvoVisionCanvas({
       const h = rect.height || window.innerHeight;
 
       if (w < 768) {
-        const fitScale = Math.min(
-          Math.max(0.32, (w - 24) / 1480),
-          Math.max(0.32, (h - 70) / 1050)
-        );
+        const isOnlyNexus = expandedNodeIdsRef.current.size === 0;
+        const fitScale = isOnlyNexus
+          ? 1.38
+          : Math.min(
+              Math.max(0.32, (w - 24) / 1480),
+              Math.max(0.32, (h - 70) / 1050)
+            );
         cameraRef.current.x = 0;
         cameraRef.current.y = 0;
         cameraRef.current.zoom = fitScale;
@@ -1512,19 +1553,26 @@ export function EvoVisionCanvas({
         const labelFontSize = Math.round((isMajorCluster ? 13 : 11) * scale);
         ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
 
-        const textMetrics = ctx.measureText(node.label);
-        const textWidth = Math.max(textMetrics.width, (node.sublabel ? 80 : 40) * scale);
-        const pillHeight = (node.sublabel ? 30 : 18) * scale;
+        const labelMetrics = ctx.measureText(node.label);
+        let sublabelWidth = 0;
+        if (node.sublabel) {
+          ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          sublabelWidth = ctx.measureText(node.sublabel).width;
+          ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+        }
+
+        const maxTextWidth = Math.max(labelMetrics.width, sublabelWidth);
+        const pillW = maxTextWidth + 24 * scale;
+        const pillHeight = (node.sublabel ? 34 : 20) * scale;
         const pillY = py + nodeR + 6 * scale;
+        const pillX = px - pillW / 2;
+        const pillR = Math.max(2, 6 * scale);
 
         // Dark frosted backdrop pill
         ctx.fillStyle = "rgba(4, 8, 19, 0.78)";
         ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        const pillX = px - textWidth / 2 - 8 * scale;
-        const pillW = textWidth + 16 * scale;
-        const pillR = Math.max(2, 6 * scale);
         if (typeof (ctx as any).roundRect === "function") {
           (ctx as any).roundRect(pillX, pillY, pillW, pillHeight, pillR);
         } else {
@@ -1537,13 +1585,13 @@ export function EvoVisionCanvas({
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = "#000000";
         ctx.shadowBlur = 4;
-        ctx.fillText(node.label, px, pillY + (node.sublabel ? 12 : 13) * scale);
+        ctx.fillText(node.label, px, pillY + (node.sublabel ? 14 : 14) * scale);
         ctx.shadowBlur = 0;
 
         if (node.sublabel) {
           ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           ctx.fillStyle = node.color;
-          ctx.fillText(node.sublabel, px, pillY + 24 * scale);
+          ctx.fillText(node.sublabel, px, pillY + 27 * scale);
         }
 
         // ── F. Expandable Spheres Bloom Indicator Badge ─────────────

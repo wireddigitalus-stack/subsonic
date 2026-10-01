@@ -176,7 +176,7 @@ export interface EvoLink {
 export const EVO_CLUSTERS = {
   HUB: {
     title: "MAIN HUB",
-    subtitle: "LIVE ACTIVITY ROUTER",
+    subtitle: "ACTIVITY HUB",
     color: "#06B6D4",
     accent: "#EC4899",
     glow: "rgba(6, 182, 212, 0.4)",
@@ -216,7 +216,7 @@ export const EVO_NODES: EvoNode[] = [
   {
     id: "hub-main",
     label: "MAIN HUB",
-    sublabel: "LIVE ACTIVITY ROUTER",
+    sublabel: "ACTIVITY HUB",
     cluster: "HUB",
     role: "CENTRAL TELEMETRY & COMMS BUS",
     callsign: "NEXUS",
