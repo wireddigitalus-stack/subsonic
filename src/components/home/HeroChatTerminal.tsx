@@ -256,29 +256,29 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
   };
 
   return (
-    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/90 via-[#07090E]/95 to-black transition-all">
+    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/95 via-[#07090E]/95 to-black flex flex-col w-full select-none transition-all">
       {/* 1. HUD Telemetry Bar (Tactical Satellite & Radio Banner) */}
-      <div className="px-4 sm:px-6 py-3 border-b border-white/10 bg-black/60 backdrop-blur-md flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
+      <div className="h-11 sm:h-12 px-3 sm:px-6 border-b border-white/10 bg-black/70 backdrop-blur-md flex items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-2">
           <div className="relative flex items-center justify-center">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping absolute" />
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
           </div>
-          <div className="flex items-center gap-1.5 font-mono text-xs">
+          <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs">
             <span className="text-white font-black tracking-wider">STAGE NET</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-amber-400 font-bold hidden sm:inline">FREQ: 462.5625 MHz</span>
             <span className="text-slate-500 hidden sm:inline">•</span>
+            <span className="text-amber-400 font-bold hidden sm:inline">462.5625 MHz</span>
+            <span className="text-slate-500 hidden md:inline">•</span>
             <span className="text-cyan-400 font-semibold hidden md:inline">3,420 FT ELEV</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-mono">
           {onReplayVideo && (
             <button
               type="button"
               onClick={onReplayVideo}
-              className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-400 font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className="px-2 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-400 font-bold text-[10px] flex items-center gap-1 transition-all shadow-sm active:scale-95"
               title="Watch Satellite Video Intro"
             >
               <Play className="w-3 h-3 fill-amber-400" />
@@ -290,7 +290,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             <button
               type="button"
               onClick={onReplayLock}
-              className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-400 font-bold text-[10px] flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+              className="px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-400 font-bold text-[10px] flex items-center gap-1 transition-all shadow-sm active:scale-95"
               title="Calibrate Crosshair Reticle & Telemetry"
             >
               <Target className="w-3 h-3 text-cyan-400" />
@@ -310,7 +310,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold flex items-center gap-1.5 transition-colors ${
+            className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold flex items-center gap-1 transition-colors ${
               soundEnabled
                 ? "bg-amber-500 text-black shadow-tactical-glow"
                 : "bg-white/5 hover:bg-white/10 text-slate-400 border border-white/10"
@@ -318,28 +318,29 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             title="Toggle Tactical Radio Audio"
           >
             {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{soundEnabled ? "AUDIO ON" : "AUDIO MUTED"}</span>
+            <span className="hidden md:inline">{soundEnabled ? "AUDIO ON" : "MUTED"}</span>
           </button>
 
           <Link
             href="/chat"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-2 sm:px-2.5 sm:py-1 rounded-xl sm:rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs sm:text-[10px] tracking-wide flex items-center gap-1.5 sm:gap-1 transition-all active:scale-95 shadow-tactical-glow hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
+            className="px-2.5 sm:px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-[10px] tracking-wide flex items-center gap-1 transition-all active:scale-95 shadow-tactical-glow hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]"
             title="Launch Full Live Comms Terminal in New Tab"
           >
-            <Radio className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-black animate-pulse" />
+            <Radio className="w-3 h-3 text-black animate-pulse" />
             <span>ENTER ROOM</span>
-            <ChevronRight className="w-3.5 h-3.5 sm:w-3 sm:h-3 stroke-[2.5]" />
+            <ChevronRight className="w-3 h-3 stroke-[2.5]" />
           </Link>
         </div>
       </div>
 
-      {/* 2. Messages Display Viewport — unified responsive animated stream for both mobile and desktop */}
-      <div 
-        ref={scrollRef}
-        className="p-3.5 sm:p-6 space-y-3 min-h-[340px] sm:min-h-[380px] max-h-[460px] overflow-y-auto no-scrollbar overscroll-contain transition-all"
-      >
+      {/* 2. Messages Display Viewport — exactly matches aspect-video to lock window size */}
+      <div className="relative w-full aspect-video bg-black/95 flex flex-col overflow-hidden shrink-0">
+        <div 
+          ref={scrollRef}
+          className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-5 space-y-3 no-scrollbar overscroll-contain"
+        >
         {messages.length === 0 && !isTyping && (
           <div className="py-12 text-center space-y-2">
             <Radio className="w-6 h-6 text-amber-400 animate-pulse mx-auto" />
@@ -424,34 +425,34 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             {/* INSTANT CLAIM YOUR INVITE BUBBLE: Rendered right after Allen's welcome message */}
             {index === 0 && showInterceptor && (
               <div 
-                className="p-3.5 sm:p-4.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-black/85 to-amber-500/10 border-2 border-amber-400 shadow-tactical-glow space-y-3 my-2 transition-all"
+                className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-black/85 to-amber-500/10 border-2 border-amber-400 shadow-tactical-glow space-y-2 my-1.5 transition-all"
                 style={{
                   animation: "fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards",
                 }}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1">
+                  <div className="space-y-0.5 sm:space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                      <span className="px-2 py-0.5 rounded-md bg-amber-500 text-black text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
                         <Sparkles className="w-3 h-3 fill-black" />
                         OFFICIAL SQUAD PASS
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         INVITATION ONLY
                       </span>
                     </div>
-                    <h4 className="text-sm sm:text-base font-black text-white leading-tight">
+                    <h4 className="text-xs sm:text-sm font-black text-white leading-tight">
                       CLAIM YOUR INVITATION &amp; ACTIVATE CALLSIGN
                     </h4>
-                    <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
-                      Squad slots for the 2026 Subsonic Invitational ($7,500 Cash Purse) are strictly limited. Claim your code below to unlock private comms, stage DOPE drops, and competitor clearance.
+                    <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed max-w-xl">
+                      Squad slots for the 2026 Subsonic Invitational ($7,500 Cash Purse) are strictly limited. Claim your code below to unlock private comms and competitor clearance.
                     </p>
                   </div>
 
                   <div className="hidden sm:block shrink-0">
-                    <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-tactical-glow">
-                      <Award className="w-5 h-5" />
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-tactical-glow">
+                      <Award className="w-4 h-4" />
                     </div>
                   </div>
                 </div>
@@ -459,18 +460,18 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
                   <Link
                     href="/invite"
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow active:scale-95 transition-all text-center"
+                    className="flex-1 py-1.5 sm:py-2 px-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-tactical-glow active:scale-95 transition-all text-center"
                   >
-                    <Key className="w-4 h-4 fill-black" />
+                    <Key className="w-3.5 h-3.5 fill-black" />
                     <span>CLAIM YOUR INVITE</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
 
                   <Link
                     href="/chat"
-                    className="py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-xs flex items-center justify-center gap-2 transition-all text-center"
+                    className="py-1.5 sm:py-2 px-3 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-all text-center"
                   >
-                    <Users className="w-4 h-4" />
+                    <Users className="w-3.5 h-3.5" />
                     <span>Member Login</span>
                   </Link>
                 </div>
@@ -481,7 +482,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
 
         {/* Dynamic In-Line Typing Indicator right below latest message */}
         {isTyping && (
-          <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs font-mono text-amber-400 max-w-sm animate-pulse">
+          <div className="flex items-center gap-2 p-2 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs font-mono text-amber-400 max-w-sm animate-pulse">
             <span className="flex gap-1 items-center">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -490,62 +491,63 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             <span>{typingName || "Competitor"} is keying mic...</span>
           </div>
         )}
+
+        {/* Interactive Quick-Reply Prompt Chips embedded in stream */}
+        <div className="pt-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <span className="text-[10px] font-mono uppercase text-slate-500 font-bold shrink-0">
+            PROMPTS:
+          </span>
+
+          <button
+            type="button"
+            onClick={() => handleQuickPrompt("DOPE")}
+            className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Target className="w-3 h-3" />
+            <span>Ask for Stage 8 DOPE</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleQuickPrompt("SQUAD")}
+            className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-400 transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Flame className="w-3 h-3" />
+            <span>How Do I Squad Up?</span>
+          </button>
+
+          <Link
+            href="/documents"
+            className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <FileText className="w-3 h-3 text-amber-400" />
+            <span>18-Stage COF Dossier</span>
+          </Link>
+        </div>
       </div>
+    </div>
 
-      {/* 4. Interactive Quick-Reply Prompt Chips */}
-      <div className="px-4 sm:px-6 py-2.5 bg-black/50 border-t border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <span className="text-[10px] font-mono uppercase text-slate-500 font-bold shrink-0">
-          PROMPTS:
-        </span>
-
-        <button
-          type="button"
-          onClick={() => handleQuickPrompt("DOPE")}
-          className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 transition-all flex items-center gap-1.5 shrink-0"
-        >
-          <Target className="w-3 h-3" />
-          <span>Ask for Stage 8 DOPE</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleQuickPrompt("SQUAD")}
-          className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-400 transition-all flex items-center gap-1.5 shrink-0"
-        >
-          <Flame className="w-3 h-3" />
-          <span>How Do I Squad Up?</span>
-        </button>
-
-        <Link
-          href="/documents"
-          className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5 shrink-0"
-        >
-          <FileText className="w-3 h-3 text-amber-400" />
-          <span>18-Stage COF Dossier</span>
-        </Link>
-      </div>
-
-      {/* 5. Simulated Composer Bar at Bottom */}
-      <div className="p-3 sm:p-4 bg-[#0A0D14] border-t border-white/10 flex items-center gap-2.5">
+      {/* 3. Bottom Simulated Composer / Clearance Bar */}
+      <div className="h-11 sm:h-12 relative w-full bg-[#0A0D14] px-3 sm:px-6 border-t border-white/10 flex items-center justify-between gap-2.5 shrink-0">
         <Link
           href="/chat"
-          className="flex-1 flex items-center justify-between px-4 py-2.5 rounded-xl bg-black/60 border border-white/10 hover:border-amber-400/50 text-slate-400 hover:text-white transition-all text-xs font-mono group"
+          className="flex-1 flex items-center justify-between px-3 py-1.5 rounded-lg bg-black/60 border border-white/10 hover:border-amber-400/50 text-slate-400 hover:text-white transition-all text-[11px] font-mono group truncate"
         >
-          <div className="flex items-center gap-2">
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-2 truncate">
+            <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="truncate">Membership by invitation only • Log in with credentials...</span>
           </div>
-          <span className="text-[10px] text-amber-400 font-bold group-hover:underline">
+          <span className="text-[10px] text-amber-400 font-bold group-hover:underline shrink-0 ml-2">
             LOGIN / CLAIM →
           </span>
         </Link>
 
         <Link
           href="/invite"
-          className="p-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black transition-all active:scale-95 shadow-tactical-glow shrink-0"
+          className="p-1.5 sm:p-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black transition-all active:scale-95 shadow-tactical-glow shrink-0 flex items-center justify-center"
           title="Claim Invitation Code"
         >
-          <Key className="w-4 h-4" />
+          <Key className="w-3.5 h-3.5" />
         </Link>
       </div>
     </div>

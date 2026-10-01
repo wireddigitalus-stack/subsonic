@@ -89,9 +89,9 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
   };
 
   return (
-    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/95 via-[#07090E]/95 to-black transition-all">
+    <div className="relative ios-glass-card rounded-3xl border-2 border-amber-500/40 shadow-tactical-glow overflow-hidden bg-gradient-to-b from-black/95 via-[#07090E]/95 to-black flex flex-col w-full select-none transition-all">
       {/* 1. Tactical HUD Header Bar */}
-      <div className="px-3 sm:px-6 py-2 sm:py-3 border-b border-white/10 bg-black/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+      <div className="h-11 sm:h-12 px-3 sm:px-6 border-b border-white/10 bg-black/70 backdrop-blur-md flex items-center justify-between gap-2 shrink-0">
         <div className="flex items-center gap-2 sm:gap-2.5">
           <div className="relative flex items-center justify-center">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping absolute" />
@@ -146,7 +146,7 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
       </div>
 
       {/* 2. Video Viewport */}
-      <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden group">
+      <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden group shrink-0">
         <video
           ref={videoRef}
           playsInline
@@ -194,7 +194,7 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
       </div>
 
       {/* 3. Sleek Telemetry Progress Bar & Auto-Transition Status */}
-      <div className="relative w-full bg-black/80 px-4 sm:px-6 py-2 border-t border-white/10 flex items-center justify-between gap-4 text-[11px] font-mono">
+      <div className="h-11 sm:h-12 relative w-full bg-black/80 px-3 sm:px-6 border-t border-white/10 flex items-center justify-between gap-3 text-[10px] sm:text-[11px] font-mono shrink-0">
         <div className="flex items-center gap-2 text-slate-400">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span className="text-slate-300">
@@ -207,7 +207,7 @@ export function HeroVideoBanner({ onComplete }: HeroVideoBannerProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="w-24 sm:w-36 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="w-20 sm:w-36 h-1.5 rounded-full bg-white/10 overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-150"
               style={{ width: `${progress}%` }}
