@@ -2315,6 +2315,32 @@ export function EvoVisionCanvas({
               </span>
             </button>
 
+            {/* Astronaut / Spaceman Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                if (onToggleSpaceman) {
+                  onToggleSpaceman(!spacemanEnabled);
+                }
+              }}
+              className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                spacemanEnabled
+                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+              }`}
+              title={
+                spacemanEnabled
+                  ? "Astronaut is floating in orbit. Click to hide or recall."
+                  : "Astronaut is resting. Click to launch into orbit in distance."
+              }
+            >
+              <span className="text-[11px]">👨‍🚀</span>
+              <span>ASTRONAUT:</span>
+              <span className={spacemanEnabled ? "text-cyan-300 font-extrabold" : "text-slate-500"}>
+                {spacemanEnabled ? "ON" : "OFF"}
+              </span>
+            </button>
+
             {/* Constellation Stats Toggle */}
             <button
               type="button"

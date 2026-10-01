@@ -388,79 +388,115 @@ export default function EvosDashboardPage() {
         </div>
       </header>
 
-      {/* Mobile Horizontal Cluster Filter Strip */}
-      <div className="lg:hidden shrink-0 bg-black/85 backdrop-blur-md border-b border-cyan-500/20 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none z-10 text-[10px]">
-        <div className="shrink-0 flex items-center gap-1 border-r border-white/10 pr-1.5">
-          <button
-            onClick={() => setExpandAllSignal((prev) => prev + 1)}
-            className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shrink-0 shadow-[0_0_6px_rgba(245,158,11,0.2)]"
-            title="Expand all nodes"
-          >
-            ⊕ ALL
-          </button>
-          <button
-            onClick={() => {
-              setSelectedNode(null);
-              setContractAllSignal((prev) => prev + 1);
-            }}
-            className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shrink-0 shadow-[0_0_6px_rgba(6,182,212,0.2)]"
-            title="Contract to NEXUS"
-          >
-            ⊖ NEXUS
-          </button>
+      {/* Mobile Expandable Controls Drawer */}
+      {mobileControlsOpen && (
+        <div className="lg:hidden shrink-0 bg-black/95 backdrop-blur-xl border-b border-cyan-500/30 px-3 py-2 space-y-2 z-10 text-[10px] animate-fadeIn">
+          {/* Quick Actions Grid */}
+          <div className="grid grid-cols-4 gap-1.5">
+            <button
+              onClick={() => setExpandAllSignal((prev) => prev + 1)}
+              className="py-1.5 px-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-center shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+            >
+              ⊕ ALL
+            </button>
+            <button
+              onClick={() => {
+                setSelectedNode(null);
+                setContractAllSignal((prev) => prev + 1);
+              }}
+              className="py-1.5 px-2 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold text-center shadow-[0_0_8px_rgba(6,182,212,0.2)]"
+            >
+              ⊖ NEXUS
+            </button>
+            <button
+              onClick={() => {
+                setSelectedNode(null);
+                setRecenterSignal((prev) => prev + 1);
+              }}
+              className="py-1.5 px-2 rounded-lg bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 font-bold text-center"
+            >
+              ⟲ RECENTER
+            </button>
+            <Link
+              href="/shooters"
+              className="py-1.5 px-2 rounded-lg bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 font-bold text-center flex items-center justify-center gap-1"
+            >
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span>SHOOTERS</span>
+            </Link>
+          </div>
+
+          {/* 3D Revolution Control (if in 3D Mode) */}
+          {is3DMode && (
+            <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px]">
+              <span className="text-slate-400 font-mono">3D REVOLUTION:</span>
+              <button
+                onClick={() => setAutoRotate(!autoRotate)}
+                className={`px-2 py-0.5 rounded font-bold ${
+                  autoRotate ? "text-cyan-300 bg-cyan-500/20 border border-cyan-500/40" : "text-slate-400 bg-white/5"
+                }`}
+              >
+                {autoRotate ? "▶ REVOLVING" : "⏸ PAUSED"}
+              </button>
+            </div>
+          )}
+
+          {/* Cluster Filter Strip */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1 border-t border-white/10">
+            <span className="text-[9px] text-slate-400 font-bold uppercase shrink-0">CLUSTERS:</span>
+            <button
+              onClick={() => setActiveClusterFilter(null)}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+                activeClusterFilter === null
+                  ? "bg-cyan-500/25 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              ALL ({EVO_NODES.length})
+            </button>
+            <button
+              onClick={() => setActiveClusterFilter("USERS")}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+                activeClusterFilter === "USERS"
+                  ? "bg-sky-500/25 text-sky-300 border-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              COMPETITORS (8)
+            </button>
+            <button
+              onClick={() => setActiveClusterFilter("MODS")}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+                activeClusterFilter === "MODS"
+                  ? "bg-rose-500/25 text-rose-300 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              MODS (6)
+            </button>
+            <button
+              onClick={() => setActiveClusterFilter("ADMIN")}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+                activeClusterFilter === "ADMIN"
+                  ? "bg-indigo-500/25 text-indigo-300 border-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              ADMIN (6)
+            </button>
+            <button
+              onClick={() => setActiveClusterFilter("BOTS")}
+              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+                activeClusterFilter === "BOTS"
+                  ? "bg-amber-500/25 text-amber-300 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                  : "bg-white/5 text-slate-400 border-white/10"
+              }`}
+            >
+              AI BOTS (6)
+            </button>
+          </div>
         </div>
-        <span className="text-[8px] text-slate-400 font-bold uppercase shrink-0 pl-1">CLUSTER:</span>
-        <button
-          onClick={() => setActiveClusterFilter(null)}
-          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
-            activeClusterFilter === null
-              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold shadow-[0_0_8px_rgba(6,182,212,0.2)]"
-              : "bg-white/5 text-slate-400 border-white/10"
-          }`}
-        >
-          ALL ({EVO_NODES.length})
-        </button>
-        <button
-          onClick={() => setActiveClusterFilter("USERS")}
-          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
-            activeClusterFilter === "USERS"
-              ? "bg-sky-500/20 text-sky-300 border-sky-500/40 font-bold shadow-[0_0_8px_rgba(56,189,248,0.2)]"
-              : "bg-white/5 text-slate-400 border-white/10"
-          }`}
-        >
-          COMPETITORS (8)
-        </button>
-        <button
-          onClick={() => setActiveClusterFilter("MODS")}
-          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
-            activeClusterFilter === "MODS"
-              ? "bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold shadow-[0_0_8px_rgba(244,63,94,0.2)]"
-              : "bg-white/5 text-slate-400 border-white/10"
-          }`}
-        >
-          MODS (6)
-        </button>
-        <button
-          onClick={() => setActiveClusterFilter("ADMIN")}
-          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
-            activeClusterFilter === "ADMIN"
-              ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40 font-bold shadow-[0_0_8px_rgba(99,102,241,0.2)]"
-              : "bg-white/5 text-slate-400 border-white/10"
-          }`}
-        >
-          ADMIN (6)
-        </button>
-        <button
-          onClick={() => setActiveClusterFilter("BOTS")}
-          className={`px-2 py-0.5 rounded border shrink-0 transition-all ${
-            activeClusterFilter === "BOTS"
-              ? "bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold shadow-[0_0_8px_rgba(245,158,11,0.2)]"
-              : "bg-white/5 text-slate-400 border-white/10"
-          }`}
-        >
-          AI BOTS (6)
-        </button>
-      </div>
+      )}
 
       {/* Toast Notice */}
       {transmissionSuccessNotice && (
@@ -537,25 +573,6 @@ export default function EvosDashboardPage() {
         {/* Floating Quick Hint (Bottom Center) */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
           Drag to pan • Pinch / Scroll to zoom • Double-click blank space to close card
-        </div>
-
-        {/* Subtle Spaceman Toggle Button (Bottom Right) */}
-        <div className="absolute bottom-4 right-4 z-20">
-          <button
-            onClick={() => setSpacemanActive((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[10px] font-mono font-bold transition-all shadow-lg backdrop-blur-md cursor-pointer ${
-              spacemanActive
-                ? "bg-cyan-950/70 hover:bg-cyan-900/90 border-cyan-500/40 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.25)]"
-                : "bg-black/70 hover:bg-white/10 border-white/10 text-slate-400"
-            }`}
-            title={spacemanActive ? "Astronaut is floating in space. Click to hide or recall." : "Astronaut is resting. Click to launch into orbit in distance."}
-          >
-            <span className="text-sm">👨‍🚀</span>
-            <span className="hidden sm:inline">SPACEMAN:</span>
-            <span className={spacemanActive ? "text-cyan-400 font-extrabold" : "text-slate-500"}>
-              {spacemanActive ? "ACTIVE" : "OFF"}
-            </span>
-          </button>
         </div>
 
         {/* ─── RICH NODE INSPECTOR CARD (Right Side / Mobile Bottom Sheet) ──── */}
