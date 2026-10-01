@@ -1967,7 +1967,7 @@ export function EvoVisionCanvas({
     });
 
     setHoveredNode(hit || null);
-    if (hit && !cameraRef.current.isPanning) {
+    if (hit && hit.id !== "hub-main" && !cameraRef.current.isPanning) {
       setHoverPos({ x: e.clientX, y: e.clientY });
     } else {
       setHoverPos(null);
@@ -2124,7 +2124,7 @@ export function EvoVisionCanvas({
       />
 
       {/* ─── Hover Preview HUD Tooltip ───────────────────────── */}
-      {hoveredNode && hoverPos && !selectedNode && !cameraRef.current.isPanning && (
+      {hoveredNode && hoveredNode.id !== "hub-main" && hoverPos && !selectedNode && !cameraRef.current.isPanning && (
         <div
           className="fixed pointer-events-none z-40 px-3.5 py-2.5 rounded-2xl bg-[#090D18]/95 backdrop-blur-xl border border-cyan-400/40 text-xs font-mono shadow-[0_0_24px_rgba(6,182,212,0.35)] transition-opacity duration-150 flex flex-col gap-1 min-w-[200px] max-w-[260px] animate-fadeIn"
           style={{
