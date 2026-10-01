@@ -335,8 +335,8 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
         </div>
       </div>
 
-      {/* 2. Messages Display Viewport — exactly matches aspect-video to lock window size */}
-      <div className="relative w-full aspect-video bg-black/95 flex flex-col overflow-hidden shrink-0">
+      {/* 2. Messages Display Viewport — sized to fit full Claim Your Invite card and call-to-action buttons */}
+      <div className="relative w-full aspect-video min-h-[400px] sm:min-h-[430px] md:min-h-[450px] bg-black/95 flex flex-col overflow-hidden shrink-0">
         <div 
           ref={scrollRef}
           className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-5 space-y-3 no-scrollbar overscroll-contain"
