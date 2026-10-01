@@ -268,15 +268,15 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     type: "MATCH_ALERT",
     author: {
       id: "plink_ai_moderator",
-      name: "RO",
-      callsign: "RO",
+      name: "RO BOT",
+      callsign: "RO BOT",
       role: "OFFICIAL",
-      badgeText: "AI RANGE OFFICER",
+      badgeText: "AI Range Officer",
       division: "Autonomous AI Assistant • The Hideout",
       rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",
     },
     content:
-      "🤖 Welcome competitors to the 2026 Subsonic Society Invitational Money Match at The Hideout (Nov 13–15, 2026)! I am RO, your 24/7 Autonomous AI Assistant and Range Officer. I have full operational intel on match schedules, the $2,500 cash side matches, the 220-acre facility, 12 Bristol hotel options, top dining spots (Blackbird Bakery is open 24h!), and local entertainment like South Holston River trophy trout fly fishing and the Hard Rock Casino.\n\n📖 Official Competitor Packet & Match Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\nSay 'hey ro' or ask '@ro help' anytime!",
+      "🤖 Welcome competitors to the 2026 Subsonic Society Invitational Money Match at The Hideout (Nov 13–15, 2026)! I am RO BOT, your 24/7 Autonomous AI Assistant and Range Officer. I have full operational intel on match schedules, the $2,500 cash side matches, the 220-acre facility, 12 Bristol hotel options, top dining spots (Blackbird Bakery is open 24h!), and local entertainment like South Holston River trophy trout fly fishing and the Hard Rock Casino.\n\n📖 Official Competitor Packet & Match Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\nSay 'hey ro' or ask '@ro help' anytime!",
     timestamp: "09:00 AM",
     reactions: [
       { emoji: "🎯", count: 32, users: ["u1", "u2", "u3", "u4", "u5"] },

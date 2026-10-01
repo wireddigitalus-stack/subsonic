@@ -12,10 +12,10 @@ import { ChatMessage } from "./types";
 
 export const RO_AUTHOR = {
   id: "plink_ai_moderator", // keep ID for backwards compatibility with message moderation & filters
-  name: "RO",
-  callsign: "RO",
+  name: "RO BOT",
+  callsign: "RO BOT",
   role: "OFFICIAL" as const,
-  badgeText: "AI RANGE OFFICER",
+  badgeText: "AI Range Officer",
   division: "Autonomous AI Range Officer • The Hideout",
   rifleSetup: "Autonomous AI Assistant • 24/7 Match Ops",
 };
@@ -131,32 +131,32 @@ const RO_MENTIONED = /\b(ro|range\s*officer|plink)\b/i;
 
 const RO_GREETING_RESPONSES = [
   (c: string) =>
-    `Hey ${c}! 🤖 RO here — your autonomous AI Range Officer and match assistant on deck for The Hideout Invitational. Ready to talk match stages, Bristol lodging, food spots, or local entertainment. What do you need?`,
+    `Hey ${c}! 🤖 RO BOT here — your autonomous AI Range Officer and match assistant on deck for The Hideout Invitational. Ready to talk match stages, Bristol lodging, food spots, or local entertainment. What do you need?`,
   (c: string) =>
-    `${c}, AI Range Officer on net! 📻 Standing 24/7 post for the 2026 Subsonic Society Invitational. Need info on the match schedule, hotels in Bristol, or where to grab dinner tonight? Ask away.`,
+    `${c}, RO BOT on net! 📻 Standing 24/7 post for the 2026 Subsonic Society Invitational. Need info on the match schedule, hotels in Bristol, or where to grab dinner tonight? Ask away.`,
   (c: string) =>
-    `Welcome to the Invitational frequency, ${c}! ⛰️ I'm your 24/7 AI Assistant & Range Officer (RO). I have the entire 2026 Competitor Packet locked in — stages, side matches, hotels, BBQ, and Bristol entertainment. How can I help you prep?`,
+    `Welcome to the Invitational frequency, ${c}! ⛰️ I'm RO BOT, your 24/7 AI Range Officer. I have the entire 2026 Competitor Packet locked in — stages, side matches, hotels, BBQ, and Bristol entertainment. How can I help you prep?`,
   (c: string) =>
-    `RO here, ${c}. Frequencies open. As your AI match assistant, whether you need hotel recommendations, stage rotation times, or the best steak and doughnuts in Bristol, I've got your DOPE.`,
+    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, stage rotation times, or the best steak and doughnuts in Bristol, I've got your DOPE.`,
 ];
 
 const RO_THANKS_RESPONSES = [
-  (c: string) => `Roger that, ${c}. RO out. 🤖 Keep your chamber flagged and stay dialed in.`,
+  (c: string) => `Roger that, ${c}. RO BOT out. 🤖 Keep your chamber flagged and stay dialed in.`,
   (c: string) => `Anytime, ${c}. See you on the firing line at The Hideout. ⛰️`,
-  (c: string) => `Copy that, ${c}. RO standing by on the Invitational frequency.`,
+  (c: string) => `Copy that, ${c}. RO BOT standing by on the Invitational frequency.`,
   (c: string) => `Glad to help, ${c}. Let's make this the best money match in the country. Said. Done. 🏆`,
 ];
 
 const RO_IDENTITY_RESPONSES = [
   (c: string) =>
-    `I'm RO — your official autonomous AI Assistant and Range Officer for Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
+    `I'm RO BOT — your official autonomous AI Range Officer for the Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
   (c: string) =>
-    `I am the autonomous AI Range Officer (RO) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full dossier at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
+    `I am the autonomous AI Range Officer (RO BOT) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full dossier at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
 ];
 
 const RO_REAL_RESPONSES = [
   (c: string) =>
-    `I'm your autonomous AI Range Officer, ${c} — running official 24/7 Subsonic Society match intelligence. 🤖 I'm always on duty across The Hideout network to keep comms safe, answer match questions, and guide competitors visiting Bristol.`,
+    `I'm your autonomous AI Range Officer, ${c} (RO BOT) — running official 24/7 Subsonic Society match intelligence. 🤖 I'm always on duty across The Hideout network to keep comms safe, answer match questions, and guide competitors visiting Bristol.`,
 ];
 
 const RO_HOW_RESPONSES = [

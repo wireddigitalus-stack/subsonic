@@ -382,7 +382,7 @@ export function ChannelPickerModal({
               {filteredPartners.map((partner) => {
                 const isActive = currentChannel === partner.id;
                 const unread = unreadCounts[partner.id] || 0;
-                const isRO = partner.callsign === "RO" || partner.id === "dm_ro";
+                const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                 const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "ALLEN";
                 const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
 

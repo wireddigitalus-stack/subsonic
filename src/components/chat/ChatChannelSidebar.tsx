@@ -122,7 +122,7 @@ export function ChatChannelSidebar({
                 {directPartners.map((partner) => {
                   const isActive = currentChannel === partner.id;
                   const unread = unreadCounts[partner.id] || 0;
-                  const isRO = partner.callsign === "RO" || partner.id === "dm_ro";
+                  const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                   const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "ALLEN";
                   const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
 
@@ -173,7 +173,7 @@ export function ChatChannelSidebar({
                             {isRO ? (
                               <span className="text-cyan-300 font-bold flex items-center gap-1">
                                 <Bot className="w-2.5 h-2.5 text-cyan-400" />
-                                <span>AI Assistant · 24/7 Intel</span>
+                                <span>AI Range Officer · 24/7 Intel</span>
                               </span>
                             ) : (
                               partner.division || partner.badgeText || "Competitor"

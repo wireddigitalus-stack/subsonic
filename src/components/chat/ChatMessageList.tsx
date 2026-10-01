@@ -96,13 +96,13 @@ export function ChatMessageList({
 
   const handleAuthorClick = (author: ChatMessage["author"]) => {
     if (!onSelectShooter) return;
-    const isRO = author.id === "plink_ai_moderator" || author.name === "RO" || author.callsign === "RO";
+    const isRO = author.id === "plink_ai_moderator" || author.name === "RO" || author.name === "RO BOT" || author.callsign === "RO" || author.callsign === "RO BOT";
     const partner: DirectPartner = {
       id: isRO ? "dm_ro" : `dm_${(author.callsign || author.id).toLowerCase()}`,
-      callsign: isRO ? "RO" : (author.callsign || "MARKS"),
-      name: isRO ? "RO (AI Range Officer)" : author.name,
+      callsign: isRO ? "RO BOT" : (author.callsign || "MARKS"),
+      name: isRO ? "RO BOT" : author.name,
       role: author.role,
-      badgeText: isRO ? "AI RANGE OFFICER" : (author.badgeText || author.role),
+      badgeText: isRO ? "AI Range Officer" : (author.badgeText || author.role),
       division: isRO ? "Autonomous AI Match Assistant" : author.division,
       rifleSetup: isRO ? "Autonomous AI Agent • Match Ops & Safety" : author.rifleSetup,
       status: isRO ? "online" : "online",
@@ -214,11 +214,11 @@ export function ChatMessageList({
                 </p>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-[10px] font-mono text-amber-300">
                   <Bot className="w-3 h-3 text-cyan-400 shrink-0" />
-                  <span>Monitored by RO · Autonomous AI Match & Safety Agent</span>
+                  <span>Monitored by RO BOT · Autonomous AI Match & Safety Agent</span>
                 </div>
               </div>
 
-              {activeDirectPartner?.callsign === "RO" && (
+              {(activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") && (
                 <div className="p-3.5 rounded-2xl bg-black/60 border border-amber-500/30 text-left space-y-2.5">
                   <div className="text-[11px] font-mono text-amber-400 font-bold flex items-center gap-1.5">
                     <Bot className="w-3.5 h-3.5 text-cyan-400" />
@@ -263,7 +263,7 @@ export function ChatMessageList({
             const isPro = msg.author.role === "PRO_COMPETITOR";
             const isDopeDrop = msg.type === "DOPE_DROP" || !!msg.dopeCard;
             const isFlagged = msg.moderationStatus === "FLAGGED";
-            const isRO = msg.author.id === "plink_ai_moderator" || msg.author.name === "RO" || msg.author.callsign === "RO";
+            const isRO = msg.author.id === "plink_ai_moderator" || msg.author.name === "RO" || msg.author.name === "RO BOT" || msg.author.callsign === "RO" || msg.author.callsign === "RO BOT";
             // RO warning tier from aiEngine field
             const roSeverity: "warn" | "alert" | "info" = isRO
               ? msg.aiModerationReport
@@ -338,7 +338,7 @@ export function ChatMessageList({
                             isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
-                          {isRO ? "RO" : msg.author.name}
+                          {isRO ? "RO BOT" : msg.author.name}
                         </button>
 
                         {/* Callsign brackets */}
@@ -372,7 +372,7 @@ export function ChatMessageList({
                               : "bg-white/10 text-slate-300"
                           }`}
                         >
-                          {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
+                          {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
                         </span>
 
                         {/* Timestamp — inline on mobile */}
@@ -609,7 +609,7 @@ export function ChatMessageList({
         <div className="flex items-center gap-1.5 min-w-0">
           <Radio className="w-3 h-3 text-cyan-400 shrink-0" />
           {isDirectMode ? (
-            activeDirectPartner?.callsign === "RO" ? (
+            (activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") ? (
               <>
                 <button
                   type="button"

@@ -93,10 +93,10 @@ const ALL_CHANNELS: ChannelConfig[] = [
 const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
   {
     id: "dm_ro",
-    callsign: "RO",
-    name: "RO (AI Range Officer)",
+    callsign: "RO BOT",
+    name: "RO BOT",
     role: "OFFICIAL",
-    badgeText: "AI RANGE OFFICER",
+    badgeText: "AI Range Officer",
     division: "Autonomous AI Match Assistant",
     status: "online",
     bio: "Official Autonomous AI Assistant & Range Officer for The Hideout Invitational. Available 24/7 with expert intel on Bristol lodging, dining, match schedule, and cash side matches.",

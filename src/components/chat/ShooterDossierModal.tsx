@@ -31,7 +31,7 @@ export function ShooterDossierModal({
 }: ShooterDossierModalProps) {
   if (!isOpen || !shooter) return null;
 
-  const isRO = shooter.callsign === "RO" || shooter.name === "RO" || shooter.id === "dm_ro";
+  const isRO = shooter.callsign === "RO" || shooter.callsign === "RO BOT" || shooter.name === "RO" || shooter.name === "RO BOT" || shooter.id === "dm_ro";
   const isMasterOwner = shooter.role === "MASTER_OWNER" || shooter.callsign === "ROB" || shooter.callsign === "RADAR";
   const isOwnerAdmin = shooter.role === "OWNER_ADMIN" || shooter.callsign === "ALLEN";
 
@@ -82,10 +82,10 @@ export function ShooterDossierModal({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-white text-base truncate">
-                {isRO ? "RO (Range Officer)" : shooter.name}
+                {isRO ? "RO BOT" : shooter.name}
               </h3>
               <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
-                [{shooter.callsign}]
+                [{isRO ? "RO BOT" : shooter.callsign}]
               </span>
             </div>
 
@@ -99,7 +99,7 @@ export function ShooterDossierModal({
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {isRO ? "🤖 AI RANGE OFFICER" : isMasterOwner ? "⚡ MASTER ADMIN" : shooter.badgeText || shooter.role}
+                {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "⚡ MASTER ADMIN" : shooter.badgeText || shooter.role}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
@@ -180,7 +180,7 @@ export function ShooterDossierModal({
               <span>Autonomous AI Match Assistant · 24/7 Intel</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-normal">
-              RO is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 on private encrypted comms to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
+              RO BOT is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 on private encrypted comms to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
             </p>
           </div>
         )}
