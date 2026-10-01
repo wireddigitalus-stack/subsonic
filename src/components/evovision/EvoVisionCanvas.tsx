@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { ZoomIn, ZoomOut, Maximize2, X, Activity } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize2, X, Activity, ChevronDown, ChevronUp } from "lucide-react";
 import { EvoNode, EvoLink, EVO_NODES, EVO_LINKS, EVO_CLUSTERS } from "@/lib/evovision-data";
 import {
   REAL_STARS,
@@ -204,30 +204,33 @@ export function EvoVisionCanvas({
     return 100;
   });
 
-  // Real Constellations & "Connect the Dots" toggle
+  // Real Constellations & "Connect the Dots" toggle (Default: OFF)
   const [showConstellations, setShowConstellations] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("subsonic_show_constellations");
       if (saved !== null) return saved === "true";
     }
-    return true;
+    return false;
   });
   const showConstellationsRef = useRef<boolean>(showConstellations);
   showConstellationsRef.current = showConstellations;
 
-  // Real Constellation Stars toggle
+  // Real Constellation Stars toggle (Default: OFF)
   const [showStars, setShowStars] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("subsonic_show_stars");
       if (saved !== null) return saved === "true";
     }
-    return true;
+    return false;
   });
   const showStarsRef = useRef<boolean>(showStars);
   showStarsRef.current = showStars;
 
   // Live Constellation & Celestial Stats HUD overlay toggle
   const [showConstellationStats, setShowConstellationStats] = useState<boolean>(false);
+
+  // Mobile expandable drawer for celestial controls
+  const [celestialExpandedMobile, setCelestialExpandedMobile] = useState<boolean>(false);
 
   // Live Eastern Time tracking (updates every 1s for the UI meter)
   const [etInfo, setEtInfo] = useState<EasternTimeInfo>(() => getEasternTimeInfo());
@@ -2174,12 +2177,46 @@ export function EvoVisionCanvas({
 
       {/* ─── Compact Sun / Moon Celestial Day/Night Meter & Constellation Controls ─── */}
       <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[calc(100vw-24px)] pointer-events-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+        {/* Mobile Collapsed Mini-Badge */}
+        {!celestialExpandedMobile && (
+          <button
+            type="button"
+            onClick={() => setCelestialExpandedMobile(true)}
+            className="sm:hidden flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.7)] text-[10px] font-mono font-bold text-slate-300 active:scale-95 transition-transform"
+            title="Expand Celestial & Constellation Controls"
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                etInfo.isDaylight
+                  ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]"
+                  : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"
+              }`}
+            />
+            <span className={etInfo.isDaylight ? "text-amber-300" : "text-indigo-300"}>
+              {etInfo.isDaylight ? "☀️ DAYLIGHT" : `🌙 NIGHT (${etInfo.moonPhaseIcon})`}
+            </span>
+            <span className="text-slate-400 font-normal">| {etInfo.timeString24}</span>
+            <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+          </button>
+        )}
+
+        {/* Full Celestial Bar (always visible on desktop sm+, expandable on mobile) */}
+        <div
+          className={`${
+            celestialExpandedMobile ? "flex" : "hidden sm:flex"
+          } flex-col sm:flex-row sm:items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]`}
+        >
           {/* Day/Night Solar & Lunar Track */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-between gap-2.5">
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold tracking-wider">
-                <span className={`w-1.5 h-1.5 rounded-full ${etInfo.isDaylight ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]" : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"}`} />
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    etInfo.isDaylight
+                      ? "bg-amber-400 animate-pulse shadow-[0_0_8px_#f59e0b]"
+                      : "bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]"
+                  }`}
+                />
                 <span className={etInfo.isDaylight ? "text-amber-300 font-extrabold" : "text-indigo-300 font-extrabold"}>
                   {etInfo.isDaylight ? "☀️ DAYLIGHT GLIDE" : `🌙 NIGHT GLIDE (${etInfo.moonPhaseIcon})`}
                 </span>
@@ -2212,6 +2249,16 @@ export function EvoVisionCanvas({
                 </div>
               </div>
             </div>
+
+            {/* Mobile close/collapse button */}
+            <button
+              type="button"
+              onClick={() => setCelestialExpandedMobile(false)}
+              className="sm:hidden p-1 text-slate-400 hover:text-white"
+              title="Collapse"
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           {/* Celestial Controls: LINES, STARS, STATS */}
