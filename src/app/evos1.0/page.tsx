@@ -21,6 +21,7 @@ import {
   MapPin,
   Maximize2,
   MessageSquare,
+  Mic,
   Minimize2,
   Network,
   Radio,
@@ -42,6 +43,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { NexusVoiceIntercom, NexusVoiceState } from "@/components/evovision/NexusVoiceIntercom";
 
 export default function EvosDashboardPage() {
   const [selectedNode, setSelectedNode] = useState<EvoNode | null>(null);
@@ -53,6 +55,8 @@ export default function EvosDashboardPage() {
   const [recenterSignal, setRecenterSignal] = useState<number>(0);
   const [expandAllSignal, setExpandAllSignal] = useState<number>(0);
   const [contractAllSignal, setContractAllSignal] = useState<number>(0);
+  const [nexusVoiceState, setNexusVoiceState] = useState<NexusVoiceState>("idle");
+  const [externalVoiceTrigger, setExternalVoiceTrigger] = useState<number>(0);
   const [expandStats, setExpandStats] = useState({
     expandedCount: 1,
     totalCount: EVO_NODES.length,
@@ -259,6 +263,23 @@ export default function EvosDashboardPage() {
             </button>
           )}
 
+          <button
+            onClick={() => setExternalVoiceTrigger((prev) => prev + 1)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold transition-all ${
+              nexusVoiceState === "listening"
+                ? "bg-cyan-500 text-slate-950 border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.6)] animate-pulse"
+                : nexusVoiceState === "thinking"
+                ? "bg-amber-500 text-slate-950 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse"
+                : nexusVoiceState === "speaking"
+                ? "bg-emerald-500 text-slate-950 border-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.6)] animate-pulse"
+                : "bg-cyan-950/40 border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60 shadow-[0_0_8px_rgba(6,182,212,0.25)]"
+            }`}
+            title="Initiate Push-to-Talk Voice Comms with NEXUS"
+          >
+            <Mic className="w-3 h-3 text-cyan-400" />
+            <span className="hidden md:inline">NEXUS VOICE</span>
+          </button>
+
           <Link
             href="/shooters"
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[10px] text-emerald-300 hover:bg-emerald-900/60 transition-colors"
@@ -386,6 +407,7 @@ export default function EvosDashboardPage() {
           recenterSignal={recenterSignal}
           expandAllSignal={expandAllSignal}
           contractAllSignal={contractAllSignal}
+          nexusVoiceState={nexusVoiceState}
           onExpandStateChange={(count, total, isAllExp, isAllContr) => {
             setExpandStats({
               expandedCount: count,
@@ -1055,6 +1077,16 @@ export default function EvosDashboardPage() {
 
               {/* Action Buttons */}
               <div className="space-y-2 pt-1">
+                {selectedNode.id === "hub-main" && (
+                  <button
+                    onClick={() => setExternalVoiceTrigger((prev) => prev + 1)}
+                    className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500/30 to-blue-500/30 hover:from-cyan-500/40 hover:to-blue-500/40 border border-cyan-400/60 text-cyan-200 font-black text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_16px_rgba(6,182,212,0.35)]"
+                  >
+                    <Mic className="w-4 h-4 text-cyan-400 animate-pulse" />
+                    <span>OPEN NEXUS VOICE INTERCOM</span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => handleSimulateTransmission(selectedNode)}
                   className="w-full py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_12px_rgba(6,182,212,0.2)]"
@@ -1096,6 +1128,18 @@ export default function EvosDashboardPage() {
             </div>
           </aside>
         )}
+
+        {/* ─── PUSH-TO-TALK NEXUS VOICE INTERCOM ───────────────────────── */}
+        <NexusVoiceIntercom
+          onVoiceStateChange={setNexusVoiceState}
+          externalTrigger={externalVoiceTrigger}
+          dashboardContext={{
+            activeFilter: activeClusterFilter || undefined,
+            expandedCount: expandStats.expandedCount,
+            totalNodes: expandStats.totalCount,
+            registeredCount: 94,
+          }}
+        />
       </main>
     </div>
   );

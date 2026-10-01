@@ -32,6 +32,7 @@ interface EvoVisionCanvasProps {
     isAllExpanded: boolean,
     isAllContracted: boolean
   ) => void;
+  nexusVoiceState?: "idle" | "listening" | "thinking" | "speaking";
 }
 
 // Map each parent node to its immediate children
@@ -147,6 +148,7 @@ export function EvoVisionCanvas({
   expandAllSignal = 0,
   contractAllSignal = 0,
   onExpandStateChange,
+  nexusVoiceState = "idle",
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -471,6 +473,8 @@ export function EvoVisionCanvas({
   hoveredNodeRef.current = hoveredNode;
   const hoveredSpacemanRef = useRef(hoveredSpaceman);
   hoveredSpacemanRef.current = hoveredSpaceman;
+  const nexusVoiceStateRef = useRef(nexusVoiceState);
+  nexusVoiceStateRef.current = nexusVoiceState;
 
   // 3D Perspective & Rotation parameters
   const is3DModeRef = useRef(is3DMode);
@@ -1370,6 +1374,51 @@ export function EvoVisionCanvas({
         ctx.arc(px, py, nodeR * 2.4, 0, Math.PI * 2);
         ctx.fill();
 
+        // Special NEXUS voice visualizer animations when active
+        const voiceState = nexusVoiceStateRef.current;
+        if (node.id === "hub-main" && voiceState !== "idle") {
+          if (voiceState === "listening") {
+            // Sonar pulse waves in cyan
+            for (let i = 0; i < 3; i++) {
+              const ringProgress = (time * 1.5 + i * 0.33) % 1;
+              const ringRadius = nodeR + ringProgress * 42 * scale;
+              const ringAlpha = (1 - ringProgress) * 0.7;
+              ctx.strokeStyle = `rgba(6, 182, 212, ${ringAlpha})`;
+              ctx.lineWidth = Math.max(1.5, 2.5 * scale * (1 - ringProgress));
+              ctx.beginPath();
+              ctx.arc(px, py, ringRadius, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          } else if (voiceState === "thinking") {
+            // Orbiting golden particle nodes
+            for (let i = 0; i < 5; i++) {
+              const angle = time * 3.8 + (i * Math.PI * 2) / 5;
+              const orbDist = nodeR + 18 * scale;
+              const dotX = px + Math.cos(angle) * orbDist;
+              const dotY = py + Math.sin(angle) * orbDist;
+              ctx.fillStyle = "#F59E0B";
+              ctx.shadowColor = "#F59E0B";
+              ctx.shadowBlur = 8 * scale;
+              ctx.beginPath();
+              ctx.arc(dotX, dotY, 2.5 * scale, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.shadowBlur = 0;
+            }
+          } else if (voiceState === "speaking") {
+            // Warm audio waveform resonance rings
+            const voicePulse = Math.sin(time * 10) * 0.5 + 0.5;
+            const ringRadius = nodeR + (8 + voicePulse * 28) * scale;
+            ctx.strokeStyle = `rgba(245, 158, 11, ${0.4 + voicePulse * 0.4})`;
+            ctx.lineWidth = Math.max(1.5, 2.8 * scale);
+            ctx.shadowColor = "#F59E0B";
+            ctx.shadowBlur = 12 * scale;
+            ctx.beginPath();
+            ctx.arc(px, py, ringRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
+        }
+
         // ── B. Translucent Glass Orb Base Shell ───────────────────────
         const bodyGrad = ctx.createRadialGradient(
           px - nodeR * 0.32,
@@ -1381,10 +1430,22 @@ export function EvoVisionCanvas({
         );
 
         if (node.id === "hub-main") {
-          bodyGrad.addColorStop(0, "rgba(224, 242, 254, 0.85)");
-          bodyGrad.addColorStop(0.3, "rgba(56, 189, 248, 0.52)");
-          bodyGrad.addColorStop(0.7, "rgba(2, 132, 199, 0.40)");
-          bodyGrad.addColorStop(1, "rgba(8, 47, 73, 0.72)");
+          if (voiceState === "thinking" || voiceState === "speaking") {
+            bodyGrad.addColorStop(0, "rgba(254, 243, 199, 0.90)");
+            bodyGrad.addColorStop(0.3, "rgba(245, 158, 11, 0.65)");
+            bodyGrad.addColorStop(0.7, "rgba(217, 119, 6, 0.45)");
+            bodyGrad.addColorStop(1, "rgba(69, 26, 3, 0.75)");
+          } else if (voiceState === "listening") {
+            bodyGrad.addColorStop(0, "rgba(224, 242, 254, 0.95)");
+            bodyGrad.addColorStop(0.3, "rgba(6, 182, 212, 0.70)");
+            bodyGrad.addColorStop(0.7, "rgba(2, 132, 199, 0.50)");
+            bodyGrad.addColorStop(1, "rgba(8, 47, 73, 0.85)");
+          } else {
+            bodyGrad.addColorStop(0, "rgba(224, 242, 254, 0.85)");
+            bodyGrad.addColorStop(0.3, "rgba(56, 189, 248, 0.52)");
+            bodyGrad.addColorStop(0.7, "rgba(2, 132, 199, 0.40)");
+            bodyGrad.addColorStop(1, "rgba(8, 47, 73, 0.72)");
+          }
         } else if (node.cluster === "MODS") {
           bodyGrad.addColorStop(0, "rgba(255, 228, 230, 0.82)");
           bodyGrad.addColorStop(0.35, "rgba(244, 63, 94, 0.52)");
@@ -1553,17 +1614,32 @@ export function EvoVisionCanvas({
         const labelFontSize = Math.round((isMajorCluster ? 13 : 11) * scale);
         ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
 
+        let displaySublabel = node.sublabel;
+        let sublabelColor = node.color;
+        if (node.id === "hub-main" && voiceState !== "idle") {
+          if (voiceState === "listening") {
+            displaySublabel = "🎙️ LISTENING...";
+            sublabelColor = "#38BDF8";
+          } else if (voiceState === "thinking") {
+            displaySublabel = "⚡ THINKING...";
+            sublabelColor = "#F59E0B";
+          } else if (voiceState === "speaking") {
+            displaySublabel = "🔊 SPEAKING...";
+            sublabelColor = "#F59E0B";
+          }
+        }
+
         const labelMetrics = ctx.measureText(node.label);
         let sublabelWidth = 0;
-        if (node.sublabel) {
+        if (displaySublabel) {
           ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-          sublabelWidth = ctx.measureText(node.sublabel).width;
+          sublabelWidth = ctx.measureText(displaySublabel).width;
           ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
         }
 
         const maxTextWidth = Math.max(labelMetrics.width, sublabelWidth);
         const pillW = maxTextWidth + 24 * scale;
-        const pillHeight = (node.sublabel ? 34 : 20) * scale;
+        const pillHeight = (displaySublabel ? 34 : 20) * scale;
         const pillY = py + nodeR + 6 * scale;
         const pillX = px - pillW / 2;
         const pillR = Math.max(2, 6 * scale);
@@ -1585,13 +1661,13 @@ export function EvoVisionCanvas({
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = "#000000";
         ctx.shadowBlur = 4;
-        ctx.fillText(node.label, px, pillY + (node.sublabel ? 14 : 14) * scale);
+        ctx.fillText(node.label, px, pillY + (displaySublabel ? 14 : 14) * scale);
         ctx.shadowBlur = 0;
 
-        if (node.sublabel) {
+        if (displaySublabel) {
           ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-          ctx.fillStyle = node.color;
-          ctx.fillText(node.sublabel, px, pillY + 27 * scale);
+          ctx.fillStyle = sublabelColor;
+          ctx.fillText(displaySublabel, px, pillY + 27 * scale);
         }
 
         // ── F. Expandable Spheres Bloom Indicator Badge ─────────────

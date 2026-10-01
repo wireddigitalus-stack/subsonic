@@ -167,3 +167,73 @@ export function playTacticalChirp(frequency = 940) {
     // Silent fallback
   }
 }
+
+/**
+ * NEXUS VOICE INTERCOM CHIRP
+ * Distinct tactical radio clicks for PTT engage, disengage, and AI uplink
+ */
+export function playNexusCommsChirp(type: "ptt_on" | "ptt_off" | "response" = "ptt_on") {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+
+    if (type === "ptt_on") {
+      // Mic-open chirp: quick rising dual-tone chirp
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(680, now);
+      osc.frequency.exponentialRampToValueAtTime(1380, now + 0.06);
+      gain.gain.setValueAtTime(0.24, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.06);
+    } else if (type === "ptt_off") {
+      // Mic-close chirp: falling low squelch tail
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(540, now + 0.05);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else {
+      // AI Uplink / Response incoming: cyber dual-pip
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "triangle";
+      osc1.frequency.setValueAtTime(920, now);
+      gain1.gain.setValueAtTime(0.16, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.04);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(1480, now + 0.05);
+      gain2.gain.setValueAtTime(0.20, now + 0.05);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.10);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.05);
+      osc2.stop(now + 0.10);
+    }
+  } catch {
+    // Silent fallback
+  }
+}
+
