@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Deterministic fallback (offline or API issue)
-    const fallbackText = getNexusDeterministicAnswer(cleanQuery);
+    const fallbackText = getNexusDeterministicAnswer(cleanQuery, context);
     return NextResponse.json({
       text: fallbackText,
       mood: "informative",
