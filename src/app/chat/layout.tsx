@@ -21,6 +21,21 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/chat",
   },
+  icons: {
+    icon: "/images/SS-RWB-LOGO.png",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon-180x180.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon-1024x1024.png", sizes: "1024x1024", type: "image/png" },
+      { url: "/assets/apple-touch-icon.png" },
+    ],
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SUBSONIC SOCIETY",
+  },
   openGraph: {
     title: "Tactical Comms Network & Firing Line Intel | Subsonic Society",
     description:

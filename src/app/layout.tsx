@@ -27,6 +27,8 @@ export const metadata: Metadata = {
     icon: "/images/SS-RWB-LOGO.png",
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon-180x180.png", sizes: "180x180", type: "image/png" },
+      { url: "/apple-touch-icon-1024x1024.png", sizes: "1024x1024", type: "image/png" },
       { url: "/assets/apple-touch-icon.png" },
     ],
   },
@@ -34,7 +36,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Subsonic",
+    title: "SUBSONIC SOCIETY",
   },
   alternates: {
     canonical: siteUrl,
