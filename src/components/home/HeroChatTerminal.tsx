@@ -329,7 +329,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             title="Launch Full Live Comms Terminal in New Tab"
           >
             <Radio className="w-3 h-3 text-black animate-pulse" />
-            <span>ENTER ROOM</span>
+            <span>ENTER THE CHAT</span>
             <ChevronRight className="w-3 h-3 stroke-[2.5]" />
           </Link>
         </div>

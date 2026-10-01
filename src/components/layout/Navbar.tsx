@@ -484,7 +484,7 @@ export function Navbar() {
                     title="Open Live Comms Room in New Tab"
                   >
                     <MessageSquare className="w-3.5 h-3.5 fill-black" />
-                    <span>Enter Room</span>
+                    <span>Enter The Chat</span>
                   </Link>
                 )}
                 <button
