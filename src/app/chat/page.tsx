@@ -1420,29 +1420,6 @@ export default function ChatPage() {
           : "flex flex-col h-full w-full max-w-full overflow-hidden overflow-x-hidden bg-[#07090E]"
       }
     >
-      {/* Floating Escape Breadcrumb for Fullscreen Handheld Mode */}
-      {isFullscreen && (
-        <div className="fixed top-[max(0.6rem,env(safe-area-inset-top,0px))] left-3 z-[80] flex items-center gap-2 pointer-events-auto">
-          <Link
-            href="/"
-            className="px-2.5 py-1.5 rounded-xl bg-black/90 backdrop-blur-xl border border-white/20 text-slate-200 hover:text-white font-mono text-xs font-bold flex items-center gap-1.5 shadow-2xl active:scale-95 transition-all"
-            title="Return to Main Portal"
-          >
-            <ChevronLeft className="w-4 h-4 text-amber-400" />
-            <span>HOME</span>
-          </Link>
-          <button
-            type="button"
-            onClick={() => setIsFullscreen(false)}
-            className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 backdrop-blur-xl border border-amber-400/50 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-2xl active:scale-95 transition-all"
-            title="Exit Fullscreen Mode"
-          >
-            <Minimize2 className="w-3.5 h-3.5" />
-            <span>EXIT FULL</span>
-          </button>
-        </div>
-      )}
-
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
         <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] sm:pt-3">
@@ -1786,45 +1763,52 @@ export default function ChatPage() {
         </div>
       ) : (
         /* Fullscreen Top Bar — Messenger-clean on mobile, richer on desktop */
-        <div className="bg-black/80 md:ios-glass rounded-none md:rounded-2xl px-3 sm:px-4 py-2.5 md:py-2.5 border-b md:border border-white/10 flex items-center justify-between gap-2 sm:gap-3 md:mb-1.5 shrink-0">
-          {/* Left: Back Button (mobile) */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsFullscreen(false);
-              if (isMobileRef.current && typeof window !== "undefined") {
-                window.location.href = "/";
-              }
-            }}
-            className="w-10 h-10 md:w-7 md:h-7 rounded-xl md:rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center shrink-0 transition-colors"
-            title="Back"
-          >
-            <ChevronDown className="w-5 h-5 md:w-3.5 md:h-3.5 text-amber-400 -rotate-90" />
-          </button>
+        <div className="bg-black/90 backdrop-blur-md md:ios-glass rounded-none md:rounded-2xl px-2 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-2 md:py-2.5 border-b md:border border-white/10 flex items-center justify-between gap-1.5 sm:gap-3 md:mb-1.5 shrink-0 z-30">
+          {/* Left: Breadcrumbs to Home + Fullscreen Exit */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <Link
+              href="/"
+              className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all"
+              title="Return to Main Portal"
+            >
+              <ChevronLeft className="w-3.5 h-3.5 text-amber-400 -mr-0.5" />
+              <span className="font-extrabold text-[10px] sm:text-[11px]">HOME</span>
+            </Link>
 
-          {/* Center: Tappable Room Name */}
+            <button
+              type="button"
+              onClick={() => setIsFullscreen(false)}
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold active:scale-95 transition-all"
+              title="Exit Fullscreen Mode"
+            >
+              <Minimize2 className="w-3 h-3 text-amber-400" />
+              <span className="text-[10px]">EXIT</span>
+            </button>
+          </div>
+
+          {/* Center: Tappable Room Name (cleanly spaced, properly truncated) */}
           <button
             type="button"
             onClick={() => {
               setIsChannelModalOpen(true);
               playTacticalChirp(1100);
             }}
-            className="flex items-center gap-1.5 font-mono text-left min-w-0 group flex-1 justify-center md:justify-start"
+            className="flex items-center gap-1 sm:gap-1.5 font-mono text-left min-w-0 group flex-1 justify-center px-1"
             title="Switch room"
           >
-            <span className="text-amber-400 font-bold text-sm md:text-base">#</span>
-            <span className="font-mono font-bold text-sm md:text-base text-white whitespace-nowrap truncate max-w-[150px] sm:max-w-[220px] md:max-w-none group-hover:text-amber-300 transition-colors">
+            <span className="text-amber-400 font-bold text-xs sm:text-sm md:text-base">#</span>
+            <span className="font-mono font-bold text-xs sm:text-sm md:text-base text-white whitespace-nowrap truncate max-w-[90px] xs:max-w-[140px] sm:max-w-[200px] md:max-w-none group-hover:text-amber-300 transition-colors">
               {currentChannelData.name}
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
+            <span className="text-[9px] sm:text-[10px] font-mono px-1 sm:px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-0.5 sm:gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
               <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
               <span>{currentChannelEngagement.postCount}</span>
             </span>
-            <ChevronDown className="w-4 h-4 text-amber-400/70 group-hover:text-amber-300 shrink-0" />
+            <ChevronDown className="w-3 h-3 text-amber-400/70 group-hover:text-amber-300 shrink-0" />
           </button>
 
           {/* Right: Controls */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Desktop-only: Weather, Staff Moderated */}
             <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px] font-mono">
               <Wind className="w-3 h-3 text-cyan-400" />
@@ -1846,14 +1830,14 @@ export default function ChatPage() {
               title="Terms of Use & Code of Conduct"
             >
               <Scale className="w-2.5 h-2.5 text-amber-400" />
-              <span>TERMS &amp; CONDUCT</span>
+              <span>TERMS</span>
             </button>
 
-            {/* Audio Toggle — Icon only on mobile */}
+            {/* Audio Toggle */}
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`w-10 h-10 md:h-7 md:w-auto md:px-2 rounded-xl md:rounded-lg border flex items-center justify-center md:gap-1 font-mono font-semibold transition-all ${
+              className={`h-7 w-7 sm:h-8 sm:w-8 md:h-7 md:w-auto md:px-2 rounded-lg sm:rounded-xl border flex items-center justify-center md:gap-1 font-mono font-semibold transition-all ${
                 soundEnabled
                   ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                   : "bg-white/5 text-slate-400 border-white/10"
@@ -1862,22 +1846,11 @@ export default function ChatPage() {
               aria-label="Toggle Audio"
             >
               {soundEnabled ? (
-                <Volume2 className="w-5 h-5 md:w-3 md:h-3 text-amber-400" />
+                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
               ) : (
-                <VolumeX className="w-5 h-5 md:w-3 md:h-3 text-slate-400" />
+                <VolumeX className="w-3.5 h-3.5 text-slate-400" />
               )}
               <span className="hidden md:inline text-[10px]">{soundEnabled ? "ON" : "OFF"}</span>
-            </button>
-
-            {/* Desktop-only: Exit Fullscreen */}
-            <button
-              type="button"
-              onClick={() => setIsFullscreen(false)}
-              className="hidden md:flex h-7 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-xs items-center gap-1 font-mono transition-all"
-              title="Exit Fullscreen"
-            >
-              <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
-              <span>Exit</span>
             </button>
           </div>
         </div>
