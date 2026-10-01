@@ -104,6 +104,7 @@ export interface EvoSecurityLogEntry {
 
 export interface EvoNode {
   id: string;
+  parentId?: string;
   label: string;
   sublabel?: string;
   cluster: "HUB" | "USERS" | "MODS" | "ADMIN" | "BOTS";
@@ -255,6 +256,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "hub-feed-bristol",
+    parentId: "hub-main",
     label: "BRISTOL PRO FEED",
     sublabel: "Stage 1-18 Live Stream",
     cluster: "HUB",
@@ -277,6 +279,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "hub-feed-ballistics",
+    parentId: "hub-main",
     label: "BALLISTICS LAB",
     sublabel: "Radar Chrono & Tuner Logs",
     cluster: "HUB",
@@ -301,6 +304,7 @@ export const EVO_NODES: EvoNode[] = [
   // ─── 2. USER POPULATION CLUSTER (Top-Left) ────────────────────────
   {
     id: "cluster-users",
+    parentId: "hub-main",
     label: "USER POPULATION",
     sublabel: "Active Competitors Hub",
     cluster: "USERS",
@@ -321,6 +325,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-wyatt",
+    parentId: "cluster-users",
     label: "Wyatt Sterling",
     sublabel: "Open Pro • Rank #4",
     cluster: "USERS",
@@ -414,6 +419,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-kendra",
+    parentId: "cluster-users",
     label: "Kendra Cross",
     sublabel: "SE Regional Champion",
     cluster: "USERS",
@@ -465,6 +471,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-eli",
+    parentId: "cluster-users",
     label: "Eli McAllister",
     sublabel: "Appalachian Cup Winner",
     cluster: "USERS",
@@ -507,6 +514,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-sofia",
+    parentId: "cluster-users",
     label: "Sofia Reyes",
     sublabel: "Production Class",
     cluster: "USERS",
@@ -538,6 +546,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-caleb",
+    parentId: "cluster-users",
     label: "Caleb Sterling",
     sublabel: "Match Director Staff",
     cluster: "USERS",
@@ -563,6 +572,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-comm-groups",
+    parentId: "cluster-users",
     label: "COMMUN GROUPS",
     sublabel: "Squad Comms Channels",
     cluster: "USERS",
@@ -579,6 +589,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-apex",
+    parentId: "cluster-users",
     label: "Jackson Miller",
     sublabel: "Open Division Squad 2",
     cluster: "USERS",
@@ -598,6 +609,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "user-ghostrider",
+    parentId: "cluster-users",
     label: "Dan Kowalski",
     sublabel: "Squad 3 Barricade Lead",
     cluster: "USERS",
@@ -619,6 +631,7 @@ export const EVO_NODES: EvoNode[] = [
   // ─── 3. MODERATOR TEAM CLUSTER (Top-Right) ────────────────────────
   {
     id: "cluster-mods",
+    parentId: "hub-main",
     label: "MODERATOR TEAM",
     sublabel: "Range Marshal Watch",
     cluster: "MODS",
@@ -639,6 +652,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "mod-sentinel",
+    parentId: "cluster-mods",
     label: "PLINK AI MARSHAL",
     sublabel: "Gemini 2.5 Sentinel",
     cluster: "MODS",
@@ -692,6 +706,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "mod-host-1",
+    parentId: "cluster-mods",
     label: "HOST ROOM 1",
     sublabel: "Bristol Pro Shootout",
     cluster: "MODS",
@@ -714,6 +729,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "mod-host-12",
+    parentId: "cluster-mods",
     label: "HOST ROOM 12",
     sublabel: "Ballistics & DOPE",
     cluster: "MODS",
@@ -730,6 +746,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "mod-host-23",
+    parentId: "cluster-mods",
     label: "HOST ROOM 23",
     sublabel: "Squad Comms & Trade",
     cluster: "MODS",
@@ -746,6 +763,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "mod-policy",
+    parentId: "cluster-mods",
     label: "SAFETY PROTOCOLS",
     sublabel: "Auto-Mute Timer",
     cluster: "MODS",
@@ -764,6 +782,7 @@ export const EVO_NODES: EvoNode[] = [
   // ─── 4. ADMIN CONTROLS CLUSTER (Bottom-Left) ──────────────────────
   {
     id: "cluster-admin",
+    parentId: "hub-main",
     label: "ADMIN CONTROLS",
     sublabel: "Core Security Hub",
     cluster: "ADMIN",
@@ -784,6 +803,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "admin-rob",
+    parentId: "cluster-admin",
     label: "Rob Neilson",
     sublabel: "Master Admin • Systems Architecture",
     cluster: "ADMIN",
@@ -838,6 +858,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "admin-telemetry-db",
+    parentId: "cluster-admin",
     label: "TELEMETRY ENGINE",
     sublabel: "telemetry-events.jsonl",
     cluster: "ADMIN",
@@ -857,6 +878,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "admin-member-db",
+    parentId: "cluster-admin",
     label: "MEMBER REGISTRY",
     sublabel: "120 Registered Shooters",
     cluster: "ADMIN",
@@ -873,6 +895,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "admin-security",
+    parentId: "cluster-admin",
     label: "GATEKEEPER AUTH",
     sublabel: "Passkey Security Gate",
     cluster: "ADMIN",
@@ -889,6 +912,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "admin-panic-lock",
+    parentId: "cluster-admin",
     label: "EMERGENCY LOCKDOWN",
     sublabel: "Global Comms Killswitch",
     cluster: "ADMIN",
@@ -907,6 +931,7 @@ export const EVO_NODES: EvoNode[] = [
   // ─── 5. AI BOTS TEST BED CLUSTER (Bottom-Right) ───────────────────
   {
     id: "cluster-bots",
+    parentId: "hub-main",
     label: "AI BOTS TEST BED",
     sublabel: "Autonomous Fleet Hub",
     cluster: "BOTS",
@@ -927,6 +952,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-marcus-badactor",
+    parentId: "cluster-bots",
     label: "Marcus Webb",
     sublabel: "AI Mod Stress Actor",
     cluster: "BOTS",
@@ -987,6 +1013,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-garrett",
+    parentId: "cluster-bots",
     label: "Garrett Vance (Bot)",
     sublabel: "Match Director Bot",
     cluster: "BOTS",
@@ -1025,6 +1052,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-wyatt-sim",
+    parentId: "cluster-bots",
     label: "Wyatt Sterling (Bot)",
     sublabel: "Simulated Open Pro",
     cluster: "BOTS",
@@ -1050,6 +1078,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-kendra-sim",
+    parentId: "cluster-bots",
     label: "Kendra Cross (Bot)",
     sublabel: "Simulated Ballistics",
     cluster: "BOTS",
@@ -1075,6 +1104,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-eli-sim",
+    parentId: "cluster-bots",
     label: "Eli McAllister (Bot)",
     sublabel: "Simulated Production",
     cluster: "BOTS",
@@ -1100,6 +1130,7 @@ export const EVO_NODES: EvoNode[] = [
   },
   {
     id: "bot-sofia-sim",
+    parentId: "cluster-bots",
     label: "Sofia Reyes (Bot)",
     sublabel: "Simulated Enthusiast",
     cluster: "BOTS",

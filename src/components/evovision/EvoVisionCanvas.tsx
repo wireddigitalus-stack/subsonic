@@ -10,6 +10,7 @@ import {
   getEasternTimeInfo,
   EasternTimeInfo,
 } from "@/lib/evovision-constellations";
+import { playBotTelemetryChirp } from "@/lib/chat-audio";
 
 interface EvoVisionCanvasProps {
   selectedNode: EvoNode | null;
@@ -23,6 +24,42 @@ interface EvoVisionCanvasProps {
   onToggleAutoRotate?: (active: boolean) => void;
   onDismissSelection?: () => void;
   recenterSignal?: number;
+  expandAllSignal?: number;
+  contractAllSignal?: number;
+  onExpandStateChange?: (
+    expandedCount: number,
+    totalCount: number,
+    isAllExpanded: boolean,
+    isAllContracted: boolean
+  ) => void;
+}
+
+// Map each parent node to its immediate children
+const PARENT_CHILD_MAP = new Map<string, string[]>();
+EVO_NODES.forEach((n) => {
+  if (n.parentId) {
+    if (!PARENT_CHILD_MAP.has(n.parentId)) {
+      PARENT_CHILD_MAP.set(n.parentId, []);
+    }
+    PARENT_CHILD_MAP.get(n.parentId)!.push(n.id);
+  }
+});
+
+// Fast global lookup map for nodes
+const NODE_LOOKUP_MAP = new Map<string, EvoNode>(
+  EVO_NODES.map((n) => [n.id, n])
+);
+
+interface NodeAnimState {
+  currentX: number;
+  currentY: number;
+  currentScale: number;
+  targetScale: number;
+  velocityScale: number;
+  currentOpacity: number;
+  targetOpacity: number;
+  visible: boolean;
+  bloomDelay: number;
 }
 
 interface Particle {
@@ -107,8 +144,39 @@ export function EvoVisionCanvas({
   onToggleAutoRotate,
   onDismissSelection,
   recenterSignal = 0,
+  expandAllSignal = 0,
+  contractAllSignal = 0,
+  onExpandStateChange,
 }: EvoVisionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Progressive disclosure: Set of expanded parent node IDs (starts empty = ONLY NEXUS visible!)
+  const expandedNodeIdsRef = useRef<Set<string>>(new Set());
+
+  // Live animation states for each node in the bloom topology
+  const nodeAnimMapRef = useRef<Map<string, NodeAnimState>>(new Map());
+  if (nodeAnimMapRef.current.size === 0) {
+    EVO_NODES.forEach((n) => {
+      const isRoot = n.id === "hub-main";
+      nodeAnimMapRef.current.set(n.id, {
+        currentX: isRoot ? n.x : 0,
+        currentY: isRoot ? n.y : 0,
+        currentScale: isRoot ? 1 : 0,
+        targetScale: isRoot ? 1 : 0,
+        velocityScale: 0,
+        currentOpacity: isRoot ? 1 : 0,
+        targetOpacity: isRoot ? 1 : 0,
+        visible: isRoot,
+        bloomDelay: 0,
+      });
+    });
+  }
+
+  // Multi-click & tap gesture detection (single = expand/collapse, double = data card, triple = expand all)
+  const lastClickTimeRef = useRef<number>(0);
+  const clickCountRef = useRef<number>(0);
+  const lastClickedNodeIdRef = useRef<string | null>(null);
+  const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Camera viewport transform
   const cameraRef = useRef({
@@ -183,6 +251,178 @@ export function EvoVisionCanvas({
     }
     return 1.0;
   }, []);
+
+  // Update stats notification to parent
+  const updateExpandStats = useCallback(() => {
+    if (!onExpandStateChange) return;
+    const allParentIds = Array.from(PARENT_CHILD_MAP.keys());
+    const set = expandedNodeIdsRef.current;
+    const isAllExp = allParentIds.length > 0 && allParentIds.every((id) => set.has(id));
+    const isAllContr = set.size === 0;
+
+    let count = 0;
+    EVO_NODES.forEach((n) => {
+      if (n.id === "hub-main") {
+        count++;
+      } else if (n.parentId) {
+        const parentNode = NODE_LOOKUP_MAP.get(n.parentId);
+        const grandParentOk = !parentNode?.parentId || set.has(parentNode.parentId);
+        if (set.has(n.parentId) && grandParentOk) count++;
+      }
+    });
+
+    onExpandStateChange(count, EVO_NODES.length, isAllExp, isAllContr);
+  }, [onExpandStateChange]);
+
+  // Toggle single sphere expand / collapse
+  const toggleNodeExpand = useCallback((nodeId: string) => {
+    const set = expandedNodeIdsRef.current;
+    if (set.has(nodeId)) {
+      set.delete(nodeId);
+      const childIds = PARENT_CHILD_MAP.get(nodeId);
+      if (childIds) {
+        childIds.forEach((cId) => set.delete(cId));
+      }
+    } else {
+      set.add(nodeId);
+      const node = NODE_LOOKUP_MAP.get(nodeId);
+      if (node?.parentId) {
+        set.add(node.parentId);
+      }
+    }
+    updateExpandStats();
+  }, [updateExpandStats]);
+
+  // Toggle expand all / contract all
+  const toggleExpandAll = useCallback(() => {
+    const set = expandedNodeIdsRef.current;
+    const allParentIds = Array.from(PARENT_CHILD_MAP.keys());
+    const isAllExpanded = allParentIds.length > 0 && allParentIds.every((id) => set.has(id));
+
+    if (isAllExpanded) {
+      set.clear();
+    } else {
+      allParentIds.forEach((id) => set.add(id));
+    }
+    updateExpandStats();
+  }, [updateExpandStats]);
+
+  // High-precision interaction dispatcher (single click = expand, double click = data card, triple click = toggle all)
+  const handleNodeInteraction = useCallback((node: EvoNode) => {
+    const now = Date.now();
+    const timeSinceLast = now - lastClickTimeRef.current;
+    lastClickTimeRef.current = now;
+
+    if (timeSinceLast < 380 && lastClickedNodeIdRef.current === node.id) {
+      clickCountRef.current += 1;
+    } else {
+      clickCountRef.current = 1;
+      lastClickedNodeIdRef.current = node.id;
+    }
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+
+    if (clickCountRef.current >= 3) {
+      // TRIPLE CLICK -> Toggle Expand All / Contract All
+      clickCountRef.current = 0;
+      toggleExpandAll();
+      try { playBotTelemetryChirp(); } catch {}
+      return;
+    }
+
+    if (clickCountRef.current === 2) {
+      // DOUBLE CLICK -> Open Data Card!
+      clickTimerRef.current = setTimeout(() => {
+        clickCountRef.current = 0;
+        onSelectNode(node);
+        try { playBotTelemetryChirp(); } catch {}
+      }, 40);
+      return;
+    }
+
+    // SINGLE CLICK -> Wait briefly to differentiate from double click
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+      const isParent = PARENT_CHILD_MAP.has(node.id);
+      if (isParent) {
+        toggleNodeExpand(node.id);
+        try { playBotTelemetryChirp(); } catch {}
+      } else {
+        // Leaf node single click selects / opens data card
+        onSelectNode(node);
+        try { playBotTelemetryChirp(); } catch {}
+      }
+    }, 220);
+  }, [onSelectNode, toggleExpandAll, toggleNodeExpand]);
+
+  const handleBlankInteraction = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLast = now - lastClickTimeRef.current;
+    lastClickTimeRef.current = now;
+
+    if (timeSinceLast < 380 && lastClickedNodeIdRef.current === "__BLANK__") {
+      clickCountRef.current += 1;
+    } else {
+      clickCountRef.current = 1;
+      lastClickedNodeIdRef.current = "__BLANK__";
+    }
+
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+
+    if (clickCountRef.current >= 3) {
+      // Blank canvas TRIPLE CLICK -> Toggle Expand All / Contract All
+      clickCountRef.current = 0;
+      toggleExpandAll();
+      try { playBotTelemetryChirp(); } catch {}
+      return;
+    }
+
+    if (clickCountRef.current === 2) {
+      // Blank canvas DOUBLE CLICK -> Dismiss selection
+      clickCountRef.current = 0;
+      if (onDismissSelection) onDismissSelection();
+    }
+  }, [onDismissSelection, toggleExpandAll]);
+
+  // Synchronize external Expand All / Contract All signals
+  const prevExpandSignalRef = useRef(expandAllSignal);
+  useEffect(() => {
+    if (expandAllSignal && expandAllSignal !== prevExpandSignalRef.current) {
+      prevExpandSignalRef.current = expandAllSignal;
+      const allParentIds = Array.from(PARENT_CHILD_MAP.keys());
+      allParentIds.forEach((id) => expandedNodeIdsRef.current.add(id));
+      updateExpandStats();
+      try { playBotTelemetryChirp(); } catch {}
+    }
+  }, [expandAllSignal, updateExpandStats]);
+
+  const prevContractSignalRef = useRef(contractAllSignal);
+  useEffect(() => {
+    if (contractAllSignal && contractAllSignal !== prevContractSignalRef.current) {
+      prevContractSignalRef.current = contractAllSignal;
+      expandedNodeIdsRef.current.clear();
+      updateExpandStats();
+      try { playBotTelemetryChirp(); } catch {}
+    }
+  }, [contractAllSignal, updateExpandStats]);
+
+  // When activeFilter changes, automatically ensure relevant cluster is expanded
+  useEffect(() => {
+    if (activeFilter) {
+      expandedNodeIdsRef.current.add("hub-main");
+      if (activeFilter === "USERS") expandedNodeIdsRef.current.add("cluster-users");
+      else if (activeFilter === "MODS") expandedNodeIdsRef.current.add("cluster-mods");
+      else if (activeFilter === "ADMIN") expandedNodeIdsRef.current.add("cluster-admin");
+      else if (activeFilter === "BOTS") expandedNodeIdsRef.current.add("cluster-bots");
+      updateExpandStats();
+    }
+  }, [activeFilter, updateExpandStats]);
 
   // Keep live refs for uninterrupted 60 FPS animation loop
   const selectedNodeRef = useRef(selectedNode);
@@ -809,27 +1049,116 @@ export function EvoVisionCanvas({
       const selectedNodeVal = selectedNodeRef.current;
       const hoveredNodeVal = hoveredNodeRef.current;
 
-      // Project all nodes and update projected lookup map for 100% accurate hit-testing
-      const projectedNodes = EVO_NODES.map((node) => {
-        const proj = project3D(node.x, node.y);
-        return {
+      // ─── 0. Progressive Bloom Spring Physics & Staggered Reveal ───
+      const animMap = nodeAnimMapRef.current;
+      const expandedSet = expandedNodeIdsRef.current;
+      const dt = 0.016; // 60 FPS delta
+
+      EVO_NODES.forEach((node) => {
+        const anim = animMap.get(node.id);
+        if (!anim) return;
+
+        const isRoot = node.id === "hub-main";
+        const parentId = node.parentId;
+        let desiredVisible = false;
+
+        if (isRoot) {
+          desiredVisible = true;
+        } else if (parentId) {
+          const parentNode = NODE_LOOKUP_MAP.get(parentId);
+          const isGrandparentExpanded = !parentNode?.parentId || expandedSet.has(parentNode.parentId);
+          desiredVisible = expandedSet.has(parentId) && isGrandparentExpanded;
+        }
+
+        if (desiredVisible) {
+          anim.targetScale = 1;
+          anim.targetOpacity = 1;
+
+          if (!anim.visible) {
+            anim.visible = true;
+            const parentAnim = parentId ? animMap.get(parentId) : null;
+            anim.currentX = parentAnim ? parentAnim.currentX : 0;
+            anim.currentY = parentAnim ? parentAnim.currentY : 0;
+            anim.currentScale = 0;
+            anim.velocityScale = 0;
+            anim.currentOpacity = 0;
+          }
+
+          // Spring physics with elastic overshoot bounce
+          const stiffness = 145;
+          const damping = 12.5;
+          const force = (anim.targetScale - anim.currentScale) * stiffness;
+          anim.velocityScale += force * dt;
+          anim.velocityScale *= Math.exp(-damping * dt);
+          anim.currentScale += anim.velocityScale * dt;
+
+          // Radial glide to target coordinate
+          const posSpeed = 0.12;
+          anim.currentX += (node.x - anim.currentX) * posSpeed;
+          anim.currentY += (node.y - anim.currentY) * posSpeed;
+
+          // Smooth fade in
+          anim.currentOpacity += (anim.targetOpacity - anim.currentOpacity) * 0.14;
+        } else {
+          // Contracting back into parent sphere
+          anim.targetScale = 0;
+          anim.targetOpacity = 0;
+
+          if (anim.visible) {
+            const parentAnim = parentId ? animMap.get(parentId) : null;
+            const returnX = parentAnim ? parentAnim.currentX : 0;
+            const returnY = parentAnim ? parentAnim.currentY : 0;
+
+            const contractSpeed = 0.18;
+            anim.currentX += (returnX - anim.currentX) * contractSpeed;
+            anim.currentY += (returnY - anim.currentY) * contractSpeed;
+
+            anim.currentScale += (0 - anim.currentScale) * 0.22;
+            anim.currentOpacity += (0 - anim.currentOpacity) * 0.22;
+
+            if (anim.currentScale < 0.03 && anim.currentOpacity < 0.03) {
+              anim.visible = false;
+              anim.currentScale = 0;
+              anim.currentOpacity = 0;
+              anim.velocityScale = 0;
+              anim.currentX = returnX;
+              anim.currentY = returnY;
+            }
+          }
+        }
+      });
+
+      // Project active/visible nodes and update projected lookup map for 100% accurate hit-testing
+      const projectedNodes: {
+        node: EvoNode;
+        px: number;
+        py: number;
+        scale: number;
+        z: number;
+        alphaFactor: number;
+      }[] = [];
+
+      projectedNodeMap.current.clear();
+      EVO_NODES.forEach((node) => {
+        const anim = animMap.get(node.id);
+        if (!anim || !anim.visible || anim.currentOpacity < 0.02) return;
+
+        const proj = project3D(anim.currentX, anim.currentY);
+        projectedNodes.push({
           node,
           px: proj.px,
           py: proj.py,
-          scale: proj.scale,
+          scale: proj.scale * anim.currentScale,
           z: proj.z,
-          alphaFactor: proj.alphaFactor,
-        };
-      });
+          alphaFactor: proj.alphaFactor * anim.currentOpacity,
+        });
 
-      projectedNodeMap.current.clear();
-      projectedNodes.forEach((pn) => {
-        projectedNodeMap.current.set(pn.node.id, {
-          px: pn.px,
-          py: pn.py,
-          scale: pn.scale,
-          z: pn.z,
-          radius: pn.node.radius * pn.scale,
+        projectedNodeMap.current.set(node.id, {
+          px: proj.px,
+          py: proj.py,
+          scale: proj.scale * anim.currentScale,
+          z: proj.z,
+          radius: node.radius * proj.scale * anim.currentScale,
         });
       });
 
@@ -845,22 +1174,27 @@ export function EvoVisionCanvas({
 
       // ─── 3. Organic Synaptic Links (Curved Beziers in 3D) ───────────
       EVO_LINKS.forEach((link) => {
-        const src = nodeMap.current.get(link.sourceId);
-        const tgt = nodeMap.current.get(link.targetId);
+        const src = NODE_LOOKUP_MAP.get(link.sourceId);
+        const tgt = NODE_LOOKUP_MAP.get(link.targetId);
         if (!src || !tgt) return;
 
-        const srcProj = project3D(src.x, src.y);
-        const tgtProj = project3D(tgt.x, tgt.y);
+        const srcAnim = animMap.get(src.id);
+        const tgtAnim = animMap.get(tgt.id);
+        if (!srcAnim?.visible || !tgtAnim?.visible) return;
+        if (srcAnim.currentOpacity < 0.05 || tgtAnim.currentOpacity < 0.05) return;
+
+        const srcProj = project3D(srcAnim.currentX, srcAnim.currentY);
+        const tgtProj = project3D(tgtAnim.currentX, tgtAnim.currentY);
 
         const isDimmed =
           activeFilterVal &&
           src.cluster !== activeFilterVal &&
           tgt.cluster !== activeFilterVal;
 
-        const midX = (src.x + tgt.x) / 2;
-        const midY = (src.y + tgt.y) / 2;
-        const dx = tgt.x - src.x;
-        const dy = tgt.y - src.y;
+        const midX = (srcAnim.currentX + tgtAnim.currentX) / 2;
+        const midY = (srcAnim.currentY + tgtAnim.currentY) / 2;
+        const dx = tgtAnim.currentX - srcAnim.currentX;
+        const dy = tgtAnim.currentY - srcAnim.currentY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const normX = -dy / (dist || 1);
         const normY = dx / (dist || 1);
@@ -869,8 +1203,9 @@ export function EvoVisionCanvas({
         const cpY = midY + normY * curveFactor;
         const cpProj = project3D(cpX, cpY, 20);
 
+        const linkAlpha = Math.min(srcAnim.currentOpacity, tgtAnim.currentOpacity);
         const avgScale = (srcProj.scale + tgtProj.scale) / 2;
-        const avgAlpha = (srcProj.alphaFactor + tgtProj.alphaFactor) / 2;
+        const avgAlpha = ((srcProj.alphaFactor + tgtProj.alphaFactor) / 2) * linkAlpha;
 
         // Outer glow path
         ctx.strokeStyle = link.color;
@@ -891,8 +1226,8 @@ export function EvoVisionCanvas({
         ctx.stroke();
 
         // Latency pill text along the link
-        if (link.latencyLabel && !isDimmed) {
-          ctx.globalAlpha = 0.75 * cpProj.alphaFactor;
+        if (link.latencyLabel && !isDimmed && linkAlpha > 0.6) {
+          ctx.globalAlpha = 0.75 * cpProj.alphaFactor * linkAlpha;
           ctx.font = `${Math.max(7, Math.round(9 * cpProj.scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           ctx.fillStyle = link.color;
           ctx.textAlign = "center";
@@ -904,24 +1239,23 @@ export function EvoVisionCanvas({
       particlesRef.current.forEach((p) => {
         const link = EVO_LINKS.find((l) => l.id === p.linkId);
         if (!link) return;
-        const src = nodeMap.current.get(link.sourceId);
-        const tgt = nodeMap.current.get(link.targetId);
+        const src = NODE_LOOKUP_MAP.get(link.sourceId);
+        const tgt = NODE_LOOKUP_MAP.get(link.targetId);
         if (!src || !tgt) return;
 
-        // Is this link dimmed by filter?
-        const isDimmed =
-          activeFilterVal &&
-          src.cluster !== activeFilterVal &&
-          tgt.cluster !== activeFilterVal;
+        const srcAnim = animMap.get(src.id);
+        const tgtAnim = animMap.get(tgt.id);
+        if (!srcAnim?.visible || !tgtAnim?.visible) return;
+        if (srcAnim.currentOpacity < 0.65 || tgtAnim.currentOpacity < 0.65) return;
 
         p.progress += p.speed;
         if (p.progress >= 1) p.progress = 0;
 
         const t = p.progress;
-        const midX = (src.x + tgt.x) / 2;
-        const midY = (src.y + tgt.y) / 2;
-        const dx = tgt.x - src.x;
-        const dy = tgt.y - src.y;
+        const midX = (srcAnim.currentX + tgtAnim.currentX) / 2;
+        const midY = (srcAnim.currentY + tgtAnim.currentY) / 2;
+        const dx = tgtAnim.currentX - srcAnim.currentX;
+        const dy = tgtAnim.currentY - srcAnim.currentY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const normX = -dy / (dist || 1);
         const normY = dx / (dist || 1);
@@ -930,13 +1264,19 @@ export function EvoVisionCanvas({
         const cpY = midY + normY * curveFactor;
 
         // Quadratic Bezier formula
-        const bx = (1 - t) * (1 - t) * src.x + 2 * (1 - t) * t * cpX + t * t * tgt.x;
-        const by = (1 - t) * (1 - t) * src.y + 2 * (1 - t) * t * cpY + t * t * tgt.y;
+        const bx = (1 - t) * (1 - t) * srcAnim.currentX + 2 * (1 - t) * t * cpX + t * t * tgtAnim.currentX;
+        const by = (1 - t) * (1 - t) * srcAnim.currentY + 2 * (1 - t) * t * cpY + t * t * tgtAnim.currentY;
         const archZ = 20 * Math.sin(t * Math.PI);
         const pProj = project3D(bx, by, archZ);
 
+        const isDimmed =
+          activeFilterVal &&
+          src.cluster !== activeFilterVal &&
+          tgt.cluster !== activeFilterVal;
+
+        const packetAlpha = Math.min(srcAnim.currentOpacity, tgtAnim.currentOpacity);
         // Render glowing energy packet dot
-        ctx.globalAlpha = (isDimmed ? 0.08 : 0.95) * pProj.alphaFactor;
+        ctx.globalAlpha = (isDimmed ? 0.08 : 0.95) * pProj.alphaFactor * packetAlpha;
         ctx.fillStyle = "#FFFFFF";
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 12 * pProj.scale;
@@ -1205,6 +1545,55 @@ export function EvoVisionCanvas({
           ctx.fillStyle = node.color;
           ctx.fillText(node.sublabel, px, pillY + 24 * scale);
         }
+
+        // ── F. Expandable Spheres Bloom Indicator Badge ─────────────
+        const childIds = PARENT_CHILD_MAP.get(node.id);
+        if (childIds && childIds.length > 0 && scale > 0.35) {
+          const isExpanded = expandedNodeIdsRef.current.has(node.id);
+          const badgeScale = Math.max(0.65, Math.min(1.05, scale));
+          const badgeY = pillY + pillHeight + 5 * scale;
+
+          ctx.save();
+          const badgeText = isExpanded
+            ? `⊖ CONTRACT (${childIds.length})`
+            : `⊕ EXPAND (${childIds.length})`;
+          ctx.font = `900 ${Math.max(7, Math.round(8.5 * badgeScale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          const bMetrics = ctx.measureText(badgeText);
+          const bW = bMetrics.width + 12 * badgeScale;
+          const bH = 14 * badgeScale;
+          const bX = px - bW / 2;
+          const bR = 4 * badgeScale;
+
+          ctx.fillStyle = isExpanded ? "rgba(15, 23, 42, 0.88)" : `${node.color}30`;
+          ctx.strokeStyle = isExpanded ? "rgba(255, 255, 255, 0.3)" : `${node.color}90`;
+          ctx.lineWidth = 1;
+          if (typeof (ctx as any).roundRect === "function") {
+            (ctx as any).roundRect(bX, badgeY, bW, bH, bR);
+          } else {
+            ctx.rect(bX, badgeY, bW, bH);
+          }
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = isExpanded ? "#94A3B8" : "#FFFFFF";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(badgeText, px, badgeY + bH / 2);
+
+          // Pulsing halo beacon ring when contracted to attract discovery!
+          if (!isExpanded) {
+            const beaconR = nodeR + (5 + Math.sin(time * 3 + nodePhase) * 3) * scale;
+            ctx.strokeStyle = `${node.color}80`;
+            ctx.lineWidth = 1.3 * scale;
+            ctx.setLineDash([3, 4]);
+            ctx.beginPath();
+            ctx.arc(px, py, beaconR, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+
+          ctx.restore();
+        }
       });
 
       ctx.restore();
@@ -1389,9 +1778,9 @@ export function EvoVisionCanvas({
           });
 
           if (hitNode) {
-            onSelectNode(hitNode);
-          } else if (onDismissSelection) {
-            onDismissSelection();
+            handleNodeInteraction(hitNode);
+          } else {
+            handleBlankInteraction();
           }
         }
       }
@@ -1519,7 +1908,9 @@ export function EvoVisionCanvas({
     });
 
     if (clicked) {
-      onSelectNode(clicked);
+      handleNodeInteraction(clicked);
+    } else {
+      handleBlankInteraction();
     }
   };
 
@@ -1549,8 +1940,12 @@ export function EvoVisionCanvas({
     const smDy = worldY - sm.y;
     const isSmHit = sm.active && !sm.isVanishing && Math.sqrt(smDx * smDx + smDy * smDy) <= 50;
 
-    // If double-clicked in blank space (no node or spaceman hit)
-    if (!hitNode && !isSmHit && onDismissSelection) {
+    // If double-clicked on a node, open data card immediately
+    if (hitNode) {
+      onSelectNode(hitNode);
+      try { playBotTelemetryChirp(); } catch {}
+    } else if (!isSmHit && onDismissSelection) {
+      // If double-clicked in blank space (no node or spaceman hit)
       onDismissSelection();
     }
   };

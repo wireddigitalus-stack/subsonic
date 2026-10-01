@@ -51,6 +51,14 @@ export default function EvosDashboardPage() {
   const [is3DMode, setIs3DMode] = useState<boolean>(false);
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
   const [recenterSignal, setRecenterSignal] = useState<number>(0);
+  const [expandAllSignal, setExpandAllSignal] = useState<number>(0);
+  const [contractAllSignal, setContractAllSignal] = useState<number>(0);
+  const [expandStats, setExpandStats] = useState({
+    expandedCount: 1,
+    totalCount: EVO_NODES.length,
+    isAllExpanded: false,
+    isAllContracted: true,
+  });
 
   // Directly linked synaptic peers for the active node
   const connectedNodes = useMemo(() => {
@@ -175,6 +183,39 @@ export default function EvosDashboardPage() {
         {/* Status / Quick Links */}
         {/* Status / Quick Links & 3D Meeting Presentation Switch */}
         <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Progressive Bloom Controls: EXPAND ALL / CONTRACT ALL */}
+          <div className="flex items-center rounded-lg bg-black/60 border border-white/10 p-0.5 shadow-inner">
+            <button
+              onClick={() => {
+                setExpandAllSignal((prev) => prev + 1);
+              }}
+              className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
+                expandStats.isAllExpanded
+                  ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.35)]"
+                  : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
+              title="Expand all clusters and satellites (Full Bloom)"
+            >
+              <span className="text-amber-400 font-extrabold text-xs">⊕</span>
+              <span className="hidden sm:inline">EXPAND ALL</span>
+            </button>
+            <button
+              onClick={() => {
+                setSelectedNode(null);
+                setContractAllSignal((prev) => prev + 1);
+              }}
+              className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-md text-[10px] font-bold transition-all ${
+                expandStats.isAllContracted
+                  ? "bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.35)]"
+                  : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
+              title="Contract all nodes back to NEXUS hub"
+            >
+              <span className="text-cyan-400 font-extrabold text-xs">⊖</span>
+              <span className="hidden sm:inline">CONTRACT ALL</span>
+            </button>
+          </div>
+
           {/* 3D Holographic Orbit Meeting Switch */}
           <div className="flex items-center rounded-lg bg-black/60 border border-white/10 p-0.5 shadow-inner">
             <button
@@ -240,6 +281,25 @@ export default function EvosDashboardPage() {
 
       {/* Mobile Horizontal Cluster Filter Strip */}
       <div className="lg:hidden shrink-0 bg-black/85 backdrop-blur-md border-b border-cyan-500/20 px-2 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none z-10 text-[10px]">
+        <div className="shrink-0 flex items-center gap-1 border-r border-white/10 pr-1.5">
+          <button
+            onClick={() => setExpandAllSignal((prev) => prev + 1)}
+            className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shrink-0 shadow-[0_0_6px_rgba(245,158,11,0.2)]"
+            title="Expand all nodes"
+          >
+            ⊕ ALL
+          </button>
+          <button
+            onClick={() => {
+              setSelectedNode(null);
+              setContractAllSignal((prev) => prev + 1);
+            }}
+            className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shrink-0 shadow-[0_0_6px_rgba(6,182,212,0.2)]"
+            title="Contract to NEXUS"
+          >
+            ⊖ NEXUS
+          </button>
+        </div>
         <span className="text-[8px] text-slate-400 font-bold uppercase shrink-0 pl-1">CLUSTER:</span>
         <button
           onClick={() => setActiveClusterFilter(null)}
@@ -305,11 +365,11 @@ export default function EvosDashboardPage() {
       <main className="relative flex-1 w-full h-full overflow-hidden">
         {/* Mobile Touch Guidance Pill */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-cyan-500/30 text-[9px] text-cyan-300 font-mono pointer-events-none md:hidden z-10 flex items-center gap-1.5 shadow-lg">
-          <span>🤏 Pinch to zoom</span>
+          <span>⊕ Tap sphere to expand</span>
           <span className="text-slate-500">•</span>
-          <span>👆 Drag to pan</span>
+          <span>🎯 Double-tap for card</span>
           <span className="text-slate-500">•</span>
-          <span>🎯 Tap to inspect</span>
+          <span>🤏 Pinch zoom</span>
         </div>
 
         <EvoVisionCanvas
@@ -324,6 +384,16 @@ export default function EvosDashboardPage() {
           onToggleAutoRotate={setAutoRotate}
           onDismissSelection={() => setSelectedNode(null)}
           recenterSignal={recenterSignal}
+          expandAllSignal={expandAllSignal}
+          contractAllSignal={contractAllSignal}
+          onExpandStateChange={(count, total, isAllExp, isAllContr) => {
+            setExpandStats({
+              expandedCount: count,
+              totalCount: total,
+              isAllExpanded: isAllExp,
+              isAllContracted: isAllContr,
+            });
+          }}
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
