@@ -288,134 +288,244 @@ export function NexusVoiceIntercom({
     };
   }, [handlePttDown, handlePttUp, voiceState]);
 
+  // Auto-scroll transcript container to bottom as messages flow in
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (hudVisible && transcriptEndRef.current) {
+      transcriptEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [transcriptHistory, interimTranscript, voiceState, hudVisible]);
+
+  // ESC key to close full-screen intercom terminal
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && hudVisible) {
+        setHudVisible(false);
+        if (isSpeaking) stopSpeaking();
+        if (isListening) abortListening();
+        setVoiceState("idle");
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [hudVisible, isSpeaking, isListening, stopSpeaking, abortListening]);
+
   return (
     <>
-      {/* ─── FLOATING NEXUS INTERCOM HUD MEDALLION ───────────────────────── */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 select-none">
-        {/* Transcript / Response HUD Balloon */}
-        {hudVisible && (
-          <div className="w-[320px] sm:w-[380px] max-w-[92vw] bg-[#070D18]/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-4 shadow-2xl shadow-cyan-950/60 transition-all duration-300 animate-in fade-in slide-in-from-bottom-3">
-            {/* HUD Header */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span
-                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                      voiceState === "listening"
-                        ? "bg-cyan-400"
-                        : voiceState === "thinking"
-                        ? "bg-amber-400"
-                        : voiceState === "speaking"
-                        ? "bg-emerald-400"
-                        : "bg-slate-400"
-                    }`}
-                  />
-                  <span
-                    className={`relative inline-flex rounded-full h-2 w-2 ${
-                      voiceState === "listening"
-                        ? "bg-cyan-400"
-                        : voiceState === "thinking"
-                        ? "bg-amber-400"
-                        : voiceState === "speaking"
-                        ? "bg-emerald-400"
-                        : "bg-slate-500"
-                    }`}
-                  />
-                </span>
-                <span className="font-mono text-xs font-bold tracking-wider text-cyan-300 uppercase">
-                  NEXUS TELEMETRY VOICE
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-500/20 uppercase">
-                  {voiceState}
-                </span>
-              </div>
+      {/* ─── MINI FLOATING TRIGGER (When Intercom is Idle / Closed) ─────────── */}
+      {!hudVisible && (
+        <button
+          type="button"
+          onClick={() => {
+            setHudVisible(true);
+            handlePttDown();
+          }}
+          className="fixed bottom-6 right-6 z-40 px-4 py-2.5 rounded-full bg-[#070D18]/90 hover:bg-[#0A1628] backdrop-blur-md border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 font-mono text-xs font-bold flex items-center gap-2.5 shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] active:scale-95 transition-all select-none group cursor-pointer"
+          title="Open NEXUS Holographic Voice Terminal"
+        >
+          <div className="relative flex items-center justify-center">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping absolute" />
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+          </div>
+          <Mic className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
+          <span className="tracking-wider">NEXUS VOICE</span>
+        </button>
+      )}
 
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  title={isMuted ? "Unmute Voice" : "Mute Voice"}
-                  className="p-1 rounded text-slate-400 hover:text-white transition-colors"
-                >
-                  {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-cyan-400" />}
-                </button>
-                <button
-                  onClick={() => setShowVoiceModal(true)}
-                  title="Voice Settings"
-                  className="p-1 rounded text-slate-400 hover:text-white transition-colors"
-                >
-                  <Settings className="w-3.5 h-3.5 text-slate-400 hover:text-cyan-400" />
-                </button>
-                <button
-                  onClick={() => {
-                    setHudVisible(false);
-                    if (isSpeaking) stopSpeaking();
-                    if (isListening) abortListening();
-                    setVoiceState("idle");
-                  }}
-                  title="Close HUD & Stop Comms"
-                  className="p-1 rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
+      {/* ─── FULL-SCREEN IMMERSIVE HOLOGRAPHIC TERMINAL ──────────────────── */}
+      {hudVisible && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-between bg-black/85 backdrop-blur-md select-none animate-in fade-in duration-300 overflow-hidden">
+          {/* Ambient Radial Background Glow */}
+          <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
+            <div
+              className={`absolute bottom-20 left-1/2 -translate-x-1/2 w-[500px] sm:w-[650px] h-[400px] sm:h-[500px] rounded-full blur-[140px] transition-all duration-700 ${
+                voiceState === "listening"
+                  ? "bg-cyan-500/25"
+                  : voiceState === "thinking"
+                  ? "bg-amber-500/20"
+                  : voiceState === "speaking"
+                  ? "bg-emerald-500/25"
+                  : "bg-cyan-600/10"
+              }`}
+            />
+          </div>
+
+          {/* 1. Top Minimalist HUD Header */}
+          <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 flex items-center justify-between z-10 shrink-0">
+            {/* Telemetry Status Pill */}
+            <div className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 rounded-full bg-slate-900/85 border border-white/10 backdrop-blur-md shadow-lg">
+              <span className="relative flex h-2 w-2">
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    voiceState === "listening"
+                      ? "bg-cyan-400"
+                      : voiceState === "thinking"
+                      ? "bg-amber-400"
+                      : voiceState === "speaking"
+                      ? "bg-emerald-400"
+                      : "bg-slate-400"
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    voiceState === "listening"
+                      ? "bg-cyan-400"
+                      : voiceState === "thinking"
+                      ? "bg-amber-400"
+                      : voiceState === "speaking"
+                      ? "bg-emerald-400"
+                      : "bg-slate-500"
+                  }`}
+                />
+              </span>
+              <span className="font-mono text-xs font-black tracking-wider text-white uppercase">
+                NEXUS UPLINK
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/5 border border-white/10 uppercase tracking-widest font-bold text-cyan-400">
+                {voiceState === "listening"
+                  ? "LISTENING"
+                  : voiceState === "thinking"
+                  ? "ANALYZING"
+                  : voiceState === "speaking"
+                  ? "SPEAKING"
+                  : "READY"}
+              </span>
             </div>
 
-            {/* Conversation Log */}
-            <div className="max-h-48 overflow-y-auto space-y-2 pr-1 text-xs font-mono scrollbar-thin scrollbar-thumb-cyan-500/20">
+            {/* Header Action Buttons (Mute, Settings, Close) */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsMuted(!isMuted)}
+                className={`p-2 rounded-full border transition-all ${
+                  isMuted
+                    ? "bg-rose-950/60 border-rose-500/40 text-rose-300 shadow-md shadow-rose-950"
+                    : "bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                }`}
+                title={isMuted ? "Unmute Voice" : "Mute Voice"}
+              >
+                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowVoiceModal(true)}
+                className="p-2 rounded-full bg-white/5 border border-white/10 text-slate-300 hover:text-cyan-300 hover:bg-white/10 transition-all"
+                title="Voice Profile & Speed Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setHudVisible(false);
+                  if (isSpeaking) stopSpeaking();
+                  if (isListening) abortListening();
+                  setVoiceState("idle");
+                }}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition-all cursor-pointer"
+                title="Close Comms Terminal (ESC)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* 2. Center Message Stream with Gradient Fade to Transparent at Top */}
+          <div className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 flex flex-col justify-end overflow-hidden py-3 sm:py-6 relative min-h-0">
+            <div className="overflow-y-auto space-y-4 pr-1 text-sm font-mono scrollbar-none nexus-transcript-mask">
+              {/* Empty state: welcome & interactive tactical prompt chips */}
               {transcriptHistory.length === 0 && !interimTranscript && (
-                <div className="text-slate-400 text-center py-4 italic text-[11px]">
-                  Press & hold the mic button or Spacebar to ask NEXUS about shooters, match ops, Bristol lodging, or DOPE.
+                <div className="text-center py-6 sm:py-10 space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-xs sm:text-sm font-mono text-cyan-300 font-bold uppercase tracking-wider">
+                      NEXUS TACTICAL AI ONLINE
+                    </p>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                      Ask about competitors, squads, match operations, 300-yard DOPE, or Bristol weather.
+                    </p>
+                  </div>
+
+                  {/* Interactive Quick-Prompt Chips */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                    {[
+                      { label: "Who is registered?", q: "Who is registered for the match?" },
+                      { label: "Stage 8 DOPE", q: "What is the DOPE for Stage 8?" },
+                      { label: "Bristol Range Weather", q: "What is the Bristol weather forecast?" },
+                      { label: "Match Director Info", q: "Who is the Match Director?" },
+                    ].map((chip) => (
+                      <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => handleQuerySubmit(chip.q)}
+                        className="px-3 py-1.5 rounded-full bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400 text-cyan-200 text-xs font-mono transition-all active:scale-95 cursor-pointer shadow-sm shadow-cyan-950"
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
+              {/* Conversation Log Flow */}
               {transcriptHistory.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`p-2 rounded-lg border ${
-                    item.role === "user"
-                      ? "bg-slate-900/60 border-slate-700/50 text-slate-200 ml-4"
-                      : "bg-cyan-950/40 border-cyan-500/30 text-cyan-100 mr-4 shadow-sm shadow-cyan-900/40"
+                  className={`space-y-1.5 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+                    item.role === "user" ? "text-right" : "text-left"
                   }`}
                 >
-                  <div className="flex justify-between text-[10px] font-bold opacity-60 mb-0.5 uppercase">
-                    <span>{item.role === "user" ? "MARKS-TRANS" : "NEXUS CORE"}</span>
-                    <span>{item.timestamp}</span>
+                  <div
+                    className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider ${
+                      item.role === "user" ? "justify-end text-slate-400" : "text-cyan-400"
+                    }`}
+                  >
+                    <span>{item.role === "user" ? "YOU" : "◆ NEXUS"}</span>
+                    <span className="text-slate-600">•</span>
+                    <span className="text-slate-500">{item.timestamp}</span>
                   </div>
-                  <div className="leading-relaxed">{item.text}</div>
+
+                  <div
+                    className={`inline-block p-3 sm:p-4 rounded-2xl leading-relaxed text-xs sm:text-sm max-w-[88%] text-left ${
+                      item.role === "user"
+                        ? "bg-slate-800/60 border border-slate-700/60 text-slate-100 rounded-br-none ml-auto"
+                        : "bg-cyan-950/30 border border-cyan-500/30 text-cyan-50 rounded-bl-none shadow-[0_0_25px_rgba(6,182,212,0.15)]"
+                    }`}
+                  >
+                    {item.text}
+                  </div>
                 </div>
               ))}
 
-              {/* Live speech preview */}
+              {/* Live Streaming Transcribing Preview */}
               {interimTranscript && (
-                <div className="p-2 rounded-lg bg-cyan-950/30 border border-cyan-400/40 text-cyan-200 ml-4 animate-pulse">
-                  <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mb-0.5">
-                    TRANSMITTING...
+                <div className="space-y-1.5 text-right animate-in fade-in slide-in-from-bottom-2">
+                  <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex items-center justify-end gap-1.5">
+                    <Radio className="w-3 h-3 animate-pulse" />
+                    <span>TRANSMITTING...</span>
                   </div>
-                  <div>{interimTranscript}</div>
+                  <div className="inline-block p-3 sm:p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/50 text-cyan-200 text-xs sm:text-sm max-w-[88%] text-left animate-pulse">
+                    {interimTranscript}
+                  </div>
                 </div>
               )}
 
+              {/* Thinking / Analyzing Status */}
               {voiceState === "thinking" && (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-950/30 border border-amber-500/30 text-amber-300">
-                  <Sparkles className="w-3.5 h-3.5 animate-spin" />
-                  <span className="text-[11px] font-mono">Compiling range telemetry & response...</span>
+                <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-950/30 border border-amber-500/30 text-amber-300 text-xs sm:text-sm w-fit animate-in fade-in">
+                  <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
+                  <span className="font-mono">NEXUS analyzing tactical telemetry & records...</span>
                 </div>
               )}
-            </div>
 
-            {/* Quick Text Fallback Input Toggle */}
-            <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between text-[11px]">
-              <button
-                onClick={() => setShowTextFallback(!showTextFallback)}
-                className="text-slate-400 hover:text-cyan-400 flex items-center gap-1 font-mono transition-colors"
-              >
-                <Terminal className="w-3 h-3" />
-                <span>{showTextFallback ? "Hide Text Line" : "Type Question"}</span>
-              </button>
-              <span className="text-[10px] text-slate-500 font-mono">SPACE to talk</span>
+              <div ref={transcriptEndRef} />
             </div>
+          </div>
 
-            {/* Text Input Row */}
+          {/* 3. Bottom Control Dock: Centered Large Mic Button & Controls */}
+          <div className="w-full max-w-xl mx-auto px-4 pb-6 sm:pb-8 flex flex-col items-center gap-3 z-10 shrink-0">
+            {/* Optional Slide-Up Text Input Fallback Bar */}
             {showTextFallback && (
               <form
                 onSubmit={(e) => {
@@ -425,144 +535,158 @@ export function NexusVoiceIntercom({
                     setFallbackInput("");
                   }
                 }}
-                className="mt-2 flex gap-1.5"
+                className="w-full flex items-center gap-2 p-1.5 rounded-full bg-slate-900/90 border border-cyan-500/40 backdrop-blur-md shadow-2xl animate-in fade-in slide-in-from-bottom-2 mb-1"
               >
                 <input
                   type="text"
                   value={fallbackInput}
                   onChange={(e) => setFallbackInput(e.target.value)}
-                  placeholder="Ask NEXUS (e.g. 'Who is Leipold?')"
-                  className="flex-1 bg-black/60 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+                  placeholder="Type tactical query for NEXUS..."
+                  className="flex-1 bg-transparent px-4 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none font-mono"
+                  autoFocus
                 />
                 <button
                   type="submit"
                   disabled={!fallbackInput.trim()}
-                  className="px-2.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 text-black font-bold rounded-lg text-xs transition-colors flex items-center justify-center"
+                  className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-30 text-slate-950 font-bold rounded-full text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Send className="w-3 h-3" />
+                  <Send className="w-3.5 h-3.5" />
+                  <span>SEND</span>
                 </button>
               </form>
             )}
-          </div>
-        )}
 
-        {/* ─── PUSH TO TALK CONTROLLER MEDALLION (Fixed Height to Prevent Layout Shift) ─────────────────────────── */}
-        <div className="h-12 flex items-center justify-end gap-2 shrink-0">
-          {/* Waveform indicator bars when active */}
-          {(voiceState === "listening" || voiceState === "speaking") && (
-            <div className="h-11 px-3.5 flex items-center gap-2 rounded-full bg-black/90 border border-cyan-500/40 backdrop-blur-md shadow-lg shadow-cyan-500/20 shrink-0">
-              <div className="h-4 flex items-center gap-1">
-                {[10, 14, 16, 12, 16, 8].map((barHeight, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      height: `${barHeight}px`,
-                      animation: `pulse ${(i % 3) * 0.25 + 0.6}s ease-in-out infinite alternate`,
-                    }}
-                    className={`w-1 rounded-full ${
-                      voiceState === "speaking" ? "bg-amber-400" : "bg-cyan-400"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-[10px] font-mono font-bold uppercase text-cyan-300 tracking-wider">
-                {voiceState === "speaking" ? "AI TRANSMITTING" : "VOICE UPLINK"}
-              </span>
-            </div>
-          )}
-
-          {/* Quick Cancel Button while Listening */}
-          {voiceState === "listening" && (
-            <button
-              type="button"
-              onClick={handleCancelListening}
-              className="h-11 px-3.5 rounded-full bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white font-mono text-[11px] font-bold flex items-center gap-1.5 shadow-lg shadow-rose-950/40 transition-all cursor-pointer shrink-0 animate-fadeIn"
-              title="Cancel voice uplink"
-            >
-              <X className="w-3.5 h-3.5" />
-              <span>CANCEL</span>
-            </button>
-          )}
-
-          {/* Quick Stop Voice Button while Speaking */}
-          {voiceState === "speaking" && (
-            <button
-              type="button"
-              onClick={handleStopSpeaking}
-              className="h-11 px-3.5 rounded-full bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 text-amber-300 hover:text-white font-mono text-[11px] font-bold flex items-center gap-1.5 shadow-lg shadow-amber-950/40 transition-all cursor-pointer shrink-0 animate-fadeIn"
-              title="Stop NEXUS voice playback"
-            >
-              <VolumeX className="w-3.5 h-3.5 text-amber-400" />
-              <span>STOP</span>
-            </button>
-          )}
-
-          {/* Main PTT Button */}
-          <div className="relative group shrink-0">
-            {/* Outer Sonar Pulse Glow Ring */}
-            <div
-              className={`absolute -inset-1 rounded-full blur-md transition-all duration-300 ${
-                voiceState === "listening"
-                  ? "bg-cyan-400 opacity-90 animate-pulse"
-                  : voiceState === "thinking"
-                  ? "bg-amber-400 opacity-80 animate-spin"
-                  : voiceState === "speaking"
-                  ? "bg-amber-400 opacity-90 animate-pulse"
-                  : "bg-cyan-600/30 group-hover:bg-cyan-500/50 opacity-50"
-              }`}
-            />
-
-            <button
-              onClick={handlePttClick}
-              onMouseDown={handlePttDown}
-              onMouseUp={handlePttUp}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handlePttDown();
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handlePttUp();
-              }}
-              className={`h-11 relative flex items-center gap-2.5 px-4 rounded-full font-mono text-xs font-black tracking-wider uppercase transition-all duration-200 shadow-2xl active:scale-95 shrink-0 cursor-pointer ${
-                voiceState === "listening"
-                  ? "bg-gradient-to-r from-cyan-400 to-cyan-300 text-slate-950 ring-4 ring-cyan-400/40"
-                  : voiceState === "thinking"
-                  ? "bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 ring-4 ring-amber-400/40"
-                  : voiceState === "speaking"
-                  ? "bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 ring-4 ring-amber-400/40"
-                  : "bg-gradient-to-r from-slate-900 to-slate-950 text-cyan-300 border border-cyan-500/50 hover:border-cyan-400 hover:text-white"
-              }`}
-            >
-              {voiceState === "listening" ? (
-                <>
-                  <Radio className="w-4 h-4 animate-pulse text-slate-950" />
-                  <span>TAP OR RELEASE TO SEND</span>
-                </>
-              ) : voiceState === "thinking" ? (
-                <>
-                  <Sparkles className="w-4 h-4 animate-spin text-slate-950" />
-                  <span>PROCESSING...</span>
-                </>
-              ) : voiceState === "speaking" ? (
-                <>
-                  <Volume2 className="w-4 h-4 text-slate-950 animate-pulse" />
-                  <span>NEXUS SPEAKING</span>
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-                  <span>PUSH TO TALK</span>
-                </>
+            {/* Center Action Row: Centered Large Mic Button flanked by Cancel / Stop */}
+            <div className="relative flex items-center justify-center gap-4 sm:gap-6 w-full">
+              {/* Flanking Cancel button when listening */}
+              {voiceState === "listening" && (
+                <button
+                  type="button"
+                  onClick={handleCancelListening}
+                  className="h-10 px-4 rounded-full bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>CANCEL</span>
+                </button>
               )}
-            </button>
+
+              {/* Flanking Stop button when speaking */}
+              {voiceState === "speaking" && (
+                <button
+                  type="button"
+                  onClick={handleStopSpeaking}
+                  className="h-10 px-4 rounded-full bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
+                >
+                  <VolumeX className="w-3.5 h-3.5 text-amber-400" />
+                  <span>STOP</span>
+                </button>
+              )}
+
+              {/* MAIN CENTERED PTT MIC BUTTON (w-20 h-20 sm:w-24 sm:h-24) */}
+              <div className="relative flex items-center justify-center group">
+                {/* Concentric Sonar Pulse Rings (when listening) */}
+                {voiceState === "listening" && (
+                  <>
+                    <span className="absolute w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-cyan-400 animate-sonar-pulse pointer-events-none" />
+                    <span className="absolute w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-cyan-400 animate-sonar-pulse-delayed pointer-events-none" />
+                  </>
+                )}
+
+                {/* Ambient Glow */}
+                <div
+                  className={`absolute -inset-2 rounded-full blur-xl transition-all duration-500 ${
+                    voiceState === "listening"
+                      ? "bg-cyan-400 opacity-90"
+                      : voiceState === "thinking"
+                      ? "bg-amber-400 opacity-80 animate-spin"
+                      : voiceState === "speaking"
+                      ? "bg-emerald-400 opacity-90 animate-pulse"
+                      : "bg-cyan-600/30 group-hover:bg-cyan-500/50 opacity-50"
+                  }`}
+                />
+
+                {/* Large Circular Button */}
+                <button
+                  type="button"
+                  onClick={handlePttClick}
+                  onMouseDown={handlePttDown}
+                  onMouseUp={handlePttUp}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    handlePttDown();
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    handlePttUp();
+                  }}
+                  className={`w-20 h-20 sm:w-24 sm:h-24 relative rounded-full flex flex-col items-center justify-center gap-1 transition-all duration-300 shadow-2xl active:scale-90 cursor-pointer select-none ${
+                    voiceState === "listening"
+                      ? "bg-gradient-to-tr from-cyan-400 to-cyan-200 text-slate-950 ring-4 ring-cyan-400/50 shadow-[0_0_40px_rgba(6,182,212,0.6)]"
+                      : voiceState === "thinking"
+                      ? "bg-gradient-to-tr from-amber-400 to-amber-200 text-slate-950 ring-4 ring-amber-400/50 shadow-[0_0_40px_rgba(245,158,11,0.5)]"
+                      : voiceState === "speaking"
+                      ? "bg-gradient-to-tr from-emerald-400 to-teal-200 text-slate-950 ring-4 ring-emerald-400/50 shadow-[0_0_40px_rgba(16,185,129,0.5)] animate-gentle-breathe"
+                      : "bg-[#0A1424] hover:bg-[#0E1E36] text-cyan-300 border-2 border-cyan-500/50 hover:border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.25)]"
+                  }`}
+                >
+                  {voiceState === "listening" ? (
+                    <>
+                      <Radio className="w-8 h-8 animate-pulse text-slate-950" />
+                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">SEND</span>
+                    </>
+                  ) : voiceState === "thinking" ? (
+                    <>
+                      <Sparkles className="w-8 h-8 animate-spin text-slate-950" />
+                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">AI</span>
+                    </>
+                  ) : voiceState === "speaking" ? (
+                    <>
+                      <Volume2 className="w-8 h-8 animate-pulse text-slate-950" />
+                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">MUTE</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform" />
+                      <span className="text-[9px] font-mono font-bold tracking-tight uppercase text-cyan-300">TALK</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* State Label & Hints below Button */}
+            <div className="text-center space-y-1">
+              <p className="text-xs font-mono font-bold tracking-wider uppercase text-slate-300">
+                {voiceState === "listening"
+                  ? "LISTENING • TAP OR RELEASE TO SEND"
+                  : voiceState === "thinking"
+                  ? "NEXUS IS PROCESSING..."
+                  : voiceState === "speaking"
+                  ? "NEXUS TRANSMITTING • TAP TO HALT"
+                  : "TAP OR HOLD TO SPEAK"}
+              </p>
+              <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-slate-500">
+                <button
+                  type="button"
+                  onClick={() => setShowTextFallback(!showTextFallback)}
+                  className="hover:text-cyan-400 flex items-center gap-1 transition-colors underline-offset-2 hover:underline cursor-pointer"
+                >
+                  <Terminal className="w-3 h-3" />
+                  <span>{showTextFallback ? "Hide keyboard" : "Type question"}</span>
+                </button>
+                <span>•</span>
+                <span className="hidden sm:inline">SPACEBAR to talk</span>
+                <span className="hidden sm:inline">•</span>
+                <span className="hidden sm:inline">ESC to exit</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ─── VOICE SELECTION MODAL ─────────────────────────────────────── */}
       {showVoiceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in">
           <div className="w-full max-w-md bg-[#080E1C] border border-cyan-500/40 rounded-2xl p-6 shadow-2xl shadow-cyan-950/80">
             <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
               <div className="flex items-center gap-2">
