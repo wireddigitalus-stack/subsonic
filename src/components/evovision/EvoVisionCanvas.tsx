@@ -1611,115 +1611,106 @@ export function EvoVisionCanvas({
           ctx.shadowBlur = 0;
         }
 
-        // Node Label Typography with clear pill backing
-        ctx.textAlign = "center";
-        const isMajorCluster = node.radius >= 40;
-        const labelFontSize = Math.round((isMajorCluster ? 13 : 11) * scale);
-        ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-
-        let displaySublabel = node.sublabel;
-        let sublabelColor = node.color;
-        if (node.id === "hub-main" && voiceState !== "idle") {
-          if (voiceState === "listening") {
-            displaySublabel = "🎙️ LISTENING...";
-            sublabelColor = "#38BDF8";
-          } else if (voiceState === "thinking") {
-            displaySublabel = "⚡ THINKING...";
-            sublabelColor = "#F59E0B";
-          } else if (voiceState === "speaking") {
-            displaySublabel = "🔊 SPEAKING...";
-            sublabelColor = "#F59E0B";
-          }
-        }
-
-        const labelMetrics = ctx.measureText(node.label);
-        let sublabelWidth = 0;
-        if (displaySublabel) {
-          ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-          sublabelWidth = ctx.measureText(displaySublabel).width;
+        // Node Label Typography with clear pill backing & Expandable Badge
+        // (Omitted for central NEXUS sphere to keep the sphere pristine and uncluttered)
+        if (node.id !== "hub-main") {
+          ctx.textAlign = "center";
+          const isMajorCluster = node.radius >= 40;
+          const labelFontSize = Math.round((isMajorCluster ? 13 : 11) * scale);
           ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-        }
 
-        const maxTextWidth = Math.max(labelMetrics.width, sublabelWidth);
-        const pillW = maxTextWidth + 24 * scale;
-        const pillHeight = (displaySublabel ? 34 : 20) * scale;
-        const pillY = py + nodeR + 6 * scale;
-        const pillX = px - pillW / 2;
-        const pillR = Math.max(2, 6 * scale);
+          const displaySublabel = node.sublabel;
+          const sublabelColor = node.color;
 
-        // Dark frosted backdrop pill
-        ctx.fillStyle = "rgba(4, 8, 19, 0.78)";
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        if (typeof (ctx as any).roundRect === "function") {
-          (ctx as any).roundRect(pillX, pillY, pillW, pillHeight, pillR);
-        } else {
-          ctx.rect(pillX, pillY, pillW, pillHeight);
-        }
-        ctx.fill();
-        ctx.stroke();
+          const labelMetrics = ctx.measureText(node.label);
+          let sublabelWidth = 0;
+          if (displaySublabel) {
+            ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+            sublabelWidth = ctx.measureText(displaySublabel).width;
+            ctx.font = `${isMajorCluster ? "900 " : "bold "}${Math.max(8, labelFontSize)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+          }
 
-        // Label text
-        ctx.fillStyle = "#FFFFFF";
-        ctx.shadowColor = "#000000";
-        ctx.shadowBlur = 4;
-        ctx.fillText(node.label, px, pillY + (displaySublabel ? 14 : 14) * scale);
-        ctx.shadowBlur = 0;
+          const maxTextWidth = Math.max(labelMetrics.width, sublabelWidth);
+          const pillW = maxTextWidth + 24 * scale;
+          const pillHeight = (displaySublabel ? 34 : 20) * scale;
+          const pillY = py + nodeR + 6 * scale;
+          const pillX = px - pillW / 2;
+          const pillR = Math.max(2, 6 * scale);
 
-        if (displaySublabel) {
-          ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-          ctx.fillStyle = sublabelColor;
-          ctx.fillText(displaySublabel, px, pillY + 27 * scale);
-        }
-
-        // ── F. Expandable Spheres Bloom Indicator Badge ─────────────
-        const childIds = PARENT_CHILD_MAP.get(node.id);
-        if (childIds && childIds.length > 0 && scale > 0.35) {
-          const isExpanded = expandedNodeIdsRef.current.has(node.id);
-          const badgeScale = Math.max(0.65, Math.min(1.05, scale));
-          const badgeY = pillY + pillHeight + 5 * scale;
-
-          ctx.save();
-          const badgeText = isExpanded
-            ? `⊖ CONTRACT (${childIds.length})`
-            : `⊕ EXPAND (${childIds.length})`;
-          ctx.font = `900 ${Math.max(7, Math.round(8.5 * badgeScale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
-          const bMetrics = ctx.measureText(badgeText);
-          const bW = bMetrics.width + 12 * badgeScale;
-          const bH = 14 * badgeScale;
-          const bX = px - bW / 2;
-          const bR = 4 * badgeScale;
-
-          ctx.fillStyle = isExpanded ? "rgba(15, 23, 42, 0.88)" : `${node.color}30`;
-          ctx.strokeStyle = isExpanded ? "rgba(255, 255, 255, 0.3)" : `${node.color}90`;
+          // Dark frosted backdrop pill
+          ctx.fillStyle = "rgba(4, 8, 19, 0.78)";
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
           ctx.lineWidth = 1;
+          ctx.beginPath();
           if (typeof (ctx as any).roundRect === "function") {
-            (ctx as any).roundRect(bX, badgeY, bW, bH, bR);
+            (ctx as any).roundRect(pillX, pillY, pillW, pillHeight, pillR);
           } else {
-            ctx.rect(bX, badgeY, bW, bH);
+            ctx.rect(pillX, pillY, pillW, pillHeight);
           }
           ctx.fill();
           ctx.stroke();
 
-          ctx.fillStyle = isExpanded ? "#94A3B8" : "#FFFFFF";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(badgeText, px, badgeY + bH / 2);
+          // Label text
+          ctx.fillStyle = "#FFFFFF";
+          ctx.shadowColor = "#000000";
+          ctx.shadowBlur = 4;
+          ctx.fillText(node.label, px, pillY + (displaySublabel ? 14 : 14) * scale);
+          ctx.shadowBlur = 0;
 
-          // Pulsing halo beacon ring when contracted to attract discovery!
-          if (!isExpanded) {
-            const beaconR = nodeR + (5 + Math.sin(time * 3 + nodePhase) * 3) * scale;
-            ctx.strokeStyle = `${node.color}80`;
-            ctx.lineWidth = 1.3 * scale;
-            ctx.setLineDash([3, 4]);
-            ctx.beginPath();
-            ctx.arc(px, py, beaconR, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.setLineDash([]);
+          if (displaySublabel) {
+            ctx.font = `${Math.max(7, Math.round(9 * scale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+            ctx.fillStyle = sublabelColor;
+            ctx.fillText(displaySublabel, px, pillY + 27 * scale);
           }
 
-          ctx.restore();
+          // ── F. Expandable Spheres Bloom Indicator Badge ─────────────
+          const childIds = PARENT_CHILD_MAP.get(node.id);
+          if (childIds && childIds.length > 0 && scale > 0.35) {
+            const isExpanded = expandedNodeIdsRef.current.has(node.id);
+            const badgeScale = Math.max(0.65, Math.min(1.05, scale));
+            const badgeY = pillY + pillHeight + 5 * scale;
+
+            ctx.save();
+            const badgeText = isExpanded
+              ? `⊖ CONTRACT (${childIds.length})`
+              : `⊕ EXPAND (${childIds.length})`;
+            ctx.font = `900 ${Math.max(7, Math.round(8.5 * badgeScale))}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+            const bMetrics = ctx.measureText(badgeText);
+            const bW = bMetrics.width + 12 * badgeScale;
+            const bH = 14 * badgeScale;
+            const bX = px - bW / 2;
+            const bR = 4 * badgeScale;
+
+            ctx.fillStyle = isExpanded ? "rgba(15, 23, 42, 0.88)" : `${node.color}30`;
+            ctx.strokeStyle = isExpanded ? "rgba(255, 255, 255, 0.3)" : `${node.color}90`;
+            ctx.lineWidth = 1;
+            if (typeof (ctx as any).roundRect === "function") {
+              (ctx as any).roundRect(bX, badgeY, bW, bH, bR);
+            } else {
+              ctx.rect(bX, badgeY, bW, bH);
+            }
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = isExpanded ? "#94A3B8" : "#FFFFFF";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(badgeText, px, badgeY + bH / 2);
+
+            // Pulsing halo beacon ring when contracted to attract discovery!
+            if (!isExpanded) {
+              const beaconR = nodeR + (5 + Math.sin(time * 3 + nodePhase) * 3) * scale;
+              ctx.strokeStyle = `${node.color}80`;
+              ctx.lineWidth = 1.3 * scale;
+              ctx.setLineDash([3, 4]);
+              ctx.beginPath();
+              ctx.arc(px, py, beaconR, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+
+            ctx.restore();
+          }
         }
       });
 
