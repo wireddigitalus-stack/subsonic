@@ -105,7 +105,7 @@ export function NexusVoiceIntercom({
           { role: "nexus", text: responseText, timestamp },
         ]);
 
-        if (!isMuted && isTtsSupported) {
+        if (!isMuted) {
           setVoiceState("speaking");
           speak(responseText, () => {
             setVoiceState("idle");
@@ -124,16 +124,19 @@ export function NexusVoiceIntercom({
         setVoiceState("idle");
       }
     },
-    [dashboardContext, isMuted, isTtsSupported, speak]
+    [dashboardContext, isMuted, speak]
   );
 
   // Speech Recognition Hook (STT)
+  const interimTranscriptRef = useRef("");
+
   const {
     isSupported: isSttSupported,
     isListening,
     interimTranscript,
     startListening,
     stopListening,
+    abortListening,
     resetTranscript,
   } = useSpeechRecognition({
     onFinalResult: (finalText) => {
@@ -145,18 +148,48 @@ export function NexusVoiceIntercom({
     },
   });
 
-  // Watch speech recognition state
+  interimTranscriptRef.current = interimTranscript;
+
+  // Watch speech recognition state & auto-recover to idle
   useEffect(() => {
     if (isListening) {
       setVoiceState("listening");
       setHudVisible(true);
     } else if (voiceState === "listening") {
-      // Stopped listening but not yet thinking
+      // Stopped listening: if there is captured speech in interim ref, send it; otherwise return to idle within 400ms
+      const timer = setTimeout(() => {
+        setVoiceState((curr) => {
+          if (curr === "listening") {
+            const captured = interimTranscriptRef.current?.trim();
+            if (captured) {
+              handleQuerySubmit(captured);
+              return "thinking";
+            }
+            return "idle";
+          }
+          return curr;
+        });
+      }, 400);
+      return () => clearTimeout(timer);
     }
-  }, [isListening, voiceState]);
+  }, [isListening, voiceState, handleQuerySubmit]);
+
+  // Safety timer: maximum 12s listening session
+  useEffect(() => {
+    if (voiceState === "listening") {
+      const timeout = setTimeout(() => {
+        stopListening();
+        setVoiceState("idle");
+      }, 12000);
+      return () => clearTimeout(timeout);
+    }
+  }, [voiceState, stopListening]);
+
+  const pttPressTimeRef = useRef<number>(0);
 
   // Handle Push-To-Talk Press
   const handlePttDown = useCallback(() => {
+    pttPressTimeRef.current = Date.now();
     if (voiceState === "speaking") {
       stopSpeaking();
     }
@@ -165,12 +198,42 @@ export function NexusVoiceIntercom({
     startListening();
   }, [voiceState, stopSpeaking, resetTranscript, startListening]);
 
-  // Handle Push-To-Talk Release
+  // Handle Push-To-Talk Release (for press & hold)
   const handlePttUp = useCallback(() => {
-    if (isListening) {
+    const holdDuration = Date.now() - pttPressTimeRef.current;
+    if (holdDuration > 350 && isListening) {
       stopListening();
     }
   }, [isListening, stopListening]);
+
+  // Handle PTT Click (Tap to toggle on/off)
+  const handlePttClick = useCallback(() => {
+    if (voiceState === "speaking") {
+      stopSpeaking();
+      setVoiceState("idle");
+      return;
+    }
+    if (voiceState === "listening") {
+      stopListening();
+      return;
+    }
+    if (voiceState === "idle") {
+      handlePttDown();
+    }
+  }, [voiceState, stopSpeaking, stopListening, handlePttDown]);
+
+  // Cancel listening manually
+  const handleCancelListening = useCallback(() => {
+    abortListening();
+    playNexusCommsChirp("ptt_off");
+    setVoiceState("idle");
+  }, [abortListening]);
+
+  // Stop speaking manually
+  const handleStopSpeaking = useCallback(() => {
+    stopSpeaking();
+    setVoiceState("idle");
+  }, [stopSpeaking]);
 
   // External trigger (e.g. clicking NEXUS sphere in canvas)
   const prevTriggerRef = useRef(externalTrigger);
@@ -224,21 +287,6 @@ export function NexusVoiceIntercom({
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, [handlePttDown, handlePttUp, voiceState]);
-
-  // Waveform Bar Animation Values
-  const [waveAmplitudes, setWaveAmplitudes] = useState([8, 14, 20, 12, 16, 10]);
-  useEffect(() => {
-    if (voiceState === "listening" || voiceState === "speaking") {
-      const interval = setInterval(() => {
-        setWaveAmplitudes(
-          Array.from({ length: 6 }, () => Math.floor(Math.random() * 24) + 6)
-        );
-      }, 90);
-      return () => clearInterval(interval);
-    } else {
-      setWaveAmplitudes([4, 6, 8, 6, 8, 4]);
-    }
-  }, [voiceState]);
 
   return (
     <>
@@ -301,9 +349,11 @@ export function NexusVoiceIntercom({
                   onClick={() => {
                     setHudVisible(false);
                     if (isSpeaking) stopSpeaking();
+                    if (isListening) abortListening();
+                    setVoiceState("idle");
                   }}
-                  title="Close HUD"
-                  className="p-1 rounded text-slate-400 hover:text-white transition-colors"
+                  title="Close HUD & Stop Comms"
+                  className="p-1 rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -396,28 +446,59 @@ export function NexusVoiceIntercom({
           </div>
         )}
 
-        {/* ─── PUSH TO TALK CONTROLLER MEDALLION ─────────────────────────── */}
-        <div className="flex items-center gap-2">
+        {/* ─── PUSH TO TALK CONTROLLER MEDALLION (Fixed Height to Prevent Layout Shift) ─────────────────────────── */}
+        <div className="h-12 flex items-center justify-end gap-2 shrink-0">
           {/* Waveform indicator bars when active */}
           {(voiceState === "listening" || voiceState === "speaking") && (
-            <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-black/80 border border-cyan-500/40 backdrop-blur-md shadow-lg shadow-cyan-500/20">
-              {waveAmplitudes.map((h, i) => (
-                <div
-                  key={i}
-                  style={{ height: `${h}px` }}
-                  className={`w-1 rounded-full transition-all duration-100 ${
-                    voiceState === "speaking" ? "bg-amber-400" : "bg-cyan-400"
-                  }`}
-                />
-              ))}
-              <span className="ml-1 text-[10px] font-mono font-bold uppercase text-cyan-300">
+            <div className="h-11 px-3.5 flex items-center gap-2 rounded-full bg-black/90 border border-cyan-500/40 backdrop-blur-md shadow-lg shadow-cyan-500/20 shrink-0">
+              <div className="h-4 flex items-center gap-1">
+                {[10, 14, 16, 12, 16, 8].map((barHeight, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      height: `${barHeight}px`,
+                      animation: `pulse ${(i % 3) * 0.25 + 0.6}s ease-in-out infinite alternate`,
+                    }}
+                    className={`w-1 rounded-full ${
+                      voiceState === "speaking" ? "bg-amber-400" : "bg-cyan-400"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] font-mono font-bold uppercase text-cyan-300 tracking-wider">
                 {voiceState === "speaking" ? "AI TRANSMITTING" : "VOICE UPLINK"}
               </span>
             </div>
           )}
 
+          {/* Quick Cancel Button while Listening */}
+          {voiceState === "listening" && (
+            <button
+              type="button"
+              onClick={handleCancelListening}
+              className="h-11 px-3.5 rounded-full bg-rose-950/80 hover:bg-rose-900 border border-rose-500/50 text-rose-300 hover:text-white font-mono text-[11px] font-bold flex items-center gap-1.5 shadow-lg shadow-rose-950/40 transition-all cursor-pointer shrink-0 animate-fadeIn"
+              title="Cancel voice uplink"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>CANCEL</span>
+            </button>
+          )}
+
+          {/* Quick Stop Voice Button while Speaking */}
+          {voiceState === "speaking" && (
+            <button
+              type="button"
+              onClick={handleStopSpeaking}
+              className="h-11 px-3.5 rounded-full bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 text-amber-300 hover:text-white font-mono text-[11px] font-bold flex items-center gap-1.5 shadow-lg shadow-amber-950/40 transition-all cursor-pointer shrink-0 animate-fadeIn"
+              title="Stop NEXUS voice playback"
+            >
+              <VolumeX className="w-3.5 h-3.5 text-amber-400" />
+              <span>STOP</span>
+            </button>
+          )}
+
           {/* Main PTT Button */}
-          <div className="relative group">
+          <div className="relative group shrink-0">
             {/* Outer Sonar Pulse Glow Ring */}
             <div
               className={`absolute -inset-1 rounded-full blur-md transition-all duration-300 ${
@@ -432,6 +513,7 @@ export function NexusVoiceIntercom({
             />
 
             <button
+              onClick={handlePttClick}
               onMouseDown={handlePttDown}
               onMouseUp={handlePttUp}
               onTouchStart={(e) => {
@@ -442,7 +524,7 @@ export function NexusVoiceIntercom({
                 e.preventDefault();
                 handlePttUp();
               }}
-              className={`relative flex items-center gap-2.5 px-4 py-3 rounded-full font-mono text-xs font-black tracking-wider uppercase transition-all duration-200 shadow-2xl active:scale-95 ${
+              className={`h-11 relative flex items-center gap-2.5 px-4 rounded-full font-mono text-xs font-black tracking-wider uppercase transition-all duration-200 shadow-2xl active:scale-95 shrink-0 cursor-pointer ${
                 voiceState === "listening"
                   ? "bg-gradient-to-r from-cyan-400 to-cyan-300 text-slate-950 ring-4 ring-cyan-400/40"
                   : voiceState === "thinking"
@@ -455,7 +537,7 @@ export function NexusVoiceIntercom({
               {voiceState === "listening" ? (
                 <>
                   <Radio className="w-4 h-4 animate-pulse text-slate-950" />
-                  <span>RELEASE TO SEND</span>
+                  <span>TAP OR RELEASE TO SEND</span>
                 </>
               ) : voiceState === "thinking" ? (
                 <>
@@ -464,7 +546,7 @@ export function NexusVoiceIntercom({
                 </>
               ) : voiceState === "speaking" ? (
                 <>
-                  <Volume2 className="w-4 h-4 animate-bounce text-slate-950" />
+                  <Volume2 className="w-4 h-4 text-slate-950 animate-pulse" />
                   <span>NEXUS SPEAKING</span>
                 </>
               ) : (

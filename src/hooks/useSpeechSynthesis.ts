@@ -124,8 +124,15 @@ export function useSpeechSynthesis({
         return;
       }
 
-      // Stop any active utterance first
-      window.speechSynthesis.cancel();
+      // Resume if browser synthesis is paused or stalled
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
+      // Only cancel if already speaking or pending
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
 
       onEndCallbackRef.current = onEnd || null;
 
@@ -134,11 +141,20 @@ export function useSpeechSynthesis({
       utterance.pitch = pitch;
       utterance.volume = defaultVolume;
 
-      // Select voice object by uri
-      if (selectedVoiceUri && voices.length > 0) {
-        const found = voices.find((v) => v.voiceURI === selectedVoiceUri);
-        if (found) {
-          utterance.voice = found;
+      // Select voice object by uri or fallback to best available
+      const availableVoices =
+        voices.length > 0 ? voices : window.speechSynthesis.getVoices();
+
+      if (availableVoices.length > 0) {
+        if (selectedVoiceUri) {
+          const found = availableVoices.find((v) => v.voiceURI === selectedVoiceUri);
+          if (found) utterance.voice = found;
+        }
+        if (!utterance.voice) {
+          const englishVoice = availableVoices.find(
+            (v) => v.lang.startsWith("en") && !v.name.includes("Bad")
+          );
+          if (englishVoice) utterance.voice = englishVoice;
         }
       }
 
@@ -164,7 +180,20 @@ export function useSpeechSynthesis({
       };
 
       utteranceRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
+
+      // Chrome/Safari delay buffer to avoid speech cancellation race condition
+      setTimeout(() => {
+        try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          console.warn("SpeechSynthesis speak exception:", err);
+          setIsSpeaking(false);
+          if (onEnd) onEnd();
+        }
+      }, 30);
     },
     [defaultVolume, pitch, rate, selectedVoiceUri, voices]
   );

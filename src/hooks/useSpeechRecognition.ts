@@ -23,6 +23,9 @@ export function useSpeechRecognition({
   const onFinalResultRef = useRef(onFinalResult);
   onFinalResultRef.current = onFinalResult;
 
+  const latestTranscriptRef = useRef<string>("");
+  const hasDispatchedFinalRef = useRef<boolean>(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
@@ -30,6 +33,21 @@ export function useSpeechRecognition({
         (window as any).webkitSpeechRecognition;
       setIsSupported(Boolean(SpeechRecognition));
     }
+  }, []);
+
+  const abortListening = useCallback(() => {
+    hasDispatchedFinalRef.current = true; // prevent dispatch
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        // Ignore
+      }
+    }
+    setIsListening(false);
+    setTranscript("");
+    setInterimTranscript("");
+    latestTranscriptRef.current = "";
   }, []);
 
   const stopListening = useCallback(() => {
@@ -41,6 +59,19 @@ export function useSpeechRecognition({
       }
     }
     setIsListening(false);
+
+    // If user stopped and we have accumulated speech that wasn't dispatched yet, send it
+    setTimeout(() => {
+      if (!hasDispatchedFinalRef.current && latestTranscriptRef.current.trim()) {
+        hasDispatchedFinalRef.current = true;
+        const textToSend = latestTranscriptRef.current.trim();
+        setTranscript(textToSend);
+        setInterimTranscript("");
+        if (onFinalResultRef.current) {
+          onFinalResultRef.current(textToSend);
+        }
+      }
+    }, 200);
   }, []);
 
   const startListening = useCallback(() => {
@@ -72,6 +103,8 @@ export function useSpeechRecognition({
 
       setTranscript("");
       setInterimTranscript("");
+      latestTranscriptRef.current = "";
+      hasDispatchedFinalRef.current = false;
       setError(null);
 
       recognition.onstart = () => {
@@ -96,12 +129,15 @@ export function useSpeechRecognition({
 
         if (interimStr) {
           setInterimTranscript(interimStr);
+          latestTranscriptRef.current = interimStr;
         }
 
         if (finalStr) {
           const trimmed = finalStr.trim();
+          latestTranscriptRef.current = trimmed;
           setTranscript(trimmed);
           setInterimTranscript("");
+          hasDispatchedFinalRef.current = true;
           if (onFinalResultRef.current) {
             onFinalResultRef.current(trimmed);
           }
@@ -119,6 +155,16 @@ export function useSpeechRecognition({
 
       recognition.onend = () => {
         setIsListening(false);
+        // Fallback: if browser ended without marking isFinal, dispatch captured speech
+        if (!hasDispatchedFinalRef.current && latestTranscriptRef.current.trim()) {
+          hasDispatchedFinalRef.current = true;
+          const textToSend = latestTranscriptRef.current.trim();
+          setTranscript(textToSend);
+          setInterimTranscript("");
+          if (onFinalResultRef.current) {
+            onFinalResultRef.current(textToSend);
+          }
+        }
       };
 
       recognitionRef.current = recognition;
@@ -133,6 +179,8 @@ export function useSpeechRecognition({
   const resetTranscript = useCallback(() => {
     setTranscript("");
     setInterimTranscript("");
+    latestTranscriptRef.current = "";
+    hasDispatchedFinalRef.current = false;
     setError(null);
   }, []);
 
@@ -156,6 +204,7 @@ export function useSpeechRecognition({
     error,
     startListening,
     stopListening,
+    abortListening,
     resetTranscript,
   };
 }
