@@ -145,7 +145,7 @@ export function HeroSection() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
                 <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
               </div>
-              <span className="truncate">REDEEM PRO INVITE</span>
+              <span className="truncate">START REGISTRATION</span>
             </div>
             <ChevronRight className="w-4 h-4 text-black shrink-0" />
           </Link>

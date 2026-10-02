@@ -81,68 +81,80 @@ export function HeroInviteCard() {
             </span>
           </div>
 
-          {/* 2. Main Headline & Narrative */}
-          <div className="space-y-3 max-w-3xl">
+          {/* 2. Main Headline & Welcome Narrative */}
+          <div className="space-y-4 max-w-4xl">
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1]">
-              ALL SHOOTERS ARE PRO. <br />
+              WELCOME TO THE INVITATIONAL <br />
               <span className="amber-gradient-text">
-                ONE MEMBERSHIP. BY INVITATION ONLY.
+                ALL SHOOTERS ARE PRO. BY INVITATION ONLY.
               </span>
             </h2>
 
-            <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal">
-              Subsonic Society operates on a single, invite-only membership model. There are no dual sign-ups, basic tiers, or public accounts. Every approved marksman is certified as a <strong className="text-white font-bold">PRO Competitor</strong> — receiving full profile accreditation, custom rifle blueprinting, 340-yd ballistic DOPE drops, and direct entry to the private Chat Room.
-            </p>
+            <div className="space-y-3.5 text-slate-200">
+              <p className="text-sm sm:text-base md:text-lg leading-relaxed">
+                <strong className="text-amber-400 font-bold">Welcome to the Invitational!</strong> You’ve been selected as part of an elite group of shooters for the inaugural <strong className="text-white">Subsonic Society Invitational Match</strong>. Get ready for an epic weekend — we’ll start your journey with registration right here.
+              </p>
+
+              <div className="p-4 sm:p-5 rounded-2xl bg-black/60 border border-white/10 space-y-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed shadow-inner">
+                <p>
+                  Clear, simple prompts will lead you step-by-step through registration — <strong className="text-emerald-400 font-semibold">designed to be easy and hassle-free</strong>. You’ll choose your callsign, select your 4-digit PIN, and enter your rifle setup.
+                </p>
+                <p>
+                  When you finish, you’ll arrive directly at the official <strong className="text-white font-semibold">Competitor Information Page</strong>, giving you everything you need for the match: range schedule, Course of Fire briefings, and recommended Bristol hotel accommodations.
+                </p>
+                <p>
+                  You’ll also receive a direct link straight into our <strong className="text-cyan-400 font-semibold">private Chat Room</strong>, which you can use for internal squad conversations, questions with match directors, and live DOPE coordination.
+                </p>
+                <div className="pt-1 flex items-center gap-2 text-amber-400 font-bold text-xs sm:text-sm">
+                  <span>Let’s start your journey below:</span>
+                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* 3. 4 Tactical Pillar Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-1">
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <Trophy className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">TIER</span>
+          {/* 3. 3-Step Guided Journey (Tech-friendly breakdown for first-time users) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="p-3.5 rounded-2xl bg-black/50 border border-amber-500/30 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 font-mono font-black text-sm flex items-center justify-center shrink-0 border border-amber-500/30">
+                1
               </div>
-              <span className="text-xs sm:text-sm font-black text-white block">PRO Competitor</span>
-              <span className="text-[10px] text-slate-400 block truncate">Official Marksman Roster</span>
+              <div className="min-w-0">
+                <span className="text-xs font-black text-white block">Step 1: Enter Invite Code</span>
+                <span className="text-[11px] text-slate-400 block">Redeem your personalized invitation key below</span>
+              </div>
             </div>
 
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-              <div className="flex items-center gap-1.5 text-cyan-400">
-                <Crosshair className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">BLUEPRINT</span>
+            <div className="p-3.5 rounded-2xl bg-black/50 border border-cyan-500/30 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 font-mono font-black text-sm flex items-center justify-center shrink-0 border border-cyan-500/30">
+                2
               </div>
-              <span className="text-xs sm:text-sm font-black text-white block">Rifle Specs & Optic</span>
-              <span className="text-[10px] text-slate-400 block truncate">Action, Chassis & DOPE</span>
+              <div className="min-w-0">
+                <span className="text-xs font-black text-white block">Step 2: Follow Quick Prompts</span>
+                <span className="text-[11px] text-slate-400 block">Enter callsign, PIN & rifle specs</span>
+              </div>
             </div>
 
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-              <div className="flex items-center gap-1.5 text-emerald-400">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">NETWORK</span>
+            <div className="p-3.5 rounded-2xl bg-black/50 border border-emerald-500/30 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 font-mono font-black text-sm flex items-center justify-center shrink-0 border border-emerald-500/30">
+                3
               </div>
-              <span className="text-xs sm:text-sm font-black text-white block">Chat Room</span>
-              <span className="text-[10px] text-slate-400 block truncate">Live Squad & Direct Net</span>
-            </div>
-
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <Flame className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider">MATCHES</span>
+              <div className="min-w-0">
+                <span className="text-xs font-black text-white block">Step 3: Competitor Hub & Chat</span>
+                <span className="text-[11px] text-slate-400 block">Match packet, hotels & private Chat Room</span>
               </div>
-              <span className="text-xs sm:text-sm font-black text-white block">$7,500 Cash Purse</span>
-              <span className="text-[10px] text-slate-400 block truncate">Invitational Squad Access</span>
             </div>
           </div>
 
           {/* 4. Interactive Invite Redemption Bar */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-black/70 border border-amber-500/40 space-y-4">
+          <div className="p-4 sm:p-6 rounded-2xl bg-black/75 border border-amber-500/40 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
-              <label htmlFor="hero-invite-code" className="font-mono text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <label htmlFor="hero-invite-code" className="font-mono text-slate-200 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-amber-400" />
-                <span>Enter Serialized Invitation Code</span>
+                <span>Step 1: Enter Serialized Invitation Code</span>
               </label>
-              <span className="font-mono text-[10px] text-amber-400/80">
-                PRO VERIFICATION GATEWAY
+              <span className="font-mono text-[10px] text-amber-400/90 font-bold">
+                100% PRO COMPETITOR GATEWAY
               </span>
             </div>
 
@@ -156,7 +168,7 @@ export function HeroInviteCard() {
                     setInviteCode(e.target.value.toUpperCase());
                     setErrorMessage(null);
                   }}
-                  placeholder="e.g. SS-PRO-VIP2026 or YOUR INVITATION KEY"
+                  placeholder="e.g. SS-PRO-VIP2026 or Paste your code here"
                   className="w-full h-14 bg-black/90 border-2 border-white/15 focus:border-amber-400 rounded-2xl px-5 text-white text-sm sm:text-base font-mono font-bold tracking-wider outline-none transition-all placeholder:text-slate-600 shadow-inner"
                   autoComplete="off"
                   spellCheck="false"
@@ -174,7 +186,7 @@ export function HeroInviteCard() {
                 ) : (
                   <>
                     <Key className="w-4 h-4 fill-black" />
-                    <span>REDEEM PRO INVITE</span>
+                    <span>START REGISTRATION</span>
                     <ArrowRight className="w-4 h-4 stroke-[3]" />
                   </>
                 )}
