@@ -47,22 +47,30 @@ export function HeroSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
         {/* Hero Headline & Brand Mantra */}
-        <div className="max-w-4xl space-y-2">
+        <div className="max-w-4xl space-y-2 text-center sm:text-left mx-auto sm:mx-0">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.08]">
             SUBSONIC SOCIETY
           </h1>
           <p className="text-xs sm:text-sm md:text-base font-mono font-bold tracking-[0.25em] text-amber-400 uppercase">
             PRECISION IS IN OUR DNA.
           </p>
-          <p className="text-[11px] sm:text-xs font-mono tracking-wider text-slate-400">
-            <span className="text-amber-400/80">COMPETITION</span>
-            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
-            <span className="text-blue-400/80">TESTING</span>
-            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
-            <span className="text-emerald-400/80">EDUCATION</span>
-            <span className="text-slate-600 mx-1.5 sm:mx-2">•</span>
-            <span className="text-purple-400/80">COMMUNITY</span>
-          </p>
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-1.5 text-[11px] sm:text-xs font-mono tracking-wider text-slate-400 pt-0.5">
+            <span className="inline-flex items-center gap-2 text-amber-400/90 font-semibold">
+              COMPETITION
+              <span className="text-slate-600 select-none">•</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-blue-400/90 font-semibold">
+              TESTING
+              <span className="text-slate-600 select-none">•</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-emerald-400/90 font-semibold">
+              EDUCATION
+              <span className="text-slate-600 select-none">•</span>
+            </span>
+            <span className="text-purple-400/90 font-semibold">
+              COMMUNITY
+            </span>
+          </div>
         </div>
 
         {/* Primary Hero: High-Impact Pro Invite Redemption Card */}
