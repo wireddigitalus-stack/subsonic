@@ -68,22 +68,19 @@ export function HeroInviteCard() {
         <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-6">
-          {/* 1. Header Badge */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <span className="px-3.5 py-1.5 rounded-full bg-amber-500 text-black text-xs font-mono font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 fill-black" />
-              <span>ACCESS BY • INVITATION ONLY</span>
-            </span>
-          </div>
-
-          {/* 2. Main Headline & Welcome Narrative */}
+          {/* Main Headline & Welcome Narrative */}
           <div className="space-y-4 max-w-4xl">
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1]">
-              WELCOME TO THE INVITATIONAL <br />
-              <span className="amber-gradient-text">
-                BY INVITATION ONLY.
-              </span>
-            </h2>
+            <div className="space-y-3">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1]">
+                WELCOME TO THE INVITATIONAL
+              </h2>
+              <div className="pt-0.5">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 text-black text-xs font-mono font-black uppercase tracking-wider shadow-sm">
+                  <Lock className="w-3.5 h-3.5 fill-black" />
+                  <span>ACCESS PROTOCOL • INVITATION ONLY</span>
+                </span>
+              </div>
+            </div>
 
             <div className="space-y-3.5 text-slate-200">
               <p className="text-sm sm:text-base md:text-lg leading-relaxed">
