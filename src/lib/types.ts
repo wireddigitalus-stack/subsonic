@@ -43,6 +43,7 @@ export interface DirectPartner {
   badgeText?: string;
   division?: string;
   avatarUrl?: string;
+  image?: string;
   rifleSetup?: string;
   status: "online" | "on_range" | "offline";
   lastSeen?: string;

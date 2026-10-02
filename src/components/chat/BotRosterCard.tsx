@@ -99,7 +99,7 @@ export function BotRosterCard({
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-base sm:text-lg font-bold font-mono text-white tracking-wide">
-                  BOT CHATS & COMMS FLEET
+                  TEST BOT FLEET (DEVELOPER QA & ONBOARDING)
                 </h2>
                 <span
                   className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1 border ${
@@ -113,11 +113,11 @@ export function BotRosterCard({
                       botsEnabled ? "bg-emerald-400 animate-pulse" : "bg-slate-500"
                     }`}
                   />
-                  {botsEnabled ? "6 BOTS LIVE" : "FLEET STANDBY"}
+                  {botsEnabled ? "6 TEST BOTS LIVE" : "TEST BOTS STANDBY"}
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-mono truncate">
-                Simulated AI competitors transmitting live • Distinct tones for Real vs Bot chats
+                Onboarding stress test bots • Chat simulators & AI moderation testers
               </p>
             </div>
           </div>

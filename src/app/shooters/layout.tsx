@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   keywords: [
     "Precision rimfire shooters",
     "PRS Rimfire athlete profiles",
-    "Wyatt Sterling rimfire",
-    "Kendra Cross precision rimfire",
-    "Eli McAllister 22LR",
+    "Erich Leipold rimfire",
+    "Ron Verran precision rimfire",
+    "Allen Hurley Subsonic Society",
     "Rimfire rifle builds",
     "Modacam rifle build",
-    "Vudoo V-22 Open Division",
+    "Zermatt RimX Open Division",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/shooters",
@@ -66,38 +66,38 @@ const shootersSchema = {
     },
     {
       "@type": "Person",
-      "@id": "https://subsonicsociety.com/shooters#wyatt-sterling",
-      "name": "Wyatt Sterling",
-      "jobTitle": "Precision Rimfire Marksman & Pro Division Athlete",
+      "@id": "https://subsonicsociety.com/shooters#erich-leipold",
+      "name": "Erich Leipold",
+      "jobTitle": "Team USA 🇺🇸 • Rimfire Challenge World Champion",
       "affiliation": {
         "@type": "SportsOrganization",
         "name": "Subsonic Society"
       },
-      "description": "Rank #1 2025 Subsonic Invitational Champion. Modacam Custom RimX, Proof Carbon 20-inch, Vortex Razor HD Gen III 6-36x56, Lapua Center-X.",
-      "award": "2025 Subsonic Invitational Champion"
+      "description": "Rimfire Challenge World Champion and Team USA marksman. Zermatt RimX, Bartlein MTU 22-inch, Vortex Razor HD Gen III 6-36x56, Lapua Midas+.",
+      "award": "Rimfire Challenge World Champion"
     },
     {
       "@type": "Person",
-      "@id": "https://subsonicsociety.com/shooters#kendra-cross",
-      "name": "Kendra Cross",
-      "jobTitle": "National Rimfire Competitor & Ladies Division Champion",
+      "@id": "https://subsonicsociety.com/shooters#ron-verran",
+      "name": "Ron Verran",
+      "jobTitle": "Team USA 🇺🇸 • 2x PRS National Champion",
       "affiliation": {
         "@type": "SportsOrganization",
         "name": "Subsonic Society"
       },
-      "description": "Top-ranked precision rimfire athlete known for stage speed and barricade transitions. Vudoo V-22, Foundation Centurion stock, Kahles K525i DLR, Lapua Midas+.",
-      "award": "High Lady 2025 Mountain Shootout"
+      "description": "2x PRS National Champion and Great Lakes Series Champion. Zermatt RimX, Bartlein MTU 22-inch, MPA Matrix Pro, Lapua Center-X.",
+      "award": "2x PRS National Champion"
     },
     {
       "@type": "Person",
-      "@id": "https://subsonicsociety.com/shooters#eli-mcallister",
-      "name": "Eli McAllister",
-      "jobTitle": "Subsonic Society Ballistics Fellow & Production Division Lead",
+      "@id": "https://subsonicsociety.com/shooters#allen-hurley",
+      "name": "Allen Hurley",
+      "jobTitle": "Founder & Executive Match Host • Subsonic Society",
       "affiliation": {
         "@type": "SportsOrganization",
         "name": "Subsonic Society"
       },
-      "description": "CZ 457 MTR specialist with 99.4% stage hit consistency inside 150 yards. Subsonic DNA lab tester and DOPE verification lead."
+      "description": "Founder of The Hideout in Bristol, TN. Modacam Custom Precision V-22, Zero Compromise Optic ZC527, MDT ACC Elite."
     }
   ]
 };

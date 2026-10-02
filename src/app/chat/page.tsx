@@ -126,37 +126,28 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
   },
   {
-    id: "dm_wyatt",
-    callsign: "APEX-22",
-    name: "Wyatt Sterling",
+    id: "dm_leipold",
+    callsign: "LEIPOLD",
+    name: "Erich Leipold",
     role: "PRO_COMPETITOR",
-    badgeText: "PRO SHOOTER",
-    division: "Open Division Pro",
-    status: "on_range",
-    bio: "Rimfire PRS national competitor. Holston Ridge squad leader.",
-    rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-  },
-  {
-    id: "dm_marcus",
-    callsign: "VIPER-01",
-    name: "Marcus Vance",
-    role: "PRO_COMPETITOR",
-    badgeText: "TOP SQUAD",
-    division: "Production Division",
+    badgeText: "TEAM USA 🇺🇸",
+    division: "Open Rimfire Pro • Team USA",
     status: "online",
-    bio: "CZ 457 specialist and ballistic data analyst.",
-    rifleSetup: "CZ 457 LRP / Nightforce ATACR 7-35x56",
+    bio: "Team USA 🇺🇸 • Rimfire Challenge World Champion • Modacam Pro",
+    rifleSetup: "Zermatt RimX / Bartlein MTU 22\" / MPA BA PMR Pro",
+    image: "/assets/erich-leipold-poster.jpg",
   },
   {
-    id: "dm_kendra",
-    callsign: "BALLISTIC",
-    name: "Kendra Cole",
+    id: "dm_verran",
+    callsign: "VERRAN",
+    name: "Ron Verran",
     role: "PRO_COMPETITOR",
-    badgeText: "MATCH PRO",
-    division: "Open Division Pro",
-    status: "on_range",
-    bio: "Rimfire precision competitor running Lapua Center-X.",
-    rifleSetup: "RimX Action / Proof Carbon / Tangent Theta 5-25",
+    badgeText: "TEAM USA 🇺🇸",
+    division: "Open Rimfire Pro • Team USA",
+    status: "online",
+    bio: "2x PRS National Champion 🏆 • Team USA 🇺🇸 • Modacam Pro",
+    rifleSetup: "Zermatt RimX / Bartlein MTU 22\" / MPA Matrix Pro",
+    image: "/assets/ron-verran-poster.jpg",
   },
 ];
 
@@ -171,12 +162,12 @@ interface ShooterProfile {
 }
 
 const DEFAULT_PROFILE: ShooterProfile = {
-  name: "Wyatt Sterling",
-  callsign: "APEX-22",
-  role: "PRO_COMPETITOR",
-  division: "Open Division Pro",
-  rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
-  badgeText: "PRO SHOOTER",
+  name: "Guest Competitor",
+  callsign: "GUEST",
+  role: "MEMBER",
+  division: "Pro Invitational Division",
+  rifleSetup: "Unclaimed Rig",
+  badgeText: "SOCIETY GUEST",
 };
 
 
@@ -1123,12 +1114,10 @@ export default function ChatPage() {
           replyText = `Copy that, [${shooterProfile.callsign}]. Direct transmission received. Staging and dinner operations at The Hideout (111 Hwy 44) are dialed in. Let me know if you need anything before check-in.`;
         } else if (partnerCallsign === "RADAR" || partnerCallsign === "ROB") {
           replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received on RADAR frequency. Subsonic network, scoring uplinks, and telemetry are running green across The Hideout.`;
-        } else if (partnerCallsign === "APEX-22") {
-          replyText = `Roger that, [${shooterProfile.callsign}]. Dialed in on direct net. Let's compare DOPE for Stage 4 Friday afternoon during chrono testing.`;
-        } else if (partnerCallsign === "VIPER-01") {
-          replyText = `Solid copy, [${shooterProfile.callsign}]. I have the CZ 457 running Lapua Center-X on 9-round groups. Holston Ridge looks fast.`;
-        } else if (partnerCallsign === "BALLISTIC") {
-          replyText = `Understood, [${shooterProfile.callsign}]. Tracking your transmission. Good luck on the line this weekend!`;
+        } else if (partnerCallsign === "LEIPOLD") {
+          replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received. Zeroed the RimX at 50, standard deviation is down to 4.2 fps on Lapua Midas+. Ready for the match.`;
+        } else if (partnerCallsign === "VERRAN") {
+          replyText = `Solid copy, [${shooterProfile.callsign}]. Trust the process and stay calm on the barricades. See you on the firing line.`;
         }
 
         const now = new Date();
@@ -2223,7 +2212,7 @@ export default function ChatPage() {
                       type="text"
                       value={profileForm.callsign}
                       onChange={(e) => setProfileForm({ ...profileForm, callsign: e.target.value.toUpperCase() })}
-                      placeholder={isMasterOwner ? "RADAR" : "e.g. APEX-22"}
+                      placeholder={isMasterOwner ? "RADAR" : "e.g. LEIPOLD"}
                       className={`w-full px-3 py-2 rounded-xl bg-black/50 border font-mono text-base sm:text-xs font-bold focus:outline-none ${
                         isMasterOwner
                           ? "border-cyan-500/40 text-cyan-300 focus:border-cyan-400"

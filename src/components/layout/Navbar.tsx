@@ -40,7 +40,7 @@ export function Navbar() {
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [callsign, setCallsign] = useState<string>("APEX-22");
+  const [callsign, setCallsign] = useState<string>("");
 
   // Track private chat room auth state & callsign
   useEffect(() => {

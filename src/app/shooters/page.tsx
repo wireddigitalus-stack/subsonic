@@ -162,104 +162,48 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     status: "PUBLISHED",
   },
   {
-    id: "wyatt-sterling",
-    name: "Wyatt 'Ghost' Sterling",
-    callsign: "GHOST",
-    division: "Open Division Pro",
-    ranking: "National Rank #4 • Appalachian Cup 1st Place",
-    homeRange: "Holston Range, Bristol, TN",
-    podiums: 14,
-    featuredMatch: "Subsonic Society Invitational 2026",
+    id: "allen-hurley",
+    name: "Allen Hurley",
+    callsign: "ALLEN",
+    division: "Owner Admin / Executive",
+    ranking: "Founder • Subsonic Society",
+    homeRange: "The Hideout, Bristol, TN",
+    podiums: 12,
+    featuredMatch: "Subsonic Society Invitational Money Match 2026",
     image: "/images/SS-RWB-LOGO.png",
-    quote: "In the Bristol mountains, the wind never blows the same way two seconds in a row. You have to trust your bubble level, watch the trees along the hollow, and commit to the shot.",
-    accolades: ["TEAM USA 🇺🇸", "APPALACHIAN CUP CHAMPION", "NATIONAL RANK #4"],
-    sponsors: ["Modacam Custom Rifles", "Vudoo Gun Works", "Lapua Rimfire"],
+    actionPhoto: "/images/SS-RWB-LOGO.png",
+    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously. Said. Done.",
+    signature: "Allen Hurley",
+    accolades: ["FOUNDER 👑", "MATCH HOST", "EXECUTIVE RO"],
+    careerStats: {
+      matches: 38,
+      states: 9,
+      countries: 1,
+      wins: 12,
+      top3: 20,
+      top5: 28,
+      top10: 35,
+      nationalPlacements: ["Host & Director — Subsonic Society Invitational", "1st Place — Bristol Ridge Shootout"],
+    },
+    sponsors: ["Modacam Custom Rifles", "Subsonic Society"],
     rifleSetup: {
-      action: "Vudoo Gun Works V-22 (3-Lug Rimfire)",
-      barrel: "Bartlein MTU 20\" Match (1:16 Twist)",
-      trigger: "Bix'n Andy TacSport PRO (4.2 oz)",
-      chassis: "MDT ACC Elite Chassis with Titanium Weights",
-      optic: "Zero Compromise Optic ZC527 MPCT3X",
-      mount: "Spuhr QDP-4002 0 MOA with Level",
-      tuner: "Harrell Precision Custom Rimfire Tuner",
-      ammoLot: "Lapua Center-X Lot #32187 (1,062 FPS)",
+      action: "Modacam Custom Precision V-22 Rimfire",
+      barrel: "22\" Custom Fluted Match Contour",
+      trigger: "TriggerTech Diamond Pro Curved (5 oz)",
+      chassis: "MDT ACC Elite Carbon Inlay Custom",
+      optic: "Zero Compromise Optic ZC527",
+      mount: "Spuhr 36mm Unimount",
+      tuner: "Modacam Custom Harmonic Brake",
+      ammoLot: "Lapua Center-X Hand-Sorted (1,064 FPS)",
     },
     interview: [
       {
-        question: "How do you read mirage on targets past 300 yards in the Tennessee high country?",
-        answer: "I back my magnification down from 25x to around 16x. High mag over-exaggerates boiling heat shimmer and makes the steel dance. By backing off, I can see the horizontal boil direction clearly and hold the true center of the plate."
-      },
-      {
-        question: "What is your pre-match lot testing routine?",
-        answer: "I clean down to bare metal with Bore Tech Rimfire Blend, shoot 30 rounds of the test lot to season the wax lubricant in the bore, and then fire three consecutive 10-shot groups through a Garmin Xero chronograph. If the SD is over 6 fps, it becomes practice ammo."
+        question: "What was the vision behind The Hideout complex in Bristol?",
+        answer: "To bring together the best shooters in the country onto terrain that tests real wind reading and elevation, while providing hospitality, live scoring, and community that the sport has been missing.",
       }
     ],
-    createdAt: "2026-09-01T00:00:00Z",
-    status: "PUBLISHED"
-  },
-  {
-    id: "kendra-cross",
-    name: "Kendra 'Coldbore' Cross",
-    callsign: "COLDBORE",
-    division: "Open Rimfire Pro",
-    ranking: "Southeast Regional Champion • Top Lady Marksman",
-    homeRange: "Smoky Mountain Precision, TN",
-    podiums: 19,
-    featuredMatch: "300X Long Gong Challenge",
-    image: "/assets/subsonic-logo-dark.png",
-    quote: "Subsonic rimfire is pure shooting discipline. Without recoil to mask your flaws, every breath and trigger press is written directly onto the steel plate.",
-    accolades: ["TOP LADY MARKSMAN", "SOUTHEAST REGIONAL CHAMPION"],
-    sponsors: ["Zermatt Arms", "Foundation Stocks", "Eley Tenex"],
-    rifleSetup: {
-      action: "Zermatt RimX Precision Rimfire Action",
-      barrel: "Proof Research Competition Contour 22\"",
-      trigger: "TriggerTech Diamond Single-Stage (6 oz)",
-      chassis: "Foundation Revelation Heavy Stock (Dark Distressed)",
-      optic: "Tangent Theta TT525P Gen 3XR",
-      mount: "Hawkins Precision Ultra Light Tactical",
-      tuner: "EC Tuner Brake (Eric Cortina)",
-      ammoLot: "Eley Tenex Batch 1058 (1,066 FPS)",
-    },
-    interview: [
-      {
-        question: "Why did you choose the Foundation stock over an aluminum chassis?",
-        answer: "The micarta composite deadens vibrational energy in a way metal can't replicate. On barricades, when you plant the rifle into wood or rock props, the rifle settles into your shoulder instantly with zero bounce."
-      }
-    ],
-    createdAt: "2026-09-05T00:00:00Z",
-    status: "PUBLISHED"
-  },
-  {
-    id: "eli-mcallister",
-    name: "Eli 'Dialed' McAllister",
-    callsign: "DIALED",
-    division: "Production Division Champion",
-    ranking: "Appalachian Cup Production 1st",
-    homeRange: "Tri-Cities Rimfire Club, Bristol, TN",
-    podiums: 8,
-    featuredMatch: "200X Mountain Match",
-    image: "/assets/subsonic-logo-round.png",
-    quote: "You don't need a $10,000 custom rig to win if you master stage timing, barricade stability, and find a lot of ammunition your factory barrel loves.",
-    accolades: ["PRODUCTION DIVISION CHAMPION", "APPALACHIAN 1ST PLACE"],
-    sponsors: ["CZ USA", "MDT Sporting Goods", "SK Ammunition"],
-    rifleSetup: {
-      action: "CZ 457 MTR (Match Target Rifle Factory Tuned)",
-      barrel: "Factory 20.5\" Match Chamber Cold Hammer Forged",
-      trigger: "Yo-Dave Spring Mod (12 oz)",
-      chassis: "MDT XRS Hybrid Chassis",
-      optic: "Vortex Razor HD Gen III 6-36x56 EBR-7D",
-      mount: "Seekins Precision Match Rings",
-      tuner: "None (Production Spec)",
-      ammoLot: "SK Rifle Match Lot #4412 (1,051 FPS)",
-    },
-    interview: [
-      {
-        question: "What is your secret to out-shooting custom rifles with a factory CZ 457?",
-        answer: "I spent all my money on ammo lots instead of titanium actions. I tested 14 different lots of SK and Lapua until I found one that shot 0.28 MOA at 100 yards. The rifle doesn't know how much it costs; it only knows how true the bullet is."
-      }
-    ],
-    createdAt: "2026-09-10T00:00:00Z",
-    status: "PUBLISHED"
+    createdAt: "2026-07-01T12:00:00Z",
+    status: "PUBLISHED",
   }
 ];
 
