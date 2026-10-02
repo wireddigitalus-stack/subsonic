@@ -33,7 +33,7 @@ export const SEED_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0002",
     full_name: "Allen Hurley",
-    callsign: "ALLEN",
+    callsign: "SAID DONE",
     email: "allen@subsonicsociety.com",
     state: "TN",
     experience_level: "Owner Admin / Executive",
@@ -42,7 +42,7 @@ export const SEED_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority",
+    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
   },
   {
     member_id: "SS-2026-0003",
@@ -202,6 +202,7 @@ export function getMembersFromStorage(): SocietyMember[] {
     const allen = Array.from(memberMap.values()).find(
       (m) =>
         m.member_id === "SS-2026-0002" ||
+        m.callsign === "SAID DONE" ||
         m.callsign === "ALLEN" ||
         (m.full_name.toLowerCase().includes("allen") && m.full_name.toLowerCase().includes("hurley"))
     );
@@ -210,7 +211,7 @@ export function getMembersFromStorage(): SocietyMember[] {
     } else {
       allen.member_id = "SS-2026-0002";
       allen.role = "OWNER_ADMIN";
-      allen.callsign = "ALLEN";
+      allen.callsign = "SAID DONE";
       memberMap.set(allen.member_id.toLowerCase(), allen);
     }
 

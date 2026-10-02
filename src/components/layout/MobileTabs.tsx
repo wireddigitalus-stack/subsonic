@@ -49,7 +49,7 @@ export function MobileTabs() {
           role === "OWNER_ADMIN" ||
           role === "DEV_ADMIN" ||
           role === "ADMIN" ||
-          ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY"].includes(callsign)
+          ["RADAR", "ROB", "LTDAN", "SAID DONE", "SAIDDONE", "ALLEN", "AHURLEY", "HURLEY"].includes(callsign)
         ) {
           setIsAdmin(true);
         }

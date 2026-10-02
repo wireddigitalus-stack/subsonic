@@ -27,8 +27,16 @@ const DEFAULT_PASSKEYS: Record<string, AdminPasskeyEntry> = {
     passkey: "2468",
     updatedAt: "2026-07-04T12:00:00Z",
   },
+  "SAID DONE": {
+    callsign: "SAID DONE",
+    name: "Allen Hurley",
+    role: "OWNER_ADMIN",
+    memberId: "SS-2026-0002",
+    passkey: "620620",
+    updatedAt: "2026-07-04T12:00:00Z",
+  },
   ALLEN: {
-    callsign: "ALLEN",
+    callsign: "SAID DONE",
     name: "Allen Hurley",
     role: "OWNER_ADMIN",
     memberId: "SS-2026-0002",
@@ -155,14 +163,14 @@ export function verifyAdminPasskey(inputPasskey: string): {
     };
   }
 
-  // 2. Check Allen Hurley (ALLEN)
-  const allenEntry = passkeys["ALLEN"] || DEFAULT_PASSKEYS["ALLEN"];
+  // 2. Check Allen Hurley (SAID DONE / ALLEN)
+  const allenEntry = passkeys["SAID DONE"] || passkeys["ALLEN"] || DEFAULT_PASSKEYS["SAID DONE"] || DEFAULT_PASSKEYS["ALLEN"];
   if (clean === allenEntry.passkey || clean === "620620") {
     return {
       valid: true,
       session: {
         name: allenEntry.name || "Allen Hurley",
-        callsign: "ALLEN",
+        callsign: "SAID DONE",
         role: "OWNER_ADMIN",
         memberId: allenEntry.memberId || "SS-2026-0002",
       },

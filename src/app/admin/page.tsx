@@ -112,7 +112,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   {
     member_id: "SS-2026-0002",
     full_name: "Allen Hurley",
-    callsign: "ALLEN",
+    callsign: "SAID DONE",
     email: "allen@subsonicsociety.com",
     state: "TN",
     experience_level: "Owner Admin / Executive",
@@ -121,7 +121,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority",
+    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
   },
   {
     member_id: "SS-2026-0003",

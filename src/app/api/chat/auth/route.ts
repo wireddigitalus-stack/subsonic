@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
       'RADAR': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
       'ROB': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
       'LTDAN': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
+      'SAID DONE': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
+      'SAIDDONE': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
       'ALLEN': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
       'AHURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
       'HURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
@@ -29,14 +31,20 @@ export async function POST(req: NextRequest) {
     // Check executive aliases
     const execKeys = Object.keys(execOverrides);
     for (const key of execKeys) {
-      if (cleanCallsign === key || cleanCallsign.includes(key)) {
+      if (cleanCallsign === key || (key.length >= 4 && cleanCallsign.includes(key))) {
         const exec = execOverrides[key];
         if (cleanPin === exec.pin || cleanPin.toLowerCase() === 'subsonic2026') {
+          const finalCallsign = (key === 'ROB' || key === 'LTDAN' || key === 'RADAR')
+            ? 'RADAR'
+            : ['SAID DONE', 'SAIDDONE', 'ALLEN', 'AHURLEY', 'HURLEY'].includes(key)
+            ? 'SAID DONE'
+            : cleanCallsign;
+
           return NextResponse.json({
             authenticated: true,
             profile: {
               name: exec.name,
-              callsign: key === 'ROB' || key === 'LTDAN' ? 'RADAR' : key === 'AHURLEY' || key === 'HURLEY' ? 'ALLEN' : cleanCallsign,
+              callsign: finalCallsign,
               role: exec.role,
               division: exec.division,
               rifleSetup: exec.rifleSetup,
@@ -45,7 +53,7 @@ export async function POST(req: NextRequest) {
             member: {
               member_id: exec.memberId,
               full_name: exec.name,
-              callsign: key === 'ROB' || key === 'LTDAN' ? 'RADAR' : key === 'AHURLEY' || key === 'HURLEY' ? 'ALLEN' : cleanCallsign,
+              callsign: finalCallsign,
               state: 'TN',
               experience_level: exec.division,
               rifle_setup: exec.rifleSetup,

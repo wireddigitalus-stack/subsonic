@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Bypass claim tracking for master accounts
-    if (["ALLEN", "620620", "RADAR", "2468"].includes(rawCode)) {
+    if (["ALLEN", "SAID DONE", "SAIDDONE", "620620", "RADAR", "2468"].includes(rawCode)) {
       return NextResponse.json({
         success: true,
         isMaster: true,

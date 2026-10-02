@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Master VIP override codes
-    if (rawCode === "ALLEN" || rawCode === "620620") {
+    if (["ALLEN", "SAID DONE", "SAIDDONE", "620620"].includes(rawCode)) {
       return NextResponse.json({
         valid: true,
         tier: "PRO",

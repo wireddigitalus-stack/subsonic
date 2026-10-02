@@ -83,7 +83,7 @@ export function ChatAuthGate({
               required
               value={loginCallsign}
               onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
-              placeholder="e.g. ALLEN, ROB, or Callsign"
+              placeholder="e.g. SAID DONE, RADAR, or Callsign"
               autoComplete="username"
               className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400 transition-colors"
             />
@@ -92,7 +92,7 @@ export function ChatAuthGate({
           <div className="space-y-1">
             <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
               <span>Member Key or Security PIN</span>
-              <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for ALLEN • 2468 for ROB</span>
+              <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for SAID DONE • 2468 for RADAR</span>
             </label>
             <input
               type="password"

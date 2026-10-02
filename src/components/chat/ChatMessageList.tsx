@@ -256,7 +256,7 @@ export function ChatMessageList({
         ) : (
           filteredMessages.map((msg) => {
             const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB";
-            const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
+            const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "SAID DONE" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
             const isAdmin = msg.author.role === "ADMIN";
             const isMod = msg.author.role === "MODERATOR";
             const isMD = msg.author.role === "MATCH_DIRECTOR" || msg.type === "MATCH_ALERT";

@@ -82,13 +82,15 @@ export function Navbar() {
               localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsed));
             } catch {}
           } else if (
+            parsed.callsign === "SAID DONE" ||
+            parsed.callsign === "SAIDDONE" ||
             parsed.callsign === "ALLEN" ||
             parsed.callsign === "AHURLEY" ||
             parsed.member_id === "SS-2026-0002" ||
             (parsed.name && parsed.name.toLowerCase().includes("hurley")) ||
             (parsed.name && parsed.name.toLowerCase().includes("allen"))
           ) {
-            parsed.callsign = "ALLEN";
+            parsed.callsign = "SAID DONE";
             parsed.name = "Allen Hurley";
             parsed.rifleSetup = parsed.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527";
             parsed.division = "Owner Admin / Executive";
@@ -107,7 +109,7 @@ export function Navbar() {
             role === "OWNER_ADMIN" ||
             role === "DEV_ADMIN" ||
             role === "ADMIN" ||
-            ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY"].includes(cs)
+            ["RADAR", "ROB", "LTDAN", "SAID DONE", "SAIDDONE", "ALLEN", "AHURLEY", "HURLEY"].includes(cs)
           ) {
             setIsAdmin(true);
           }

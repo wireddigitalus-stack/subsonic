@@ -387,7 +387,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     author: {
       id: "user-allen",
       name: "Allen Hurley",
-      callsign: "ALLEN",
+      callsign: "SAID DONE",
       role: "OWNER_ADMIN",
       badgeText: "FOUNDER",
       division: "Executive / Match Host",
@@ -417,7 +417,7 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
     author: {
       id: "user-allen",
       name: "Allen Hurley",
-      callsign: "ALLEN",
+      callsign: "SAID DONE",
       role: "OWNER_ADMIN",
       badgeText: "OWNER ADMIN",
       division: "Executive / Match Host",

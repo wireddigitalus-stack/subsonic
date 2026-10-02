@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify authorized callsign
-    const validCallsigns = ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY", "ADMIN"];
+    const validCallsigns = ["RADAR", "ROB", "LTDAN", "SAID DONE", "SAIDDONE", "ALLEN", "AHURLEY", "HURLEY", "ADMIN"];
     if (!validCallsigns.includes((payload.callsign || "").toUpperCase())) {
       const response = NextResponse.json({ authenticated: false, error: "Unauthorized callsign" });
       response.cookies.delete("subsonic_admin_session");

@@ -72,9 +72,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!["RADAR", "ALLEN"].includes(cleanTarget)) {
+    if (!["RADAR", "ALLEN", "SAID DONE", "SAIDDONE"].includes(cleanTarget)) {
       return NextResponse.json(
-        { error: "Invalid target. Only RADAR (Rob) or ALLEN (Allen) passkeys can be configured." },
+        { error: "Invalid target. Only RADAR (Rob) or SAID DONE / ALLEN (Allen) passkeys can be configured." },
         { status: 400 }
       );
     }

@@ -105,7 +105,7 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
   },
   {
     id: "dm_allen",
-    callsign: "ALLEN",
+    callsign: "SAID DONE",
     name: "Allen Hurley",
     role: "OWNER_ADMIN",
     badgeText: "OWNER ADMIN",
@@ -523,6 +523,8 @@ export default function ChatPage() {
                 }));
               } catch {}
             } else if (
+              parsedShooter.callsign === "SAID DONE" ||
+              parsedShooter.callsign === "SAIDDONE" ||
               parsedShooter.callsign === "ALLEN" ||
               parsedShooter.callsign === "AHURLEY" ||
               (parsedShooter.name && parsedShooter.name.toLowerCase().includes("hurley"))
@@ -532,13 +534,13 @@ export default function ChatPage() {
               parsedShooter.role = "OWNER_ADMIN";
               parsedShooter.division = "Owner Admin / Executive";
               parsedShooter.badgeText = "OWNER ADMIN";
-              parsedShooter.callsign = "ALLEN";
+              parsedShooter.callsign = "SAID DONE";
               try {
                 localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
                 localStorage.setItem("subsonic_member_profile", JSON.stringify({
                   member_id: "SS-2026-0002",
                   full_name: "Allen Hurley",
-                  callsign: "ALLEN",
+                  callsign: "SAID DONE",
                   state: "TN",
                   experience_level: "Owner Admin / Executive",
                   rifle_setup: parsedShooter.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527",
@@ -1110,7 +1112,7 @@ export default function ChatPage() {
       const delay = 1800 + Math.random() * 1200;
       setTimeout(() => {
         let replyText = `Copy that, [${shooterProfile.callsign}]. Transmission received on private net.`;
-        if (partnerCallsign === "ALLEN") {
+        if (partnerCallsign === "SAID DONE" || partnerCallsign === "ALLEN") {
           replyText = `Copy that, [${shooterProfile.callsign}]. Direct transmission received. Staging and dinner operations at The Hideout (111 Hwy 44) are dialed in. Let me know if you need anything before check-in.`;
         } else if (partnerCallsign === "RADAR" || partnerCallsign === "ROB") {
           replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received on RADAR frequency. Subsonic network, scoring uplinks, and telemetry are running green across The Hideout.`;
@@ -1670,6 +1672,7 @@ export default function ChatPage() {
               {(shooterProfile?.role === "MASTER_OWNER" || 
                 shooterProfile?.role === "OWNER_ADMIN" || 
                 shooterProfile?.callsign === "RADAR" || 
+                shooterProfile?.callsign === "SAID DONE" || 
                 shooterProfile?.callsign === "ALLEN") && (
                 <Link
                   href="/admin"

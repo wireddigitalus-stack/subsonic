@@ -164,7 +164,7 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
   {
     id: "allen-hurley",
     name: "Allen Hurley",
-    callsign: "ALLEN",
+    callsign: "SAID DONE",
     division: "Owner Admin / Executive",
     ranking: "Founder • Subsonic Society",
     homeRange: "The Hideout, Bristol, TN",
