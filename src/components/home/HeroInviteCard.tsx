@@ -86,7 +86,7 @@ export function HeroInviteCard() {
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1]">
               WELCOME TO THE INVITATIONAL <br />
               <span className="amber-gradient-text">
-                ALL SHOOTERS ARE PRO. BY INVITATION ONLY.
+                BY INVITATION ONLY.
               </span>
             </h2>
 
