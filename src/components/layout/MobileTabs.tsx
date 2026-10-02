@@ -69,7 +69,7 @@ export function MobileTabs() {
   const tabs: TabItem[] = [
     { name: "Home", href: "/", icon: Home },
     { name: "Calendar", href: "/calendar", icon: CalendarDays },
-    { name: "Comms", href: "/chat", icon: MessageSquare },
+    { name: "Chat", href: "/chat", icon: MessageSquare },
     { name: "Shooters", href: "/shooters", icon: Trophy },
     { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
     ...(isAdmin ? [{ name: "Admin", href: "/admin", icon: BarChart3 }] : []),
@@ -103,7 +103,7 @@ export function MobileTabs() {
         {tabs.map((tab) => {
           const isActive = pathname === tab.href || (tab.href.startsWith("/#") && pathname === "/" && typeof window !== "undefined" && window.location.hash === tab.href.slice(1));
           const Icon = tab.icon;
-          const isComms = tab.name === "Comms";
+          const isChat = tab.href === "/chat";
 
           return (
             <Link
@@ -131,8 +131,8 @@ export function MobileTabs() {
                   </span>
                 )}
 
-                {/* Live Color-Coded Pulsing Beacon for Comms */}
-                {isComms && alertConfig && (
+                {/* Live Color-Coded Pulsing Beacon for Chat */}
+                {isChat && alertConfig && (
                   <span 
                     className="absolute -top-1 -right-1 flex h-2.5 w-2.5"
                     title={commsStatus.noticeTitle || alertConfig.label}

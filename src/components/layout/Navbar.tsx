@@ -28,9 +28,9 @@ import {
   Target,
   Mail,
   Lock,
-  Unlock,
   FileText,
-  Key
+  Key,
+  BarChart3
 } from "lucide-react";
 
 export function Navbar() {
@@ -39,6 +39,7 @@ export function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [callsign, setCallsign] = useState<string>("APEX-22");
 
   // Track private chat room auth state & callsign
@@ -52,6 +53,7 @@ export function Navbar() {
           const data = await res.json();
           if (data.authenticated && data.session) {
             setIsAuthenticated(true);
+            setIsAdmin(true);
             setCallsign(data.session.callsign || "RADAR");
             return;
           }
@@ -98,6 +100,17 @@ export function Navbar() {
             } catch {}
           }
           if (parsed.callsign) setCallsign(parsed.callsign);
+          const role = (parsed.role || "").toUpperCase();
+          const cs = (parsed.callsign || "").toUpperCase();
+          if (
+            role === "MASTER_OWNER" ||
+            role === "OWNER_ADMIN" ||
+            role === "DEV_ADMIN" ||
+            role === "ADMIN" ||
+            ["RADAR", "ROB", "LTDAN", "ALLEN", "AHURLEY", "HURLEY"].includes(cs)
+          ) {
+            setIsAdmin(true);
+          }
         } catch {
           // ignore
         }
@@ -117,6 +130,7 @@ export function Navbar() {
       localStorage.removeItem("subsonic_shooter_profile");
       localStorage.removeItem("subsonic_member_profile");
       setIsAuthenticated(false);
+      setIsAdmin(false);
       window.location.reload();
     }
   };
@@ -475,6 +489,16 @@ export function Navbar() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span className="font-bold">{callsign}</span>
                 </div>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="hidden sm:flex px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] font-mono font-bold text-amber-300 items-center gap-1 transition-all"
+                    title="Open Admin Control Center"
+                  >
+                    <BarChart3 className="w-3 h-3 text-amber-400" />
+                    <span>Admin</span>
+                  </Link>
+                )}
                 {pathname !== "/chat" && (
                   <Link
                     href="/chat"
@@ -507,7 +531,7 @@ export function Navbar() {
                 </Link>
 
                 <Link
-                  href="/invite"
+                  href="/invite/pro"
                   data-telemetry="nav_primary_invite_cta"
                   className="hidden sm:flex px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all items-center gap-1.5"
                 >
@@ -547,112 +571,138 @@ export function Navbar() {
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             {/* Group 1: The Society & Facility */}
-                <div className="space-y-1">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
-                    The Society & Facility
-                  </span>
-                  <Link
-                    href="/society"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>The Story & Philosophy</span>
-                  </Link>
-                  <Link
-                    href="/chat"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
-                  >
-                    <MessageSquare className="w-4 h-4 text-emerald-400" />
-                    <span>Chat Room (Live)</span>
-                  </Link>
-                  <Link
-                    href="/the-hideout"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <Mountain className="w-4 h-4 text-blue-400" />
-                    <span>The Hideout Range (3,420 FT)</span>
-                  </Link>
-                  <Link
-                    href="/partners"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <Award className="w-4 h-4 text-purple-400" />
-                    <span>Modacam & Sponsors</span>
-                  </Link>
-                  <Link
-                    href="/contact"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <Mail className="w-4 h-4 text-cyan-400" />
-                    <span>Contact & Inquiries</span>
-                  </Link>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
+                The Society & Facility
+              </span>
+              <Link
+                href="/society"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>The Story & Philosophy</span>
+              </Link>
+              <Link
+                href="/chat"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-400" />
+                <span>Chat Room (Live)</span>
+              </Link>
+              <Link
+                href="/the-hideout"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                <Mountain className="w-4 h-4 text-blue-400" />
+                <span>The Hideout Range (3,420 FT)</span>
+              </Link>
+              <Link
+                href="/partners"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                <Award className="w-4 h-4 text-purple-400" />
+                <span>Modacam & Partners</span>
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                <Mail className="w-4 h-4 text-cyan-400" />
+                <span>Contact & Inquiries</span>
+              </Link>
+            </div>
+
+            {/* Group 2: Competitions & Athletes */}
+            <div className="space-y-1 pt-2 border-t border-white/5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-blue-400 font-bold px-2">
+                Competitions & Athletes
+              </span>
+              <Link
+                href="/competitor-packet"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
+              >
+                <FileText className="w-4 h-4 text-amber-400" />
+                <div className="flex items-center justify-between w-full">
+                  <span>2026 Competitor Packet</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">Official</span>
                 </div>
+              </Link>
+              <Link
+                href="/matches"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
+              >
+                <Target className="w-4 h-4 text-amber-400" />
+                <span>Matches ($7,500 Purse Invitational)</span>
+              </Link>
+              <Link
+                href="/calendar"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                <Calendar className="w-4 h-4 text-emerald-400" />
+                <span>Match Calendar & Dates</span>
+              </Link>
+              <Link
+                href="/documents"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
+              >
+                <FileText className="w-4 h-4 text-cyan-400" />
+                <span>Competition Documents (COF & Waivers)</span>
+              </Link>
+              <Link
+                href="/shooters"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+              >
+                <Users className="w-4 h-4 text-purple-400" />
+                <span>Shooter Profiles & Rifle Builds</span>
+              </Link>
+              <Link
+                href="/shooters/intake"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-400 hover:bg-white/10 transition-colors"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span>Shooter Intake (Auto-Card)</span>
+              </Link>
+            </div>
 
-                {/* Group 2: Competitions & Shooters */}
-                <div className="space-y-1 pt-2 border-t border-white/5">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-blue-400 font-bold px-2">
-                    Competitions & Athletes
-                  </span>
-                  <Link
-                    href="/matches"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
-                  >
-                    <Target className="w-4 h-4 text-amber-400" />
-                    <span>Matches ($7,500 Purse Invitational)</span>
-                  </Link>
-                  <Link
-                    href="/documents"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
-                  >
-                    <FileText className="w-4 h-4 text-cyan-400" />
-                    <span>Competition Documents (COF & Waivers)</span>
-                  </Link>
-                  <Link
-                    href="/competitor-packet"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-white/10"
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>2026 Competitor Packet & Bristol Guide</span>
-                  </Link>
-                  <Link
-                    href="/shooters"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10"
-                  >
-                    <Users className="w-4 h-4 text-purple-400" />
-                    <span>Shooter Profiles & Rifle Builds</span>
-                  </Link>
-                  <Link
-                    href="/shooters/intake"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-400 hover:bg-white/10"
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Shooter Intake (Auto-Card)</span>
-                  </Link>
-                </div>
+            {/* Group 3: Command & Administration (Admin only) */}
+            {isAdmin && (
+              <div className="space-y-1 pt-2 border-t border-white/5">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold px-2">
+                  Command & Administration
+                </span>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/20 transition-colors"
+                >
+                  <BarChart3 className="w-4 h-4 text-emerald-400" />
+                  <span>Admin Control Center</span>
+                </Link>
+              </div>
+            )}
 
-
-
-                {/* Mobile Action: Invitation-Only Member Sign-In */}
-                <div className="pt-2 border-t border-white/10 space-y-2">
-                  <Link
-                    href="/invite"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
-                  >
-                    <Key className="w-4 h-4 fill-black" />
-                    <span>Membership By Invitation Only • Enter Credentials</span>
-                  </Link>
-                </div>
+            {/* Mobile Action: Invitation-Only Member Sign-In */}
+            <div className="pt-2 border-t border-white/10 space-y-2">
+              <Link
+                href="/invite/pro"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
+              >
+                <Key className="w-4 h-4 fill-black" />
+                <span>Redeem Pro Invitation Key</span>
+              </Link>
+            </div>
           </div>
         )}
       </div>
