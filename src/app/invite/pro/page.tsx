@@ -77,25 +77,10 @@ function ProInviteContent() {
   const [homeRange, setHomeRange] = useState("The Hideout, Bristol, TN");
   const [ranking, setRanking] = useState("");
   const [podiums, setPodiums] = useState<number>(0);
-  const [quote, setQuote] = useState("");
   const [accolades, setAccolades] = useState<string[]>([]);
   const [customAccolade, setCustomAccolade] = useState("");
   const [sponsors, setSponsors] = useState<string[]>([]);
   const [customSponsor, setCustomSponsor] = useState("");
-
-  // Rifle Specs
-  const [action, setAction] = useState("Vudoo V-22 (3-Lug Rimfire)");
-  const [barrel, setBarrel] = useState("Bartlein MTU 20\" Match (1:16 Twist)");
-  const [trigger, setTrigger] = useState("Bix'n Andy TacSport PRO (4.2 oz)");
-  const [chassis, setChassis] = useState("MDT ACC Elite Chassis with Titanium Weights");
-  const [optic, setOptic] = useState("Zero Compromise Optic ZC527 MPCT3X");
-  const [mount, setMount] = useState("Spuhr QDP-4002 0 MOA with Level");
-  const [tuner, setTuner] = useState("Harrell Precision Custom Rimfire Tuner");
-  const [ammoLot, setAmmoLot] = useState("Lapua Center-X Lot #32187 (1,062 FPS)");
-
-  // Interview
-  const [interviewQ1, setInterviewQ1] = useState("In sudden mountain wind shifts, what is your go-to holdover strategy?");
-  const [interviewA1, setInterviewA1] = useState("");
 
   // Photos & Compression
   const [headshotResult, setHeadshotResult] = useState<CompressionResult | null>(null);
@@ -279,27 +264,22 @@ function ProInviteContent() {
         podiums: Number(podiums) || 0,
         ranking: ranking.trim() || `${division} Competitor`,
         featuredMatch: "Subsonic Society Invitational 2026",
-        quote: quote.trim() || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
+        quote: "",
         accolades: accolades.length > 0 ? accolades : ["VIP COMPETITOR"],
         sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
         image: primaryImage,
         actionPhoto: secondaryImage,
         rifleSetup: {
-          action,
-          barrel,
-          trigger,
-          chassis,
-          optic,
-          mount,
-          tuner,
-          ammoLot,
+          action: "Match Rig (Classified)",
+          barrel: "Match Grade",
+          trigger: "Precision Match",
+          chassis: "Competition",
+          optic: "Precision Optic",
+          mount: "Precision Mount",
+          tuner: "Tuned",
+          ammoLot: "Match Lot",
         },
-        interview: [
-          {
-            question: interviewQ1,
-            answer: interviewA1.trim() || "Focus on solid rear bag support, verify zero before the buzzer, and let the dope work.",
-          },
-        ],
+        interview: [],
       };
 
       // 1. Save shooter profile
@@ -833,7 +813,7 @@ function ProInviteContent() {
                 <div className="space-y-2 flex-1">
                   <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{actionPhotoResult ? "Replace Action Shot" : "Upload Rifle Shot"}</span>
+                    <span>{actionPhotoResult ? "Replace Action Shot" : "Upload Action Shot"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -849,7 +829,7 @@ function ProInviteContent() {
                     </div>
                   ) : (
                     <p className="text-[11px] text-slate-400 leading-snug">
-                      Show your custom rifle, barricade setup, or range photo.
+                      Show your match jersey, barricade setup, or range action photo.
                     </p>
                   )}
                 </div>
@@ -953,150 +933,6 @@ function ProInviteContent() {
               >
                 Add
               </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Step 4: Complete Rifle Rig Blueprint */}
-        <section className="p-6 sm:p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-              <Target className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">Section 4</span>
-              <h2 className="text-lg font-black text-white">Verified Rifle Rig Equipment Specs</h2>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Action</label>
-              <input
-                type="text"
-                value={action}
-                onChange={(e) => setAction(e.target.value)}
-                placeholder="e.g. Vudoo V-22, RimX, CZ 457"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Barrel & Twist</label>
-              <input
-                type="text"
-                value={barrel}
-                onChange={(e) => setBarrel(e.target.value)}
-                placeholder="e.g. Bartlein MTU 20-inch 1:16"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Trigger & Pull Weight</label>
-              <input
-                type="text"
-                value={trigger}
-                onChange={(e) => setTrigger(e.target.value)}
-                placeholder="e.g. Bix'n Andy TacSport PRO (4.2 oz)"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Chassis / Stock</label>
-              <input
-                type="text"
-                value={chassis}
-                onChange={(e) => setChassis(e.target.value)}
-                placeholder="e.g. MDT ACC Elite / Foundation Revelation"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Optic & Reticle</label>
-              <input
-                type="text"
-                value={optic}
-                onChange={(e) => setOptic(e.target.value)}
-                placeholder="e.g. ZCO ZC527 MPCT3X / Tangent Theta 525P"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Scope Mount & Level</label>
-              <input
-                type="text"
-                value={mount}
-                onChange={(e) => setMount(e.target.value)}
-                placeholder="e.g. Spuhr QDP-4002 / Hawkins Tactical"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Harmonic Tuner / Muzzle</label>
-              <input
-                type="text"
-                value={tuner}
-                onChange={(e) => setTuner(e.target.value)}
-                placeholder="e.g. Harrell Precision Rimfire Tuner"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">Match Ammo Lot & Velocity</label>
-              <input
-                type="text"
-                value={ammoLot}
-                onChange={(e) => setAmmoLot(e.target.value)}
-                placeholder="e.g. Lapua Center-X Lot #32187 (1,062 FPS)"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Step 5: Match Philosophy & Interview */}
-        <section className="p-6 sm:p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold">Section 5</span>
-              <h2 className="text-lg font-black text-white">Philosophy, Quote & Advice</h2>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Personal Match Quote / Creed
-              </label>
-              <textarea
-                rows={2}
-                value={quote}
-                onChange={(e) => setQuote(e.target.value)}
-                placeholder="e.g. In the Bristol mountains, the wind never blows the same way two seconds in a row. You have to trust your bubble level, watch the hollow, and commit to the shot."
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                {interviewQ1}
-              </label>
-              <textarea
-                rows={3}
-                value={interviewA1}
-                onChange={(e) => setInterviewA1(e.target.value)}
-                placeholder="Share your practical technical technique for reading Appalachian wind, mirage, or stage timing..."
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
             </div>
           </div>
         </section>

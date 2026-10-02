@@ -59,7 +59,8 @@ import {
   Gavel,
   Crown,
   Shield,
-  Key
+  Key,
+  Copy
 } from "lucide-react";
 import { 
   getLocalTelemetryEvents, 
@@ -323,6 +324,7 @@ export default function AdminDashboardPage() {
   const [memberActionNotice, setMemberActionNotice] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [copiedCredentialMemberId, setCopiedCredentialMemberId] = useState<string | null>(null);
+  const [copiedFullProfile, setCopiedFullProfile] = useState(false);
 
   // Admin Passkeys Security Management Modal State
   const [isAdminPasskeyModalOpen, setIsAdminPasskeyModalOpen] = useState(false);
@@ -856,6 +858,33 @@ export default function AdminDashboardPage() {
       setIsSavingMember(false);
       setTimeout(() => setMemberActionNotice(null), 4000);
     }
+  };
+
+  const handleCopyFullMemberProfile = () => {
+    if (!selectedMember) return;
+    const lines = [
+      `=== SUBSONIC SOCIETY MARKSMAN PROFILE ===`,
+      `Member ID: ${memberForm.member_id || selectedMember.member_id}`,
+      `Full Name: ${memberForm.full_name || selectedMember.full_name || "N/A"}`,
+      `Callsign: ${memberForm.callsign || selectedMember.callsign || "N/A"}`,
+      `Email: ${memberForm.email || selectedMember.email || "N/A"}`,
+      `Home State: ${memberForm.state || selectedMember.state || "N/A"}`,
+      `Role: ${memberForm.role || selectedMember.role || "MEMBER"}`,
+      `Account Status: ${memberForm.status || selectedMember.status || "ACTIVE"}`,
+      `Classification / Division: ${memberForm.experience_level || selectedMember.experience_level || "N/A"}`,
+      `Primary Rifle & Optic: ${memberForm.rifle_setup || selectedMember.rifle_setup || "N/A"}`,
+      `Login PIN: ${memberForm.pin || selectedMember.pin || "N/A"}`,
+      `Registered: ${selectedMember.created_at || "N/A"}`,
+      memberForm.notes ? `Staff Notes: ${memberForm.notes}` : (selectedMember.notes ? `Staff Notes: ${selectedMember.notes}` : null),
+      `Portal Link: https://subsonicsociety.com/chat`,
+      `========================================`
+    ].filter(Boolean).join("\n");
+
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(lines);
+    }
+    setCopiedFullProfile(true);
+    setTimeout(() => setCopiedFullProfile(false), 3000);
   };
 
   const handleQuickStatusChange = async (
@@ -2563,6 +2592,7 @@ export default function AdminDashboardPage() {
           shooterSearch={shooterSearch}
           setShooterSearch={setShooterSearch}
           handleDeleteShooter={handleDeleteShooter}
+          onShooterUpdated={(updated) => setShooterProfiles((prev) => prev.map((s) => s.id === updated.id ? updated : s))}
         />
       )}
 
@@ -2886,13 +2916,25 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsMemberModalOpen(false)}
-                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors shrink-0"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleCopyFullMemberProfile}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  title="Copy all contents of the shooter profile"
+                >
+                  <Copy className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{copiedFullProfile ? "✓ Profile Copied!" : "Copy Full Profile"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsMemberModalOpen(false)}
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Tabs: Edit Details vs Digital Pass Preview */}
@@ -3179,7 +3221,7 @@ export default function AdminDashboardPage() {
 
                 {/* Primary Action Buttons */}
                 <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10">
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <button
                       type="submit"
                       disabled={isSavingMember}
@@ -3187,6 +3229,16 @@ export default function AdminDashboardPage() {
                     >
                       <Save className="w-4 h-4" />
                       <span>{isSavingMember ? "Saving Changes..." : "Save Member Changes"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyFullMemberProfile}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
+                      title="Copy all contents of shooter profile"
+                    >
+                      <Copy className="w-4 h-4 text-amber-400" />
+                      <span>{copiedFullProfile ? "✓ Profile Copied!" : "Copy All Profile Data"}</span>
                     </button>
 
                     <button

@@ -97,7 +97,7 @@ export function HeroInviteCard() {
 
               <div className="p-4 sm:p-5 rounded-2xl bg-black/60 border border-white/10 space-y-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed shadow-inner">
                 <p>
-                  Clear, simple prompts will lead you step-by-step through registration — <strong className="text-emerald-400 font-semibold">designed to be easy and hassle-free</strong>. You’ll choose your callsign, select your 4-digit PIN, and enter your rifle setup.
+                  Clear, simple prompts will lead you step-by-step through registration — <strong className="text-emerald-400 font-semibold">designed to be easy and hassle-free</strong>. You’ll choose your callsign, select your 4-digit PIN, and select your division.
                 </p>
                 <p>
                   When you finish, you’ll arrive directly at the official <strong className="text-white font-semibold">Competitor Information Page</strong>, giving you everything you need for the match: range schedule, Course of Fire briefings, and recommended Bristol hotel accommodations.
@@ -131,7 +131,7 @@ export function HeroInviteCard() {
               </div>
               <div className="min-w-0">
                 <span className="text-xs font-black text-white block">Step 2: Follow Quick Prompts</span>
-                <span className="text-[11px] text-slate-400 block">Enter callsign, PIN & rifle specs</span>
+                <span className="text-[11px] text-slate-400 block">Set your callsign, PIN & credentials</span>
               </div>
             </div>
 
