@@ -1908,17 +1908,68 @@ export default function ChatPage() {
         </div>
 
         {/* DESKTOP CHANNEL SELECTOR BAR (Hidden on mobile & small tablets) */}
-        <div className="hidden md:block space-y-1.5">
-          {/* Network Mode Selector Tabs */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
-              <div className="px-3 py-1 rounded-lg font-mono text-xs font-bold bg-amber-500 text-black shadow-tactical-glow flex items-center gap-1.5">
-                <Lock className="w-3 h-3" />
-                <span>OFFICIAL INVITATIONAL CHAT ROOM</span>
-              </div>
+        <div className="hidden md:block">
+          <div className="flex items-center justify-between gap-3">
+            {/* Desktop Channel Pills on Left */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+              {visibleChannels.map((ch) => {
+                const isActive = currentChannel === ch.id;
+                const unread = unreadCounts[ch.id] || 0;
+                const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
+                return (
+                  <button
+                    key={ch.id}
+                    type="button"
+                    onClick={() => setCurrentChannel(ch.id)}
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
+                      isActive
+                        ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
+                        : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
+                    <span>{ch.name}</span>
+
+                    {/* Post Counter Badge on Pill */}
+                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 ${
+                      isActive
+                        ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 shadow-sm"
+                        : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                    }`} title={`${engagement.postCount} posts in #${ch.name}`}>
+                      <MessageSquare className="w-2 h-2 text-cyan-400" />
+                      <span>{engagement.postCount}</span>
+                    </span>
+
+                    {unread > 0 && !isActive ? (
+                      <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                        {unread > 9 ? "9+" : unread}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+
+              {/* Active Direct Comms Pill */}
+              {isDirectMode && activeDirectPartner && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs bg-emerald-950/60 border border-emerald-500/60 text-white shadow-tactical-glow shrink-0 animate-fadeIn">
+                  <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="text-emerald-300 font-bold truncate max-w-[200px]">
+                    DM: {activeDirectPartner.name} [{activeDirectPartner.callsign}]
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleBackToInvitational}
+                    className="ml-1 p-0.5 rounded hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+                    title="Close direct view and return to #invitational"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Right: Terms & Browse Rooms */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => {
@@ -1949,64 +2000,6 @@ export default function ChatPage() {
                 {activeNetTab === "PRO" ? "VERIFIED SQUAD CHAT" : "OPEN SOCIETY"}
               </span>
             </div>
-          </div>
-
-          {/* Desktop Channel Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
-            {visibleChannels.map((ch) => {
-              const isActive = currentChannel === ch.id;
-              const unread = unreadCounts[ch.id] || 0;
-              const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
-              return (
-                <button
-                  key={ch.id}
-                  type="button"
-                  onClick={() => setCurrentChannel(ch.id)}
-                  className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
-                    isActive
-                      ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
-                      : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
-                  <span>{ch.name}</span>
-
-                  {/* Post Counter Badge on Pill */}
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 ${
-                    isActive
-                      ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 shadow-sm"
-                      : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
-                  }`} title={`${engagement.postCount} posts in #${ch.name}`}>
-                    <MessageSquare className="w-2 h-2 text-cyan-400" />
-                    <span>{engagement.postCount}</span>
-                  </span>
-
-                  {unread > 0 && !isActive ? (
-                    <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
-                      {unread > 9 ? "9+" : unread}
-                    </span>
-                  ) : null}
-                </button>
-              );
-            })}
-
-            {/* Active Direct Comms Pill */}
-            {isDirectMode && activeDirectPartner && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs bg-emerald-950/60 border border-emerald-500/60 text-white shadow-tactical-glow shrink-0 animate-fadeIn">
-                <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="text-emerald-300 font-bold truncate max-w-[200px]">
-                  DM: {activeDirectPartner.name} [{activeDirectPartner.callsign}]
-                </span>
-                <button
-                  type="button"
-                  onClick={handleBackToInvitational}
-                  className="ml-1 p-0.5 rounded hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
-                  title="Close direct view and return to #invitational"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
