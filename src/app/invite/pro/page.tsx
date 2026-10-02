@@ -22,7 +22,8 @@ import {
   Zap,
   Share2,
   FileCheck,
-  Check
+  Check,
+  FileText
 } from "lucide-react";
 import { compressImageFile, CompressionResult } from "@/lib/imageCompression";
 import { CallsignInput } from "@/components/common/CallsignInput";
@@ -439,13 +440,21 @@ function ProInviteContent() {
           </div>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href={`/shooters/${slug}`}
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
             >
               <span>View Your Public SEO Profile</span>
               <ExternalLink className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/competitor-packet"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.5)] border border-amber-300 hover:brightness-110 active:scale-95 transition-all"
+            >
+              <FileText className="w-4 h-4 fill-black" />
+              <span>Competitor Packet (Hotels & COF)</span>
             </Link>
 
             <Link

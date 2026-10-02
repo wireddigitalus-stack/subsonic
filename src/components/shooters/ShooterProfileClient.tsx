@@ -24,7 +24,8 @@ import {
   Shield,
   Flag,
   Flame,
-  Check
+  Check,
+  FileText
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
 
@@ -419,6 +420,15 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               )}
             </button>
 
+            {/* Yellow Competitor Packet Button */}
+            <Link
+              href="/competitor-packet"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-[0_0_20px_rgba(245,158,11,0.5)] border border-amber-300"
+            >
+              <FileText className="w-3.5 h-3.5 fill-black text-black" />
+              <span>Competitor Packet</span>
+            </Link>
+
             <Link
               href="/chat"
               className="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-tactical-glow"
@@ -614,6 +624,15 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                     <Award className="w-4 h-4" />
                     <span>{shooter.ranking}</span>
                   </div>
+
+                  {/* Yellow Competitor Packet Button */}
+                  <Link
+                    href="/competitor-packet"
+                    className="px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 text-black text-xs font-mono font-black uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_20px_rgba(251,191,36,0.6)] border border-amber-300 hover:scale-105 active:scale-95 transition-all"
+                  >
+                    <FileText className="w-3.5 h-3.5 fill-black" />
+                    <span>Competitor Packet</span>
+                  </Link>
                 </div>
               </div>
 
@@ -922,7 +941,17 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             </div>
 
             <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
-              <span>MEMBER PROFILE: {shooter.callsign}</span>
+              <div className="flex items-center gap-3">
+                <span className="hidden sm:inline">MEMBER PROFILE: {shooter.callsign}</span>
+                <Link
+                  href="/competitor-packet"
+                  className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-300 transition-all"
+                >
+                  <FileText className="w-3.5 h-3.5 fill-black" />
+                  <span>Competitor Packet</span>
+                </Link>
+              </div>
+
               <Link
                 href="/chat"
                 className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-bold"
