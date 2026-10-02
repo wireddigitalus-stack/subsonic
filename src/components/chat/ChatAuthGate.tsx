@@ -36,7 +36,7 @@ export function ChatAuthGate({
           <ChevronLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
           <span className="font-bold">HOME</span>
           <span className="text-white/30">/</span>
-          <span className="text-amber-400 font-extrabold">COMMS</span>
+          <span className="text-amber-400 font-extrabold">CHAT ROOM</span>
         </Link>
 
         <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest px-2.5 py-1 rounded-lg bg-black/40 border border-white/5">
@@ -64,7 +64,7 @@ export function ChatAuthGate({
             PRIVATE CHAT ROOM
           </h2>
           <p className="text-xs text-slate-300">
-            Enter your callsign and member key to access live squad comms and DOPE drops.
+            Enter your callsign and member key to access the live Chat Room and DOPE drops.
           </p>
         </div>
 

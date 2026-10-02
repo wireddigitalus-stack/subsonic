@@ -7,12 +7,12 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Tactical Comms Network & Firing Line Intel | Subsonic Society",
+  title: "Private Chat Room & Firing Line Intel | Subsonic Society",
   description:
-    "Real-time shooter comms network for Subsonic Society competitors. Live match updates, 340yd DOPE drops, ridge wind conditions, and squad coordination in Bristol, TN.",
+    "Real-time shooter Chat Room for Subsonic Society competitors. Live match updates, 340yd DOPE drops, ridge wind conditions, and squad coordination in Bristol, TN.",
   keywords: [
     "Precision rimfire forum",
-    "Subsonic Society comms",
+    "Subsonic Society chat",
     "Rimfire chat network",
     "Firing line intel",
     "DOPE cards",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
     title: "SUBSONIC SOCIETY",
   },
   openGraph: {
-    title: "Tactical Comms Network & Firing Line Intel | Subsonic Society",
+    title: "Private Chat Room & Firing Line Intel | Subsonic Society",
     description:
-      "Encrypted squad comms, verified 340-yd DOPE drops, ridge weather telemetry from The Hideout, and real-time precision rimfire debriefs.",
+      "Encrypted squad chat, verified 340-yd DOPE drops, ridge weather telemetry from The Hideout, and real-time precision rimfire debriefs.",
     url: "/chat",
     siteName: "Subsonic Society",
     images: [
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tactical Comms Network | Subsonic Society",
+    title: "Private Chat Room | Subsonic Society",
     description: "Live marksman communications, verified DOPE cards, and firing line intel.",
     images: ["/assets/subsonic-chat-social-share.jpg?v=4"],
   },
@@ -77,7 +77,7 @@ const chatSchema = {
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Comms Network",
+          "name": "Chat Room",
           "item": "https://subsonicsociety.com/chat"
         }
       ]
@@ -85,7 +85,7 @@ const chatSchema = {
     {
       "@type": "WebPage",
       "@id": "https://subsonicsociety.com/chat#page",
-      "name": "Subsonic Society Comms Network",
+      "name": "Subsonic Society Chat Room",
       "description": "Community messaging and situational intel platform for Subsonic Society competitors."
     }
   ]

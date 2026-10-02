@@ -384,7 +384,7 @@ export default function CompetitorPacketPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono font-bold tracking-wider uppercase bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4" />
-              Official Match Dossier
+              Official Match Packet
             </span>
             <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200">
               Presented by Modacam Custom Rifles
@@ -492,7 +492,7 @@ export default function CompetitorPacketPage() {
         <div className="max-w-7xl mx-auto space-y-2.5">
           <div className="flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">
             <Compass className="w-4 h-4 text-amber-400" />
-            <span>Match Dossier Sections & Jump Navigation</span>
+            <span>Match Packet Sections & Jump Navigation</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1.5 sm:gap-2 text-xs sm:text-sm font-mono">
             <a

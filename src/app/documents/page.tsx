@@ -120,14 +120,14 @@ export default function CompetitionDocumentsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-semibold">
             <FileText className="w-3.5 h-3.5" />
-            <span>SUBSONIC VAULT • OFFICIAL COMPETITION DOSSIERS</span>
+            <span>SUBSONIC VAULT • OFFICIAL COMPETITION PACKETS</span>
           </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
                 COMPETITION <br />
-                <span className="amber-gradient-text">DOCUMENTS & RANGE DOSSIERS.</span>
+                <span className="amber-gradient-text">DOCUMENTS & RANGE PACKETS.</span>
               </h1>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
                 Download verified Course of Fire stage packets, match rules, cold-range liability waivers, and Appalachian elevation intel for upcoming Subsonic Society shoots.
@@ -348,7 +348,7 @@ export default function CompetitionDocumentsPage() {
         {loading ? (
           <div className="py-20 text-center space-y-3">
             <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs font-mono text-slate-400">Loading competition vault dossiers...</p>
+            <p className="text-xs font-mono text-slate-400">Loading competition vault packets...</p>
           </div>
         ) : filteredDocs.length === 0 ? (
           <div className="py-20 text-center space-y-3 ios-glass rounded-3xl border border-white/10 p-8">
@@ -435,7 +435,7 @@ export default function CompetitionDocumentsPage() {
                         className="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all active:scale-98"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        <span>Download Dossier</span>
+                        <span>Download PDF</span>
                       </a>
 
                       <button

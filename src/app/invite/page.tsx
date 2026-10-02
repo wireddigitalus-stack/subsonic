@@ -47,11 +47,10 @@ function StandardInviteContent() {
   const [memberResult, setMemberResult] = useState<any | null>(null);
 
   useEffect(() => {
+    // Single Tier Policy: All members are PRO competitors. Forward seamlessly to /invite/pro
     const queryCode = searchParams.get("code");
-    if (queryCode) {
-      validateCode(queryCode);
-    }
-  }, [searchParams]);
+    router.replace(queryCode ? `/invite/pro?code=${encodeURIComponent(queryCode)}` : "/invite/pro");
+  }, [searchParams, router]);
 
   const validateCode = async (codeToTest: string) => {
     const clean = codeToTest.trim().toUpperCase();
@@ -295,8 +294,8 @@ function StandardInviteContent() {
               CLAIM YOUR INVITATION
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Subsonic Society squad comms and competitor networks are strictly invitation-only. 
-              Log in with your invitation credentials we sent you, or enter your invite code below to activate your marksman dossier.
+              Subsonic Society Chat Room and competitor networks are strictly invitation-only. 
+              Log in with your invitation credentials we sent you, or enter your invite code below to activate your marksman profile.
             </p>
           </div>
 

@@ -317,7 +317,7 @@ export function AdminInviteGeneratorTab() {
           <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
             <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Pro VIP Invites</span>
             <span className="text-2xl font-mono font-black text-amber-400">{proCount}</span>
-            <span className="text-[10px] font-mono text-amber-400/80 block mt-0.5">Competitor Dossiers</span>
+            <span className="text-[10px] font-mono text-amber-400/80 block mt-0.5">Competitor Profiles</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
@@ -363,7 +363,7 @@ export function AdminInviteGeneratorTab() {
                     <Sparkles className="w-4 h-4 text-amber-400" />
                   </div>
                   <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-                    Unlocks full marksman dossier, rifle blueprint, photo compressor & auto-publishes to /shooters/[callsign].
+                    Unlocks full marksman profile, rifle blueprint, photo compressor & auto-publishes to /shooters/[callsign].
                   </p>
                 </button>
 
@@ -636,7 +636,7 @@ export function AdminInviteGeneratorTab() {
                   ? `${baseUrl}/invite/pro?code=${inv.code}`
                   : `${baseUrl}/invite?code=${inv.code}`;
                 const smsText = isPro
-                  ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${inv.code}. Build your marksman dossier here: ${inviteUrl}`
+                  ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${inv.code}. Build your marksman profile here: ${inviteUrl}`
                   : `You're invited to join Subsonic Society! Your access code is: ${inv.code}. Set up your profile here: ${inviteUrl}`;
 
                 const copyIdSms = `table-sms-${inv.id}`;
@@ -755,8 +755,8 @@ export function AdminInviteGeneratorTab() {
           ? `${baseUrl}/invite/pro?code=${cardModalInvite.code}`
           : `${baseUrl}/invite?code=${cardModalInvite.code}`;
         const smsText = isPro
-          ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${cardModalInvite.code}. Build your marksman dossier and enter private comms here: ${inviteUrl}`
-          : `You're invited to join Subsonic Society! Your private access code is: ${cardModalInvite.code}. Complete your profile and enter live squad comms here: ${inviteUrl}`;
+          ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${cardModalInvite.code}. Build your marksman profile and enter the private Chat Room here: ${inviteUrl}`
+          : `You're invited to join Subsonic Society! Your private access code is: ${cardModalInvite.code}. Complete your profile and enter the live Chat Room here: ${inviteUrl}`;
 
         return (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">

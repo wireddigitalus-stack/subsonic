@@ -22,9 +22,12 @@ import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
 import { HeroVideoBanner } from "./HeroVideoBanner";
 import { HeroCrosshairLoader } from "./HeroCrosshairLoader";
+import { HeroInviteCard } from "./HeroInviteCard";
 
 export function HeroSection() {
   const [heroMode, setHeroMode] = useState<"video" | "loading" | "chat">("video");
+  // Retain legacy hero video/animation components in codebase, but keep hidden as requested
+  const showLegacyHeroMedia = false;
 
   return (
     <section data-section="hero" className="relative pt-4 pb-16 overflow-hidden">
@@ -62,40 +65,47 @@ export function HeroSection() {
           </p>
         </div>
 
-        {/* Video Banner Reel -> 3-Sec Crosshair Lock -> Live Animated Tactical Chat Terminal */}
-        <div className="w-full transition-all duration-500">
-          {heroMode === "video" && (
-            <div className="animate-fadeIn">
-              <HeroVideoBanner onComplete={() => setHeroMode("loading")} />
-            </div>
-          )}
-
-          {heroMode === "loading" && (
-            <div className="animate-fadeIn">
-              <HeroCrosshairLoader onComplete={() => setHeroMode("chat")} />
-            </div>
-          )}
-
-          {heroMode === "chat" && (
-            <div className="animate-fadeIn">
-              <HeroChatTerminal
-                isActive={heroMode === "chat"}
-                onReplayVideo={() => setHeroMode("video")}
-                onReplayLock={() => setHeroMode("loading")}
-              />
-            </div>
-          )}
+        {/* Primary Hero: High-Impact Pro Invite Redemption Card */}
+        <div className="w-full">
+          <HeroInviteCard />
         </div>
 
-        {/* Hero Creed & Mission Statement (Positioned under video & chat mockup) */}
+        {/* Legacy Video Banner / Loader / Chat Terminal (Preserved in code, hidden from view) */}
+        {showLegacyHeroMedia && (
+          <div className="w-full transition-all duration-500">
+            {heroMode === "video" && (
+              <div className="animate-fadeIn">
+                <HeroVideoBanner onComplete={() => setHeroMode("loading")} />
+              </div>
+            )}
+
+            {heroMode === "loading" && (
+              <div className="animate-fadeIn">
+                <HeroCrosshairLoader onComplete={() => setHeroMode("chat")} />
+              </div>
+            )}
+
+            {heroMode === "chat" && (
+              <div className="animate-fadeIn">
+                <HeroChatTerminal
+                  isActive={heroMode === "chat"}
+                  onReplayVideo={() => setHeroMode("video")}
+                  onReplayLock={() => setHeroMode("loading")}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Hero Creed & Mission Statement */}
         <p className="text-sm sm:text-lg text-slate-300 font-normal leading-relaxed max-w-3xl">
           A grassroots precision-rimfire community built around real-world ballistic knowledge, extreme 300-yard competition, and figuring out what <strong className="text-white">actually works</strong>.
         </p>
 
-        {/* 3 PRIMARY BUTTONS: MATCHES • SUBSONIC DNA • CLAIM INVITE */}
+        {/* 3 PRIMARY BUTTONS: MATCHES • COMPETITOR PACKET • REDEEM PRO INVITE */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
 
-          {/* Button 2: MATCHES */}
+          {/* Button 1: MATCHES */}
           <Link
             href="/matches"
             data-telemetry="hero_primary_btn_matches"
@@ -110,7 +120,7 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Button 3: COMPETITOR PACKET */}
+          {/* Button 2: COMPETITOR PACKET */}
           <Link
             href="/competitor-packet"
             data-telemetry="hero_primary_btn_packet"
@@ -125,9 +135,9 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Button 4: CLAIM INVITE (INVITATION ONLY) */}
+          {/* Button 3: REDEEM PRO INVITE (INVITATION ONLY) */}
           <Link
-            href="/invite"
+            href="/invite/pro"
             data-telemetry="hero_primary_btn_invite"
             className="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs sm:text-sm flex items-center justify-between shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
           >
@@ -135,7 +145,7 @@ export function HeroSection() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
                 <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
               </div>
-              <span className="truncate">CLAIM INVITE</span>
+              <span className="truncate">REDEEM PRO INVITE</span>
             </div>
             <ChevronRight className="w-4 h-4 text-black shrink-0" />
           </Link>
@@ -153,7 +163,7 @@ export function HeroSection() {
               </div>
               <div className="min-w-0 text-left">
                 <div className="text-[11px] font-black text-white group-hover:text-emerald-400 flex items-center gap-1.5">
-                  <span>Competitor Comms</span>
+                  <span>Chat Room</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 </div>
                 <div className="text-[10px] font-mono text-slate-400 truncate">

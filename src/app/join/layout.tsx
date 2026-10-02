@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Membership By Invitation Only | Subsonic Society",
   description:
-    "Subsonic Society membership and private squad comms are strictly by invitation only. Log in with the invitation credentials sent to you, or enter your invite code to activate your profile.",
+    "Subsonic Society membership and private Chat Room are strictly by invitation only. Log in with the invitation credentials sent to you, or enter your invite code to activate your profile.",
   keywords: [
     "Subsonic Society Invitation",
     "Invitation Only Membership",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Membership By Invitation Only | Subsonic Society",
     description:
-      "Membership and private comms are by invitation only. Log in with your credentials or claim your invitation code.",
+      "Membership and private Chat Room access are by invitation only. Log in with your credentials or claim your invitation code.",
     url: "https://subsonicsociety.com/join",
     siteName: "Subsonic Society",
     images: [

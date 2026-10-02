@@ -167,9 +167,9 @@ export function ChatMessageList({
               type="button"
               onClick={() => onSelectShooter(activeDirectPartner)}
               className="px-2 sm:px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white font-mono text-[10px] sm:text-xs flex items-center gap-1 border border-white/10 shrink-0 transition-colors"
-              title="View Shooter Dossier"
+              title="View Shooter Profile"
             >
-              <span>Dossier</span>
+              <span>Profile</span>
               <ChevronRight className="w-3 h-3" />
             </button>
           )}
@@ -301,11 +301,11 @@ export function ChatMessageList({
                 {/* Message Header: Author, Badge, Timestamp */}
                 <div className="flex items-center justify-between gap-1.5">
                   <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                    {/* Avatar — clickable to open dossier & start DM */}
+                    {/* Avatar — clickable to open profile & start DM */}
                     <button
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
-                      title={`View ${msg.author.name} Dossier & Direct Comms`}
+                      title={`View ${msg.author.name} Profile & Direct Chat`}
                       className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 transition-transform active:scale-95 hover:border-amber-400 cursor-pointer ${
                         isRO
                           ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
@@ -333,7 +333,7 @@ export function ChatMessageList({
                         <button
                           type="button"
                           onClick={() => handleAuthorClick(msg.author)}
-                          title={`View ${msg.author.name} Dossier & Direct Comms`}
+                          title={`View ${msg.author.name} Profile & Direct Chat`}
                           className={`text-xs md:text-sm font-bold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
                             isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
@@ -346,7 +346,7 @@ export function ChatMessageList({
                           <button
                             type="button"
                             onClick={() => handleAuthorClick(msg.author)}
-                            title={`View ${msg.author.callsign} Dossier`}
+                            title={`View ${msg.author.callsign} Profile`}
                             className="hidden md:inline text-xs font-mono text-amber-400 font-bold hover:text-amber-300"
                           >
                             [{msg.author.callsign}]

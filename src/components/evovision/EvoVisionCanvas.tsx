@@ -2188,7 +2188,7 @@ export function EvoVisionCanvas({
           )}
 
           <div className="text-[8px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-1 mt-0.5 font-bold">
-            <span className="tracking-wider">CLICK TO INSPECT DOSSIER</span>
+            <span className="tracking-wider">CLICK TO INSPECT PROFILE</span>
             <span className="text-cyan-400 text-xs">➔</span>
           </div>
         </div>

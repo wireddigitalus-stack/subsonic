@@ -273,7 +273,7 @@ export function Navbar() {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
-                        <span>Competitor Comms</span>
+                        <span>Competitor Chat Room</span>
                         <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
@@ -481,7 +481,7 @@ export function Navbar() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all items-center gap-1.5 shadow-tactical-glow"
-                    title="Open Live Comms Room in New Tab"
+                    title="Open Live Chat Room in New Tab"
                   >
                     <MessageSquare className="w-3.5 h-3.5 fill-black" />
                     <span>Enter The Chat</span>
@@ -490,7 +490,7 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={handleLockChat}
-                  title="Lock Comms & Sign Out"
+                  title="Lock Chat & Sign Out"
                   className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-amber-400 hover:bg-white/10 transition-colors"
                 >
                   <Lock className="w-3.5 h-3.5" />
@@ -553,7 +553,7 @@ export function Navbar() {
               className="w-full py-3 rounded-xl text-xs font-black bg-emerald-500 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
             >
               <MessageSquare className="w-4 h-4 fill-black" />
-              <span>Enter Competitor Comms (Live)</span>
+              <span>Enter Chat Room (Live)</span>
             </Link>
 
             {/* Group 1: The Society & Facility */}
@@ -575,7 +575,7 @@ export function Navbar() {
                     className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10"
                   >
                     <MessageSquare className="w-4 h-4 text-emerald-400" />
-                    <span>Competitor Comms (Live)</span>
+                    <span>Chat Room (Live)</span>
                   </Link>
                   <Link
                     href="/the-hideout"

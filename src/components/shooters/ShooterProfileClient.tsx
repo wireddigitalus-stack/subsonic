@@ -284,13 +284,13 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
           <div className="space-y-2">
             <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
-              DOSSIER NOT LOCATED
+              PROFILE NOT LOCATED
             </span>
             <h1 className="text-2xl font-black text-white uppercase tracking-tight">
               Marksman Profile Pending
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed">
-              No published shooter dossier matches callsign or ID <code className="text-amber-400 font-mono font-bold">&ldquo;{slug}&rdquo;</code>. If you recently generated this profile, please ensure your submission was saved.
+              No published shooter profile matches callsign or ID <code className="text-amber-400 font-mono font-bold">&ldquo;{slug}&rdquo;</code>. If you recently generated this profile, please ensure your submission was saved.
             </p>
           </div>
 
@@ -424,7 +424,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               className="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-tactical-glow"
             >
               <MessageSquare className="w-3.5 h-3.5 fill-black" />
-              <span>Squad Comms</span>
+              <span>Chat Room</span>
             </Link>
           </div>
         </div>
@@ -916,18 +916,18 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 ))
               ) : (
                 <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-400">
-                  Technical interview dossier pending range verification.
+                  Technical interview profile pending range verification.
                 </div>
               )}
             </div>
 
             <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
-              <span>MEMBER DOSSIER: {shooter.callsign}</span>
+              <span>MEMBER PROFILE: {shooter.callsign}</span>
               <Link
                 href="/chat"
                 className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-bold"
               >
-                <span>Connect in Squad Comms</span>
+                <span>Connect in Chat Room</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>

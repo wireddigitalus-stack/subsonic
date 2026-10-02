@@ -521,7 +521,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
             className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5 shrink-0"
           >
             <FileText className="w-3 h-3 text-amber-400" />
-            <span>18-Stage COF Dossier</span>
+            <span>18-Stage COF Packet</span>
           </Link>
         </div>
       </div>

@@ -44,11 +44,7 @@ export default function JoinSocietyGatePage() {
       if (!res.ok || !data.valid) {
         setErrorMessage(data.error || "Invalid or expired invitation code. Please check your credentials.");
       } else {
-        if (data.tier === "PRO") {
-          router.push(`/invite/pro?code=${encodeURIComponent(clean)}`);
-        } else {
-          router.push(`/invite?code=${encodeURIComponent(clean)}`);
-        }
+        router.push(`/invite/pro?code=${encodeURIComponent(clean)}`);
       }
     } catch (err: any) {
       setErrorMessage("Network error validating code. Please try again.");
@@ -72,7 +68,7 @@ export default function JoinSocietyGatePage() {
         </h1>
 
         <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Log in with the invitation credentials sent to you, or enter your serialized invite code below to activate your marksman dossier and private squad comms.
+          Log in with the invitation credentials sent to you, or enter your serialized invite code below to activate your marksman profile and private Chat Room access.
         </p>
       </section>
 
@@ -84,10 +80,10 @@ export default function JoinSocietyGatePage() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5" />
-                <span>NEW INVITATION PASS</span>
+                <span>PRO INVITATION PASS</span>
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                ACTIVATION
+                100% PRO TIER
               </span>
             </div>
 
@@ -130,13 +126,13 @@ export default function JoinSocietyGatePage() {
               <button
                 type="submit"
                 disabled={validating}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {validating ? (
                   <span>VALIDATING INVITATION...</span>
                 ) : (
                   <>
-                    <span>CLAIM &amp; ACTIVATE PROFILE</span>
+                    <span>CLAIM &amp; ACTIVATE PRO PROFILE</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -145,14 +141,11 @@ export default function JoinSocietyGatePage() {
           </div>
 
           <div className="pt-4 border-t border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
-            <span>Competition Pro Shooter?</span>
-            <Link
-              href="/invite/pro"
-              className="text-amber-400 font-bold hover:underline flex items-center gap-1"
-            >
+            <span>Single Tier Membership:</span>
+            <span className="text-amber-400 font-bold flex items-center gap-1 font-mono text-[10px]">
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>Pro VIP Portal →</span>
-            </Link>
+              <span>100% PRO COMPETITOR</span>
+            </span>
           </div>
         </div>
 
@@ -174,7 +167,7 @@ export default function JoinSocietyGatePage() {
                 Log In With Credentials
               </h2>
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Already claimed your tactical callsign and 6-digit access PIN? Sign directly into the Subsonic Private Comms Terminal.
+                Already claimed your tactical callsign and 6-digit access PIN? Sign directly into the Subsonic Chat Room.
               </p>
             </div>
 
@@ -182,7 +175,7 @@ export default function JoinSocietyGatePage() {
               <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-mono text-emerald-300 font-bold">
                   <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />
-                  <span>SQUAD NET SECURE COMMS</span>
+                  <span>SQUAD NET SECURE CHAT ROOM</span>
                 </div>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
                   Real-time match chatter, live Doppler DOPE telemetry, stage notes, and verified competitor-to-competitor dispatches.
@@ -194,7 +187,7 @@ export default function JoinSocietyGatePage() {
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:brightness-110 active:scale-95 transition-all"
               >
                 <MessageSquare className="w-4 h-4 fill-black" />
-                <span>ENTER PRIVATE COMMS LOGIN</span>
+                <span>ENTER CHAT ROOM LOGIN</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

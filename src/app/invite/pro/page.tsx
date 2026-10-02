@@ -259,7 +259,7 @@ function ProInviteContent() {
     }
 
     if (!agreeTerms) {
-      setFormError("You must read and agree to the Terms of Use and platform conduct rules to publish your Pro Dossier.");
+      setFormError("You must read and agree to the Terms of Use and platform conduct rules to publish your Pro Profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -425,7 +425,7 @@ function ProInviteContent() {
 
           <div className="space-y-2">
             <span className="text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              PRO DOSSIER GENERATED & PUBLISHED
+              PRO PROFILE GENERATED & PUBLISHED
             </span>
             <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
               Welcome to The Society, <br />
@@ -433,7 +433,7 @@ function ProInviteContent() {
             </h1>
             <p className="text-sm text-slate-300 max-w-xl mx-auto">
               Your official Pro Competitor Profile is now live with full AI-SEO indexing. 
-              Your private chat key is active for squad comms.
+              Your private chat key is active for the Chat Room.
             </p>
           </div>
 
@@ -472,7 +472,7 @@ function ProInviteContent() {
               href="/chat"
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-500 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
             >
-              <span>Enter Private Squad Comms (Live)</span>
+              <span>Enter Chat Room (Live)</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
@@ -506,7 +506,7 @@ function ProInviteContent() {
             </h1>
             <p className="text-xs text-slate-300 leading-relaxed">
               This onboarding area is reserved for competition shooters and sponsored pros. 
-              Enter your invitation code to access the dossier builder.
+              Enter your invitation code to access the profile builder.
             </p>
           </div>
 
@@ -577,7 +577,7 @@ function ProInviteContent() {
 
         <h1 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
           PRO COMPETITOR <br />
-          <span className="amber-gradient-text">DOSSIER & PROFILE BUILDER.</span>
+          <span className="amber-gradient-text">PROFILE BUILDER.</span>
         </h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
           Fill out your marksman questionnaire and gear blueprint. Our engine automatically compresses 
@@ -602,7 +602,7 @@ function ProInviteContent() {
             </div>
             <div>
               <span className="text-[10px] font-mono uppercase text-amber-400 font-bold">Section 1</span>
-              <h2 className="text-lg font-black text-white">Shooter Identity & Squad Comms Security</h2>
+              <h2 className="text-lg font-black text-white">Shooter Identity & Chat Room Security</h2>
             </div>
           </div>
 
@@ -1130,7 +1130,7 @@ function ProInviteContent() {
         <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-black to-zinc-900 border border-amber-500/40 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="space-y-1 text-center sm:text-left">
             <div className="text-sm font-black text-white flex items-center gap-2 justify-center sm:justify-start">
-              <span>Ready to Publish Your Pro Dossier?</span>
+              <span>Ready to Publish Your Pro Profile?</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Instant Live</span>
             </div>
             <p className="text-xs text-slate-400">
@@ -1141,17 +1141,17 @@ function ProInviteContent() {
           <button
             type="submit"
             disabled={isSubmitting || !agreeTerms}
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider shadow-tactical-glow flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 disabled:opacity-50"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider shadow-tactical-glow flex items-center justify-center gap-2 shrink-0 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {isSubmitting ? (
               <>
                 <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                <span>Publishing Profile & Activating Comms...</span>
+                <span>Publishing Profile & Activating Chat Room...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4 fill-black" />
-                <span>Publish Pro Dossier & Enter Comms</span>
+                <span>Publish Pro Profile & Enter Chat Room</span>
                 <ChevronRight className="w-4 h-4" />
               </>
             )}

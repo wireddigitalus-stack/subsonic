@@ -600,7 +600,7 @@ function ShootersContent() {
             <div className="p-5 rounded-2xl ios-glass border border-amber-500/20 bg-amber-500/5 space-y-3 mt-4 lg:mt-6">
               <span className="text-xs font-mono text-amber-400 font-bold uppercase block flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Automated Athlete Dossier</span>
+                <span>Automated Athlete Profile</span>
               </span>
               <p className="text-xs text-slate-300 leading-relaxed">
                 Are you shooting in the 2026 Invitational or Appalachian circuit? Complete the 2-minute questionnaire to auto-generate your competitor card.

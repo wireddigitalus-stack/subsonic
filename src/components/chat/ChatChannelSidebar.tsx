@@ -111,7 +111,7 @@ export function ChatChannelSidebar({
               <div className="flex items-center justify-between px-1 mb-2.5 shrink-0 pt-2 border-t border-white/10">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
                   <Lock className="w-3 h-3 text-emerald-400" />
-                  Direct Comms (1-on-1)
+                  Direct Chat (1-on-1)
                 </span>
                 <span className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
                   Closed Net
@@ -198,7 +198,7 @@ export function ChatChannelSidebar({
                               onOpenDossier(partner);
                             }}
                             className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-300 transition-colors"
-                            title={`View ${partner.callsign} Dossier`}
+                            title={`View ${partner.callsign} Profile`}
                           >
                             <Info className="w-3.5 h-3.5" />
                           </button>

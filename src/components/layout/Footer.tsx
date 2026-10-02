@@ -83,7 +83,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/chat" className="hover:text-emerald-400 transition-colors flex items-center gap-1 font-semibold text-emerald-400/90">
-                  <span>Competitor Comms (Live)</span>
+                  <span>Chat Room (Live)</span>
                 </Link>
               </li>
               <li>
@@ -153,10 +153,10 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Dossiers & Comms */}
+          {/* Column 4: Profiles & Chat Room */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
-              Competitor Dossiers & Comms
+              Competitor Profiles &amp; Chat Room
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -178,7 +178,7 @@ export function Footer() {
               <li>
                 <Link href="/chat" className="hover:text-emerald-400 transition-colors flex items-center gap-1">
                   <Shield className="w-3 h-3 text-emerald-400" />
-                  <span>Competitor Comms</span>
+                  <span>Chat Room</span>
                 </Link>
               </li>
             </ul>

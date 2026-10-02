@@ -47,19 +47,19 @@ export function ShooterDossierModal({
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
             <span className="font-mono text-[11px] font-bold text-amber-400 tracking-wider uppercase">
               {isRO 
-                ? "AUTONOMOUS AI RANGE OFFICER DOSSIER" 
+                ? "AUTONOMOUS AI RANGE OFFICER PROFILE" 
                 : isMasterOwner 
-                ? "MASTER ADMIN DOSSIER" 
+                ? "MASTER ADMIN PROFILE" 
                 : isOwnerAdmin 
-                ? "OWNER ADMIN DOSSIER" 
-                : "COMPETITOR DOSSIER"}
+                ? "OWNER ADMIN PROFILE" 
+                : "COMPETITOR PROFILE"}
             </span>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
-            title="Close dossier"
+            title="Close profile"
           >
             <X className="w-4 h-4" />
           </button>
@@ -180,12 +180,12 @@ export function ShooterDossierModal({
               <span>Autonomous AI Match Assistant · 24/7 Intel</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-normal">
-              RO BOT is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 on private encrypted comms to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
+              RO BOT is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 in the private Chat Room to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
             </p>
           </div>
         )}
 
-        {/* Action Button: Start Direct Comms */}
+        {/* Action Button: Start Direct Chat */}
         <div className="pt-2">
           <button
             type="button"
@@ -193,7 +193,7 @@ export function ShooterDossierModal({
             className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all active:scale-[0.98]"
           >
             <Lock className="w-4 h-4 text-black" />
-            <span>Open Direct Comms with {shooter.callsign}</span>
+            <span>Open Direct Chat with {shooter.callsign}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </button>
 

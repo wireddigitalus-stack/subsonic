@@ -44,9 +44,9 @@ export const SEED_INVITES: SocietyInvite[] = [
   {
     id: "seed-mbr-open",
     code: "SS-MBR-HIDE2026",
-    tier: "MEMBER",
+    tier: "PRO",
     recipientName: "Society Member Invite",
-    note: "General access code for private squad comms & member card",
+    note: "General access code for private Chat Room & member card",
     createdBy: "ALLEN",
     createdAt: "2026-09-01T12:00:00Z",
     maxUses: 250,

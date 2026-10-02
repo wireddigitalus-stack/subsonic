@@ -151,7 +151,7 @@ export function FullHomePage() {
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>OFFICIAL MATCH DOSSIER • THE HIDEOUT BRISTOL</span>
+                <span>OFFICIAL MATCH BRIEFING • THE HIDEOUT BRISTOL</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-white font-heading">
                 2026 INVITATIONAL COMPETITOR PACKET
@@ -266,7 +266,7 @@ export function FullHomePage() {
         </div>
       </section>
 
-      {/* 5. Competitor Dossier & Documents Vault Hub */}
+      {/* 5. Competitor Profile & Documents Vault Hub */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Card 1: 2-Minute Shooter Questionnaire & Auto-Card Generator */}
@@ -278,7 +278,7 @@ export function FullHomePage() {
                   <span>2-MINUTE COMPETITOR ONBOARDING</span>
                 </div>
                 <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                  AUTO-DOSSIER
+                  AUTO-PROFILE
                 </span>
               </div>
 
@@ -287,7 +287,7 @@ export function FullHomePage() {
                   AUTO-GENERATE YOUR SHOOTER CARD
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Are you shooting in the 2026 Invitational or Appalachian circuit? Skip the manual forms. Enter your rig specs, 1-tap accolade badges (Team USA, National Champion), sponsor tags, and photos to generate your verified public dossier.
+                  Are you shooting in the 2026 Invitational or Appalachian circuit? Skip the manual forms. Enter your rig specs, 1-tap accolade badges (Team USA, National Champion), sponsor tags, and photos to generate your verified public profile.
                 </p>
               </div>
 
@@ -344,7 +344,7 @@ export function FullHomePage() {
                   COMPETITION DOCUMENTS VAULT
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  Download verified Course of Fire dossiers, match rules, cold range liability waivers, and Appalachian elevation intel out to 465 yards. One-click access for all squadded competitors.
+                  Download verified Course of Fire stage packets, match rules, cold range liability waivers, and Appalachian elevation intel out to 465 yards. One-click access for all squadded competitors.
                 </p>
               </div>
 
@@ -501,18 +501,18 @@ export function FullHomePage() {
               MEMBERSHIP BY INVITATION ONLY
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Log in with your invitation credentials we sent you, or enter your invite code to activate your digital marksman dossier and squad comms.
+              Log in with your invitation credentials we sent you, or enter your invite code to activate your digital marksman profile and Chat Room access.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link
-              href="/invite"
+              href="/invite/pro"
               data-telemetry="home_bottom_join_cta"
               className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-sm flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
             >
               <Key className="w-4 h-4 fill-black" />
-              <span>Claim Your Invite Code</span>
+              <span>Redeem Your Pro Invite</span>
             </Link>
 
             <Link

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
     description:
-      "Exclusive invitation portal for precision rimfire competitors. Activate your VIP profile, rifle blueprint, and shooter dossier.",
+      "Exclusive invitation portal for precision rimfire competitors. Activate your VIP profile, rifle blueprint, and shooter profile.",
     url: "/invite/pro",
     siteName: "Subsonic Society",
     images: [
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
-    description: "Activate your VIP marksman dossier, rifle blueprint, and squad comms.",
+    description: "Activate your VIP marksman profile, rifle blueprint, and Chat Room access.",
     images: ["/assets/subsonic-invite-social-share.jpg?v=5"],
   },
 };

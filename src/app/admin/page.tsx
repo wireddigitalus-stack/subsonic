@@ -2579,7 +2579,7 @@ export default function AdminDashboardPage() {
                   </h3>
                 </div>
                 <p className="text-xs text-slate-300">
-                  Manage Course of Fire (COF) packets, match bylaws, cold range liability waivers, and elevation dossiers.
+                  Manage Course of Fire (COF) packets, match bylaws, cold range liability waivers, and elevation packets.
                 </p>
               </div>
 

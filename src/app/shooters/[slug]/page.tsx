@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
       title: `${formattedName} — Pro Marksman Profile | Subsonic Society`,
-      description: `Official Subsonic Society Pro Competitor Profile dossier for ${formattedName}. Precision rimfire optics, action specs, and match accolades.`,
+      description: `Official Subsonic Society Pro Competitor Profile for ${formattedName}. Precision rimfire optics, action specs, and match accolades.`,
       openGraph: {
         title: `${formattedName} — Pro Marksman Profile | Subsonic Society`,
-        description: `Official Subsonic Society Pro Competitor Profile dossier for ${formattedName}. Precision rimfire optics, action specs, and match accolades.`,
+        description: `Official Subsonic Society Pro Competitor Profile for ${formattedName}. Precision rimfire optics, action specs, and match accolades.`,
         images: [
           {
             url: "https://subsonic-omega.vercel.app/assets/subsonic-invite-social-share.jpg?v=5",

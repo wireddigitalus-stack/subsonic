@@ -24,7 +24,7 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-purple-400" />
                   <h3 className="text-xl font-black text-white">
-                    Automated Competitor Profiles &amp; Rig Dossiers ({shooterProfiles.length})
+                    Automated Competitor Profiles &amp; Rig Specs ({shooterProfiles.length})
                   </h3>
                 </div>
                 <p className="text-xs text-slate-300">

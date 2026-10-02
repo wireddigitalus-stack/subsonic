@@ -1436,7 +1436,7 @@ export default function ChatPage() {
                 <ChevronLeft className="w-4 h-4 text-amber-400 -mr-0.5" />
                 <span className="font-extrabold text-[11px] text-slate-200">HOME</span>
                 <span className="text-white/30 text-[10px]">/</span>
-                <span className="text-amber-400 font-extrabold text-[11px]">COMMS</span>
+                <span className="text-amber-400 font-extrabold text-[11px]">CHAT ROOM</span>
               </Link>
 
               {/* Quick Link to EVOS Holographic Net */}
@@ -1553,7 +1553,7 @@ export default function ChatPage() {
                   PORTAL
                 </span>
                 <span className="text-white/20">/</span>
-                <span className="text-amber-400 font-bold">COMMS</span>
+                <span className="text-amber-400 font-bold">CHAT ROOM</span>
               </Link>
 
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -1685,7 +1685,7 @@ export default function ChatPage() {
                 <Link
                   href="/admin"
                   target="_blank"
-                  title="Open Staff Admin & Comms Moderation Dashboard"
+                  title="Open Staff Admin & Chat Moderation Dashboard"
                   className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
                 >
                   <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
@@ -1925,7 +1925,7 @@ export default function ChatPage() {
             <div className="flex items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-xl">
               <div className="px-3 py-1 rounded-lg font-mono text-xs font-bold bg-amber-500 text-black shadow-tactical-glow flex items-center gap-1.5">
                 <Lock className="w-3 h-3" />
-                <span>OFFICIAL INVITATIONAL COMMS</span>
+                <span>OFFICIAL INVITATIONAL CHAT ROOM</span>
               </div>
             </div>
 
@@ -1957,7 +1957,7 @@ export default function ChatPage() {
               </button>
 
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hidden sm:inline">
-                {activeNetTab === "PRO" ? "VERIFIED SQUAD COMMS" : "OPEN SOCIETY"}
+                {activeNetTab === "PRO" ? "VERIFIED SQUAD CHAT" : "OPEN SOCIETY"}
               </span>
             </div>
           </div>

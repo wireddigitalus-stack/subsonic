@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Claim Invitation & Profile Setup | Subsonic Society",
   description:
-    "Membership by invitation only. Enter your serialized invitation key to claim your tactical callsign, set your 6-digit access PIN, and activate your verified marksman dossier and squad comms.",
+    "Membership by invitation only. Enter your serialized invitation key to claim your tactical callsign, set your 6-digit access PIN, and activate your verified marksman profile and Chat Room access.",
   keywords: [
     "Subsonic Society Invitation",
     "Invitation Code Redeem",
     "Marksman Profile Setup",
     "Precision Rimfire Credentials",
-    "Private Squad Net Comms",
+    "Private Squad Net Chat Room",
   ],
   alternates: {
     canonical: "/invite",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Claim Your Invitation & Activate Marksman Profile | Subsonic Society",
     description:
-      "Membership by invitation only. Redeem your invitation key to unlock verified shooter credentials, private squad comms, and match registration access.",
+      "Membership by invitation only. Redeem your invitation key to unlock verified shooter credentials, private Chat Room, and match registration access.",
     url: "/invite",
     siteName: "Subsonic Society",
     images: [

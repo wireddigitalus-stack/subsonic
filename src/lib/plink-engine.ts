@@ -151,12 +151,12 @@ const RO_IDENTITY_RESPONSES = [
   (c: string) =>
     `I'm RO BOT — your official autonomous AI Range Officer for the Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
   (c: string) =>
-    `I am the autonomous AI Range Officer (RO BOT) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full dossier at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
+    `I am the autonomous AI Range Officer (RO BOT) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full match packet at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
 ];
 
 const RO_REAL_RESPONSES = [
   (c: string) =>
-    `I'm your autonomous AI Range Officer, ${c} (RO BOT) — running official 24/7 Subsonic Society match intelligence. 🤖 I'm always on duty across The Hideout network to keep comms safe, answer match questions, and guide competitors visiting Bristol.`,
+    `I'm your autonomous AI Range Officer, ${c} (RO BOT) — running official 24/7 Subsonic Society match intelligence. 🤖 I'm always on duty across The Hideout network to keep chat safe, answer match questions, and guide competitors visiting Bristol.`,
 ];
 
 const RO_HOW_RESPONSES = [
@@ -177,7 +177,7 @@ const RO_GENERAL_RESPONSES = [
 
 const SOFT_LANGUAGE_WARNINGS = [
   (c: string) => `Easy on the language, ${c} — Range Officer reminder to keep transmissions range-professional. 🎯`,
-  (c: string) => `Heads up ${c} — let's keep comms clean. Competitors, sponsors, and families monitor this net.`,
+  (c: string) => `Heads up ${c} — let's keep chat clean. Competitors, sponsors, and families monitor this net.`,
 ];
 
 const FORMAL_LANGUAGE_WARNINGS = [
@@ -185,7 +185,7 @@ const FORMAL_LANGUAGE_WARNINGS = [
 ];
 
 const SOFT_SALE_WARNINGS = [
-  (c: string) => `[${c}] — Gear and firearm transactions aren't permitted on Invitational comms. Contact match staff directly for official swap tables.`,
+  (c: string) => `[${c}] — Gear and firearm transactions aren't permitted on Invitational chat. Contact match staff directly for official swap tables.`,
 ];
 
 const FORMAL_SALE_WARNINGS = [
@@ -197,7 +197,7 @@ const HARASSMENT_WARNINGS = [
 ];
 
 const UNSPORTSMANLIKE_WARNINGS = [
-  (c: string) => `⚠️ [${c}] — Range Officer notice: Disputing scores or attacking officials on open comms violates match rules. Official score protests must be submitted directly to the Match Director.`,
+  (c: string) => `⚠️ [${c}] — Range Officer notice: Disputing scores or attacking officials in chat violates match rules. Official score protests must be submitted directly to the Match Director.`,
 ];
 
 const SPAM_WARNINGS = [
@@ -480,7 +480,7 @@ export function analyzeMsgForPlink(
 
   if (UNSPORTSMANLIKE_PATTERNS.some((p) => p.test(content))) {
     const warningText = isDirectChat
-      ? `⚠️ [RO DIRECT NET MONITOR] [${callsign}] — Range Officer reminder: Maintain professional sportsmanship across all Subsonic Society comms.`
+      ? `⚠️ [RO DIRECT NET MONITOR] [${callsign}] — Range Officer reminder: Maintain professional sportsmanship across all Subsonic Society chat channels.`
       : pick(UNSPORTSMANLIKE_WARNINGS)(callsign);
     return { content: warningText, warningTier: 2, violationType: "UNSPORTSMANLIKE", shouldEscalate: true, targetCallsign: callsign };
   }
