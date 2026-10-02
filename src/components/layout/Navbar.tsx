@@ -212,12 +212,12 @@ export function Navbar() {
             </div>
             
             {/* Wordmark */}
-            <div className="relative h-[38px] w-[180px] sm:h-[46px] sm:w-[220px] flex items-center shrink-0">
+            <div className="relative h-[26px] w-[125px] sm:h-[46px] sm:w-[220px] flex items-center shrink-0">
               <Image
                 src="/assets/subsonic-banner-trimmed.png"
                 alt="Subsonic Society"
                 fill
-                sizes="(max-width: 640px) 180px, 220px"
+                sizes="(max-width: 640px) 125px, 220px"
                 className="object-contain object-left group-hover:brightness-110 transition-all duration-200"
                 priority
               />
