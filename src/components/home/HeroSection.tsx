@@ -54,18 +54,18 @@ export function HeroSection() {
           <p className="text-xs sm:text-sm md:text-base font-mono font-bold tracking-[0.25em] text-amber-400 uppercase text-center sm:text-left w-full">
             PRECISION IS IN OUR DNA.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-y-1.5 sm:gap-x-2.5 sm:gap-y-0 text-[11px] sm:text-xs font-mono tracking-wider text-slate-400 pt-1 text-center w-full">
-            <span className="inline-flex items-center gap-2 text-amber-400/90 font-semibold">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 sm:gap-x-2.5 gap-y-1 text-[10px] sm:text-xs font-mono tracking-wider text-slate-400 pt-0.5 text-center">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 text-amber-400/90 font-semibold">
               COMPETITION
-              <span className="hidden sm:inline text-slate-600 select-none">•</span>
+              <span className="text-slate-600 select-none">•</span>
             </span>
-            <span className="inline-flex items-center gap-2 text-blue-400/90 font-semibold">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 text-blue-400/90 font-semibold">
               TESTING
-              <span className="hidden sm:inline text-slate-600 select-none">•</span>
+              <span className="text-slate-600 select-none">•</span>
             </span>
-            <span className="inline-flex items-center gap-2 text-emerald-400/90 font-semibold">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 text-emerald-400/90 font-semibold">
               EDUCATION
-              <span className="hidden sm:inline text-slate-600 select-none">•</span>
+              <span className="text-slate-600 select-none">•</span>
             </span>
             <span className="text-purple-400/90 font-semibold">
               COMMUNITY
