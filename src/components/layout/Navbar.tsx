@@ -480,7 +480,7 @@ export function Navbar() {
                     href="/chat"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all items-center gap-1.5 shadow-tactical-glow"
+                    className="hidden lg:flex px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 text-black hover:brightness-110 active:scale-95 transition-all items-center gap-1.5 shadow-tactical-glow"
                     title="Open Live Chat Room in New Tab"
                   >
                     <MessageSquare className="w-3.5 h-3.5 fill-black" />
@@ -546,16 +546,6 @@ export function Navbar() {
             className="lg:hidden mt-2 ios-glass rounded-2xl p-4 sm:p-5 border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.85)] space-y-4 animate-fadeIn max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain ios-scrollbar touch-pan-y"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {/* Quick Mobile Action: Private Chat Room */}
-            <Link
-              href="/chat"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full py-3 rounded-xl text-xs font-black bg-emerald-500 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
-            >
-              <MessageSquare className="w-4 h-4 fill-black" />
-              <span>Enter Chat Room (Live)</span>
-            </Link>
-
             {/* Group 1: The Society & Facility */}
                 <div className="space-y-1">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
