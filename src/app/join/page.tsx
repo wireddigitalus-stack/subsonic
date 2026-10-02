@@ -59,7 +59,7 @@ export default function JoinSocietyGatePage() {
       <section className="relative pt-6 pb-4 text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
           <Lock className="w-3.5 h-3.5 text-amber-400" />
-          <span>ACCESS PROTOCOL • INVITATION ONLY</span>
+          <span>ACCESS BY • INVITATION ONLY</span>
         </div>
 
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">

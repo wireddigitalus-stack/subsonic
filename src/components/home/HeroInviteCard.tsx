@@ -68,16 +68,11 @@ export function HeroInviteCard() {
         <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-6">
-          {/* 1. Header Badges */}
+          {/* 1. Header Badge */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="px-3.5 py-1.5 rounded-full bg-amber-500 text-black text-xs font-mono font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 fill-black" />
-              <span>ACCESS PROTOCOL • INVITATION ONLY</span>
-            </span>
-
-            <span className="px-3 py-1.5 rounded-full bg-black/60 border border-emerald-500/40 text-emerald-400 text-xs font-mono font-bold tracking-wider flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>SINGLE TIER • 100% PRO COMPETITOR</span>
+              <span>ACCESS BY • INVITATION ONLY</span>
             </span>
           </div>
 
