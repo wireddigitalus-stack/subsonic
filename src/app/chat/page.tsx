@@ -1106,48 +1106,8 @@ export default function ChatPage() {
         }
         setTimeout(() => scrollContainerToBottom(true), 50);
       }, delay);
-    } else if (currentChannel.startsWith("dm_")) {
-      const partner = directPartners.find((p) => p.id === currentChannel);
-      const partnerCallsign = partner?.callsign || currentChannel.replace("dm_", "").toUpperCase();
-      const delay = 1800 + Math.random() * 1200;
-      setTimeout(() => {
-        let replyText = `Copy that, [${shooterProfile.callsign}]. Transmission received on private net.`;
-        if (partnerCallsign === "SAID DONE" || partnerCallsign === "ALLEN") {
-          replyText = `Copy that, [${shooterProfile.callsign}]. Direct transmission received. Staging and dinner operations at The Hideout (111 Hwy 44) are dialed in. Let me know if you need anything before check-in.`;
-        } else if (partnerCallsign === "RADAR" || partnerCallsign === "ROB") {
-          replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received on RADAR frequency. Subsonic network, scoring uplinks, and telemetry are running green across The Hideout.`;
-        } else if (partnerCallsign === "LEIPOLD") {
-          replyText = `Copy that, [${shooterProfile.callsign}]. Direct comms received. Zeroed the RimX at 50, standard deviation is down to 4.2 fps on Lapua Midas+. Ready for the match.`;
-        } else if (partnerCallsign === "VERRAN") {
-          replyText = `Solid copy, [${shooterProfile.callsign}]. Trust the process and stay calm on the barricades. See you on the firing line.`;
-        }
-
-        const now = new Date();
-        const autoReply: ChatMessage = {
-          id: "dm_reply_" + Date.now().toString(36),
-          channelId: currentChannel,
-          type: "STANDARD",
-          author: {
-            id: `usr_${partnerCallsign.toLowerCase()}`,
-            name: partner?.name || partnerCallsign,
-            callsign: partnerCallsign,
-            role: (partner?.role as any) || "PRO_COMPETITOR",
-            badgeText: partner?.badgeText || "COMPETITOR",
-            division: partner?.division || "Open Division Pro",
-            rifleSetup: partner?.rifleSetup,
-          },
-          content: replyText,
-          timestamp: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          reactions: [],
-          moderationStatus: "APPROVED",
-        };
-        setMessages((prev) => [...prev, autoReply]);
-        if (soundEnabledRef.current) {
-          playRealCommsChirp();
-        }
-        setTimeout(() => scrollContainerToBottom(true), 50);
-      }, delay);
     }
+    // Direct messages to real marksmen/admins (e.g. Allen Hurley / SAID DONE) do not have simulated auto-replies.
   };
 
   const handleInputChange = (val: string) => {
@@ -2278,7 +2238,7 @@ export default function ChatPage() {
                     {(profileForm.role === "MASTER_OWNER" || profileForm.role === "DEV_ADMIN" || profileForm.role === "OWNER_ADMIN" || profileForm.role === "ADMIN" || profileForm.role === "MODERATOR" || isMasterOwner) ? (
                       <div className={`p-3 rounded-xl border text-xs font-mono flex items-center gap-2.5 ${
                         profileForm.role === "MASTER_OWNER" || isMasterOwner
-                          ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
+                          ? "bg-blue-500/10 border-blue-500/30 text-blue-300"
                           : profileForm.role === "OWNER_ADMIN"
                           ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
                           : profileForm.role === "ADMIN"
@@ -2289,7 +2249,7 @@ export default function ChatPage() {
                       }`}>
                         <span className="text-xl shrink-0">
                           {profileForm.role === "MASTER_OWNER" || isMasterOwner
-                            ? "💻"
+                            ? "👑"
                             : profileForm.role === "OWNER_ADMIN"
                             ? "🎖️"
                             : profileForm.role === "ADMIN"

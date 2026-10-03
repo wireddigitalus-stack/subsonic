@@ -143,16 +143,26 @@ export function ChatChannelSidebar({
                       >
                         {/* Avatar / Icon with Status Dot */}
                         <div className="relative shrink-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs border ${
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs border overflow-hidden ${
                             isRO
                               ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                               : isMasterOwner
-                              ? "bg-amber-400 text-black border-amber-300"
+                              ? "bg-gradient-to-br from-blue-600 to-indigo-600 text-white border-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
                               : isOwnerAdmin
                               ? "bg-emerald-500 text-black border-emerald-300"
                               : "bg-black/60 text-amber-400 border-white/10"
                           }`}>
-                            {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
+                            {partner.image ? (
+                              <img src={partner.image} alt="" className="w-full h-full object-cover" />
+                            ) : isRO ? (
+                              "🤖"
+                            ) : isMasterOwner ? (
+                              "👑"
+                            ) : isOwnerAdmin ? (
+                              "🎖️"
+                            ) : (
+                              partner.callsign.slice(0, 2)
+                            )}
                           </div>
                           <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black ${
                             partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
@@ -162,10 +172,14 @@ export function ChatChannelSidebar({
                         {/* Partner Name & Subtitle */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <span className={`text-xs font-bold truncate ${isActive ? "text-amber-300" : "text-white"}`}>
+                            <span className={`text-xs font-bold truncate ${
+                              isActive ? (isMasterOwner ? "text-blue-300" : "text-amber-300") : "text-white"
+                            }`}>
                               {partner.name}
                             </span>
-                            <span className="text-[10px] font-mono text-amber-400/90 font-bold shrink-0">
+                            <span className={`text-[10px] font-mono font-bold shrink-0 ${
+                              isMasterOwner ? "text-blue-400" : "text-amber-400/90"
+                            }`}>
                               [{partner.callsign}]
                             </span>
                           </div>

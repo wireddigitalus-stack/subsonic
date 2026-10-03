@@ -402,16 +402,26 @@ export function ChannelPickerModal({
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative ${
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative overflow-hidden ${
                         isRO
                           ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                           : isMasterOwner
-                          ? "bg-amber-400 text-black border-amber-300 font-black"
+                          ? "bg-gradient-to-br from-blue-600 to-indigo-600 text-white border-blue-400 font-black shadow-[0_0_8px_rgba(59,130,246,0.5)]"
                           : isOwnerAdmin
                           ? "bg-emerald-500 text-black border-emerald-300 font-black"
                           : "bg-black/60 text-amber-400 border-white/10"
                       }`}>
-                        {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : partner.callsign.slice(0, 2)}
+                        {partner.image ? (
+                          <img src={partner.image} alt="" className="w-full h-full object-cover" />
+                        ) : isRO ? (
+                          "🤖"
+                        ) : isMasterOwner ? (
+                          "👑"
+                        ) : isOwnerAdmin ? (
+                          "🎖️"
+                        ) : (
+                          partner.callsign.slice(0, 2)
+                        )}
                         <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
                           partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
                         }`} />
@@ -420,12 +430,16 @@ export function ChannelPickerModal({
                       <div className="min-w-0 space-y-0.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={`text-sm font-bold truncate ${
-                            isActive ? "text-emerald-300" : "text-white group-hover:text-emerald-200"
+                            isActive 
+                              ? (isMasterOwner ? "text-blue-300" : "text-emerald-300")
+                              : (isMasterOwner ? "text-white group-hover:text-blue-200" : "text-white group-hover:text-emerald-200")
                           }`}>
                             {partner.name}
                           </span>
 
-                          <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
+                          <span className={`font-mono text-xs font-bold shrink-0 ${
+                            isMasterOwner ? "text-blue-400" : "text-amber-400"
+                          }`}>
                             [{partner.callsign}]
                           </span>
 

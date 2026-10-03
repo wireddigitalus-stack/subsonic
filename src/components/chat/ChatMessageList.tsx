@@ -255,7 +255,7 @@ export function ChatMessageList({
           )
         ) : (
           filteredMessages.map((msg) => {
-            const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB";
+            const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB" || msg.author.callsign === "RADAR";
             const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "SAID DONE" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
             const isAdmin = msg.author.role === "ADMIN";
             const isMod = msg.author.role === "MODERATOR";
@@ -282,7 +282,7 @@ export function ChatMessageList({
                       ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
                       : "bg-gradient-to-r from-amber-950/35 via-black/85 to-zinc-950 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
                     : isMasterOwner
-                    ? "bg-gradient-to-r from-amber-950/60 via-black/80 to-yellow-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
+                    ? "bg-gradient-to-r from-blue-950/70 via-black/85 to-indigo-950/50 border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.3)]"
                     : isOwnerAdmin
                     ? "bg-gradient-to-r from-emerald-950/60 via-black/80 to-teal-950/40 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
                     : isAdmin
@@ -306,11 +306,11 @@ export function ChatMessageList({
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
                       title={`View ${msg.author.name} Profile & Direct Chat`}
-                      className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 transition-transform active:scale-95 hover:border-amber-400 cursor-pointer ${
+                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 transition-transform active:scale-95 hover:border-blue-400 cursor-pointer overflow-hidden ${
                         isRO
                           ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                           : isMasterOwner
-                          ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                          ? "bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white border-blue-400 font-black shadow-[0_0_12px_rgba(59,130,246,0.6)]"
                           : isOwnerAdmin
                           ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                           : isAdmin
@@ -324,7 +324,21 @@ export function ChatMessageList({
                           : "bg-black/60 text-amber-400 border-white/10"
                       }`}
                     >
-                      {isRO ? "🤖" : isMasterOwner ? "👑" : isOwnerAdmin ? "🎖️" : isAdmin ? "🛡️" : isMod ? "⚖️" : (msg.author.callsign?.slice(0, 2) || "SS")}
+                      {msg.author.avatarUrl ? (
+                        <img src={msg.author.avatarUrl} alt="" className="w-full h-full object-cover" />
+                      ) : isRO ? (
+                        "🤖"
+                      ) : isMasterOwner ? (
+                        "👑"
+                      ) : isOwnerAdmin ? (
+                        "🎖️"
+                      ) : isAdmin ? (
+                        "🛡️"
+                      ) : isMod ? (
+                        "⚖️"
+                      ) : (
+                        msg.author.callsign?.slice(0, 2) || "SS"
+                      )}
                     </button>
 
                     <div className="min-w-0">
@@ -335,7 +349,7 @@ export function ChatMessageList({
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Profile & Direct Chat`}
                           className={`text-xs md:text-sm font-bold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
-                            isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-amber-300" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
+                            isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
                           {isRO ? "RO BOT" : msg.author.name}
@@ -347,7 +361,9 @@ export function ChatMessageList({
                             type="button"
                             onClick={() => handleAuthorClick(msg.author)}
                             title={`View ${msg.author.callsign} Profile`}
-                            className="hidden md:inline text-xs font-mono text-amber-400 font-bold hover:text-amber-300"
+                            className={`hidden md:inline text-xs font-mono font-bold hover:underline ${
+                              isMasterOwner ? "text-blue-400 hover:text-blue-300" : "text-amber-400 hover:text-amber-300"
+                            }`}
                           >
                             [{msg.author.callsign}]
                           </button>
@@ -358,7 +374,7 @@ export function ChatMessageList({
                             isRO
                               ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 font-black"
                               : isMasterOwner
-                              ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-black border border-amber-300"
+                              ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-black border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.4)]"
                               : isOwnerAdmin
                               ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300"
                               : isAdmin
@@ -372,7 +388,7 @@ export function ChatMessageList({
                               : "bg-white/10 text-slate-300"
                           }`}
                         >
-                          {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 OWNER" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
+                          {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 MASTER ADMIN" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
                         </span>
 
                         {/* Timestamp — inline on mobile */}

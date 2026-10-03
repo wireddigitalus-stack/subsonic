@@ -67,16 +67,26 @@ export function ShooterDossierModal({
 
         {/* Identity Card */}
         <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 ${
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 overflow-hidden ${
             isRO
               ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
               : isMasterOwner
-              ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-black border-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+              ? "bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]"
               : isOwnerAdmin
               ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
               : "bg-black/60 text-amber-400 border-white/15"
           }`}>
-            {isRO ? "🤖" : isMasterOwner ? "⚡" : isOwnerAdmin ? "🎖️" : (shooter.callsign?.slice(0, 2) || "SS")}
+            {shooter.image ? (
+              <img src={shooter.image} alt="" className="w-full h-full object-cover" />
+            ) : isRO ? (
+              "🤖"
+            ) : isMasterOwner ? (
+              "👑"
+            ) : isOwnerAdmin ? (
+              "🎖️"
+            ) : (
+              shooter.callsign?.slice(0, 2) || "SS"
+            )}
           </div>
 
           <div className="min-w-0 flex-1">
@@ -84,7 +94,9 @@ export function ShooterDossierModal({
               <h3 className="font-bold text-white text-base truncate">
                 {isRO ? "RO BOT" : shooter.name}
               </h3>
-              <span className="font-mono text-xs font-bold text-amber-400 shrink-0">
+              <span className={`font-mono text-xs font-bold shrink-0 ${
+                isMasterOwner ? "text-blue-400" : "text-amber-400"
+              }`}>
                 [{isRO ? "RO BOT" : shooter.callsign}]
               </span>
             </div>
@@ -94,12 +106,12 @@ export function ShooterDossierModal({
                 isRO
                   ? "bg-amber-500/20 text-amber-300 border border-amber-500/50"
                   : isMasterOwner
-                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black border border-amber-300"
+                  ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.4)]"
                   : isOwnerAdmin
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "⚡ MASTER ADMIN" : shooter.badgeText || shooter.role}
+                {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 MASTER ADMIN" : shooter.badgeText || shooter.role}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
@@ -114,18 +126,18 @@ export function ShooterDossierModal({
         <div className="space-y-2 text-xs font-mono">
           {isMasterOwner ? (
             <>
-              <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 flex items-center justify-between">
-                <span className="text-amber-400 font-bold uppercase text-[10px]">Role / System Function</span>
+              <div className="p-2.5 rounded-xl bg-black/40 border border-blue-500/30 flex items-center justify-between">
+                <span className="text-blue-400 font-bold uppercase text-[10px]">Role / System Function</span>
                 <span className="font-bold text-white">Master Admin</span>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/30 space-y-1">
-                <div className="flex items-center justify-between text-[10px] text-amber-400 uppercase">
+              <div className="p-2.5 rounded-xl bg-black/40 border border-blue-500/30 space-y-1">
+                <div className="flex items-center justify-between text-[10px] text-blue-400 uppercase">
                   <span className="flex items-center gap-1 font-bold">
-                    <ShieldCheck className="w-3 h-3 text-amber-400" />
+                    <ShieldCheck className="w-3 h-3 text-blue-400" />
                     Infrastructure &amp; Tech Stack
                   </span>
-                  <span className="text-emerald-400 font-bold">Non-Shooter • Full Admin</span>
+                  <span className="text-cyan-400 font-bold">Non-Shooter • Full Admin</span>
                 </div>
                 <p className="text-white text-xs font-bold truncate">Master Admin</p>
               </div>
