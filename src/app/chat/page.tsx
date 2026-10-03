@@ -1414,13 +1414,19 @@ export default function ChatPage() {
                 className="flex items-center gap-1 px-1.5 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
                 title="View Shooter Pass"
               >
-                <div className={`w-4 h-4 rounded flex items-center justify-center text-[9px] shrink-0 ${
+                <div className={`w-4 h-4 rounded flex items-center justify-center text-[9px] shrink-0 overflow-hidden ${
                   shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
                     ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                    : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
                     : "bg-amber-500 text-black font-bold"
                 }`}>
-                  {shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                  {shooterProfile.image ? (
+                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                  ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
                     <Radar className="w-2.5 h-2.5 text-cyan-300 stroke-[2.5]" />
+                  ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
+                    "A"
                   ) : (
                     shooterProfile.callsign.slice(0, 2)
                   )}
@@ -1714,13 +1720,19 @@ export default function ChatPage() {
                 data-telemetry="chat_edit_shooter_profile"
                 className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
               >
-                <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] ${
+                <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
                   shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
                     ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                    : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
                     : "bg-amber-500 text-black font-bold"
                 }`}>
-                  {shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                  {shooterProfile.image ? (
+                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                  ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
                     <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
+                  ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
+                    "A"
                   ) : (
                     shooterProfile.callsign.slice(0, 2)
                   )}
@@ -2276,7 +2288,7 @@ export default function ChatPage() {
                           {profileForm.role === "MASTER_OWNER" || isMasterOwner ? (
                             <Radar className="w-6 h-6 text-cyan-300 stroke-[2.2] animate-pulse" />
                           ) : profileForm.role === "OWNER_ADMIN" ? (
-                            "🎖️"
+                            <span className="font-mono font-black text-xl text-emerald-400">A</span>
                           ) : profileForm.role === "ADMIN" ? (
                             "🛡️"
                           ) : profileForm.role === "MODERATOR" ? (

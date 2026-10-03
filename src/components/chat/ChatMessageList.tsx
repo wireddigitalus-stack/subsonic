@@ -332,7 +332,7 @@ export function ChatMessageList({
                       ) : isMasterOwner ? (
                         <Radar className="w-4 h-4 md:w-5 md:h-5 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_8px_rgba(6,182,212,0.85)] animate-pulse" />
                       ) : isOwnerAdmin ? (
-                        "🎖️"
+                        <span className="font-mono font-black text-sm md:text-base text-black">A</span>
                       ) : isAdmin ? (
                         "🛡️"
                       ) : isMod ? (

@@ -84,7 +84,7 @@ export function ShooterDossierModal({
             ) : isMasterOwner ? (
               <Radar className="w-7 h-7 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_12px_rgba(6,182,212,0.85)] animate-pulse" />
             ) : isOwnerAdmin ? (
-              "🎖️"
+              <span className="font-mono font-black text-2xl text-black">A</span>
             ) : (
               shooter.callsign?.slice(0, 2) || "SS"
             )}
