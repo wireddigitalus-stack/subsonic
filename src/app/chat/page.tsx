@@ -63,7 +63,7 @@ import { recordTelemetryEvent } from "@/lib/telemetry";
 import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
-import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome, getRoDirectAnswer } from "@/lib/plink-engine";
+import { analyzeMsgForPlink, buildPlinkMessage, getRoDirectAnswer } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
@@ -614,27 +614,73 @@ export default function ChatPage() {
     return () => document.body.classList.remove("chat-active");
   }, []);
 
-  // ── RO: Channel Welcome ───────────────────────────────────────────────────
-  // Fires once per match channel — greets the user when they enter an official channel.
-  // Private / direct chats (dm_*) do NOT receive full welcome messages.
+  // ── Channel Welcome: Allen + Delayed RO BOT ────────────────────────────────
+  // Allen's welcome fires immediately. RO BOT's condensed welcome fires after
+  // 8 seconds (enough time to read Allen's message).
   useEffect(() => {
     if (!isAuthenticated || !shooterProfile.callsign) return;
     if (plinkVisitedChannels.has(currentChannel)) return;
 
     setPlinkVisitedChannels((prev) => new Set(Array.from(prev).concat(currentChannel)));
 
-    // Do NOT send welcome messages in direct / private chats (RO monitors silently)
+    // No welcomes in direct / private chats
     if (currentChannel.startsWith("dm_")) return;
 
-    const welcomeMsg = getChannelWelcome(currentChannel, shooterProfile.callsign);
-    const timer = setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        buildPlinkMessage(welcomeMsg, currentChannel, 0),
-      ]);
-    }, 2200);
+    // Allen's welcome — fires immediately
+    const now = new Date();
+    const allenTimestamp = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
-    return () => clearTimeout(timer);
+    const allenMsg: ChatMessage = {
+      id: `welcome-allen-${currentChannel}-${Date.now()}`,
+      channelId: currentChannel,
+      type: "STANDARD",
+      author: {
+        id: "user-allen",
+        name: "Allen Hurley",
+        callsign: "SAID DONE",
+        role: "OWNER_ADMIN",
+        badgeText: "FOUNDER",
+        division: "Executive / Match Host",
+        rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+      },
+      content: "Welcome to The Hideout, competitors. Two hundred and twenty acres of Tennessee ridgeline purpose-built for precision rimfire. Enjoy the chat, respect the range, and check the competitor packet for match details. Said. Done.",
+      timestamp: allenTimestamp,
+      reactions: [],
+      moderationStatus: "APPROVED",
+      aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "System" },
+    };
+
+    setMessages((prev) => [...prev, allenMsg]);
+
+    // RO BOT's welcome — fires after 8 seconds
+    const roTimer = setTimeout(() => {
+      const roTime = new Date();
+      const roTimestamp = roTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+
+      const roMsg: ChatMessage = {
+        id: `welcome-ro-${currentChannel}-${Date.now()}`,
+        channelId: currentChannel,
+        type: "MATCH_ALERT",
+        author: {
+          id: "plink_ai_moderator",
+          name: "RO BOT",
+          callsign: "RO BOT",
+          role: "OFFICIAL",
+          badgeText: "AI Range Officer",
+          division: "Autonomous AI Assistant • The Hideout",
+          rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",
+        },
+        content: `🤖 I'm RO BOT, your AI Range Officer. I have intel on the match schedule, The Hideout facility, Bristol dining & hotels, and side match details. Ask me anything — say 'hey ro' or '@ro help' anytime.\n\n📖 Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet`,
+        timestamp: roTimestamp,
+        reactions: [],
+        moderationStatus: "APPROVED",
+        aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "Autonomous AI Agent RO" },
+      };
+
+      setMessages((prev) => [...prev, roMsg]);
+    }, 8000);
+
+    return () => clearTimeout(roTimer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChannel, isAuthenticated]);
 

@@ -148,7 +148,7 @@ export function ChatMessageList({
                     </span>
                   )}
                 </div>
-                <div className="text-[9px] sm:text-[10px] font-mono text-emerald-400/90 truncate flex items-center gap-1.5 flex-wrap">
+                <div className="text-[11px] text-emerald-400/90 truncate flex items-center gap-1.5 flex-wrap">
                   <span className="flex items-center gap-1">
                     <Lock className="w-2.5 h-2.5 text-emerald-400" />
                     <span>Closed Net</span>
@@ -184,7 +184,7 @@ export function ChatMessageList({
           >
             <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
               <Pin className="w-3 h-3 text-amber-400 shrink-0" />
-              <span className={`text-[10px] sm:text-[11px] text-amber-200 font-mono ${announcementCollapsed ? "truncate" : "leading-relaxed"}`}>
+              <span className={`text-[11px] text-amber-200 ${announcementCollapsed ? "truncate" : "leading-relaxed"}`}>
                 {pinnedAnnouncement}
               </span>
             </div>
@@ -281,7 +281,7 @@ export function ChatMessageList({
                       ? "bg-red-950/20 border-l-red-500 border-y border-r border-y-white/5 border-r-white/5"
                       : roSeverity === "warn"
                       ? "bg-amber-950/15 border-l-amber-500 border-y border-r border-y-white/5 border-r-white/5"
-                      : "bg-amber-950/10 border-l-amber-400 border-y border-r border-y-white/5 border-r-white/5"
+                      : "bg-zinc-900/40 border-l-slate-400 border-y border-r border-y-white/5 border-r-white/5"
                     : isMasterOwner
                     ? "bg-blue-950/30 border-l-blue-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isOwnerAdmin
@@ -309,7 +309,7 @@ export function ChatMessageList({
                       title={`View ${msg.author.name} Profile & Direct Chat`}
                       className={`flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-blue-400 cursor-pointer overflow-hidden ${
                         isRO
-                          ? "bg-amber-600 text-black ring-amber-400 font-black"
+                          ? "bg-zinc-700 text-white ring-slate-400 font-black"
                           : isMasterOwner
                           ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
                           : isOwnerAdmin
@@ -322,7 +322,7 @@ export function ChatMessageList({
                           ? "bg-amber-500 text-black ring-amber-400"
                           : isDopeDrop
                           ? "bg-cyan-950 text-cyan-300 ring-cyan-500/40"
-                          : "bg-white/10 text-amber-400 ring-white/10"
+                          : "bg-white/10 text-slate-300 ring-white/10"
                       }`}
                     >
                       {msg.author.avatarUrl ? (
@@ -350,7 +350,7 @@ export function ChatMessageList({
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Profile & Direct Chat`}
                           className={`text-sm font-semibold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
-                            isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
+                            isRO ? "text-slate-200 font-black" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
                           {isRO ? "RO BOT" : msg.author.name}
@@ -371,9 +371,9 @@ export function ChatMessageList({
                         )}
 
                         <span
-                          className={`text-[10px] md:text-[11px] font-medium px-1.5 py-0.5 rounded uppercase ${
+                          className={`text-[11px] font-medium px-1.5 py-0.5 rounded uppercase ${
                             isRO
-                              ? "bg-amber-500/15 text-amber-300"
+                              ? "bg-slate-500/15 text-slate-300"
                               : isMasterOwner
                               ? "bg-blue-500/20 text-blue-300"
                               : isOwnerAdmin
@@ -413,12 +413,12 @@ export function ChatMessageList({
 
                       {/* Rig line or RO Subtitle */}
                       {isRO ? (
-                        <div className="hidden md:flex text-[10px] font-mono text-amber-400/90 items-center gap-1.5 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse inline-block" />
+                        <div className="hidden md:flex text-[11px] text-slate-400 items-center gap-1.5 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />
                           <span>Autonomous AI Match Assistant · The Hideout Official Guide</span>
                         </div>
                       ) : msg.author.rifleSetup ? (
-                        <div className="hidden md:block text-[10px] font-mono text-slate-400 truncate max-w-md">
+                        <div className="hidden md:block text-[11px] text-slate-400 truncate max-w-md">
                           Rig: {msg.author.rifleSetup}
                         </div>
                       ) : null}
@@ -426,15 +426,15 @@ export function ChatMessageList({
                   </div>
 
                   {/* Right Meta: Timestamp & Status */}
-                  <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-400 font-mono shrink-0">
+                  <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 shrink-0">
                     <span>{msg.timestamp}</span>
                     {isFlagged ? (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
                         <AlertTriangle className="w-2.5 h-2.5" />
                         REVIEW
                       </span>
                     ) : isRO ? (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold font-mono">
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-500/20 text-slate-300 border border-slate-500/30 font-bold">
                         OFFICIAL RO
                       </span>
                     ) : (
