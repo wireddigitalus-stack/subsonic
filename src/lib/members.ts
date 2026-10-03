@@ -44,34 +44,6 @@ export const SEED_MEMBERS: SocietyMember[] = [
     role: "OWNER_ADMIN",
     notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
   },
-  {
-    member_id: "SS-2026-0003",
-    full_name: "Erich Leipold",
-    callsign: "LEIPOLD",
-    email: "erich@subsonicsociety.com",
-    state: "PA",
-    experience_level: "Open Rimfire Pro • Team USA",
-    rifle_setup: "Zermatt RimX / Bartlein MTU 22\" / MPA BA PMR Pro",
-    interests: ["Competition", "Team USA", "Rimfire World Championship", "Ammunition Testing"],
-    created_at: "2026-09-30T00:00:00Z",
-    status: "ACTIVE",
-    role: "PRO_COMPETITOR",
-    notes: "Team USA 🇺🇸 • Rimfire Challenge World Champion • Modacam Pro",
-  },
-  {
-    member_id: "SS-2026-0004",
-    full_name: "Ron Verran",
-    callsign: "VERRAN",
-    email: "ron@subsonicsociety.com",
-    state: "MI",
-    experience_level: "Open Rimfire Pro • Team USA",
-    rifle_setup: "Zermatt RimX / Bartlein MTU 22\" / MPA Matrix Pro",
-    interests: ["Competition", "Team USA", "PRS National Champion", "Appalachian Matches"],
-    created_at: "2026-09-30T00:00:00Z",
-    status: "ACTIVE",
-    role: "PRO_COMPETITOR",
-    notes: "2x PRS National Champion 🏆 • Team USA 🇺🇸 • Modacam Pro",
-  },
 ];
 
 let memoryMembers: SocietyMember[] = [...SEED_MEMBERS];
@@ -293,22 +265,49 @@ export function addOrUpdateMember(member: SocietyMember): SocietyMember {
 }
 
 export function deleteMemberFromStorage(memberId: string): boolean {
-  if (memberId === "SS-2026-0001" || memberId === "SS-2026-0002") {
+  if (!memberId) return false;
+  const cleanId = memberId.trim().toUpperCase();
+
+  if (cleanId === "SS-2026-0001" || cleanId === "SS-2026-0002" || cleanId === "RADAR" || cleanId === "SAID DONE" || cleanId === "ROB" || cleanId === "ALLEN") {
     return false; // Cannot delete root executive accounts
   }
 
   const current = getMembersFromStorage();
-  const filtered = current.filter((m) => m.member_id !== memberId);
-  if (filtered.length === current.length) {
-    return false;
-  }
+  const target = current.find(
+    (m) =>
+      m.member_id.toUpperCase() === cleanId ||
+      (m.callsign && m.callsign.toUpperCase() === cleanId) ||
+      m.full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === memberId.toLowerCase()
+  );
 
+  if (!target) return false;
+
+  const targetMemberId = target.member_id.toUpperCase();
+  const targetCallsign = target.callsign?.toUpperCase();
+
+  const filtered = current.filter(
+    (m) =>
+      m.member_id.toUpperCase() !== targetMemberId &&
+      (!targetCallsign || m.callsign?.toUpperCase() !== targetCallsign)
+  );
+
+  memoryMembers = filtered;
   saveAllMembersToStorage(filtered);
+
+  // Cross-clean shooter profile if exists
+  try {
+    const { deleteShooterFromStorage } = require("@/lib/shooters");
+    if (targetCallsign) deleteShooterFromStorage(targetCallsign);
+    deleteShooterFromStorage(target.member_id);
+    deleteShooterFromStorage(target.full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+  } catch (e) {
+    // Avoid circular import errors
+  }
 
   if (isSupabaseConfigured && supabase) {
     (async () => {
       try {
-        const { error } = await supabase.from('society_members').delete().eq('member_id', memberId);
+        const { error } = await supabase.from('society_members').delete().eq('member_id', target.member_id);
         if (error) console.error("Error deleting member from Supabase:", error);
       } catch (err) {
         console.error("Supabase delete catch:", err);

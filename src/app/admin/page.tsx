@@ -646,7 +646,11 @@ export default function AdminDashboardPage() {
     try {
       const res = await fetch(`/api/shooters?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       if (res.ok) {
-        setShooterProfiles((prev) => prev.filter((s) => s.id !== id));
+        setShooterProfiles((prev) => prev.filter((s) => s.id !== id && s.callsign?.toLowerCase() !== id.toLowerCase()));
+        setMembers((prev) => prev.filter((m) => m.member_id !== id && m.callsign?.toLowerCase() !== id.toLowerCase()));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to delete shooter profile.");
       }
     } catch (err) {
       alert("Error deleting shooter profile");
@@ -932,7 +936,8 @@ export default function AdminDashboardPage() {
         method: "DELETE",
       });
       if (res.ok) {
-        setMembers((prev) => prev.filter((m) => m.member_id !== memberId));
+        setMembers((prev) => prev.filter((m) => m.member_id !== memberId && m.callsign?.toLowerCase() !== memberId.toLowerCase()));
+        setShooterProfiles((prev) => prev.filter((s) => s.id !== memberId && s.callsign?.toLowerCase() !== memberId.toLowerCase()));
         setIsMemberModalOpen(false);
         setSelectedMember(null);
         setShowDeleteConfirm(false);

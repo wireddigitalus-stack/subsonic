@@ -16,121 +16,6 @@ const WRITABLE_SHOOTERS_FILE = IS_SERVERLESS
 
 export const SEED_SHOOTERS: ShooterProfile[] = [
   {
-    id: "erich-leipold",
-    name: "Erich Leipold",
-    callsign: "LEIPOLD",
-    division: "Open Rimfire Pro • Team USA",
-    ranking: "Team USA 🇺🇸 • Rimfire Challenge World Champion",
-    homeRange: "National Tour / Pennsylvania",
-    podiums: 61,
-    featuredMatch: "Subsonic Society Invitational Money Match 2026",
-    image: "/assets/erich-leipold-poster.jpg",
-    actionPhoto: "/assets/erich-leipold-poster.jpg",
-    posterImage: "/assets/erich-leipold-poster.jpg",
-    quote: "Consistency isn't an accident. It's the byproduct of testing every variable, knowing your DOPE down to the tenth of a mil, and executing with absolute confidence.",
-    signature: "Erich Leipold",
-    accolades: [
-      "TEAM USA 🇺🇸 — 2026 RIMFIRE WORLD CHAMPIONSHIP",
-      "RIMFIRE CHALLENGE WORLD CHAMPION",
-      "2ND PLACE 2024 NRL22 NATIONAL CHAMPIONSHIP",
-      "35+ RIMFIRE MATCH WINS",
-    ],
-    careerStats: {
-      matches: 103,
-      states: 25,
-      countries: 2,
-      wins: 35,
-      top3: 61,
-      top5: 76,
-      top10: 91,
-      nationalPlacements: [
-        "2nd Place — 2024 NRL22 National Championship",
-        "Top-5 — 2025 PRS Rimfire Finale",
-        "Team USA — 2026 World Championship Qualifier",
-      ],
-    },
-    sponsors: [
-      "MasterPiece Arms (MPA)",
-      "Modacam Custom Rifles",
-      "Vortex Optics",
-      "Zermatt Arms",
-      "Clenzoil",
-      "Leofoto",
-      "Hoz & Shield",
-      "Arrow Products USA",
-    ],
-    interview: [
-      {
-        question: "What is your mental preparation before a national championship stage?",
-        answer: "I visualize the stage three times before loading: target acquisition order, transition footwork, and wind calls. When the timer beeps, muscle memory and DOPE take over.",
-      },
-      {
-        question: "How do you dial in harmonic tuning for your RimX setup?",
-        answer: "I test on calm mornings at 50 yards with a chronograph. I rotate the tuner 2 hash marks at a time until the vertical dispersion flattens into a single hole. Single-digit SD is the law.",
-      },
-    ],
-    createdAt: "2026-09-30T00:00:00Z",
-    status: "PUBLISHED",
-  },
-  {
-    id: "ron-verran",
-    name: "Ron Verran",
-    callsign: "VERRAN",
-    division: "Open Rimfire Pro • Team USA",
-    ranking: "2x PRS National Champion • Team USA 🇺🇸",
-    homeRange: "Great Lakes Region / National Tour",
-    podiums: 52,
-    featuredMatch: "Subsonic Society Invitational Money Match 2026",
-    image: "/assets/ron-verran-poster.jpg",
-    actionPhoto: "/assets/ron-verran-poster.jpg",
-    posterImage: "/assets/ron-verran-poster.jpg",
-    quote: "It's not luck. It's a process.",
-    signature: "Ron Verran",
-    accolades: [
-      "2021 PRS NATIONAL CHAMPION 🏆",
-      "2023 PRS NATIONAL CHAMPION 🏆",
-      "2022 & 2025 PRS GREAT LAKES SERIES CHAMPION 🥇",
-      "2025 IPRF WORLD CHAMPIONSHIPS — 3RD OVERALL 🥉",
-      "TEAM USA 🇺🇸",
-      "DEDICATED TO GROWING THE SPORT OF RIMFIRE PRECISION 🎯",
-    ],
-    careerStats: {
-      matches: 85,
-      states: 22,
-      countries: 2,
-      wins: 28,
-      top3: 52,
-      top5: 64,
-      top10: 78,
-      nationalPlacements: [
-        "2021 PRS National Champion 🏆",
-        "2023 PRS National Champion 🏆",
-        "2022 & 2025 PRS Great Lakes Series Champion 🥇",
-        "2025 IPRF World Championships — 3rd Overall 🥉",
-      ],
-    },
-    sponsors: [
-      "Modacam Custom Rifles",
-      "MasterPiece Arms (MPA)",
-      "Vortex Optics",
-      "Zermatt Arms",
-      "Lapua Rimfire",
-      "Subsonic Society",
-    ],
-    interview: [
-      {
-        question: "What separates a PRS National Championship run from an ordinary match weekend?",
-        answer: "It's never luck. It's a disciplined, repeatable process. From barricade footwork to stage timing and DOPE verification, you remove variables until hitting center-steel is simply muscle memory.",
-      },
-      {
-        question: "What advice do you give shooters entering the Subsonic Invitational in Bristol?",
-        answer: "Respect the Appalachian mountain switch-winds. Trust your initial wind call, commit cleanly to your trigger press, and don't dwell on dropped points. Every stage is a clean slate.",
-      },
-    ],
-    createdAt: "2026-09-30T00:00:00Z",
-    status: "PUBLISHED",
-  },
-  {
     id: "allen-hurley",
     name: "Allen Hurley",
     callsign: "SAID DONE",
@@ -332,6 +217,77 @@ export function saveShooterToStorage(shooter: ShooterProfile): void {
   } catch (err) {
     console.error("Error saving shooter:", err);
   }
+}
+
+export function saveAllShootersToStorage(shooters: ShooterProfile[]): void {
+  try {
+    memoryShooters = shooters;
+
+    if (!fs.existsSync(WRITABLE_DIR)) {
+      fs.mkdirSync(WRITABLE_DIR, { recursive: true });
+    }
+    const content = shooters.map((s) => JSON.stringify(s)).join("\n") + "\n";
+    fs.writeFileSync(WRITABLE_SHOOTERS_FILE, content, "utf-8");
+    if (!IS_SERVERLESS) {
+      if (!fs.existsSync(REPO_DATA_DIR)) {
+        fs.mkdirSync(REPO_DATA_DIR, { recursive: true });
+      }
+      fs.writeFileSync(REPO_SHOOTERS_FILE, content, "utf-8");
+    }
+  } catch (err) {
+    console.error("Error saving all shooters to storage:", err);
+  }
+}
+
+export function deleteShooterFromStorage(idOrCallsign: string): boolean {
+  if (!idOrCallsign) return false;
+  const clean = idOrCallsign.trim().toLowerCase();
+
+  // Root executive protection
+  if (clean === "allen-hurley" || clean === "said done" || clean === "allen") {
+    return false;
+  }
+
+  const current = getShootersFromStorage();
+  const target = current.find(
+    (s) =>
+      s.id.toLowerCase() === clean ||
+      s.callsign.toLowerCase() === clean ||
+      s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === clean
+  );
+
+  if (!target) return false;
+
+  const filtered = current.filter(
+    (s) =>
+      s.id.toLowerCase() !== target.id.toLowerCase() &&
+      s.callsign.toLowerCase() !== target.callsign.toLowerCase()
+  );
+
+  memoryShooters = filtered;
+  saveAllShootersToStorage(filtered);
+
+  if (isSupabaseConfigured && supabase) {
+    (async () => {
+      try {
+        const { error } = await supabase.from("shooters").delete().eq("id", target.id);
+        if (error) console.error("Error deleting shooter from Supabase:", error);
+      } catch (err) {
+        console.error("Supabase delete catch (shooters):", err);
+      }
+    })();
+  }
+
+  // Cross-clean matching society member if exists
+  try {
+    const { deleteMemberFromStorage } = require("@/lib/members");
+    if (target.callsign) deleteMemberFromStorage(target.callsign);
+    deleteMemberFromStorage(target.id);
+  } catch (e) {
+    // avoid cyclic errors
+  }
+
+  return true;
 }
 
 export function getShooterBySlug(slug: string): ShooterProfile | null {

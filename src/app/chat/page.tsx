@@ -126,30 +126,6 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     bio: "Master Admin",
     rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
   },
-  {
-    id: "dm_leipold",
-    callsign: "LEIPOLD",
-    name: "Erich Leipold",
-    role: "PRO_COMPETITOR",
-    badgeText: "TEAM USA 🇺🇸",
-    division: "Open Rimfire Pro • Team USA",
-    status: "online",
-    bio: "Team USA 🇺🇸 • Rimfire Challenge World Champion • Modacam Pro",
-    rifleSetup: "Zermatt RimX / Bartlein MTU 22\" / MPA BA PMR Pro",
-    image: "/assets/erich-leipold-poster.jpg",
-  },
-  {
-    id: "dm_verran",
-    callsign: "VERRAN",
-    name: "Ron Verran",
-    role: "PRO_COMPETITOR",
-    badgeText: "TEAM USA 🇺🇸",
-    division: "Open Rimfire Pro • Team USA",
-    status: "online",
-    bio: "2x PRS National Champion 🏆 • Team USA 🇺🇸 • Modacam Pro",
-    rifleSetup: "Zermatt RimX / Bartlein MTU 22\" / MPA Matrix Pro",
-    image: "/assets/ron-verran-poster.jpg",
-  },
 ];
 
 interface ShooterProfile {

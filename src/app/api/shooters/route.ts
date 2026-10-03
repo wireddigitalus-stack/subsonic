@@ -3,7 +3,8 @@ import { ShooterProfile } from "@/lib/types";
 import { 
   getShootersFromStorage, 
   saveShooterToStorage, 
-  getShooterBySlug 
+  getShooterBySlug,
+  deleteShooterFromStorage
 } from "@/lib/shooters";
 import { checkCallsignAvailability } from "@/lib/callsigns";
 import { hashPin, isHashedPin } from "@/lib/pin-hash";
@@ -136,6 +137,41 @@ export async function POST(req: NextRequest) {
       url: `/shooters/${newShooter.id}`,
     });
   } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    let id = searchParams.get("id");
+
+    if (!id) {
+      try {
+        const body = await req.json();
+        id = body.id || body.callsign;
+      } catch {}
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: "Shooter id is required" }, { status: 400 });
+    }
+
+    const deleted = deleteShooterFromStorage(id);
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Shooter not found or cannot delete founder profile." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      deleted_id: id,
+      message: `Shooter profile for ${id} has been permanently deleted.`,
+    });
+  } catch (err: any) {
+    console.error("Error deleting shooter profile:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
