@@ -182,7 +182,7 @@ export function HomePreFacebookSpotlights() {
               </div>
               <h4 className="text-base font-bold text-white">Curated Shooter Lodging Directory</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                The Bristol Hotel rooftop luxury, Hard Rock Hotel & Casino 24/7 gaming, Marriott suites near The Pinnacle, plus on-site RV hookups.
+                The Bristol Hotel rooftop luxury, Hard Rock Hotel & Casino 24/7 gaming, Marriott suites near The Pinnacle, plus nearby Bristol RV campgrounds (Hilltop, Lakeview).
               </p>
             </div>
 

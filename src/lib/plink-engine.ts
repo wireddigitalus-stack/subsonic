@@ -213,15 +213,35 @@ const COMMERCIAL_WARNINGS = [
 export function getFaqResponse(content: string): string {
   const lower = content.toLowerCase();
 
-  // 1. HOTELS & LODGING IN BRISTOL
+  // 1. RV HOOKUPS & CAMPGROUNDS (BRISTOL / HOLSTON AREA)
+  if (
+    lower.includes("rv") ||
+    lower.includes("hookup") ||
+    lower.includes("camper") ||
+    lower.includes("motorhome") ||
+    lower.includes("trailer") ||
+    (lower.includes("camp") && !lower.includes("hotel") && !lower.includes("motel"))
+  ) {
+    return `🚐 **RV Hookups & Camping Policy for The Hideout Invitational:**\n\n` +
+      `**Official Range Policy:**\n` +
+      `❌ **Negative on on-site RV hookups.** We do **NOT** have RV electric, water, or sewer hookups available at the clubhouse or range facility at this time.\n\n` +
+      `⛺ **Reputable RV Parks & Campgrounds in the Area:**\n` +
+      `• **Hilltop Campground / BMS Hilltop RV** (Bristol, TN) — *Highly Recommended.* Very reputable, popular event and traveler campground perched on the ridge overlooking Bristol. Excellent access for rigs.\n` +
+      `• **Lakeview RV Resort** (Bluff City / Bristol, TN — Hwy 11E) — Premier full-hookup resort (30/50 amp, water, sewer) with 87 sites, swimming pool, bathhouse, and lake recreation. Located ~10–12 min from the gate.\n` +
+      `• **Bristol / Kingsport KOA Holiday** (Blountville, TN) — 100% full hookups with 50-amp pull-through sites, high-speed Wi-Fi, camp store, and modern bathhouses.\n` +
+      `• **Lake Retreat RV Park & Campground** (Bristol, TN) — Full hookups located directly on scenic South Holston Lake with boat ramps and mountain views.\n` +
+      `• **Sugar Hollow Park Campground** (Bristol, VA) — 75 sites with water/electric hookups in a quiet 400-acre city park with clean bathhouses.\n` +
+      `• **Hicks White Top & Farmer Bob's Campgrounds** (Bristol, TN) — Established regional campgrounds catering to large rigs.\n\n` +
+      `💡 *Shooter Advisory:* If you are traveling in an RV or towing a camper for match weekend (Nov 13–15), we strongly recommend reserving your site in advance at Hilltop or Lakeview RV Resort as regional sites fill quickly during major Appalachian sporting weekends!`;
+  }
+
+  // 2. HOTELS & LODGING IN BRISTOL
   if (
     lower.includes("hotel") ||
     lower.includes("lodg") ||
     lower.includes("stay") ||
     lower.includes("room") ||
     lower.includes("cabin") ||
-    lower.includes("camp") ||
-    lower.includes("rv") ||
     lower.includes("motel")
   ) {
     return `🏨 **Bristol Lodging Guide (From 2026 Competitor Packet):**\n\n` +
@@ -231,7 +251,7 @@ export function getFaqResponse(content: string): string {
       `• **Hilton Garden Inn & Hampton Inn** — 10–11 mi / 15 min. Clean, dependable, with hot breakfast.\n` +
       `• **Extended Stay America** — 10 mi / 15 min. Kitchenettes ideal for traveling shooters carrying pelican cases.\n` +
       `• **Quality Inn / Days Inn / Red Roof** — 10–11 mi. Solid budget-friendly options.\n` +
-      `• **The Hideout On-Site Camping** — RV hookups & primitive camping available directly at 111 Hwy 44!\n\n` +
+      `• **RVs & Campers:** Note that the clubhouse has no on-site RV hookups at this time. Recommended reputable options: Hilltop Campground in Bristol and Lakeview RV Resort just 10–12 min away.\n\n` +
       `💡 Check the full 12-hotel directory with direct phone numbers & online booking links in the Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet#hotels`;
   }
 
@@ -363,7 +383,7 @@ export function getFaqResponse(content: string): string {
       `  - 1,000-Yard Centerfire Long-Range Course\n` +
       `  - Sporting Clays & Skeet Field\n` +
       `• **Clubhouse:** Air-conditioned pro shop, lounge, conference rooms & staging pavilions\n` +
-      `• **Camping:** On-site RV hookups (water/electric) and dry tent camping\n` +
+      `• **Camping / RVs:** No on-site RV hookups at the clubhouse at this time. Recommended nearby Bristol RV parks: Hilltop Campground and Lakeview RV Resort (10–12 min away).\n` +
       `• **Host:** Allen Hurley — Subsonic Society Founder ("Said. Done.")`;
   }
 
@@ -409,10 +429,11 @@ export function getFaqResponse(content: string): string {
     return `🎯 **I'm RO — Official Range Officer for The Hideout Invitational. Here's what I know:**\n\n` +
       `• **@ro schedule** — Full 3-day match schedule (Nov 13–15)\n` +
       `• **@ro hotels** — 12 recommended Bristol hotels, rates & distances\n` +
+      `• **@ro rv** — RV hookup policy & reputable Bristol campgrounds (Hilltop, Lakeview, KOA)\n` +
       `• **@ro food** — Top 12 Bristol restaurants, BBQ, steaks & Blackbird Bakery\n` +
       `• **@ro entertainment** — Fly fishing, Hard Rock Casino, Speedway & attractions\n` +
       `• **@ro side matches** — $1,000 Speed Duel & $1,500 Cold Bore Challenge\n` +
-      `• **@ro hideout** — 220-acre facility amenities, camping & address\n` +
+      `• **@ro hideout** — 220-acre facility amenities, ranges & address\n` +
       `• **@ro ammo** — Authorized ammo specs & subsonic speed limits\n` +
       `• **@ro rules** — Safety SOPs and cold range rules\n\n` +
       `Or just ask any natural question about the match or Bristol — I'm monitoring this frequency 24/7!`;
@@ -539,8 +560,22 @@ export function analyzeMsgForPlink(
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  // Direct question keywords about Bristol or match details
+  // Direct RV, camping, hookup, or trailer inquiries
   const lower = content.toLowerCase();
+  if (
+    lower.includes("rv") ||
+    lower.includes("hookup") ||
+    lower.includes("camper") ||
+    lower.includes("motorhome") ||
+    lower.includes("campsite") ||
+    lower.includes("campground") ||
+    lower.includes("hilltop") ||
+    (lower.includes("camp") && (lower.includes("?") || lower.includes("clubhouse") || lower.includes("on site") || lower.includes("weekend") || lower.includes("ro")))
+  ) {
+    return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  }
+
+  // Direct question keywords about Bristol or match details
   if (
     (lower.includes("where to stay") || lower.includes("hotel") || lower.includes("lodging") || lower.includes("where to eat") || lower.includes("restaurant") || lower.includes("blackbird") || lower.includes("bbq") || lower.includes("fly fishing") || lower.includes("south holston") || lower.includes("casino") || lower.includes("side match") || lower.includes("cold bore") || lower.includes("schedule")) &&
     (lower.includes("?") || lower.includes("recommend") || lower.includes("best") || lower.includes("ro") || lower.includes("anyone"))

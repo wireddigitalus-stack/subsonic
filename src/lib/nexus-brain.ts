@@ -41,7 +41,7 @@ CORE DOMAIN KNOWLEDGE:
 1. THE HIDEOUT FACILITY & HEADQUARTERS:
    - Location: 111 Hwy 44, Bristol, TN 37620.
    - Property: 220 acres of private Appalachian mountain ridgeline.
-   - Range Features: 300-yard dedicated precision rimfire range (barricades, tank traps, rooftop simulator, natural rock ledges), 1,000-yard centerfire course, sporting clays, air-conditioned clubhouse, on-site RV hookups and dry tent camping.
+   - Range Features: 300-yard dedicated precision rimfire range (barricades, tank traps, rooftop simulator, natural rock ledges), 1,000-yard centerfire course, sporting clays, air-conditioned clubhouse (no on-site RV hookups at the clubhouse at this time; recommend nearby Bristol RV parks including Hilltop Campground and Lakeview RV Resort).
    - Leadership: Founded by Allen Hurley (Callsign: "SAID DONE", "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:

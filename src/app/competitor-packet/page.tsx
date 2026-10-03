@@ -675,9 +675,9 @@ export default function CompetitorPacketPage() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <Car className="w-5 h-5" />
               </div>
-              <h4 className="text-lg font-bold text-white">Dirt Track, RV Hookups & Camping</h4>
+              <h4 className="text-lg font-bold text-white">Dirt Track, Staging & RV Lodging</h4>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                1/4-mile dirt flat track & supercross rhythm section, dedicated RV hookup spaces, and scenic dry camping zones nestled into the Tennessee hillside.
+                1/4-mile dirt flat track & supercross rhythm section with ample squad staging. Note: The clubhouse does not have on-site RV hookups at this time; reputable regional RV parks (Hilltop Campground, Lakeview RV Resort) are located 10–12 minutes away.
               </p>
             </div>
           </div>
