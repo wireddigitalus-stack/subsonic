@@ -213,15 +213,15 @@ export function ChatMessageList({
                 <p className="text-xs text-slate-400 leading-relaxed">
                   Direct communication channel with <strong className="text-white">{activeDirectPartner?.name || "this competitor"}</strong>. Messages are private to this net.
                 </p>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-[10px] font-mono text-amber-300">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-[10px] font-mono text-cyan-300">
                   <Bot className="w-3 h-3 text-cyan-400 shrink-0" />
                   <span>Monitored by RO BOT · Autonomous AI Match & Safety Agent</span>
                 </div>
               </div>
 
               {(activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") && (
-                <div className="p-3.5 rounded-2xl bg-black/60 border border-amber-500/30 text-left space-y-2.5">
-                  <div className="text-[11px] font-mono text-amber-400 font-bold flex items-center gap-1.5">
+                <div className="p-3.5 rounded-2xl bg-black/60 border border-cyan-500/30 text-left space-y-2.5 shadow-[0_0_20px_rgba(6,182,212,0.12)]">
+                  <div className="text-[11px] font-mono text-cyan-300 font-bold flex items-center gap-1.5">
                     <Bot className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Autonomous AI Assistant Quick Inquiries:</span>
                   </div>
@@ -236,7 +236,7 @@ export function ChatMessageList({
                         key={i}
                         type="button"
                         onClick={() => setInputText(promptText)}
-                        className="text-[10px] font-mono p-2 rounded-xl bg-white/5 hover:bg-amber-500/20 text-slate-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/30 transition-all text-left"
+                        className="text-[10px] font-mono p-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-200 border border-white/10 hover:border-cyan-500/30 transition-all text-left"
                       >
                         &ldquo;{promptText}&rdquo;
                       </button>
@@ -281,7 +281,7 @@ export function ChatMessageList({
                       ? "bg-red-950/20 border-l-red-500 border-y border-r border-y-white/5 border-r-white/5"
                       : roSeverity === "warn"
                       ? "bg-amber-950/15 border-l-amber-500 border-y border-r border-y-white/5 border-r-white/5"
-                      : "bg-zinc-900/40 border-l-slate-400 border-y border-r border-y-white/5 border-r-white/5"
+                      : "bg-cyan-950/15 border-l-cyan-400 border-y border-r border-y-cyan-500/10 border-r-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.06)]"
                     : isMasterOwner
                     ? "bg-blue-950/30 border-l-blue-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isOwnerAdmin
@@ -307,9 +307,9 @@ export function ChatMessageList({
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
                       title={`View ${msg.author.name} Profile & Direct Chat`}
-                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-blue-400 cursor-pointer overflow-hidden ${
+                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-cyan-400 cursor-pointer overflow-hidden ${
                         isRO
-                          ? "bg-zinc-700 text-white ring-slate-400 font-black"
+                          ? "bg-cyan-950 text-cyan-300 ring-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
                           : isMasterOwner
                           ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
                           : isOwnerAdmin
@@ -350,7 +350,7 @@ export function ChatMessageList({
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Profile & Direct Chat`}
                           className={`text-sm font-semibold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
-                            isRO ? "text-slate-200 font-black" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
+                            isRO ? "text-cyan-300 font-bold" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
                           {isRO ? "RO BOT" : msg.author.name}
@@ -373,7 +373,7 @@ export function ChatMessageList({
                         <span
                           className={`text-[11px] font-medium px-1.5 py-0.5 rounded uppercase ${
                             isRO
-                              ? "bg-slate-500/15 text-slate-300"
+                              ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
                               : isMasterOwner
                               ? "bg-blue-500/20 text-blue-300"
                               : isOwnerAdmin
@@ -413,8 +413,8 @@ export function ChatMessageList({
 
                       {/* Rig line or RO Subtitle */}
                       {isRO ? (
-                        <div className="hidden md:flex text-[11px] text-slate-400 items-center gap-1.5 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />
+                        <div className="hidden md:flex text-[11px] text-cyan-300/80 items-center gap-1.5 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block shadow-[0_0_6px_rgba(6,182,212,0.8)]" />
                           <span>Autonomous AI Match Assistant · The Hideout Official Guide</span>
                         </div>
                       ) : msg.author.rifleSetup ? (
@@ -434,8 +434,9 @@ export function ChatMessageList({
                         REVIEW
                       </span>
                     ) : isRO ? (
-                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-500/20 text-slate-300 border border-slate-500/30 font-bold">
-                        OFFICIAL RO
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1">
+                        <Bot className="w-3 h-3 text-cyan-400" />
+                        AI RO
                       </span>
                     ) : (
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -446,7 +447,9 @@ export function ChatMessageList({
                 {/* Standard Content with Clickable URLs & Competitor Packet Badge */}
                 {msg.content && (
                   <div className="space-y-2">
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal whitespace-pre-line">
+                    <p className={`text-xs sm:text-sm leading-relaxed font-normal whitespace-pre-line ${
+                      isRO ? "text-cyan-50/95" : "text-slate-200"
+                    }`}>
                       {msg.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
                         if (part.match(/^https?:\/\//)) {
                           return (
@@ -455,7 +458,11 @@ export function ChatMessageList({
                               href={part}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 font-mono font-bold text-amber-400 hover:text-amber-300 underline underline-offset-4 decoration-amber-500/60 hover:decoration-amber-300 break-all transition-colors"
+                              className={`inline-flex items-center gap-1 font-mono font-bold underline underline-offset-4 break-all transition-colors ${
+                                isRO
+                                  ? "text-cyan-300 hover:text-cyan-200 decoration-cyan-400/60 hover:decoration-cyan-200"
+                                  : "text-amber-400 hover:text-amber-300 decoration-amber-500/60 hover:decoration-amber-300"
+                              }`}
                             >
                               <span>{part}</span>
                               <ExternalLink className="w-3 h-3 inline shrink-0" />
@@ -473,11 +480,15 @@ export function ChatMessageList({
                           href="https://subsonic-omega.vercel.app/competitor-packet"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-mono font-bold transition-all shadow-sm active:scale-95"
+                          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all shadow-sm active:scale-95 ${
+                            isRO
+                              ? "bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                              : "bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200"
+                          }`}
                         >
-                          <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <FileText className={`w-3.5 h-3.5 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
                           <span>Open 2026 Competitor Packet (Guide & PDF)</span>
-                          <ExternalLink className="w-3 h-3 text-amber-400 shrink-0" />
+                          <ExternalLink className={`w-3 h-3 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
                         </a>
                       </div>
                     )}
@@ -579,14 +590,14 @@ export function ChatMessageList({
                 <button
                   type="button"
                   onClick={() => quickBroadcast("What are the recommended hotels in Bristol?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 transition-all shrink-0"
+                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-500/40 transition-all shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.15)]"
                 >
                   🏨 &ldquo;Bristol Lodging&rdquo;
                 </button>
                 <button
                   type="button"
                   onClick={() => quickBroadcast("What are the best dinner and BBQ spots near the match?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-slate-300 hover:text-amber-200 border border-white/10 transition-all shrink-0"
+                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-950/25 hover:bg-cyan-900/40 text-slate-300 hover:text-cyan-200 border border-white/10 hover:border-cyan-500/30 transition-all shrink-0"
                 >
                   🍖 &ldquo;Bristol Food&rdquo;
                 </button>

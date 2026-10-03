@@ -788,12 +788,12 @@ export default function ChatPage() {
         const roMsg: ChatMessage = {
           id: `welcome-ro-${targetChannel}`,
           channelId: targetChannel,
-          type: "MATCH_ALERT",
+          type: "STANDARD",
           author: {
             id: "plink_ai_moderator",
             name: "RO BOT",
             callsign: "RO BOT",
-            role: "OFFICIAL",
+            role: "AI_MODERATOR",
             badgeText: "AI Range Officer",
             division: "Autonomous AI Assistant • The Hideout",
             rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",

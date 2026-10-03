@@ -146,12 +146,12 @@ export function ChatChannelSidebar({
                         <div className="relative shrink-0">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 overflow-hidden ${
                             isRO
-                              ? "bg-amber-600 text-black ring-amber-400 font-black"
+                              ? "bg-cyan-950 text-cyan-300 ring-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
                               : isMasterOwner
                               ? "bg-blue-800 text-cyan-200 ring-cyan-400"
                               : isOwnerAdmin
                               ? "bg-emerald-500 text-black ring-emerald-300"
-                              : "bg-white/10 text-amber-400 ring-white/10"
+                              : "bg-white/10 text-slate-300 ring-white/10"
                           }`}>
                             {partner.image ? (
                               <img src={partner.image} alt="" className="w-full h-full object-cover" />
@@ -174,12 +174,12 @@ export function ChatChannelSidebar({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <span className={`text-xs font-bold truncate ${
-                              isActive ? (isMasterOwner ? "text-blue-300" : "text-amber-300") : "text-white"
+                              isActive ? (isRO ? "text-cyan-300" : isMasterOwner ? "text-blue-300" : "text-amber-300") : "text-white"
                             }`}>
                               {partner.name}
                             </span>
                             <span className={`text-[10px] font-mono font-bold shrink-0 ${
-                              isMasterOwner ? "text-blue-400" : "text-amber-400/90"
+                              isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-slate-400"
                             }`}>
                               [{partner.callsign}]
                             </span>

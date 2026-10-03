@@ -405,12 +405,12 @@ export function ChannelPickerModal({
                     <div className="flex items-start gap-3 min-w-0">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative overflow-hidden ${
                         isRO
-                          ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                          ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
                           : isMasterOwner
                           ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 font-black shadow-[0_0_10px_rgba(6,182,212,0.4)]"
                           : isOwnerAdmin
                           ? "bg-emerald-500 text-black border-emerald-300 font-black"
-                          : "bg-black/60 text-amber-400 border-white/10"
+                          : "bg-black/60 text-slate-300 border-white/10"
                       }`}>
                         {partner.image ? (
                           <img src={partner.image} alt="" className="w-full h-full object-cover" />
@@ -432,14 +432,14 @@ export function ChannelPickerModal({
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={`text-sm font-bold truncate ${
                             isActive 
-                              ? (isMasterOwner ? "text-blue-300" : "text-emerald-300")
-                              : (isMasterOwner ? "text-white group-hover:text-blue-200" : "text-white group-hover:text-emerald-200")
+                              ? (isRO ? "text-cyan-300" : isMasterOwner ? "text-blue-300" : "text-emerald-300")
+                              : (isRO ? "text-white group-hover:text-cyan-200" : isMasterOwner ? "text-white group-hover:text-blue-200" : "text-white group-hover:text-emerald-200")
                           }`}>
                             {partner.name}
                           </span>
 
                           <span className={`font-mono text-xs font-bold shrink-0 ${
-                            isMasterOwner ? "text-blue-400" : "text-amber-400"
+                            isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-slate-400"
                           }`}>
                             [{partner.callsign}]
                           </span>

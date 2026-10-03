@@ -48,8 +48,10 @@ export function ShooterDossierModal({
         {/* Header Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
-            <span className="font-mono text-[11px] font-bold text-amber-400 tracking-wider uppercase">
+            <span className={`w-2 h-2 rounded-full inline-block ${isRO ? "bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" : "bg-amber-400 animate-ping"}`} />
+            <span className={`font-mono text-[11px] font-bold tracking-wider uppercase ${
+              isRO ? "text-cyan-400" : "text-amber-400"
+            }`}>
               {isRO 
                 ? "AUTONOMOUS AI RANGE OFFICER PROFILE" 
                 : isMasterOwner 
@@ -73,7 +75,7 @@ export function ShooterDossierModal({
         <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 overflow-hidden ${
             isRO
-              ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
+              ? "bg-gradient-to-br from-cyan-900 via-cyan-950 to-black text-cyan-300 border-cyan-400/80 shadow-[0_0_20px_rgba(6,182,212,0.35)]"
               : isMasterOwner
               ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
               : isOwnerAdmin
@@ -99,7 +101,7 @@ export function ShooterDossierModal({
                 {isRO ? "RO BOT" : shooter.name}
               </h3>
               <span className={`font-mono text-xs font-bold shrink-0 ${
-                isMasterOwner ? "text-blue-400" : "text-amber-400"
+                isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-amber-400"
               }`}>
                 [{isRO ? "RO BOT" : shooter.callsign}]
               </span>
@@ -108,7 +110,7 @@ export function ShooterDossierModal({
             <div className="flex items-center gap-1.5 mt-1 flex-wrap">
               <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-black tracking-wide uppercase ${
                 isRO
-                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/50"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50"
                   : isMasterOwner
                   ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.4)]"
                   : isOwnerAdmin
@@ -199,8 +201,8 @@ export function ShooterDossierModal({
 
         {/* RO Special Capabilities / Direct Prompt shortcuts */}
         {isRO && (
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-300">
+          <div className="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2 shadow-[0_0_15px_rgba(6,182,212,0.08)]">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-cyan-300">
               <Bot className="w-4 h-4 text-cyan-400" />
               <span>Autonomous AI Match Assistant · 24/7 Intel</span>
             </div>
@@ -215,7 +217,11 @@ export function ShooterDossierModal({
           <button
             type="button"
             onClick={() => onStartDirectComms(shooter)}
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all active:scale-[0.98]"
+            className={`w-full py-3 px-4 rounded-xl font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+              isRO
+                ? "bg-cyan-500 hover:bg-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.35)]"
+                : "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.35)]"
+            }`}
           >
             <Lock className="w-4 h-4 text-black" />
             <span>Open Direct Chat with {shooter.callsign}</span>
