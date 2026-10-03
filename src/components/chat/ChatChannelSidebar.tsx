@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, Users, ChevronRight } from "lucide-react";
+import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, Users, ChevronRight, LogOut } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
 export interface ChatChannelSidebarProps {
@@ -15,6 +15,14 @@ export interface ChatChannelSidebarProps {
   directPartners?: DirectPartner[];
   unreadCounts?: Record<string, number>;
   onOpenDossier?: (partner: DirectPartner) => void;
+  shooterProfile?: {
+    name?: string;
+    callsign: string;
+    image?: string;
+    role?: string;
+    badgeText?: string;
+  };
+  onLogout?: () => void;
 }
 
 export function ChatChannelSidebar({
@@ -27,6 +35,8 @@ export function ChatChannelSidebar({
   directPartners = [],
   unreadCounts = {},
   onOpenDossier,
+  shooterProfile,
+  onLogout,
 }: ChatChannelSidebarProps) {
   return (
     <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
@@ -245,6 +255,38 @@ export function ChatChannelSidebar({
             </span>
           </Link>
         </div>
+
+        {/* Current User Session Bar */}
+        {shooterProfile && onLogout && (
+          <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center font-mono font-bold text-[10px] text-amber-400 shrink-0 overflow-hidden">
+                {shooterProfile.image ? (
+                  <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  shooterProfile.callsign?.slice(0, 2) || "SS"
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-white truncate font-mono leading-tight">
+                  {shooterProfile.callsign}
+                </div>
+                <div className="text-[10px] text-slate-400 truncate leading-tight">
+                  {shooterProfile.name || "Society Member"}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              title="Log Out of Chat"
+              className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1 text-[10px] font-medium"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>LOGOUT</span>
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

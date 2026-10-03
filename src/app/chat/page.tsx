@@ -54,7 +54,8 @@ import {
   Bot,
   Activity,
   Radar,
-  Hash
+  Hash,
+  LogOut
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -1545,6 +1546,25 @@ export default function ChatPage() {
     }
   };
 
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("subsonic_chat_authenticated");
+        localStorage.removeItem("subsonic_shooter_profile");
+        localStorage.removeItem("subsonic_member_profile");
+      } catch (e) {
+        console.warn("Failed to clear chat authentication from storage:", e);
+      }
+    }
+    setIsAuthenticated(false);
+    setShooterProfile(DEFAULT_PROFILE);
+    setProfileForm(DEFAULT_PROFILE);
+    setLoginCallsign("");
+    setLoginPasscode("");
+    setIsProfileModalOpen(false);
+    playTacticalChirp(400);
+  };
+
 
   // If not authenticated, render the Private Chat Room Gate
   if (authChecked && !isAuthenticated) {
@@ -1682,17 +1702,12 @@ export default function ChatPage() {
 
               <button
                 type="button"
-                onClick={() => {
-                  if (typeof window !== "undefined") {
-                    localStorage.removeItem("subsonic_chat_authenticated");
-                  }
-                  setIsAuthenticated(false);
-                  playTacticalChirp(400);
-                }}
-                title="Lock Chat"
-                className="h-7 w-7 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 flex items-center justify-center"
+                onClick={handleLogout}
+                title="Log Out of Chat"
+                className="h-7 px-2 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 flex items-center gap-1 text-[10px] font-semibold transition-colors"
               >
-                <Lock className="w-3 h-3" />
+                <LogOut className="w-3 h-3 shrink-0" />
+                <span>EXIT</span>
               </button>
             </div>
           </div>
@@ -1784,18 +1799,12 @@ export default function ChatPage() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (typeof window !== "undefined") {
-                      localStorage.removeItem("subsonic_chat_authenticated");
-                    }
-                    setIsAuthenticated(false);
-                    playTacticalChirp(400);
-                  }}
-                  title="Lock Private Chat Room"
-                  className="h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
+                  onClick={handleLogout}
+                  title="Log Out of Private Chat"
+                  className="h-7 px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border-red-500/30 transition-all"
                 >
-                  <Lock className="w-3 h-3 text-red-400 shrink-0" />
-                  <span>Lock</span>
+                  <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                  <span>Log Out</span>
                 </button>
 
                 <button
@@ -2203,6 +2212,8 @@ export default function ChatPage() {
             directPartners={directPartners}
             unreadCounts={unreadCounts}
             onOpenDossier={handleOpenDossier}
+            shooterProfile={shooterProfile}
+            onLogout={handleLogout}
           />
         )}
 
@@ -2547,6 +2558,21 @@ export default function ChatPage() {
                   </div>
                 </form>
               )}
+
+              {/* Session Control / Log Out */}
+              <div className="pt-3 mt-1 border-t border-white/10 flex items-center justify-between gap-3">
+                <div className="text-[11px] text-slate-400">
+                  Signed in as <strong className="text-white font-mono">{shooterProfile.callsign}</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-red-400" />
+                  <span>Log Out of Chat</span>
+                </button>
+              </div>
             </div>
           </div>
         );
