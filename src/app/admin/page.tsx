@@ -60,8 +60,11 @@ import {
   Crown,
   Shield,
   Key,
-  Copy
+  Copy,
+  Bot
 } from "lucide-react";
+import { BotRosterCard } from "@/components/chat/BotRosterCard";
+import { BotSpeed } from "@/lib/chat-bots";
 import { 
   getLocalTelemetryEvents, 
   computeTelemetryAnalytics, 
@@ -175,6 +178,36 @@ export default function AdminDashboardPage() {
   const [matches, setMatches] = useState<MatchEvent[]>(INITIAL_MATCHES);
   const [simulating, setSimulating] = useState(false);
   const [commsBeaconLevel, setCommsBeaconLevel] = useState<CommsAlertLevel>("green");
+
+  // Autonomous Test Bot Fleet & Simulator State (Off-Chat Control)
+  const [isBotCardOpen, setIsBotCardOpen] = useState(false);
+  const [botsEnabled, setBotsEnabled] = useState(false);
+  const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
+  const [badActorEnabled, setBadActorEnabled] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("subsonic_bots_enabled");
+      if (stored !== null) setBotsEnabled(stored === "true");
+      const speed = localStorage.getItem("subsonic_bots_speed");
+      if (speed) setBotSpeed(speed as BotSpeed);
+    }
+  }, []);
+
+  const handleToggleBots = () => {
+    const next = !botsEnabled;
+    setBotsEnabled(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("subsonic_bots_enabled", String(next));
+    }
+  };
+
+  const handleChangeBotSpeed = (speed: BotSpeed) => {
+    setBotSpeed(speed);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("subsonic_bots_speed", speed);
+    }
+  };
 
   // Shooter Profiles & Competition Vault state
   const [shooterProfiles, setShooterProfiles] = useState<ShooterProfile[]>([]);
@@ -1508,6 +1541,21 @@ export default function AdminDashboardPage() {
             <span>EVOS 1.0</span>
           </Link>
 
+          {/* Autonomous Test Bots Fleet Launcher (Off-Chat Control) */}
+          <button
+            type="button"
+            onClick={() => setIsBotCardOpen(true)}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              botsEnabled
+                ? "bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/50 shadow-[0_0_14px_rgba(6,182,212,0.35)]"
+                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+            }`}
+            title="Configure and manage autonomous test bot fleet, simulation speed, and guidelines test runs"
+          >
+            <Bot className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Test Bots: <strong className={botsEnabled ? "text-cyan-300" : "text-slate-400"}>{botsEnabled ? "ON" : "OFF"}</strong></span>
+          </button>
+
           <Link
             href="/chat"
             target="_blank"
@@ -2269,7 +2317,7 @@ export default function AdminDashboardPage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className="text-2xl font-black text-amber-400">{members.length}</div>
                 <div className="text-[10px] font-mono text-slate-400 uppercase">Active Chatters</div>
@@ -2282,6 +2330,55 @@ export default function AdminDashboardPage() {
                 <div className="text-2xl font-black text-red-400">{flaggedMessages.length}</div>
                 <div className="text-[10px] font-mono text-slate-400 uppercase">Flagged Messages</div>
               </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+                <div className={`text-2xl font-black ${botsEnabled ? "text-cyan-400 animate-pulse" : "text-slate-400"}`}>
+                  {botsEnabled ? "ON" : "OFF"}
+                </div>
+                <div className="text-[10px] font-mono text-cyan-300/80 uppercase">Test Bot Fleet</div>
+              </div>
+            </div>
+
+            {/* Autonomous Test Bot Fleet Controller (Off-Chat Control) */}
+            <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                    Autonomous Test Bot Fleet (Off-Chat Controller)
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                    botsEnabled
+                      ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                      : "bg-white/10 text-slate-400 border border-white/10"
+                  }`}>
+                    {botsEnabled ? "SIMULATION ACTIVE" : "OFFLINE"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleToggleBots}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                      botsEnabled
+                        ? "bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                        : "bg-white/10 hover:bg-white/20 text-white"
+                    }`}
+                  >
+                    {botsEnabled ? "STOP TEST BOTS" : "START TEST BOTS"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsBotCardOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition-all"
+                  >
+                    <Sliders className="w-3.5 h-3.5" />
+                    <span>Open Fleet Card &amp; Audition</span>
+                  </button>
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-300">
+                Simulates real-world match chat traffic, stage discussions, equipment DOPE cards, and tests AI Sentinel defense against bad actors and spam. Controlled entirely from Admin off chat.
+              </p>
             </div>
 
             {/* Live Mobile Comms Beacon Controller & Broadcast Tester */}
@@ -3392,6 +3489,24 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Bot Roster Card & Autonomous Fleet Controls (Off-Chat Control) */}
+      <BotRosterCard
+        isOpen={isBotCardOpen}
+        onClose={() => setIsBotCardOpen(false)}
+        messages={flaggedMessages}
+        botsEnabled={botsEnabled}
+        onToggleBots={handleToggleBots}
+        botSpeed={botSpeed}
+        onChangeSpeed={handleChangeBotSpeed}
+        currentChannel="invitational"
+        onAddBotMessage={(msg) => {
+          setFlaggedMessages((prev) => [msg, ...prev]);
+        }}
+        soundEnabled={false}
+        badActorEnabled={badActorEnabled}
+        onToggleBadActor={() => setBadActorEnabled((prev) => !prev)}
+      />
     </div>
   );
 }

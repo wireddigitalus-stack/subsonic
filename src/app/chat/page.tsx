@@ -53,7 +53,8 @@ import {
   Mic,
   Bot,
   Activity,
-  Radar
+  Radar,
+  Hash
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -66,7 +67,6 @@ import { analyzeMsgForPlink, buildPlinkMessage, getChannelWelcome, getRoDirectAn
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
-import { BotRosterCard } from "@/components/chat/BotRosterCard";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
 import { clearCommsAlert } from "@/lib/comms-status";
 
@@ -344,11 +344,35 @@ export default function ChatPage() {
   // Terms of Use & Code of Conduct Modal state
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
-  // Bot Engine & Bot Chats Card State
-  const [botsEnabled, setBotsEnabled] = useState(false);
-  const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
+  // Bot Engine State (controlled from Admin Console via localStorage sync)
+  const [botsEnabled, setBotsEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("subsonic_bots_enabled") === "true";
+    }
+    return false;
+  });
+  const [botSpeed, setBotSpeed] = useState<BotSpeed>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("subsonic_bots_speed") as BotSpeed) || "NORMAL";
+    }
+    return "NORMAL";
+  });
   const [badActorEnabled, setBadActorEnabled] = useState(true);
-  const [isBotCardOpen, setIsBotCardOpen] = useState(false);
+
+  // Sync bot state across tabs if Admin toggles bots
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "subsonic_bots_enabled") {
+        setBotsEnabled(e.newValue === "true");
+      }
+      if (e.key === "subsonic_bots_speed" && e.newValue) {
+        setBotSpeed(e.newValue as BotSpeed);
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   const botCleanupRef = useRef<(() => void) | null>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages; // keep ref in sync
@@ -1391,16 +1415,6 @@ export default function ChatPage() {
                 <span className="text-amber-400 font-extrabold text-[11px]">CHAT ROOM</span>
               </Link>
 
-              {/* Quick Link to EVOS Holographic Net */}
-              <Link
-                href="/evos1.0"
-                className="hidden xs:flex items-center gap-1 px-1.5 py-1 rounded-xl bg-cyan-950/50 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold shrink-0 transition-all active:scale-95"
-                title="Switch to EVOS 1.0 Holographic Net"
-              >
-                <span className="text-cyan-400 text-xs">⚡</span>
-                <span>EVOS</span>
-              </Link>
-
               {/* Shooter Callsign & Pass Pill */}
               <button
                 id="tour-step-pass"
@@ -1500,252 +1514,231 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Desktop Top Bar: Rich Weather & Expanded Controls */}
-          <div className="hidden sm:flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-4">
-            {/* Left: Weather & Elevation Telemetry */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs font-mono">
-              <Link
-                href="/"
-                title="Return to Main Site"
-                className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/60 hover:bg-white/10 border border-white/15 text-white transition-all group shrink-0 shadow-sm"
-              >
-                <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/80 bg-black shrink-0">
-                  <Image
-                    src="/images/SS-RWB-LOGO.png"
-                    alt="Subsonic"
-                    width={20}
-                    height={20}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <ChevronLeft className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
-                <span className="font-extrabold text-[11px] font-mono tracking-wider text-slate-200 group-hover:text-amber-400">
-                  PORTAL
-                </span>
-                <span className="text-white/20">/</span>
-                <span className="text-amber-400 font-bold">CHAT ROOM</span>
-              </Link>
+          {/* Desktop Top Bar: 2x Stacked Command & Telemetry Tiers */}
+          <div className="hidden sm:flex flex-col gap-2">
+            {/* ROW 1: Identity, Room Selector, Admin & Primary Action Controls */}
+            <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/10">
+              {/* Left: Brand Portal Breadcrumb & Active Channel Indicator */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Link
+                  href="/"
+                  title="Return to Main Site"
+                  className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/60 hover:bg-white/10 border border-white/15 text-white transition-all group shrink-0 shadow-sm"
+                >
+                  <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/80 bg-black shrink-0">
+                    <Image
+                      src="/images/SS-RWB-LOGO.png"
+                      alt="Subsonic"
+                      width={20}
+                      height={20}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <ChevronLeft className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+                  <span className="font-extrabold text-[11px] font-mono tracking-wider text-slate-200 group-hover:text-amber-400">
+                    PORTAL
+                  </span>
+                  <span className="text-white/20">/</span>
+                  <span className="text-amber-400 font-bold">CHAT ROOM</span>
+                </Link>
 
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
+                {/* Quick Channel / Room Selector Chip */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsChannelModalOpen(true);
+                    playTacticalChirp(1100);
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs transition-all"
+                  title="Switch Comms Channel"
+                >
+                  <Hash className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="font-bold text-slate-200">
+                    {ALL_CHANNELS.find((c) => c.id === currentChannel)?.name || currentChannel}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
               </div>
 
-              <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                <Compass className="w-3 h-3 text-amber-400" />
-                <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
-              </div>
+              {/* Right: Admin Link, Terms, Lock, and Profile Pill */}
+              <div className="flex items-center gap-2">
+                {(shooterProfile?.role === "MASTER_OWNER" || 
+                  shooterProfile?.role === "OWNER_ADMIN" || 
+                  shooterProfile?.callsign === "RADAR" || 
+                  shooterProfile?.callsign === "SAID DONE" || 
+                  shooterProfile?.callsign === "ALLEN") && (
+                  <Link
+                    href="/admin"
+                    target="_blank"
+                    title="Open Staff Admin & Chat Moderation Dashboard"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[11px] font-mono text-emerald-300 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="font-bold">ADMIN / MODERATION</span>
+                  </Link>
+                )}
 
-              <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                <Wind className="w-3 h-3 text-cyan-400" />
-                <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
-              </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsTermsModalOpen(true);
+                    playTacticalChirp(1100);
+                  }}
+                  title="Subsonic Society Terms of Use & Code of Conduct"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-[10px] font-mono text-slate-300 hover:text-amber-300 transition-colors shrink-0"
+                >
+                  <Scale className="w-3 h-3 text-amber-400 shrink-0" />
+                  <span>TERMS &amp; CONDUCT</span>
+                </button>
 
-              <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                <Thermometer className="w-3.5 h-3.5 text-orange-400" />
-                <span>TEMP: <strong className="text-white">64°F</strong></span>
-              </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      localStorage.removeItem("subsonic_chat_authenticated");
+                    }
+                    setIsAuthenticated(false);
+                    playTacticalChirp(400);
+                  }}
+                  title="Lock Private Chat Room"
+                  className="h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
+                >
+                  <Lock className="w-3 h-3 text-red-400 shrink-0" />
+                  <span>Lock</span>
+                </button>
 
-              <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                <Target className="w-3.5 h-3.5 text-emerald-400" />
-                <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProfileForm(shooterProfile);
+                    setProfileActiveTab("EDIT");
+                    setIsProfileModalOpen(true);
+                  }}
+                  data-telemetry="chat_edit_shooter_profile"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
+                >
+                  <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
+                    shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                      ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                      : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
+                      : "bg-amber-500 text-black font-bold"
+                  }`}>
+                    {shooterProfile.image ? (
+                      <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                    ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                      <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
+                    ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
+                      "A"
+                    ) : (
+                      shooterProfile.callsign.slice(0, 2)
+                    )}
+                  </div>
+                  <span className={`font-mono font-bold text-[11px] sm:text-xs ${
+                    shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                      ? "text-cyan-300 group-hover:text-cyan-200"
+                      : "text-amber-300 group-hover:text-amber-200"
+                  }`}>
+                    {shooterProfile.callsign}
+                  </span>
+                  <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
+                </button>
               </div>
             </div>
 
-            {/* Right: Controls & Profile Pill */}
-            <div className="flex items-center justify-between lg:justify-end gap-2 sm:gap-3 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-white/10">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsTourOpen(true);
-                  playTacticalChirp(1100);
-                }}
-                data-telemetry="chat_start_tour"
-                className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white border-amber-500/40 transition-all font-bold shadow-[0_0_12px_rgba(245,158,11,0.15)]"
-                title="Start Interactive Chat Tour"
-              >
-                <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
-                <span>TOUR GUIDE</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsFullscreen(true)}
-                data-telemetry="chat_enter_fullscreen"
-                className="px-2.5 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
-                title="Expand to Fullscreen Fill Hand Mode"
-              >
-                <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
-                <span>Fullscreen</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
-                  soundEnabled
-                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                    : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
-                }`}
-                title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
-                aria-label="Toggle Tactical Radio Audio"
-              >
-                {soundEnabled ? (
-                  <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
-                ) : (
-                  <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
-                )}
-                <span className="text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
-                <span>{soundEnabled ? "ON" : "OFF"}</span>
-              </button>
-
-              {/* Bot On/Off Switch & Fleet Card Access — Admin only */}
-              {(shooterProfile.role === "MASTER_OWNER" || shooterProfile.role === "DEV_ADMIN" || shooterProfile.role === "OWNER_ADMIN" || shooterProfile.role === "ADMIN") && (
-                <div className="flex items-center rounded-lg border border-white/10 bg-black/40 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      unlockAudio();
-                      setBotsEnabled(!botsEnabled);
-                    }}
-                    className={`flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 text-[10px] font-mono font-bold transition-all ${
-                      botsEnabled
-                        ? "bg-cyan-500/25 text-cyan-300 hover:bg-cyan-500/35 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/10"
-                    }`}
-                    title={botsEnabled ? "Turn test bots OFF" : "Turn test bots ON"}
-                  >
-                    <span>🤖</span>
-                    <span>{botsEnabled ? "BOTS ON" : "BOTS OFF"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      unlockAudio();
-                      setIsBotCardOpen(true);
-                      playTacticalChirp(1100);
-                    }}
-                    className={`px-1.5 py-0.5 sm:py-1 border-l border-white/10 transition-colors ${
-                      botsEnabled
-                        ? "bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-100"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/10"
-                    }`}
-                    title="Open Bot Fleet Card (roster, live metrics, tones)"
-                    aria-label="Open Bot Fleet Card"
-                  >
-                    <Sliders className="w-3 h-3" />
-                  </button>
+            {/* ROW 2: Weather & Range Telemetry (Left) + Tactical Utilities (Right) */}
+            <div className="flex items-center justify-between gap-3">
+              {/* Left: Weather Telemetry */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-[11px] sm:text-xs font-mono">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
                 </div>
-              )}
 
-              <Link
-                href="/evos1.0"
-                target="_blank"
-                title="Launch EVOS 1.0 Dynamic Neural Network Topology"
-                className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-[10px] font-mono text-cyan-300 transition-colors shadow-[0_0_8px_rgba(6,182,212,0.15)]"
-              >
-                <Activity className="w-3 h-3 text-cyan-400 shrink-0 animate-pulse" />
-                <span className="font-bold">EVOS 1.0</span>
-              </Link>
+                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                  <Compass className="w-3 h-3 text-amber-400" />
+                  <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
+                </div>
 
-              {(shooterProfile?.role === "MASTER_OWNER" || 
-                shooterProfile?.role === "OWNER_ADMIN" || 
-                shooterProfile?.callsign === "RADAR" || 
-                shooterProfile?.callsign === "SAID DONE" || 
-                shooterProfile?.callsign === "ALLEN") && (
-                <Link
-                  href="/admin"
-                  target="_blank"
-                  title="Open Staff Admin & Chat Moderation Dashboard"
-                  className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 transition-colors"
+                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                  <Wind className="w-3 h-3 text-cyan-400" />
+                  <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
+                </div>
+
+                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                  <Thermometer className="w-3.5 h-3.5 text-orange-400" />
+                  <span>TEMP: <strong className="text-white">64°F</strong></span>
+                </div>
+
+                <div className="hidden md:flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
+                  <Target className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
+                </div>
+              </div>
+
+              {/* Right: Tactical Utilities (Tour Guide, Fullscreen, Audio, Pass) */}
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsTourOpen(true);
+                    playTacticalChirp(1100);
+                  }}
+                  data-telemetry="chat_start_tour"
+                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white border-amber-500/40 transition-all font-bold shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                  title="Start Interactive Chat Tour"
                 >
-                  <ShieldCheck className="w-3 h-3 text-emerald-400 shrink-0" />
-                  <span>Admin / Moderation</span>
-                </Link>
-              )}
+                  <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+                  <span>TOUR GUIDE</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsTermsModalOpen(true);
-                  playTacticalChirp(1100);
-                }}
-                title="Subsonic Society Terms of Use & Code of Conduct"
-                className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-[10px] font-mono text-slate-300 hover:text-amber-300 transition-colors shrink-0"
-              >
-                <Scale className="w-3 h-3 text-amber-400 shrink-0" />
-                <span className="hidden xl:inline">TERMS &amp; CONDUCT</span>
-                <span className="xl:hidden">TERMS</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFullscreen(true)}
+                  data-telemetry="chat_enter_fullscreen"
+                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
+                  title="Expand to Fullscreen Fill Hand Mode"
+                >
+                  <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Fullscreen</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (typeof window !== "undefined") {
-                    localStorage.removeItem("subsonic_chat_authenticated");
-                  }
-                  setIsAuthenticated(false);
-                  playTacticalChirp(400);
-                }}
-                title="Lock Private Chat Room"
-                className="h-6 sm:h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
-              >
-                <Lock className="w-3 h-3 text-red-400 shrink-0" />
-                <span>Lock</span>
-              </button>
-
-              <button
-                id="tour-step-pass"
-                type="button"
-                onClick={() => {
-                  setProfileForm(shooterProfile);
-                  setProfileActiveTab("PASS");
-                  setIsProfileModalOpen(true);
-                }}
-                title="View Digital Member Pass & Scannable QR Code"
-                data-telemetry="chat_view_digital_pass"
-                className="h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-mono font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/35 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
-              >
-                <QrCode className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Pass</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setProfileForm(shooterProfile);
-                  setProfileActiveTab("EDIT");
-                  setIsProfileModalOpen(true);
-                }}
-                data-telemetry="chat_edit_shooter_profile"
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
-              >
-                <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
-                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                    ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
-                    : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
-                    : "bg-amber-500 text-black font-bold"
-                }`}>
-                  {shooterProfile.image ? (
-                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
-                  ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
-                    <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
-                  ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
-                    "A"
+                <button
+                  type="button"
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className={`h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
+                    soundEnabled
+                      ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                      : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
+                  }`}
+                  title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
+                  aria-label="Toggle Tactical Radio Audio"
+                >
+                  {soundEnabled ? (
+                    <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
                   ) : (
-                    shooterProfile.callsign.slice(0, 2)
+                    <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
                   )}
-                </div>
-                <span className={`font-mono font-bold text-[11px] sm:text-xs ${
-                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                    ? "text-cyan-300 group-hover:text-cyan-200"
-                    : "text-amber-300 group-hover:text-amber-200"
-                }`}>
-                  {shooterProfile.callsign}
-                </span>
-                <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
-              </button>
+                  <span className="text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
+                  <span>{soundEnabled ? "ON" : "OFF"}</span>
+                </button>
+
+                <button
+                  id="tour-step-pass"
+                  type="button"
+                  onClick={() => {
+                    setProfileForm(shooterProfile);
+                    setProfileActiveTab("PASS");
+                    setIsProfileModalOpen(true);
+                  }}
+                  title="View Digital Member Pass & Scannable QR Code"
+                  data-telemetry="chat_view_digital_pass"
+                  className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-mono font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/35 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                >
+                  <QrCode className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Pass</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2404,22 +2397,6 @@ export default function ChatPage() {
         onClose={() => setIsDossierModalOpen(false)}
         shooter={selectedDossierShooter}
         onStartDirectComms={handleStartDirectComms}
-      />
-
-      {/* 7. BOT CHATS CARD WITH COUNTS, BOT NAMES & TONE AUDITION */}
-      <BotRosterCard
-        isOpen={isBotCardOpen}
-        onClose={() => setIsBotCardOpen(false)}
-        messages={messages}
-        botsEnabled={botsEnabled}
-        onToggleBots={() => setBotsEnabled(!botsEnabled)}
-        botSpeed={botSpeed}
-        onChangeSpeed={(speed) => setBotSpeed(speed)}
-        currentChannel={currentChannel}
-        onAddBotMessage={handleIncomingBotMessage}
-        soundEnabled={soundEnabled}
-        badActorEnabled={badActorEnabled}
-        onToggleBadActor={() => setBadActorEnabled(!badActorEnabled)}
       />
 
       {/* 8. TERMS OF USE & CODE OF CONDUCT MODAL */}
