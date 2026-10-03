@@ -126,34 +126,6 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     role: "OWNER_ADMIN",
     notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
   },
-  {
-    member_id: "SS-2026-0003",
-    full_name: "Erich Leipold",
-    callsign: "LEIPOLD",
-    email: "erich@subsonicsociety.com",
-    state: "PA",
-    experience_level: "Open Rimfire Pro • Team USA",
-    rifle_setup: "Zermatt RimX / Bartlein MTU 22\" / MPA BA PMR Pro",
-    interests: ["Competition", "Team USA", "Rimfire World Championship", "Ammunition Testing"],
-    created_at: "2026-09-30T00:00:00Z",
-    status: "ACTIVE",
-    role: "PRO_COMPETITOR",
-    notes: "Team USA 🇺🇸 • Rimfire Challenge World Champion • Modacam Pro",
-  },
-  {
-    member_id: "SS-2026-0004",
-    full_name: "Ron Verran",
-    callsign: "VERRAN",
-    email: "ron@subsonicsociety.com",
-    state: "MI",
-    experience_level: "Open Rimfire Pro • Team USA",
-    rifle_setup: "Zermatt RimX / Bartlein MTU 22\" / MPA Matrix Pro",
-    interests: ["Competition", "Team USA", "PRS National Champion", "Appalachian Matches"],
-    created_at: "2026-09-30T00:00:00Z",
-    status: "ACTIVE",
-    role: "PRO_COMPETITOR",
-    notes: "2x PRS National Champion 🏆 • Team USA 🇺🇸 • Modacam Pro",
-  },
 ];
 
 export default function AdminDashboardPage() {
@@ -460,12 +432,28 @@ export default function AdminDashboardPage() {
               }
             }
 
+            const rawDeleted = localStorage.getItem("subsonic_deleted_members");
+            const deletedList: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
+            const isDeletedOrExec = (id?: string, cs?: string, name?: string) => {
+              const cleanCs = (cs || "").trim().toUpperCase();
+              if (["RADAR", "ROB", "LTDAN", "ALLEN", "SAID DONE", "AHURLEY", "HURLEY"].includes(cleanCs)) return true;
+              return (
+                (id && deletedList.includes(id.toLowerCase())) ||
+                (cs && deletedList.includes(cs.toLowerCase())) ||
+                (name && deletedList.includes(name.toLowerCase()))
+              );
+            };
+
             const rawPro = localStorage.getItem("subsonic_pro_full_profile");
             if (rawPro) {
               const pro = JSON.parse(rawPro);
               const proCallsign = pro.callsign || "TEST";
               const proName = (!pro.name || pro.name === "VIP Pro Competitor" || pro.name === "Invitational Competitor VIP") ? proCallsign : pro.name;
-              if (proName && !apiMembers.some((m) => m.callsign?.toLowerCase() === proCallsign.toLowerCase() || m.full_name === proName)) {
+              if (
+                proName &&
+                !isDeletedOrExec(pro.member_id, proCallsign, proName) &&
+                !apiMembers.some((m) => m.callsign?.toLowerCase() === proCallsign.toLowerCase() || m.full_name === proName)
+              ) {
                 apiMembers.unshift({
                   member_id: `SS-PRO-${proCallsign}`,
                   full_name: proName,
@@ -488,7 +476,11 @@ export default function AdminDashboardPage() {
               const mem = JSON.parse(rawMem);
               const memCallsign = mem.callsign || "OPERATIVE";
               const memName = (!mem.full_name || mem.full_name === "VIP Pro Competitor" || mem.full_name === "Invitational Competitor VIP") ? memCallsign : mem.full_name;
-              if (memName && !apiMembers.some((m) => m.callsign?.toLowerCase() === memCallsign.toLowerCase() || m.member_id === mem.member_id)) {
+              if (
+                memName &&
+                !isDeletedOrExec(mem.member_id, memCallsign, memName) &&
+                !apiMembers.some((m) => m.callsign?.toLowerCase() === memCallsign.toLowerCase() || m.member_id === mem.member_id)
+              ) {
                 apiMembers.unshift({
                   member_id: mem.member_id || `SS-2026-${Math.floor(1000 + Math.random() * 9000)}`,
                   full_name: memName,
@@ -511,7 +503,11 @@ export default function AdminDashboardPage() {
               const cur = JSON.parse(rawCurShooter);
               const curCallsign = cur.callsign || "TEST";
               const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
-              if (curCallsign && !apiMembers.some((m) => m.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
+              if (
+                curCallsign &&
+                !isDeletedOrExec(cur.id, curCallsign, curName) &&
+                !apiMembers.some((m) => m.callsign?.toLowerCase() === curCallsign.toLowerCase())
+              ) {
                 apiMembers.unshift({
                   member_id: `SS-PRO-${curCallsign}`,
                   full_name: curName,
@@ -1044,23 +1040,86 @@ export default function AdminDashboardPage() {
       setCardDeleteConfirmId(null);
       return;
     }
+
+    const targetMember = members.find(
+      (m) => m.member_id === memberId || m.callsign?.toLowerCase() === memberId.toLowerCase()
+    );
+    const targetCallsign = targetMember?.callsign;
+    const targetName = targetMember?.full_name;
+
+    // Permanently record in local storage deleted list so this browser never re-hydrates this user
+    if (typeof window !== "undefined") {
+      try {
+        const deletedRaw = localStorage.getItem("subsonic_deleted_members");
+        const deletedList: string[] = deletedRaw ? JSON.parse(deletedRaw) : [];
+        if (memberId) deletedList.push(memberId.toLowerCase());
+        if (targetCallsign) deletedList.push(targetCallsign.toLowerCase());
+        if (targetName) deletedList.push(targetName.toLowerCase());
+        localStorage.setItem("subsonic_deleted_members", JSON.stringify(Array.from(new Set(deletedList))));
+
+        // Purge matching profiles from browser local storage
+        for (const key of ["subsonic_member_profile", "subsonic_pro_full_profile", "subsonic_shooter_profile"]) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const pId = (parsed.member_id || parsed.id || "").toLowerCase();
+            const pCallsign = (parsed.callsign || "").toLowerCase();
+            const pName = (parsed.full_name || parsed.name || "").toLowerCase();
+            const mid = memberId.toLowerCase();
+            const tcs = (targetCallsign || "").toLowerCase();
+            const tnm = (targetName || "").toLowerCase();
+
+            if (
+              (pId && (pId === mid || pId.includes(mid))) ||
+              (pCallsign && (pCallsign === mid || pCallsign === tcs)) ||
+              (pName && (pName === mid || pName === tnm))
+            ) {
+              localStorage.removeItem(key);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Storage purge error:", e);
+      }
+    }
+
     setIsDeletingMember(true);
     try {
-      const res = await fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
+      // 1. Delete from members API
+      await fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
         method: "DELETE",
-      });
-      if (res.ok) {
-        setMembers((prev) => prev.filter((m) => m.member_id !== memberId && m.callsign?.toLowerCase() !== memberId.toLowerCase()));
-        setShooterProfiles((prev) => prev.filter((s) => s.id !== memberId && s.callsign?.toLowerCase() !== memberId.toLowerCase()));
-        setIsMemberModalOpen(false);
-        setSelectedMember(null);
-        setShowDeleteConfirm(false);
-        setCardDeleteConfirmId(null);
-        setMemberActionNotice(`Member ${memberId} has been permanently deleted.`);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setMemberActionNotice(data.error || `Failed to delete member ${memberId}.`);
+      }).catch(() => {});
+
+      // 2. Cross-delete by callsign and ID from shooters API
+      if (targetCallsign) {
+        fetch(`/api/shooters?id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
+        fetch(`/api/join?member_id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
       }
+      fetch(`/api/shooters?id=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
+
+      // 3. Unconditionally remove from local state
+      setMembers((prev) =>
+        prev.filter(
+          (m) =>
+            m.member_id !== memberId &&
+            (!targetCallsign || m.callsign?.toLowerCase() !== targetCallsign.toLowerCase()) &&
+            (!targetName || m.full_name?.toLowerCase() !== targetName.toLowerCase())
+        )
+      );
+      setShooterProfiles((prev) =>
+        prev.filter(
+          (s) =>
+            s.id !== memberId &&
+            (!targetCallsign || s.callsign?.toLowerCase() !== targetCallsign.toLowerCase()) &&
+            (!targetName || s.name?.toLowerCase() !== targetName.toLowerCase())
+        )
+      );
+
+      setIsMemberModalOpen(false);
+      setSelectedMember(null);
+      setShowDeleteConfirm(false);
+      setCardDeleteConfirmId(null);
+      setMemberActionNotice(`Member ${targetName || targetCallsign || memberId} permanently deleted.`);
     } catch (err: any) {
       setMemberActionNotice("Error deleting member: " + err.message);
     } finally {

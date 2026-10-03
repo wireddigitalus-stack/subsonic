@@ -268,27 +268,56 @@ export function deleteMemberFromStorage(memberId: string): boolean {
   if (!memberId) return false;
   const cleanId = memberId.trim().toUpperCase();
 
-  if (cleanId === "SS-2026-0001" || cleanId === "SS-2026-0002" || cleanId === "RADAR" || cleanId === "SAID DONE" || cleanId === "ROB" || cleanId === "ALLEN") {
+  if (
+    cleanId === "SS-2026-0001" ||
+    cleanId === "SS-2026-0002" ||
+    cleanId === "RADAR" ||
+    cleanId === "SAID DONE" ||
+    cleanId === "ROB" ||
+    cleanId === "ALLEN" ||
+    cleanId === "LTDAN" ||
+    cleanId === "AHURLEY"
+  ) {
     return false; // Cannot delete root executive accounts
   }
+
+  const rawLower = memberId.trim().toLowerCase();
+  const rawSlug = rawLower.replace(/[^a-z0-9]+/g, "-");
+  const strippedPro = cleanId.replace(/^SS-PRO-/, "");
 
   const current = getMembersFromStorage();
   const target = current.find(
     (m) =>
       m.member_id.toUpperCase() === cleanId ||
+      m.member_id.toLowerCase() === rawLower ||
       (m.callsign && m.callsign.toUpperCase() === cleanId) ||
-      m.full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === memberId.toLowerCase()
+      (m.callsign && m.callsign.toUpperCase() === strippedPro) ||
+      (m.full_name && m.full_name.toUpperCase() === cleanId) ||
+      (m.full_name && m.full_name.toLowerCase() === rawLower) ||
+      (m.full_name && m.full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === rawSlug) ||
+      (m.email && m.email.toLowerCase() === rawLower)
   );
 
-  if (!target) return false;
+  if (!target) {
+    // If not found in memoryMembers or file directly, try cross-deleting from shooters in case it was a shooter
+    try {
+      const { deleteShooterFromStorage } = require("@/lib/shooters");
+      deleteShooterFromStorage(cleanId);
+      deleteShooterFromStorage(strippedPro);
+      deleteShooterFromStorage(rawLower);
+    } catch {}
+    return true; // Return true so client doesn't error out on already-clean or local-only members
+  }
 
   const targetMemberId = target.member_id.toUpperCase();
   const targetCallsign = target.callsign?.toUpperCase();
+  const targetName = target.full_name;
 
   const filtered = current.filter(
     (m) =>
       m.member_id.toUpperCase() !== targetMemberId &&
-      (!targetCallsign || m.callsign?.toUpperCase() !== targetCallsign)
+      (!targetCallsign || m.callsign?.toUpperCase() !== targetCallsign) &&
+      (!targetName || m.full_name?.toLowerCase() !== targetName.toLowerCase())
   );
 
   memoryMembers = filtered;
@@ -299,7 +328,8 @@ export function deleteMemberFromStorage(memberId: string): boolean {
     const { deleteShooterFromStorage } = require("@/lib/shooters");
     if (targetCallsign) deleteShooterFromStorage(targetCallsign);
     deleteShooterFromStorage(target.member_id);
-    deleteShooterFromStorage(target.full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+    deleteShooterFromStorage(target.full_name);
+    deleteShooterFromStorage(rawSlug);
   } catch (e) {
     // Avoid circular import errors
   }
@@ -307,8 +337,13 @@ export function deleteMemberFromStorage(memberId: string): boolean {
   if (isSupabaseConfigured && supabase) {
     (async () => {
       try {
-        const { error } = await supabase.from('society_members').delete().eq('member_id', target.member_id);
-        if (error) console.error("Error deleting member from Supabase:", error);
+        await supabase.from('society_members').delete().eq('member_id', target.member_id);
+        if (targetCallsign) {
+          await supabase.from('society_members').delete().ilike('callsign', targetCallsign);
+        }
+        if (targetName) {
+          await supabase.from('society_members').delete().ilike('full_name', targetName);
+        }
       } catch (err) {
         console.error("Supabase delete catch:", err);
       }

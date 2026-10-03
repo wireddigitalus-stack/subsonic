@@ -244,24 +244,38 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   const clean = idOrCallsign.trim().toLowerCase();
 
   // Root executive protection
-  if (clean === "allen-hurley" || clean === "said done" || clean === "allen") {
+  if (
+    clean === "allen-hurley" ||
+    clean === "said done" ||
+    clean === "allen" ||
+    clean === "rob-neilson" ||
+    clean === "radar" ||
+    clean === "rob" ||
+    clean === "ss-2026-0001" ||
+    clean === "ss-2026-0002"
+  ) {
     return false;
   }
 
   const current = getShootersFromStorage();
+  const strippedPro = clean.replace(/^ss-pro-/, "");
+
   const target = current.find(
     (s) =>
       s.id.toLowerCase() === clean ||
       s.callsign.toLowerCase() === clean ||
+      s.callsign.toLowerCase() === strippedPro ||
+      s.name.toLowerCase() === clean ||
       s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === clean
   );
 
-  if (!target) return false;
+  if (!target) return true; // Already deleted or client-only
 
   const filtered = current.filter(
     (s) =>
       s.id.toLowerCase() !== target.id.toLowerCase() &&
-      s.callsign.toLowerCase() !== target.callsign.toLowerCase()
+      s.callsign.toLowerCase() !== target.callsign.toLowerCase() &&
+      s.name.toLowerCase() !== target.name.toLowerCase()
   );
 
   memoryShooters = filtered;
