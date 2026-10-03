@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, ensureInviteExists, refreshInvitesFromDb } from "@/lib/invites";
+import { getInvitesFromStorage, refreshInvitesFromDb } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -15,32 +15,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Master VIP override codes
-    if (["ALLEN", "SAID DONE", "SAIDDONE", "620620"].includes(rawCode)) {
-      return NextResponse.json({
-        valid: true,
-        tier: "PRO",
-        recipientName: "Allen Hurley (Owner Admin)",
-        isMaster: true,
-      });
-    }
-
-    if (rawCode === "RADAR" || rawCode === "2468") {
-      return NextResponse.json({
-        valid: true,
-        tier: "PRO",
-        recipientName: "Rob Neilson (Master Admin)",
-        isMaster: true,
-      });
-    }
-
+    // Only invites that actually exist (created by an admin) are accepted.
     await refreshInvitesFromDb();
     const invites = getInvitesFromStorage();
-    let invite = invites.find((i) => i.code.toUpperCase() === rawCode);
-
-    if (!invite) {
-      invite = ensureInviteExists(rawCode) || undefined;
-    }
+    const invite = invites.find((i) => i.code.toUpperCase() === rawCode);
 
     if (!invite) {
       return NextResponse.json(

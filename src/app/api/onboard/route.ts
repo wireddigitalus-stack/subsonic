@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { ShooterProfile, SocietyMember } from "@/lib/types";
 import {
   getInvitesFromStorage,
-  ensureInviteExists,
   refreshInvitesFromDb,
   saveInviteAsync,
 } from "@/lib/invites";
@@ -24,8 +23,6 @@ import { isDbConfigured } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
-// Owner override codes (kept for parity with /api/invites/validate — scheduled for removal)
-const MASTER_CODES = ["ALLEN", "SAID DONE", "SAIDDONE", "620620", "RADAR", "2468"];
 
 /**
  * POST /api/onboard
@@ -61,17 +58,14 @@ export async function POST(req: NextRequest) {
 
     // ── 1. Invite code ─────────────────────────────────────────────
     if (!code) return fail("Please enter your invitation code.", 400, "INVITE_REQUIRED");
-    const isMaster = MASTER_CODES.includes(code);
-    let invite = isMaster ? undefined : getInvitesFromStorage().find((i) => i.code.toUpperCase() === code);
-    if (!isMaster && !invite) invite = ensureInviteExists(code) || undefined;
-    if (!isMaster) {
-      if (!invite) return fail("Invalid invite code. Check spelling or request a new code.", 404, "INVITE_INVALID");
-      if (invite.status === "REVOKED") return fail("This invite code has been revoked.", 403, "INVITE_REVOKED");
-      if (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)
-        return fail("This invite code has reached its usage limit.", 410, "INVITE_EXHAUSTED");
-      if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
-        return fail("This invite code has expired.", 410, "INVITE_EXPIRED");
-    }
+    // Only invites that actually exist (created by an admin) are accepted.
+    const invite = getInvitesFromStorage().find((i) => i.code.toUpperCase() === code);
+    if (!invite) return fail("Invalid invite code. Check spelling or request a new code.", 404, "INVITE_INVALID");
+    if (invite.status === "REVOKED") return fail("This invite code has been revoked.", 403, "INVITE_REVOKED");
+    if (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)
+      return fail("This invite code has reached its usage limit.", 410, "INVITE_EXHAUSTED");
+    if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
+      return fail("This invite code has expired.", 410, "INVITE_EXPIRED");
 
     // ── 2. Identity ────────────────────────────────────────────────
     if (!fullName || !callsign) return fail("Full name and callsign are required.", 400, "MISSING_FIELDS");
@@ -144,7 +138,7 @@ export async function POST(req: NextRequest) {
     createdMemberId = savedMember.member_id;
 
     // ── 5. Claim the invite ────────────────────────────────────────
-    if (!isMaster && invite) {
+    {
       const usedCount = (invite.usedCount || 0) + 1;
       const claimedBy = Array.from(new Set([...(invite.claimedBy || []), callsign]));
       await saveInviteAsync({

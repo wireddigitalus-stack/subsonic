@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, saveInviteAsync, ensureInviteExists, refreshInvitesFromDb } from "@/lib/invites";
+import { getInvitesFromStorage, saveInviteAsync, refreshInvitesFromDb } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -17,26 +17,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Bypass claim tracking for master accounts
-    if (["ALLEN", "SAID DONE", "SAIDDONE", "620620", "RADAR", "2468"].includes(rawCode)) {
-      return NextResponse.json({
-        success: true,
-        isMaster: true,
-        message: "Master account access verified.",
-      });
-    }
-
+    // Only invites that actually exist (created by an admin) can be claimed.
     await refreshInvitesFromDb();
-    let invites = getInvitesFromStorage();
-    let index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
-
-    if (index === -1) {
-      const created = ensureInviteExists(rawCode);
-      if (created) {
-        invites = getInvitesFromStorage();
-        index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
-      }
-    }
+    const invites = getInvitesFromStorage();
+    const index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
 
     if (index === -1) {
       return NextResponse.json(
