@@ -14,7 +14,11 @@ if (typeof window !== "undefined") {
   throw new Error("supabase-admin must only be imported on the server.");
 }
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+// The project URL is public (not a secret) — fall back to it so the server can
+// connect even if the hosting env var is missing or misnamed.
+const DEFAULT_SUPABASE_URL = "https://adwqbeumdbcaltobdedb.supabase.co";
+const envUrl = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+const url = envUrl.startsWith("http") ? envUrl : DEFAULT_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const key = serviceKey || anonKey;
