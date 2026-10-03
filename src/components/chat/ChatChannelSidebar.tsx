@@ -37,10 +37,65 @@ export function ChatChannelSidebar({
   shooterProfile,
   onLogout,
 }: ChatChannelSidebarProps) {
+  const selfCallsign = (shooterProfile?.callsign || "").toUpperCase();
+  const selfIsMaster = shooterProfile?.role === "MASTER_OWNER" || selfCallsign === "RADAR" || selfCallsign === "ROB";
+  const selfIsOwner = shooterProfile?.role === "OWNER_ADMIN" || selfCallsign === "SAID DONE" || selfCallsign === "ALLEN";
+  // You're pinned at the top — don't list yourself again under Direct Chat
+  directPartners = directPartners.filter((p) => p.callsign.toUpperCase() !== selfCallsign);
   return (
     <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
       <div className="ios-glass rounded-2xl md:rounded-3xl p-4 sm:p-5 border border-white/10 flex flex-col h-full min-h-0">
-        
+
+        {/* Current User — always pinned at the top of your own panel */}
+        {shooterProfile && (
+          <div className="pb-3 mb-3 border-b border-white/10 flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="relative shrink-0">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 overflow-hidden ${
+                  selfIsMaster
+                    ? "bg-blue-800 text-cyan-200 ring-cyan-400"
+                    : selfIsOwner
+                    ? "bg-emerald-500 text-black ring-emerald-300"
+                    : "bg-white/10 text-amber-400 ring-amber-500/40"
+                }`}>
+                  {shooterProfile.image ? (
+                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                  ) : selfIsMaster ? (
+                    <Radar className="w-4 h-4 text-cyan-300" />
+                  ) : (
+                    shooterProfile.callsign?.slice(0, 2) || "SS"
+                  )}
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black bg-emerald-400" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-white truncate font-mono leading-tight">
+                    {shooterProfile.callsign}
+                  </span>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 shrink-0">
+                    YOU
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-400 truncate leading-tight">
+                  {shooterProfile.name || "Society Member"}
+                </div>
+              </div>
+            </div>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                title="Log Out of Chat"
+                className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1 text-[10px] font-medium"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>LOGOUT</span>
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Scrollable Channels & Direct Comms List */}
         <div className="space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar pr-0.5">
           
@@ -236,38 +291,6 @@ export function ChatChannelSidebar({
           )}
 
         </div>
-
-        {/* Current User Session Bar */}
-        {shooterProfile && onLogout && (
-          <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between gap-2 shrink-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-full bg-white/10 ring-1 ring-white/20 flex items-center justify-center font-mono font-bold text-[10px] text-amber-400 shrink-0 overflow-hidden">
-                {shooterProfile.image ? (
-                  <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  shooterProfile.callsign?.slice(0, 2) || "SS"
-                )}
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-white truncate font-mono leading-tight">
-                  {shooterProfile.callsign}
-                </div>
-                <div className="text-[10px] text-slate-400 truncate leading-tight">
-                  {shooterProfile.name || "Society Member"}
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onLogout}
-              title="Log Out of Chat"
-              className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1 text-[10px] font-medium"
-            >
-              <LogOut className="w-3 h-3" />
-              <span>LOGOUT</span>
-            </button>
-          </div>
-        )}
 
       </div>
     </div>

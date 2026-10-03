@@ -474,10 +474,10 @@ export function ChatMessageList({
                     </p>
 
                     {/* Dedicated Interactive Button if message references the competitor packet */}
-                    {msg.content.includes("competitor-packet") && (
+                    {(msg.content.includes("competitor-packet") || msg.id.startsWith("welcome-allen")) && (
                       <div className="pt-1">
                         <a
-                          href="https://subsonic-omega.vercel.app/competitor-packet"
+                          href="/competitor-packet"
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all shadow-sm active:scale-95 ${
