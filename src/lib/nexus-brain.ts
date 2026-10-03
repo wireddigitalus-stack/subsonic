@@ -219,13 +219,17 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("eat") ||
     lower.includes("restaurant") ||
     lower.includes("dining") ||
+    lower.includes("620") ||
+    lower.includes("steak") ||
+    lower.includes("strak") ||
+    lower.includes("sushi") ||
+    lower.includes("suhi") ||
     lower.includes("blackbird") ||
     lower.includes("bakery") ||
     lower.includes("bbq") ||
-    lower.includes("steak") ||
     lower.includes("doughnut")
   ) {
-    return `Bristol dining intel: Blackbird Bakery on Piedmont Ave is open 24 hours Monday through Saturday for world-famous doughnuts and artisan espresso. For dinner, visit 620 State for prime steaks and sushi right on the state line, or Delta Blues BBQ for slow-smoked brisket and ribs.`;
+    return `Bristol dining intel: For great steaks and sushi, head directly to 620 State at 620 State Street right on the historic state line — it is the premier dinner destination for competitors and squads. For breakfast and sweets, Blackbird Bakery on Piedmont Ave is open 24 hours Monday through Saturday for world-famous doughnuts and artisan espresso. Delta Blues BBQ is also popular for slow-smoked brisket and ribs.`;
   }
 
   // 11. BRISTOL HOTELS & LODGING

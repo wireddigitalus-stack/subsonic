@@ -679,7 +679,7 @@ export default function ChatPage() {
           division: "Autonomous AI Assistant • The Hideout",
           rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",
         },
-        content: `🤖 I'm RO BOT, your AI Range Officer. I have intel on the match schedule, The Hideout facility, Bristol dining & hotels, and side match details. Ask me anything — say 'hey ro' or '@ro help' anytime.\n\n📖 Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet`,
+        content: `🤖 I'm RO BOT, your AI Range Officer. I have intel on the match schedule, The Hideout facility, Bristol dining & hotels (head to 620 State St for great steaks & sushi!), and side match details. Ask me anything — say 'hey ro' or '@ro help' anytime.\n\n📖 Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet`,
         timestamp: roTimestamp,
         reactions: [],
         moderationStatus: "APPROVED",

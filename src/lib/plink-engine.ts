@@ -137,7 +137,7 @@ const RO_GREETING_RESPONSES = [
   (c: string) =>
     `Welcome to the Invitational frequency, ${c}! ⛰️ I'm RO BOT, your 24/7 AI Range Officer. I have the entire 2026 Competitor Packet locked in — stages, side matches, hotels, BBQ, and Bristol entertainment. How can I help you prep?`,
   (c: string) =>
-    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, stage rotation times, or the best steak and doughnuts in Bristol, I've got your DOPE.`,
+    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, stage rotation times, or great steaks and sushi at 620 State St, I've got your DOPE.`,
 ];
 
 const RO_THANKS_RESPONSES = [
@@ -255,7 +255,26 @@ export function getFaqResponse(content: string): string {
       `💡 Check the full 12-hotel directory with direct phone numbers & online booking links in the Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet#hotels`;
   }
 
-  // 2. FOOD & DINING IN BRISTOL
+  // 2. STEAKS, SUSHI & 620 STATE STREET (TOP SPOTLIGHT)
+  if (
+    lower.includes("steak") ||
+    lower.includes("strak") ||
+    lower.includes("sushi") ||
+    lower.includes("suhi") ||
+    lower.includes("620") ||
+    (lower.includes("state") && lower.includes("st")) ||
+    (lower.includes("where") && (lower.includes("eat") || lower.includes("dinner")) && (lower.includes("best") || lower.includes("tonight") || lower.includes("squad")))
+  ) {
+    return `🥩🍣 **Range Officer Recommendation — 620 State!**\n\n` +
+      `For great **hand-cut steaks and gourmet sushi**, guide your squad straight to:\n\n` +
+      `📍 **620 State Restaurant & Bar**\n` +
+      `• **Address:** 620 State St, Bristol, TN 37620 (Right on the historic state line!)\n` +
+      `• **Specialty:** Prime hand-cut steaks, artisan fresh sushi bar, Asian-fusion entrees & craft cocktails.\n` +
+      `• **Vibe:** The #1 premier downtown dinner spot for marksmen, squads, and match visitors looking for top-tier food after running stages.\n\n` +
+      `Ask any local shooter — 620 State is the undisputed top squad dinner spot in downtown Bristol!`;
+  }
+
+  // 3. GENERAL FOOD & DINING IN BRISTOL
   if (
     lower.includes("food") ||
     lower.includes("eat") ||
@@ -268,16 +287,15 @@ export function getFaqResponse(content: string): string {
     lower.includes("bakery") ||
     lower.includes("doughnut") ||
     lower.includes("donut") ||
-    lower.includes("steak") ||
     lower.includes("beer") ||
     lower.includes("brew") ||
     lower.includes("bourbon") ||
     lower.includes("drink") ||
     lower.includes("coffee")
   ) {
-    return `🍽️ **Bristol Food & Dining Intel (Top 12 Picks):**\n\n` +
+    return `🍽️ **Bristol Food & Dining Intel (Top Picks):**\n\n` +
+      `• **620 State** (620 State St, Bristol TN) — **#1 Squad Dinner Pick!** Hand-cut prime steaks, gourmet sushi bar, Asian-fusion dishes & craft cocktails right on the historic state line.\n` +
       `• **Blackbird Bakery** (56 Piedmont Ave, Bristol VA) — Open 24h Mon–Sat! World-famous doughnuts, artisan pastries & espresso. Mandatory pre-match morning stop!\n` +
-      `• **620 State** (620 State St, Bristol TN) — Hand-cut steaks, Asian-fusion, sushi & cocktails right on the historic state line.\n` +
       `• **Lumac Rooftop Bar** (510 State St, Bristol VA) — Craft cocktails & small plates with panoramic sunset views over the Appalachians.\n` +
       `• **Vivian's Table** (Bristol Hotel) — Refined Southern dining, prime ribeyes & top-tier bourbon list.\n` +
       `• **Delta Blues BBQ** (724 State St) — Slow-smoked Memphis-style ribs, brisket, pulled pork & weekend live blues.\n` +
@@ -457,7 +475,7 @@ export function getChannelWelcome(channelId: string, callsign: string): string {
     `This is the official 2026 Subsonic Society Invitational frequency for The Hideout in Bristol, TN (Nov 13–15). ` +
     `Use this channel for match operations, stage DOPE, Bristol hotel coordination, food runs, and local entertainment.\n\n` +
     `📖 Review the complete 2026 Competitor Packet & Bristol Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\n` +
-    `Say "hey ro" or ask me anything about the match schedule, $2,500 cash side matches, Bristol dining (Blackbird Bakery!), lodging, or fly fishing on the South Holston!`;
+    `Say "hey ro" or ask me anything about the match schedule, $2,500 cash side matches, Bristol dining (head to 620 State for steaks & sushi!), lodging, or fly fishing on the South Holston!`;
 }
 
 // ─── RANDOM PICKER ───────────────────────────────────────────────────────────
@@ -575,10 +593,21 @@ export function analyzeMsgForPlink(
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
+  // Direct steak, sushi, or 620 State Street inquiries
+  if (
+    lower.includes("steak") ||
+    lower.includes("strak") ||
+    lower.includes("sushi") ||
+    lower.includes("suhi") ||
+    lower.includes("620")
+  ) {
+    return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  }
+
   // Direct question keywords about Bristol or match details
   if (
     (lower.includes("where to stay") || lower.includes("hotel") || lower.includes("lodging") || lower.includes("where to eat") || lower.includes("restaurant") || lower.includes("blackbird") || lower.includes("bbq") || lower.includes("fly fishing") || lower.includes("south holston") || lower.includes("casino") || lower.includes("side match") || lower.includes("cold bore") || lower.includes("schedule")) &&
-    (lower.includes("?") || lower.includes("recommend") || lower.includes("best") || lower.includes("ro") || lower.includes("anyone"))
+    (lower.includes("?") || lower.includes("recommend") || lower.includes("best") || lower.includes("ro") || lower.includes("anyone") || lower.includes("dinner") || lower.includes("food"))
   ) {
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
