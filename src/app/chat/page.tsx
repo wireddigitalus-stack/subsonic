@@ -335,8 +335,9 @@ export default function ChatPage() {
 
   // Plink AI Moderator state
   const [plinkWarningHistory, setPlinkWarningHistory] = useState<Record<string, number>>({});
-  const [plinkVisitedChannels, setPlinkVisitedChannels] = useState<Set<string>>(new Set());
-  const channelWelcomedRef = useRef<Set<string>>(new Set());
+  const allenWelcomedRef = useRef<Set<string>>(new Set());
+  const roWelcomedRef = useRef<Set<string>>(new Set());
+  const roTimerRef = useRef<NodeJS.Timeout | null>(null);
   // track last non-Plink message content per user for spam detection
   const lastUserMessageRef = useRef<Record<string, string>>({});
 
@@ -634,85 +635,98 @@ export default function ChatPage() {
   }, []);
 
   // ── Channel Welcome: Allen + Delayed RO BOT ────────────────────────────────
-  // Allen's welcome fires immediately. RO BOT's condensed welcome fires after
-  // 8 seconds (enough time to read Allen's message).
+  // Allen's welcome fires immediately upon authenticated entry.
+  // RO BOT's condensed welcome fires after reading delay (~4.5s) with document packet link.
   useEffect(() => {
-    if (!isAuthenticated || !shooterProfile.callsign) return;
-    if (channelWelcomedRef.current.has(currentChannel)) return;
-    channelWelcomedRef.current.add(currentChannel);
-
-    setPlinkVisitedChannels((prev) => new Set(Array.from(prev).concat(currentChannel)));
+    if (!authChecked || !isAuthenticated || !shooterProfile.callsign) return;
 
     // No welcomes in direct / private chats
     if (currentChannel.startsWith("dm_")) return;
 
-    // Allen's welcome — fires immediately
-    const now = new Date();
-    const allenTimestamp = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    // 1. Allen's welcome — fires immediately
+    if (!allenWelcomedRef.current.has(currentChannel)) {
+      allenWelcomedRef.current.add(currentChannel);
 
-    const allenMsg: ChatMessage = {
-      id: `welcome-allen-${currentChannel}`,
-      channelId: currentChannel,
-      type: "STANDARD",
-      author: {
-        id: "user-allen",
-        name: "Allen Hurley",
-        callsign: "SAID DONE",
-        role: "OWNER_ADMIN",
-        badgeText: "FOUNDER",
-        division: "Executive / Match Host",
-        rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
-      },
-      content: "Welcome to The Hideout, competitors. Two hundred and twenty acres of Tennessee ridgeline purpose-built for precision rimfire. Enjoy the chat, respect the range, and check the competitor packet for match details. Said. Done.",
-      timestamp: allenTimestamp,
-      reactions: [],
-      moderationStatus: "APPROVED",
-      aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "System" },
-    };
+      const now = new Date();
+      const allenTimestamp = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
-    setMessages((prev) => {
-      if (prev.some((m) => m.id === allenMsg.id || (m.author.id === "user-allen" && m.channelId === currentChannel && m.content.includes("Welcome to The Hideout")))) {
-        return prev;
-      }
-      return [...prev, allenMsg];
-    });
-
-    // RO BOT's welcome — fires after 8 seconds
-    const roTimer = setTimeout(() => {
-      const roTime = new Date();
-      const roTimestamp = roTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-
-      const roMsg: ChatMessage = {
-        id: `welcome-ro-${currentChannel}`,
+      const allenMsg: ChatMessage = {
+        id: `welcome-allen-${currentChannel}`,
         channelId: currentChannel,
-        type: "MATCH_ALERT",
+        type: "STANDARD",
         author: {
-          id: "plink_ai_moderator",
-          name: "RO BOT",
-          callsign: "RO BOT",
-          role: "OFFICIAL",
-          badgeText: "AI Range Officer",
-          division: "Autonomous AI Assistant • The Hideout",
-          rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",
+          id: "user-allen",
+          name: "Allen Hurley",
+          callsign: "SAID DONE",
+          role: "OWNER_ADMIN",
+          badgeText: "FOUNDER",
+          division: "Executive / Match Host",
+          rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
         },
-        content: `🤖 I'm RO BOT, your AI Range Officer. I have intel on the match schedule, The Hideout facility, Bristol dining & hotels (head to 620 State St for great steaks & sushi!), and side match details. Ask me anything — say 'hey ro' or '@ro help' anytime.\n\n📖 Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet`,
-        timestamp: roTimestamp,
+        content: "Welcome to The Hideout, competitors. Two hundred and twenty acres of Tennessee ridgeline purpose-built for precision rimfire. Enjoy the chat, respect the range, and check the competitor packet for match details. Said. Done.",
+        timestamp: allenTimestamp,
         reactions: [],
         moderationStatus: "APPROVED",
-        aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "Autonomous AI Agent RO" },
+        aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "System" },
       };
 
       setMessages((prev) => {
-        if (prev.some((m) => m.id === roMsg.id || (m.author.id === "plink_ai_moderator" && m.channelId === currentChannel && m.content.includes("RO BOT")))) {
+        if (prev.some((m) => m.id === allenMsg.id || (m.author.id === "user-allen" && m.channelId === currentChannel && m.content.includes("Welcome to The Hideout")))) {
           return prev;
         }
-        return [...prev, roMsg];
+        return [...prev, allenMsg];
       });
-    }, 8000);
+    }
 
-    return () => clearTimeout(roTimer);
+    // 2. RO BOT's welcome — fires after ~4.5 seconds (natural reading time)
+    if (!roWelcomedRef.current.has(currentChannel)) {
+      if (roTimerRef.current) {
+        clearTimeout(roTimerRef.current);
+      }
+
+      const targetChannel = currentChannel;
+      roTimerRef.current = setTimeout(() => {
+        // Ensure user is still on the same channel
+        if (currentChannelRef.current !== targetChannel) return;
+
+        roWelcomedRef.current.add(targetChannel);
+        const roTime = new Date();
+        const roTimestamp = roTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+
+        const roMsg: ChatMessage = {
+          id: `welcome-ro-${targetChannel}`,
+          channelId: targetChannel,
+          type: "MATCH_ALERT",
+          author: {
+            id: "plink_ai_moderator",
+            name: "RO BOT",
+            callsign: "RO BOT",
+            role: "OFFICIAL",
+            badgeText: "AI Range Officer",
+            division: "Autonomous AI Assistant • The Hideout",
+            rifleSetup: "Autonomous AI Agent • Match Ops & Safety Telemetry",
+          },
+          content: `🤖 I'm RO BOT, your AI Range Officer. I have intel on the match schedule, The Hideout facility, Bristol dining & hotels (head to 620 State St for great steaks & sushi!), and side match details. Ask me anything — say 'hey ro' or '@ro help' anytime.\n\n📖 Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet`,
+          timestamp: roTimestamp,
+          reactions: [],
+          moderationStatus: "APPROVED",
+          aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "Autonomous AI Agent RO" },
+        };
+
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === roMsg.id || (m.author.id === "plink_ai_moderator" && m.channelId === targetChannel && m.content.includes("RO BOT")))) {
+            return prev;
+          }
+          return [...prev, roMsg];
+        });
+
+        try {
+          playTacticalChirp(900);
+        } catch {}
+      }, 4500);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentChannel, isAuthenticated]);
+  }, [currentChannel, isAuthenticated, authChecked]);
 
   // ── RO: Message & Direct Comms Watcher ────────────────────────────────────
   // Fires on every new message. RO monitors both public frequency and direct chats
