@@ -248,7 +248,9 @@ export default function ChatPage() {
     return ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
   }, [currentChannel, isDirectMode, activeDirectPartner]);
 
-  const filteredMessages = messages.filter((m) => m.channelId === currentChannel);
+  const filteredMessages = messages
+    .filter((m) => m.channelId === currentChannel)
+    .filter((m, idx, arr) => arr.findIndex((x) => x.id === m.id || (x.author.id === m.author.id && x.content === m.content && x.content.includes("Welcome to The Hideout"))) === idx);
 
   const handleOpenDossier = useCallback((shooter: DirectPartner) => {
     setSelectedDossierShooter(shooter);
@@ -334,6 +336,7 @@ export default function ChatPage() {
   // Plink AI Moderator state
   const [plinkWarningHistory, setPlinkWarningHistory] = useState<Record<string, number>>({});
   const [plinkVisitedChannels, setPlinkVisitedChannels] = useState<Set<string>>(new Set());
+  const channelWelcomedRef = useRef<Set<string>>(new Set());
   // track last non-Plink message content per user for spam detection
   const lastUserMessageRef = useRef<Record<string, string>>({});
 
@@ -619,7 +622,8 @@ export default function ChatPage() {
   // 8 seconds (enough time to read Allen's message).
   useEffect(() => {
     if (!isAuthenticated || !shooterProfile.callsign) return;
-    if (plinkVisitedChannels.has(currentChannel)) return;
+    if (channelWelcomedRef.current.has(currentChannel)) return;
+    channelWelcomedRef.current.add(currentChannel);
 
     setPlinkVisitedChannels((prev) => new Set(Array.from(prev).concat(currentChannel)));
 
@@ -631,7 +635,7 @@ export default function ChatPage() {
     const allenTimestamp = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
     const allenMsg: ChatMessage = {
-      id: `welcome-allen-${currentChannel}-${Date.now()}`,
+      id: `welcome-allen-${currentChannel}`,
       channelId: currentChannel,
       type: "STANDARD",
       author: {
@@ -650,7 +654,12 @@ export default function ChatPage() {
       aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "System" },
     };
 
-    setMessages((prev) => [...prev, allenMsg]);
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === allenMsg.id || (m.author.id === "user-allen" && m.channelId === currentChannel && m.content.includes("Welcome to The Hideout")))) {
+        return prev;
+      }
+      return [...prev, allenMsg];
+    });
 
     // RO BOT's welcome — fires after 8 seconds
     const roTimer = setTimeout(() => {
@@ -658,7 +667,7 @@ export default function ChatPage() {
       const roTimestamp = roTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
       const roMsg: ChatMessage = {
-        id: `welcome-ro-${currentChannel}-${Date.now()}`,
+        id: `welcome-ro-${currentChannel}`,
         channelId: currentChannel,
         type: "MATCH_ALERT",
         author: {
@@ -677,7 +686,12 @@ export default function ChatPage() {
         aiModerationReport: { toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "POSITIVE" as const, aiEngine: "Autonomous AI Agent RO" },
       };
 
-      setMessages((prev) => [...prev, roMsg]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === roMsg.id || (m.author.id === "plink_ai_moderator" && m.channelId === currentChannel && m.content.includes("RO BOT")))) {
+          return prev;
+        }
+        return [...prev, roMsg];
+      });
     }, 8000);
 
     return () => clearTimeout(roTimer);
