@@ -484,74 +484,7 @@ export function ChatMessageList({
                   </div>
                 )}
 
-                {/* DOPE CARD */}
-                {msg.dopeCard && (
-                  <div className="p-2 md:p-3.5 rounded-lg md:rounded-2xl bg-black/85 border border-cyan-500/40 space-y-1 md:space-y-2.5">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20">
-                      <div className="flex items-center gap-1.5 sm:gap-2 font-mono min-w-0">
-                        <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                        <span className="text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
-                          BALLISTIC DOPE
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[9px] sm:text-[10px] font-bold shrink-0">
-                          {msg.dopeCard.targetDistance}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => copyDopeToClipboard(msg.id, msg.dopeCard!)}
-                        className="flex items-center gap-1 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[9px] sm:text-[10px] font-mono text-slate-300 hover:text-white transition-colors shrink-0"
-                      >
-                        {copiedDopeId === msg.id ? (
-                          <>
-                            <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400" />
-                            <span className="text-emerald-300">COPIED</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                            <span>COPY</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {/* DOPE Grid */}
-                    <div className="grid grid-cols-4 gap-1 sm:gap-2 font-mono text-center">
-                      <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                        <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">ELEV</span>
-                        <div className="text-[11px] sm:text-sm font-bold text-amber-400 truncate">{msg.dopeCard.elevationMils}</div>
-                      </div>
-                      <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                        <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">WIND</span>
-                        <div className="text-[11px] sm:text-sm font-bold text-cyan-300 truncate">{msg.dopeCard.windHoldMils}</div>
-                      </div>
-                      <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                        <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">SPEED</span>
-                        <div className="text-[10px] sm:text-xs font-semibold text-slate-200 truncate">{msg.dopeCard.windVelocity || "8-14 MPH"}</div>
-                      </div>
-                      <div className="p-1 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 space-y-0.5">
-                        <span className="text-[8px] sm:text-[9px] text-slate-400 uppercase block truncate">DA</span>
-                        <div className="text-[10px] sm:text-xs font-semibold text-emerald-300 truncate">{msg.dopeCard.densityAltitude || "+2,150 FT"}</div>
-                      </div>
-                    </div>
-
-                    {/* Ammo & Notes — desktop only */}
-                    {(msg.dopeCard.ammo || msg.dopeCard.notes) && (
-                      <div className="hidden md:flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5 gap-2">
-                        {msg.dopeCard.ammo && (
-                          <div className="truncate">Ammo: <strong className="text-slate-200">{msg.dopeCard.ammo}</strong></div>
-                        )}
-                        {msg.dopeCard.notes && (
-                          <div className="text-cyan-300 italic truncate text-right">
-                            &ldquo;{msg.dopeCard.notes}&rdquo;
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* DOPE CARD — hidden for initial onboarding */}
 
                 {/* Staff Moderation Flag Notice */}
                 {isFlagged && msg.aiModerationReport?.flagReason && (

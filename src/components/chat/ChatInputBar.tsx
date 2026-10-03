@@ -88,8 +88,8 @@ export function ChatInputBar({
             <Mic className={`w-4 h-4 md:w-5 md:h-5 ${isListening ? "text-white" : "text-slate-300"}`} />
           </button>
 
-          {/* DOPE card button — desktop only */}
-          <button
+          {/* DOPE card button — hidden for initial onboarding, re-enable when ready */}
+          {/* <button
             id="tour-step-dope"
             type="button"
             onClick={() => setIsDopeModalOpen(true)}
@@ -98,7 +98,7 @@ export function ChatInputBar({
           >
             <Crosshair className="w-4 h-4" />
             <span>DOPE</span>
-          </button>
+          </button> */}
 
           {/* Send */}
           <button

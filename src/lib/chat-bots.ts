@@ -54,7 +54,7 @@ export const BOT_PERSONAS: BotPersona[] = [
     rifleSetup: "Vudoo V-22 / Bartlein MTU 20\" / ZCO 527",
     personality: "elite-data-driven",
     primaryChannels: ["invitational"],
-    dopeDropRate: 0.35,
+    dopeDropRate: 0,
     reactionRate: 0.4,
   },
   {
@@ -67,7 +67,7 @@ export const BOT_PERSONAS: BotPersona[] = [
     rifleSetup: "RimX / Proof Carbon 22\" / TT525P",
     personality: "technical-analytical",
     primaryChannels: ["invitational"],
-    dopeDropRate: 0.2,
+    dopeDropRate: 0,
     reactionRate: 0.35,
   },
   {
@@ -80,7 +80,7 @@ export const BOT_PERSONAS: BotPersona[] = [
     rifleSetup: "CZ 457 MTR / Vortex Razor Gen III",
     personality: "enthusiastic-newcomer",
     primaryChannels: ["invitational"],
-    dopeDropRate: 0.05,
+    dopeDropRate: 0,
     reactionRate: 0.7,
   },
   {
@@ -93,7 +93,7 @@ export const BOT_PERSONAS: BotPersona[] = [
     rifleSetup: "Vudoo Ravage / Krieger 20\" / NF ATACR 7-35",
     personality: "veteran-tactical",
     primaryChannels: ["invitational"],
-    dopeDropRate: 0.3,
+    dopeDropRate: 0,
     reactionRate: 0.3,
     isBadActor: true,
     violationRate: 0.15,
@@ -108,7 +108,7 @@ export const BOT_PERSONAS: BotPersona[] = [
     rifleSetup: "Bergara B-14R / Bushnell XRS3 6-36",
     personality: "budget-friendly-social",
     primaryChannels: ["invitational"],
-    dopeDropRate: 0.05,
+    dopeDropRate: 0,
     reactionRate: 0.6,
   },
 ];

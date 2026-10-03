@@ -2063,15 +2063,7 @@ export default function ChatPage() {
       </div>
 
 
-      {/* 4. TACTICAL DOPE DROP BUILDER MODAL */}
-            <ChatDopeCardModal
-        isDopeModalOpen={isDopeModalOpen}
-        setIsDopeModalOpen={setIsDopeModalOpen}
-        currentChannelData={currentChannelData}
-        handleSendDopeCard={handleSendDopeCard}
-        dopeFormData={dopeFormData}
-        setDopeFormData={setDopeFormData}
-      />
+      {/* 4. TACTICAL DOPE DROP BUILDER MODAL — hidden for initial onboarding */}
 
       {/* 5. SHOOTER PROFILE CUSTOMIZER MODAL */}
       {isProfileModalOpen && (() => {

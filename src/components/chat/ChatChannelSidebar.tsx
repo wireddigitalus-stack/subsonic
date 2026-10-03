@@ -227,25 +227,8 @@ export function ChatChannelSidebar({
 
         </div>
 
-        {/* DOPE Drop Action Box */}
-        <div className="pt-3 border-t border-white/10 space-y-2 shrink-0 mt-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono uppercase text-slate-300 font-bold flex items-center gap-1.5">
-              <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-              Tactical DOPE Card
-            </span>
-            <span className="text-[10px] font-mono text-emerald-400">Holston 340y Spec</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsDopeModalOpen(true)}
-            data-telemetry="chat_open_dope_modal"
-            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-xs font-medium flex items-center justify-center gap-2 transition-all"
-          >
-            <Crosshair className="w-4 h-4" />
-            <span>DROP VERIFIED DOPE CARD</span>
-          </button>
-        </div>
+        {/* DOPE Drop Action Box — hidden for initial onboarding */}
+
 
       </div>
     </div>

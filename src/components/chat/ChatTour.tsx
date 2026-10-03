@@ -47,16 +47,7 @@ const TOUR_STEPS: TourStep[] = [
     proTip: "Tap once to speak, tap again to finish. Transcripts are reviewed before send.",
     icon: <Mic className="w-5 h-5 text-red-400" />,
   },
-  {
-    id: "dope",
-    targetId: "tour-step-dope",
-    badge: "03 / BALLISTICS",
-    title: "Tactical DOPE Drop Cards",
-    description:
-      "Share real-time ballistic cards directly with your squad. Drop exact target yardages, elevation in MIL/MOA, wind holdoffs, and muzzle velocity notes.",
-    proTip: "DOPE drops render as high-visibility tactical telemetry cards for fast reading.",
-    icon: <Crosshair className="w-5 h-5 text-cyan-400" />,
-  },
+  // DOPE tour step hidden for initial onboarding
   {
     id: "plink",
     targetId: "tour-step-plink",
