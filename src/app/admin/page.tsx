@@ -1374,18 +1374,9 @@ export default function AdminDashboardPage() {
   });
 
   const filteredMembers = members.filter((m) => {
-    const matchesState = memberStateFilter === "ALL" || m.state === memberStateFilter;
-    const isStaff =
-      ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR", "MATCH_DIRECTOR", "OFFICIAL"].includes(m.role || "") ||
-      m.member_id === "SS-2026-0001" ||
-      m.member_id === "SS-2026-0002";
-    const matchesRole =
-      memberRoleFilter === "ALL" ||
-      (memberRoleFilter === "STAFF" && isStaff) ||
-      (memberRoleFilter === "COMPETITORS" && !isStaff);
     const q = memberSearch.trim().toLowerCase();
-    const matchesSearch =
-      !q ||
+    if (!q) return true;
+    return (
       m.full_name.toLowerCase().includes(q) ||
       (m.callsign && m.callsign.toLowerCase().includes(q)) ||
       (m.role && m.role.toLowerCase().includes(q)) ||
@@ -1393,8 +1384,8 @@ export default function AdminDashboardPage() {
       m.member_id.toLowerCase().includes(q) ||
       (m.rifle_setup && m.rifle_setup.toLowerCase().includes(q)) ||
       (m.notes && m.notes.toLowerCase().includes(q)) ||
-      ((q === "radar" || q === "ltdan" || q === "dan" || q === "rob" || q === "robert" || q.includes("smart") || q.includes("systems")) && m.member_id === "SS-2026-0001");
-    return matchesState && matchesRole && matchesSearch;
+      ((q === "radar" || q === "ltdan" || q === "dan" || q === "rob" || q === "robert" || q.includes("smart") || q.includes("systems")) && m.member_id === "SS-2026-0001")
+    );
   });
 
   const filteredRegistrations = registrations.filter((r) => {
@@ -1702,7 +1693,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               {[
-                { id: "MEMBERS", label: "Society Members", icon: UserCheck, badge: `${members.length}` },
+                { id: "MEMBERS", label: "Invited Shooters", icon: UserCheck, badge: `${members.length}` },
                 { id: "INVITES", label: "Invite Keys & VIP", icon: Key, badge: "INVITE ONLY", highlight: true },
                 { id: "SHOOTERS", label: "Shooter Profiles", icon: Users, badge: `${shooterProfiles.length}` },
                 { id: "REGISTRATIONS", label: "Registrations", icon: Trophy, badge: `${registrations.length}` },
@@ -1871,7 +1862,7 @@ export default function AdminDashboardPage() {
         <div className="md:hidden overflow-x-auto no-scrollbar">
           <div className="flex gap-1.5 min-w-max pb-1">
             {[
-              { id: "MEMBERS", label: "Members", icon: UserCheck, badge: `${members.length}` },
+              { id: "MEMBERS", label: "Shooters", icon: UserCheck, badge: `${members.length}` },
               { id: "INVITES", label: "Invites & VIP", icon: Key, badge: "INVITE ONLY" },
               { id: "REGISTRATIONS", label: "Shooters", icon: Trophy, badge: `${registrations.length}` },
               { 
