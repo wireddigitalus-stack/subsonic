@@ -14,7 +14,8 @@ import {
 import { 
   getCommsStatus, 
   subscribeToCommsStatus, 
-  CommsStatusState 
+  CommsStatusState,
+  setCommsAlertLevel,
 } from "@/lib/comms-status";
 
 interface TabItem {
@@ -37,11 +38,13 @@ export function MobileTabs() {
       setCommsStatusState(status);
     });
 
+    let userCallsign = "";
     try {
       const rawShooter = localStorage.getItem("subsonic_shooter_profile");
       const rawMember = localStorage.getItem("subsonic_member_profile");
       const p = rawShooter ? JSON.parse(rawShooter) : rawMember ? JSON.parse(rawMember) : null;
       if (p) {
+        if (p.callsign) userCallsign = p.callsign;
         const role = (p.role || "").toUpperCase();
         const callsign = (p.callsign || "").toUpperCase();
         if (
@@ -58,8 +61,32 @@ export function MobileTabs() {
       // ignore
     }
 
+    // Server-backed unread comms poll for real cross-device mobile alerts
+    const checkServerUnread = async () => {
+      // Don't poll if actively viewing chat screen
+      if (window.location.pathname.startsWith("/chat")) return;
+
+      try {
+        const lastRead = localStorage.getItem("subsonic_last_read_chat") || "0";
+        const url = `/api/chat/messages?pollUnread=true&since=${lastRead}${userCallsign ? `&excludeCallsign=${encodeURIComponent(userCallsign)}` : ""}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasUnread) {
+            setCommsAlertLevel("green", "New Transmission", `From ${data.latestAuthor || "Squad"}`);
+          }
+        }
+      } catch {
+        // network silent
+      }
+    };
+
+    checkServerUnread();
+    const pollInterval = setInterval(checkServerUnread, 4000);
+
     return () => {
       unsubscribe();
+      clearInterval(pollInterval);
     };
   }, [pathname]);
 

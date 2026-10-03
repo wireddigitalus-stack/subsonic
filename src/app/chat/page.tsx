@@ -341,6 +341,27 @@ export default function ChatPage() {
   // track last non-Plink message content per user for spam detection
   const lastUserMessageRef = useRef<Record<string, string>>({});
 
+  // Live Mountain Weather Telemetry state
+  const [liveWeather, setLiveWeather] = useState<{
+    temp: number;
+    humidity: number;
+    pressureHpa: number;
+    windSpeed: number;
+    windGusts: number;
+    windDirection: string;
+    windDegrees: number;
+    densityAltitude: number;
+    condition: string;
+    location: string;
+    elevationFt: number;
+    stationName: string;
+    updatedAt: string;
+    isLive: boolean;
+  } | null>(null);
+
+  // Cross-device sync timestamp tracker
+  const lastSyncTimestampRef = useRef<number>(0);
+
   // Interactive Guided Chat Tour state
   const [isTourOpen, setIsTourOpen] = useState(false);
   // Tactile Channel Picker Drawer state
@@ -628,11 +649,82 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Lock body scroll for viewport-pinned chat layout
+  // ── Live Mountain Weather Telemetry ─────────────────────────────────────────
   useEffect(() => {
-    document.body.classList.add("chat-active");
-    return () => document.body.classList.remove("chat-active");
+    let isMounted = true;
+    const fetchWeather = async () => {
+      try {
+        const res = await fetch("/api/weather");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) setLiveWeather(data);
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    };
+    fetchWeather();
+    const interval = setInterval(fetchWeather, 3 * 60 * 1000); // 3 minutes
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
+
+  // ── Cross-Device Real-Time Chat Sync via Server Storage ─────────────────────
+  // Syncs messages across devices (Rob on Mac, Allen on iPhone, competitors)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let isMounted = true;
+
+    const syncMessages = async () => {
+      try {
+        const since = lastSyncTimestampRef.current;
+        const url = `/api/chat/messages?channel=${encodeURIComponent(currentChannel)}${since ? `&since=${since}` : "&limit=60"}`;
+        const res = await fetch(url);
+        if (!res.ok || !isMounted) return;
+        const data = await res.json();
+
+        if (Array.isArray(data.messages) && data.messages.length > 0) {
+          setMessages((prev) => {
+            const existingIds = new Set(prev.map((m) => m.id));
+            const newIncoming = data.messages.filter((m: ChatMessage) => !existingIds.has(m.id));
+            if (newIncoming.length === 0) return prev;
+
+            // Chirp for incoming messages from other marksmen
+            const hasExternalMsg = newIncoming.some(
+              (m: ChatMessage) => m.author.callsign?.toUpperCase() !== shooterProfile.callsign?.toUpperCase()
+            );
+            if (hasExternalMsg && soundEnabledRef.current) {
+              playRealCommsChirp();
+            }
+
+            return [...prev, ...newIncoming];
+          });
+
+          if (data.latestTimestamp > lastSyncTimestampRef.current) {
+            lastSyncTimestampRef.current = data.latestTimestamp;
+          }
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("subsonic_last_read_chat", Date.now().toString());
+          }
+        }
+      } catch {
+        // silent
+      }
+    };
+
+    // Immediate initial sync on channel switch
+    syncMessages();
+
+    // Fast polling loop for near-instant cross-device comms
+    const pollInterval = setInterval(syncMessages, 2500);
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+    };
+  }, [currentChannel, isAuthenticated, shooterProfile.callsign]);
 
   // ── Channel Welcome: Allen + Delayed RO BOT ────────────────────────────────
   // Allen's welcome fires immediately upon authenticated entry.
@@ -1206,6 +1298,17 @@ export default function ChatPage() {
         });
     }
 
+    // Persist to server-backed durable storage (enables cross-device sync)
+    fetch("/api/chat/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: newMsg }),
+    }).catch((err) => console.warn("Chat server persist warning:", err));
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("subsonic_last_read_chat", Date.now().toString());
+    }
+
     if (soundEnabled) {
       playRealCommsChirp();
     }
@@ -1745,18 +1848,28 @@ export default function ChatPage() {
             <div className="flex items-center justify-between gap-3">
               {/* Left: Compact Range Status Chip */}
               <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-400">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span className="text-slate-300 font-medium">Holston Ridge</span>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04]" title={liveWeather ? `Updated at ${liveWeather.updatedAt} • ${liveWeather.stationName} • Humidity: ${liveWeather.humidity}% • Baro: ${liveWeather.pressureHpa} hPa` : "Live Mountain Telemetry"}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${liveWeather?.isLive ? "bg-emerald-400" : "bg-amber-400"}`} />
+                  <span className="text-slate-300 font-medium">{liveWeather?.location || "Holston Ridge"}</span>
                   <span className="text-white/20">·</span>
-                  <span>3,420 ft</span>
+                  <span>{liveWeather?.elevationFt?.toLocaleString() || "3,420"} ft</span>
                   <span className="text-white/20">·</span>
-                  <Wind className="w-3 h-3 text-slate-500" />
-                  <span>9-14 mph</span>
+                  <Wind className="w-3 h-3 text-cyan-400" />
+                  <span>
+                    {liveWeather ? `${liveWeather.windSpeed}-${liveWeather.windGusts} mph ${liveWeather.windDirection}` : "4-6 mph SE"}
+                  </span>
                   <span className="text-white/20">·</span>
-                  <span>64°F</span>
+                  <span className="text-white font-medium">{liveWeather ? `${liveWeather.temp}°F` : "68°F"}</span>
+                  {liveWeather?.condition && (
+                    <>
+                      <span className="text-white/20">·</span>
+                      <span className="text-amber-300 font-medium">{liveWeather.condition}</span>
+                    </>
+                  )}
                   <span className="hidden md:inline text-white/20">·</span>
-                  <span className="hidden md:inline">DA +2,150 ft</span>
+                  <span className="hidden md:inline font-mono">
+                    DA {liveWeather ? `${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude.toLocaleString()} ft` : "+2,180 ft"}
+                  </span>
                 </div>
               </div>
 
@@ -1875,9 +1988,9 @@ export default function ChatPage() {
           {/* Right: Controls */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Desktop-only: Weather, Staff Moderated */}
-            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px] font-mono">
+            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px] font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude} ft` : "Live Wind Telemetry"}>
               <Wind className="w-3 h-3 text-cyan-400" />
-              <span>9-14 MPH</span>
+              <span>{liveWeather ? `${liveWeather.windSpeed}-${liveWeather.windGusts} MPH ${liveWeather.windDirection}` : "4-6 MPH SE"}</span>
             </div>
             <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300 font-mono" title="Staff Moderated">
               <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
