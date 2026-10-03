@@ -20,6 +20,7 @@ import {
 import { checkCallsignAvailability } from "@/lib/callsigns";
 import { validatePin } from "@/lib/pin-policy";
 import { hashPin } from "@/lib/pin-hash";
+import { isDbConfigured } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,13 @@ export async function POST(req: NextRequest) {
   let createdMemberId: string | null = null;
 
   try {
+    if (Boolean(process.env.VERCEL) && !isDbConfigured) {
+      console.error("[onboard] Database not configured on Vercel — refusing signup to avoid data loss.");
+      return NextResponse.json(
+        { error: "Registration is temporarily unavailable. Please contact a match director.", code: "DB_NOT_CONFIGURED" },
+        { status: 503 }
+      );
+    }
     const body = await req.json();
     const code = String(body.code || "").trim().toUpperCase();
     const fullName = String(body.fullName || "").trim();
