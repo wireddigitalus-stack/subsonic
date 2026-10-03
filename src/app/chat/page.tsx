@@ -1654,8 +1654,17 @@ export default function ChatPage() {
               </button>
             </div>
 
-            {/* Mobile Actions: Terms, Fullscreen, Audio, Lock */}
+            {/* Mobile Actions: Shooter Profiles, Terms, Fullscreen, Audio, Lock */}
             <div className="flex items-center gap-1 shrink-0">
+              <Link
+                href="/shooters"
+                className="h-7 px-2 rounded-lg bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 text-purple-300 font-mono text-[10px] font-bold flex items-center gap-1 transition-all shrink-0"
+                title="View Full Shooter Profiles & Blueprints"
+              >
+                <Users className="w-3 h-3 text-purple-400 shrink-0" />
+                <span>PROFILES</span>
+              </Link>
+
               <button
                 type="button"
                 onClick={() => {
@@ -1758,8 +1767,16 @@ export default function ChatPage() {
                 </button>
               </div>
 
-              {/* Right: Admin Link, Terms, Lock, and Profile Pill */}
+              {/* Right: Shooter Profiles, Admin Link, Terms, Lock, and Profile Pill */}
               <div className="flex items-center gap-2">
+                <Link
+                  href="/shooters"
+                  title="Explore Full Shooter Profiles, Blueprints & Accolades"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-[11px] font-mono text-purple-300 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.15)]"
+                >
+                  <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                  <span className="font-bold">SHOOTER PROFILES</span>
+                </Link>
                 {(shooterProfile?.role === "MASTER_OWNER" || 
                   shooterProfile?.role === "OWNER_ADMIN" || 
                   shooterProfile?.callsign === "RADAR" || 

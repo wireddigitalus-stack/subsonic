@@ -20,7 +20,8 @@ import {
   Camera,
   ExternalLink,
   Tag,
-  Star
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
 
@@ -308,7 +309,13 @@ function ShootersContent() {
             setShooters(finalShooters);
 
             if (requestedId) {
-              const matched = finalShooters.find((s: ShooterProfile) => s.id.toLowerCase() === requestedId.toLowerCase());
+              const reqLower = requestedId.toLowerCase().replace(/^dm_/, "").trim();
+              const matched = finalShooters.find((s: ShooterProfile) => 
+                s.id?.toLowerCase() === reqLower ||
+                s.callsign?.toLowerCase() === reqLower ||
+                s.id?.toLowerCase().includes(reqLower) ||
+                reqLower.includes(s.id?.toLowerCase())
+              );
               if (matched) {
                 setSelectedShooter(matched);
                 return;
@@ -340,6 +347,19 @@ function ShootersContent() {
       }
       const combined = Array.from(fallbackMap.values());
       setShooters(combined);
+      if (requestedId) {
+        const reqLower = requestedId.toLowerCase().replace(/^dm_/, "").trim();
+        const matched = combined.find((s: ShooterProfile) => 
+          s.id?.toLowerCase() === reqLower ||
+          s.callsign?.toLowerCase() === reqLower ||
+          s.id?.toLowerCase().includes(reqLower) ||
+          reqLower.includes(s.id?.toLowerCase())
+        );
+        if (matched) {
+          setSelectedShooter(matched);
+          return;
+        }
+      }
       setSelectedShooter(combined[0]);
     };
 
@@ -382,6 +402,15 @@ function ShootersContent() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                href="/chat"
+                className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-white border border-emerald-500/40 font-bold text-xs flex items-center gap-2 shadow-[0_0_12px_rgba(16,185,129,0.2)] transition-all active:scale-95"
+                title="Return to Live Chat Room"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-400" />
+                <span>← Return to Live Chat</span>
+              </Link>
+
               <Link
                 href="/invite/pro"
                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
@@ -768,6 +797,19 @@ function ShootersContent() {
           </div>
         </div>
       </section>
+
+      {/* Floating Tactical Back to Chat Quick-Return Button (Desktop) */}
+      <div className="fixed bottom-6 right-6 z-40 hidden md:block">
+        <Link
+          href="/chat"
+          className="ios-glass px-4 py-2.5 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/50 text-emerald-300 hover:text-white font-mono text-xs font-bold flex items-center gap-2 shadow-[0_4px_20px_rgba(16,185,129,0.35)] transition-all active:scale-95 hover:border-emerald-400 group"
+          title="Return directly to Subsonic Society Live Chat"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+          <MessageSquare className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+          <span>← Return to Live Chat</span>
+        </Link>
+      </div>
     </div>
   );
 }

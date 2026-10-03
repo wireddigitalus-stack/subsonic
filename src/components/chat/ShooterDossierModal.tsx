@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { 
   X, 
   Lock, 
@@ -13,7 +14,9 @@ import {
   Compass,
   ArrowRight,
   Bot,
-  Radar
+  Radar,
+  Users,
+  ExternalLink
 } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
@@ -207,8 +210,8 @@ export function ShooterDossierModal({
           </div>
         )}
 
-        {/* Action Button: Start Direct Chat */}
-        <div className="pt-2">
+        {/* Action Buttons: Direct Chat & Full Profile */}
+        <div className="pt-2 space-y-2">
           <button
             type="button"
             onClick={() => onStartDirectComms(shooter)}
@@ -218,6 +221,17 @@ export function ShooterDossierModal({
             <span>Open Direct Chat with {shooter.callsign}</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </button>
+
+          {!isRO && (
+            <Link
+              href={`/shooters?id=${shooter.id?.replace(/^dm_/, "") || shooter.callsign.toLowerCase()}`}
+              onClick={onClose}
+              className="w-full py-2.5 px-4 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 text-purple-200 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            >
+              <Users className="w-4 h-4 text-purple-400" />
+              <span>View Full Profile &amp; Rifle Blueprint &rarr;</span>
+            </Link>
+          )}
 
           <p className="text-[10px] text-center text-slate-500 font-mono mt-2 flex items-center justify-center gap-1">
             <Lock className="w-2.5 h-2.5 text-emerald-400" />

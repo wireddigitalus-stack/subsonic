@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar } from "lucide-react";
+import Link from "next/link";
+import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, Users, ChevronRight } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
 export interface ChatChannelSidebarProps {
@@ -227,8 +228,23 @@ export function ChatChannelSidebar({
 
         </div>
 
-        {/* DOPE Drop Action Box — hidden for initial onboarding */}
-
+        {/* Link to Full Shooter Profiles Directory */}
+        <div className="pt-2">
+          <Link
+            href="/shooters"
+            className="w-full py-2.5 px-3 rounded-xl bg-purple-950/30 hover:bg-purple-900/50 border border-purple-500/30 text-purple-200 font-mono text-xs font-semibold flex items-center justify-between transition-all group shadow-[0_0_12px_rgba(168,85,247,0.12)]"
+            title="Explore all Competitor Profiles, Blueprints & Accolades"
+          >
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+              <span>Shooter Profiles</span>
+            </div>
+            <span className="text-[10px] font-mono text-purple-300 bg-purple-500/20 px-1.5 py-0.5 rounded border border-purple-500/30 group-hover:bg-purple-500/30 flex items-center gap-0.5">
+              <span>EXPLORE</span>
+              <ChevronRight className="w-3 h-3 text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </Link>
+        </div>
 
       </div>
     </div>
