@@ -66,7 +66,7 @@ import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getRoDirectAnswer } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
-import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
+import { startBotEngine, BotSpeed, logBotActivity, subscribeToBotActivity } from "@/lib/chat-bots";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
 import { clearCommsAlert, incrementUnreadMessages } from "@/lib/comms-status";
 
@@ -387,6 +387,7 @@ export default function ChatPage() {
   // Unified Bot Message Handler — captures telemetry and dispatches abuse alerts on guidelines violations
   const handleIncomingBotMessage = useCallback((msg: ChatMessage) => {
     setMessages((prev) => [...prev, msg]);
+    logBotActivity(msg);
 
     // Fire mobile nav beacon when user isn't actively viewing chat
     if (typeof document !== "undefined" && document.hidden) {
@@ -502,6 +503,21 @@ export default function ChatPage() {
       }
     };
   }, [botsEnabled, botSpeed, badActorEnabled]);
+
+  // Sync bot transmissions triggered from Admin console
+  useEffect(() => {
+    const unsub = subscribeToBotActivity((botLogs) => {
+      if (!botLogs || botLogs.length === 0) return;
+      const latest = botLogs[0];
+      if (latest && !messagesRef.current.some((m) => m.id === latest.id)) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === latest.id)) return prev;
+          return [...prev, latest];
+        });
+      }
+    });
+    return unsub;
+  }, []);
 
   // Tour is opt-in only — user can launch it via the TOUR button in the desktop toolbar
 

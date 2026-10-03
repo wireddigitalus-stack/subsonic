@@ -7,6 +7,8 @@ import {
   BotSpeed,
   computeBotStats,
   triggerSingleBotTransmission,
+  getBotActivityLog,
+  clearBotActivityLog,
 } from "@/lib/chat-bots";
 import { ChatMessage } from "@/lib/types";
 import {
@@ -63,7 +65,8 @@ export function BotRosterCard({
 }: BotRosterCardProps) {
   if (!isOpen) return null;
 
-  const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(messages);
+  const activeMessages = messages && messages.length > 0 ? messages : getBotActivityLog();
+  const { totalBotMessages, totalDopeDrops, botStats } = computeBotStats(activeMessages);
 
   const handleManualTrigger = (botId: string, forceDope?: boolean, forceViolation?: boolean) => {
     unlockAudio();
@@ -428,13 +431,25 @@ export function BotRosterCard({
           <span>
             Real user transmissions use <strong className="text-amber-300">Tactical VHF Roger Burst</strong>. Bot transmissions use <strong className="text-cyan-300">Digital Cyber Telemetry</strong>.
           </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold transition-all"
-          >
-            Dismiss
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                clearBotActivityLog();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 text-xs font-bold transition-all"
+              title="Clear all recorded bot activity and reset message counts"
+            >
+              Reset Activity Log
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold transition-all"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       </div>
     </div>

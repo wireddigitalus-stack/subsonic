@@ -520,7 +520,7 @@ export function createBotMessage(bot: BotPersona, channelId: string, content: st
     });
   }
 
-  return {
+    const botMessage: ChatMessage = {
     id: `bot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
     channelId,
     type: dopeCard ? "DOPE_DROP" : "STANDARD",
@@ -547,6 +547,10 @@ export function createBotMessage(bot: BotPersona, channelId: string, content: st
       aiEngine: isFlagged ? "Subsonic Sentinel (Flagged)" : "Bot Engine (Simulated)",
     },
   };
+
+  logBotActivity(botMessage);
+
+  return botMessage;
 }
 
 /**
@@ -656,7 +660,9 @@ export function startBotEngine(
         const delay = Math.round(randomBetween(2000, 8000));
         const timer = setTimeout(() => {
           if (!active) return;
-          callbacks.addReaction(msgId, pickReactionEmoji());
+          const emoji = pickReactionEmoji();
+          callbacks.addReaction(msgId, emoji);
+          recordBotReaction(msgId, emoji);
         }, delay);
         timers.push(timer);
       }
@@ -710,6 +716,94 @@ export function startBotEngine(
   return () => {
     active = false;
     timers.forEach(clearTimeout);
+  };
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// BOT ACTIVITY LOG & TELEMETRY STORE
+// ──────────────────────────────────────────────────────────────────────────────
+
+export const BOT_ACTIVITY_STORAGE_KEY = "subsonic_bot_activity_log";
+export const BOT_ACTIVITY_EVENT = "subsonic_bot_activity_updated";
+
+export function getBotActivityLog(): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(BOT_ACTIVITY_STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function logBotActivity(msg: ChatMessage): void {
+  if (typeof window === "undefined") return;
+  try {
+    const current = getBotActivityLog();
+    const updated = [msg, ...current.filter((m) => m.id !== msg.id)].slice(0, 200);
+    localStorage.setItem(BOT_ACTIVITY_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(BOT_ACTIVITY_EVENT, { detail: updated }));
+  } catch {
+    // fallback
+  }
+}
+
+export function recordBotReaction(msgId: string, emoji: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const current = getBotActivityLog();
+    const updated = current.map((m) => {
+      if (m.id !== msgId) return m;
+      const existing = m.reactions?.find((r) => r.emoji === emoji);
+      if (existing) {
+        return {
+          ...m,
+          reactions: m.reactions.map((r) => r.emoji === emoji ? { ...r, count: r.count + 1 } : r),
+        };
+      }
+      return {
+        ...m,
+        reactions: [...(m.reactions || []), { emoji, count: 1, users: ["bot"] }],
+      };
+    });
+    localStorage.setItem(BOT_ACTIVITY_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(BOT_ACTIVITY_EVENT, { detail: updated }));
+  } catch {}
+}
+
+export function clearBotActivityLog(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(BOT_ACTIVITY_STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent(BOT_ACTIVITY_EVENT, { detail: [] }));
+  } catch {}
+}
+
+export function subscribeToBotActivity(callback: (messages: ChatMessage[]) => void): () => void {
+  if (typeof window === "undefined") return () => {};
+
+  const handleCustom = (e: Event) => {
+    const custom = e as CustomEvent<ChatMessage[]>;
+    if (custom.detail) {
+      callback(custom.detail);
+    } else {
+      callback(getBotActivityLog());
+    }
+  };
+
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === BOT_ACTIVITY_STORAGE_KEY) {
+      callback(getBotActivityLog());
+    }
+  };
+
+  window.addEventListener(BOT_ACTIVITY_EVENT, handleCustom);
+  window.addEventListener("storage", handleStorage);
+
+  return () => {
+    window.removeEventListener(BOT_ACTIVITY_EVENT, handleCustom);
+    window.removeEventListener("storage", handleStorage);
   };
 }
 

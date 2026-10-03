@@ -64,7 +64,7 @@ import {
   Bot
 } from "lucide-react";
 import { BotRosterCard } from "@/components/chat/BotRosterCard";
-import { BotSpeed } from "@/lib/chat-bots";
+import { BotSpeed, getBotActivityLog, subscribeToBotActivity, logBotActivity, clearBotActivityLog } from "@/lib/chat-bots";
 import { 
   getLocalTelemetryEvents, 
   computeTelemetryAnalytics, 
@@ -185,12 +185,19 @@ export default function AdminDashboardPage() {
   const [botSpeed, setBotSpeed] = useState<BotSpeed>("NORMAL");
   const [badActorEnabled, setBadActorEnabled] = useState(true);
 
+  const [botActivityMessages, setBotActivityMessages] = useState<ChatMessage[]>([]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("subsonic_bots_enabled");
       if (stored !== null) setBotsEnabled(stored === "true");
       const speed = localStorage.getItem("subsonic_bots_speed");
       if (speed) setBotSpeed(speed as BotSpeed);
+      setBotActivityMessages(getBotActivityLog());
+      const unsub = subscribeToBotActivity((msgs) => {
+        setBotActivityMessages(msgs);
+      });
+      return unsub;
     }
   }, []);
 
@@ -2490,29 +2497,52 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="ios-glass rounded-3xl border border-white/10 overflow-hidden">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <span className="text-sm font-bold text-white">Recent Transmissions — All Channels</span>
-              <span className="text-[10px] font-mono text-slate-400">Last 50 messages</span>
+            <div className="p-4 border-b border-white/10 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">Recent Transmissions — All Channels</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
+                  {botActivityMessages.length + flaggedMessages.length} Logged
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {botActivityMessages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearBotActivityLog();
+                      setBotActivityMessages([]);
+                    }}
+                    className="text-[10px] font-mono text-red-300 hover:text-red-200 underline"
+                  >
+                    Clear Bot Logs
+                  </button>
+                )}
+                <span className="text-[10px] font-mono text-slate-400">Last 50 messages</span>
+              </div>
             </div>
 
-            {flaggedMessages.length === 0 ? (
+            {flaggedMessages.length === 0 && botActivityMessages.length === 0 ? (
               <div className="p-8 text-center space-y-3">
                 <ShieldCheck className="w-10 h-10 text-emerald-400 mx-auto opacity-60" />
-                <p className="text-sm text-slate-400 font-mono">All channels clear — no flagged messages.</p>
-                <p className="text-xs text-slate-500">Messages that require action will appear here.</p>
+                <p className="text-sm text-slate-400 font-mono">No recent transmissions recorded.</p>
+                <p className="text-xs text-slate-500">Transmissions and moderation flags will appear here in real time.</p>
               </div>
             ) : (
               <div className="divide-y divide-white/5">
-                {flaggedMessages.slice(0, 50).map((msg) => (
+                {[...flaggedMessages, ...botActivityMessages.filter((b) => !flaggedMessages.some((f) => f.id === b.id))].slice(0, 50).map((msg) => (
                   <div key={msg.id} className="p-4 hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-mono text-[10px] font-bold text-amber-400">[{msg.author.callsign}]</span>
+                          <span className="text-xs font-semibold text-white">{msg.author.name}</span>
                           <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
                           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">#{msg.channelId}</span>
                           {msg.moderationStatus === "FLAGGED" && (
                             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse">FLAGGED</span>
+                          )}
+                          {msg.author.id.startsWith("bot-") && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">BOT</span>
                           )}
                         </div>
                         <p className="text-xs text-slate-300 break-words">{msg.content}</p>
@@ -2523,7 +2553,10 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
                         <button
                           type="button"
-                          onClick={() => setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id))}
+                          onClick={() => {
+                            setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id));
+                            setBotActivityMessages((prev) => prev.filter((m) => m.id !== msg.id));
+                          }}
                           className="px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -3494,14 +3527,15 @@ export default function AdminDashboardPage() {
       <BotRosterCard
         isOpen={isBotCardOpen}
         onClose={() => setIsBotCardOpen(false)}
-        messages={flaggedMessages}
+        messages={botActivityMessages}
         botsEnabled={botsEnabled}
         onToggleBots={handleToggleBots}
         botSpeed={botSpeed}
         onChangeSpeed={handleChangeBotSpeed}
         currentChannel="invitational"
         onAddBotMessage={(msg) => {
-          setFlaggedMessages((prev) => [msg, ...prev]);
+          logBotActivity(msg);
+          setBotActivityMessages(getBotActivityLog());
         }}
         soundEnabled={false}
         badActorEnabled={badActorEnabled}
