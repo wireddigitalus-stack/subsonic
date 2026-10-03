@@ -1724,16 +1724,6 @@ export default function AdminDashboardPage() {
             <ExternalLink className="w-3 h-3 opacity-70" />
           </Link>
 
-          <Link
-            href="/evos1.0"
-            target="_blank"
-            className="h-9 px-3.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            title="Open EVOS 1.0 in a new tab"
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>EVOS 1.0</span>
-          </Link>
-
           <span className="hidden md:block w-px h-6 bg-white/10 mx-0.5" />
 
           {/* Tools */}
@@ -1800,10 +1790,10 @@ export default function AdminDashboardPage() {
           <button
             onClick={handleLock}
             className="h-9 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 transition-colors"
-            title="Sign out & switch admin"
+            title="Log out of the admin dashboard"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Switch Admin</span>
+            <span>Log Out</span>
           </button>
         </div>
       </div>
