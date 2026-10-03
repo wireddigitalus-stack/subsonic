@@ -172,7 +172,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/shooters" className="hover:text-purple-300 transition-colors">
-                  Competitor Gear Specs
+                  Shooter Profiles
                 </Link>
               </li>
               <li>

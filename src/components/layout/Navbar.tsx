@@ -402,7 +402,7 @@ export function Navbar() {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-white group-hover:text-purple-400">
-                        Shooters & Gear Specs
+                        Shooter Profiles
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
                         Competitor profiles, rifle builds & advice
