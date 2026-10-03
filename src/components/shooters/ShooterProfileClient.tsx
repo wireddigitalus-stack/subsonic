@@ -833,63 +833,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
         </div>
 
-        {/* ─── SECTION 2: VERIFIED EQUIPMENT BLUEPRINT ───────────────────── */}
-        <section className="space-y-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
-              <Crosshair className="w-4 h-4" />
-              <span>Ballistic & Hardware Blueprint</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              Competition Rifle Rig Specifications
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
-              Verified component configuration fielded by {displayName} in Appalachian match conditions.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Action</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.action || "Precision Action"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Barrel & Twist</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.barrel || "Match Barrel"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Trigger Pull</span>
-              <div className="text-sm font-bold text-amber-400 leading-snug">{shooter.rifleSetup?.trigger || "Match Trigger"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Chassis / Stock</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.chassis || "Precision Chassis"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Optic & Reticle</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.optic || "Competition Optic"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Scope Mount</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.mount || "Match Mount"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Harmonic Tuner</span>
-              <div className="text-sm font-bold text-white leading-snug">{shooter.rifleSetup?.tuner || "Precision Tuner"}</div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Match Ammo & Velocity</span>
-              <div className="text-sm font-bold text-emerald-400 leading-snug">{shooter.rifleSetup?.ammoLot || "Lapua Center-X / SK"}</div>
-            </div>
-          </div>
-        </section>
 
         {/* ─── SECTION 3: ACTION PHOTO & TECHNICAL INTERVIEW ─────────────── */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">

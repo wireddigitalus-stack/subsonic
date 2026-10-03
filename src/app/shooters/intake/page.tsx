@@ -66,14 +66,6 @@ export default function ShooterIntakePage() {
     sponsors: [] as string[],
     customAccolade: "",
     customSponsor: "",
-    action: "Vudoo V-22 (3-Lug Rimfire)",
-    barrel: "Bartlein MTU 20\" Match (1:16 Twist)",
-    trigger: "Bix'n Andy TacSport PRO (4.2 oz)",
-    chassis: "MDT ACC Elite Chassis with Weights",
-    optic: "Zero Compromise Optic ZC527 MPCT3X",
-    mount: "Spuhr QDP-4002 0 MOA with Level",
-    tuner: "Harrell Precision Custom Rimfire Tuner",
-    ammoLot: "Lapua Center-X (1,062 FPS)",
     headshotUrl: "/images/SS-RWB-LOGO.png",
     actionPhotoUrl: "/images/SS-RWB-LOGO.png",
     interviewQ1: "In sudden mountain wind shifts, what is your go-to holdover strategy?",
@@ -189,16 +181,6 @@ export default function ShooterIntakePage() {
         sponsors: formData.sponsors.length > 0 ? formData.sponsors : ["Subsonic Society"],
         image: formData.headshotUrl,
         actionPhoto: formData.actionPhotoUrl,
-        rifleSetup: {
-          action: formData.action,
-          barrel: formData.barrel,
-          trigger: formData.trigger,
-          chassis: formData.chassis,
-          optic: formData.optic,
-          mount: formData.mount,
-          tuner: formData.tuner,
-          ammoLot: formData.ammoLot,
-        },
         interview: [
           {
             question: formData.interviewQ1,
@@ -240,7 +222,7 @@ export default function ShooterIntakePage() {
           BUILD YOUR <span className="amber-gradient-text">SHOOTER PROFILE</span>
         </h1>
         <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Welcome competitors. Complete this quick 2-minute questionnaire with your rifle rig, accolades, and sponsors. The system will auto-generate your official Subsonic Society digital shooter card.
+          Welcome competitors. Complete this quick 2-minute questionnaire with your accolades, competition division, and sponsors. The system will auto-generate your official Subsonic Society digital shooter card.
         </p>
       </div>
 
@@ -511,95 +493,14 @@ export default function ShooterIntakePage() {
           </div>
         </div>
 
-        {/* Section 4: Rifle Rig Specifications */}
+        {/* Section 4: Photos (Portrait & Action Photo) */}
         <div className="ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
           <div className="flex items-center gap-3 border-b border-white/10 pb-4">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
               4
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Rifle Rig & Equipment Build</h3>
-              <p className="text-xs text-slate-400">Detailed component review for the marksmen community</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">ACTION</label>
-              <input
-                type="text"
-                value={formData.action}
-                onChange={(e) => setFormData({ ...formData, action: e.target.value })}
-                placeholder="e.g. Vudoo V-22 / RimX / CZ 457"
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">BARREL</label>
-              <input
-                type="text"
-                value={formData.barrel}
-                onChange={(e) => setFormData({ ...formData, barrel: e.target.value })}
-                placeholder='e.g. Bartlein MTU 20" Match'
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">TRIGGER</label>
-              <input
-                type="text"
-                value={formData.trigger}
-                onChange={(e) => setFormData({ ...formData, trigger: e.target.value })}
-                placeholder="e.g. Bix'n Andy / TriggerTech (4.5 oz)"
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">CHASSIS / STOCK</label>
-              <input
-                type="text"
-                value={formData.chassis}
-                onChange={(e) => setFormData({ ...formData, chassis: e.target.value })}
-                placeholder="e.g. MDT ACC Elite / Foundation"
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">OPTIC</label>
-              <input
-                type="text"
-                value={formData.optic}
-                onChange={(e) => setFormData({ ...formData, optic: e.target.value })}
-                placeholder="e.g. ZCO 527 / Tangent Theta / Razor"
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 font-bold block">MATCH AMMUNITION</label>
-              <input
-                type="text"
-                value={formData.ammoLot}
-                onChange={(e) => setFormData({ ...formData, ammoLot: e.target.value })}
-                placeholder="e.g. Lapua Center-X (1,062 FPS)"
-                className="w-full px-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-amber-300 text-xs font-mono focus:border-amber-400 outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Section 5: Photos (Headshot + Action Rig) */}
-        <div className="ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-              5
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Photos (Portrait & Rifle Rig)</h3>
+              <h3 className="text-lg font-bold text-white">Photos (Portrait & Action Photo)</h3>
               <p className="text-xs text-slate-400">Upload 2 photos or snap directly from your phone camera</p>
             </div>
           </div>

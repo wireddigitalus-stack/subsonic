@@ -24,8 +24,7 @@ import {
   ExternalLink, 
   Target, 
   Copy, 
-  X,
-  Crosshair
+  X
 } from "lucide-react";
 import { SocietyMember, ShooterProfile } from "@/lib/types";
 
@@ -312,7 +311,7 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
             Showing <strong className="text-white">{filteredMembers.length}</strong> of {totalCount} total society accounts
           </span>
           <span className="text-[11px] text-amber-400 font-bold">
-            💡 Click any card to edit credentials, rig blueprint, clearance, or view digital pass
+            💡 Click any card to edit credentials, profile details, clearance, or view digital pass
           </span>
         </div>
 
@@ -560,20 +559,6 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
                       <span>Pass</span>
                     </button>
 
-                    {/* Blueprint Trigger (If shooter profile exists or for rig specs) */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenMemberModal(m);
-                        setMemberModalTab("BLUEPRINT");
-                      }}
-                      className="px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
-                      title="Inspect & Edit Rifle Blueprint Specs"
-                    >
-                      <Crosshair className="w-3 h-3 text-cyan-400" />
-                      <span>Blueprint</span>
-                    </button>
 
                     {/* One-click Copy Profile */}
                     <button

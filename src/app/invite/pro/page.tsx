@@ -569,7 +569,7 @@ function ProInviteContent() {
           <span className="amber-gradient-text">PROFILE BUILDER.</span>
         </h1>
         <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-          Fill out your marksman questionnaire and gear blueprint. Our engine automatically compresses 
+          Fill out your marksman questionnaire and profile details. Our engine automatically compresses 
           your photos, generates your private chat credentials, and publishes your dedicated SEO athlete profile.
         </p>
       </div>

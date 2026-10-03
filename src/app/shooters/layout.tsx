@@ -1,26 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Precision Rimfire Competitors & Athlete Blueprints | Subsonic Society",
+  title: "Precision Rimfire Competitors & Athlete Profiles | Subsonic Society",
   description:
-    "Explore elite rimfire marksmen profiles, match gear breakdowns, rifle builds (Modacam, Vudoo, RimX), and competitive rankings across Open, Production, and Senior divisions.",
+    "Explore elite rimfire marksmen profiles, match statistics, rankings, and competitor interviews across Open, Production, and Senior divisions.",
   keywords: [
     "Precision rimfire shooters",
     "PRS Rimfire athlete profiles",
     "Erich Leipold rimfire",
     "Ron Verran precision rimfire",
     "Allen Hurley Subsonic Society",
-    "Rimfire rifle builds",
-    "Modacam rifle build",
+    "Rimfire competitors",
     "Zermatt RimX Open Division",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/shooters",
   },
   openGraph: {
-    title: "Precision Rimfire Competitors & Rifle Blueprints | Subsonic Society",
+    title: "Precision Rimfire Competitors & Athlete Profiles | Subsonic Society",
     description:
-      "Roster of verified precision rimfire marksmen, match statistics, and complete technical breakdowns of winning rifle setups.",
+      "Roster of verified precision rimfire marksmen, match statistics, and competitor achievements.",
     url: "https://subsonicsociety.com/shooters",
     siteName: "Subsonic Society",
     images: [

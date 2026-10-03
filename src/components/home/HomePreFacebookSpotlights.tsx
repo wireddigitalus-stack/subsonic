@@ -242,7 +242,7 @@ export function HomePreFacebookSpotlights() {
                   href="/shooters"
                   className="inline-flex items-center gap-2 text-xs font-bold text-white hover:text-amber-400 transition-colors"
                 >
-                  <span>Read Wyatt&apos;s Full Interview & Gear Blueprint</span>
+                  <span>Read Wyatt&apos;s Full Interview & Shooter Profile</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

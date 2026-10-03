@@ -283,7 +283,7 @@ function ShootersContent() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-semibold">
               <Users className="w-3.5 h-3.5" />
-              <span>SUBSONIC SOCIETY ATHLETES & RIG BLUEPRINTS</span>
+              <span>SUBSONIC SOCIETY ATHLETE PROFILES</span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
@@ -588,74 +588,7 @@ function ShootersContent() {
                 &ldquo;{selectedShooter.quote}&rdquo;
               </div>
 
-              {/* Complete Equipment Blueprint — only shown when shooter has shared rig data */}
-              {selectedShooter.rifleSetup && selectedShooter.rifleSetup.action && (
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
-                    <Crosshair className="w-4 h-4" />
-                    <span>Competition Rifle Blueprint</span>
-                  </h3>
-                  <span className="text-[11px] font-mono text-slate-400">Verified Precision Specs</span>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">ACTION</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.action}</span>
-                  </div>
-
-                  {selectedShooter.rifleSetup.barrel && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">BARREL</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.barrel}</span>
-                  </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.trigger && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">TRIGGER</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.trigger}</span>
-                  </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.chassis && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">CHASSIS / STOCK</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.chassis}</span>
-                  </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.optic && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">OPTIC</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.optic}</span>
-                  </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.mount && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">RINGS & MOUNT</span>
-                    <span className="font-bold text-white">{selectedShooter.rifleSetup.mount}</span>
-                  </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.tuner && (
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                      <span className="text-[10px] font-mono text-slate-400 block">HARMONIC TUNER</span>
-                      <span className="font-bold text-white">{selectedShooter.rifleSetup.tuner}</span>
-                    </div>
-                  )}
-
-                  {selectedShooter.rifleSetup.ammoLot && (
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">AMMUNITION LOT</span>
-                    <span className="font-bold text-amber-400">{selectedShooter.rifleSetup.ammoLot}</span>
-                  </div>
-                  )}
-                </div>
-              </div>
-              )}
 
               {/* Long-form Q&A Interview */}
               {selectedShooter.interview && selectedShooter.interview.length > 0 && (

@@ -1635,7 +1635,7 @@ export default function ChatPage() {
               <Link
                 href="/shooters"
                 className="h-7 px-2 rounded-lg bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 text-purple-300 font-mono text-[10px] font-bold flex items-center gap-1 transition-all shrink-0"
-                title="View Full Shooter Profiles & Blueprints"
+                title="View Full Shooter Profiles"
               >
                 <Users className="w-3 h-3 text-purple-400 shrink-0" />
                 <span>PROFILES</span>
@@ -1747,7 +1747,7 @@ export default function ChatPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/shooters"
-                  title="Explore Full Shooter Profiles, Blueprints & Accolades"
+                  title="Explore Full Shooter Profiles & Accolades"
                   className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-[11px] font-mono text-purple-300 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.15)]"
                 >
                   <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />

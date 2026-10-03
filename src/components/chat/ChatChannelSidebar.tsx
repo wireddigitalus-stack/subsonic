@@ -233,7 +233,7 @@ export function ChatChannelSidebar({
           <Link
             href="/shooters"
             className="w-full py-2.5 px-3 rounded-xl bg-purple-950/30 hover:bg-purple-900/50 border border-purple-500/30 text-purple-200 font-mono text-xs font-semibold flex items-center justify-between transition-all group shadow-[0_0_12px_rgba(168,85,247,0.12)]"
-            title="Explore all Competitor Profiles, Blueprints & Accolades"
+            title="Explore all Competitor Profiles & Accolades"
           >
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />

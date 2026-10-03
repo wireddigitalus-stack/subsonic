@@ -235,7 +235,7 @@ export function ShooterDossierModal({
               className="w-full py-2.5 px-4 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 text-purple-200 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
               <Users className="w-4 h-4 text-purple-400" />
-              <span>View Full Profile &amp; Rifle Blueprint &rarr;</span>
+              <span>View Full Shooter Profile &rarr;</span>
             </Link>
           )}
 
