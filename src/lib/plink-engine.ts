@@ -115,17 +115,17 @@ const COMMERCIAL_PATTERNS: RegExp[] = [
   /\bclick\s+(here|this)\b/i,
 ];
 
-// ─── CONVERSATIONAL TRIGGERS (RO & PLINK COMPATIBLE) ───────────────────────────
+// ─── CONVERSATIONAL TRIGGERS (RO BOT) ───────────────────────────
 
-const RO_GREETING = /\b(hey|hi|hello|sup|yo|howdy|hiya|greetings)\s+(ro|range\s*officer|plink)\b/i;
-const RO_NAME_FIRST = /^(ro|range\s*officer|plink)\s*[,!?]/i;
-const RO_QUESTION = /\b(ro|range\s*officer|plink)[\s,]+.{0,50}\?/i;
-const RO_MENTION = /@(ro|range\s*officer|plink)\b/i;
-const RO_THANKS = /\b(thanks|thank you|ty|thx|cheers|appreciate)\b.*\b(ro|range\s*officer|plink)\b|\b(ro|range\s*officer|plink)\b.*\b(thanks|thank you|ty|thx|cheers)\b/i;
-const RO_IDENTITY = /\b(who|what)\s+(are|is)\s+(ro|range\s*officer|plink)\b|(ro|range\s*officer|plink)[\s,]+(who|what)\s+are\s+you/i;
-const RO_REAL = /\b(ro|range\s*officer|plink)\b.*(real|ai|bot|robot|human|alive|automated)/i;
-const RO_HOW = /\b(ro|range\s*officer|plink)\b.*(how\s+are\s+you|you\s+ok|you\s+good|all\s+good)/i;
-const RO_MENTIONED = /\b(ro|range\s*officer|plink)\b/i;
+const RO_GREETING = /\b(hey|hi|hello|sup|yo|howdy|hiya|greetings)\s+(ro|range\s*officer)\b/i;
+const RO_NAME_FIRST = /^(ro|range\s*officer)\s*[,!?]/i;
+const RO_QUESTION = /\b(ro|range\s*officer)[\s,]+.{0,50}\?/i;
+const RO_MENTION = /@(ro|range\s*officer)\b/i;
+const RO_THANKS = /\b(thanks|thank you|ty|thx|cheers|appreciate)\b.*\b(ro|range\s*officer)\b|\b(ro|range\s*officer)\b.*\b(thanks|thank you|ty|thx|cheers)\b/i;
+const RO_IDENTITY = /\b(who|what)\s+(are|is)\s+(ro|range\s*officer)\b|(ro|range\s*officer)[\s,]+(who|what)\s+are\s+you/i;
+const RO_REAL = /\b(ro|range\s*officer)\b.*(real|ai|bot|robot|human|alive|automated)/i;
+const RO_HOW = /\b(ro|range\s*officer)\b.*(how\s+are\s+you|you\s+ok|you\s+good|all\s+good)/i;
+const RO_MENTIONED = /\b(ro|range\s*officer)\b/i;
 
 // ─── RESPONSE BANKS ───────────────────────────────────────────────────────────
 
@@ -545,7 +545,7 @@ export function analyzeMsgForPlink(
   // ── Direct Chat Behavior: No unsolicited welcome/greetings, monitor silently ──
   if (isDirectChat) {
     // Only answer if shooter explicitly addressed RO with @ro or ro question
-    if (RO_MENTION.test(content) || RO_QUESTION.test(content) || /^(hey|hi|hello)\s+(ro|plink)\b/i.test(content)) {
+    if (RO_MENTION.test(content) || RO_QUESTION.test(content) || /^(hey|hi|hello)\s+(ro)\b/i.test(content)) {
       return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
     }
     // Otherwise RO monitors silently without interrupting the 1-on-1 convo
@@ -612,7 +612,7 @@ export function analyzeMsgForPlink(
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  // Low-priority: RO or Plink mentioned casually
+  // Low-priority: RO BOT mentioned casually
   if (RO_MENTIONED.test(content)) {
     return { content: pick(RO_GENERAL_RESPONSES)(callsign), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
