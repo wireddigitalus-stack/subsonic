@@ -815,7 +815,7 @@ export default function ChatPage() {
             threatScore: response.violationType === "HARASSMENT" ? 85 : 20,
             policyScore: 90,
             status: "ACTIVE",
-            aiRationale: `Plink detected: ${response.violationType}`,
+            aiRationale: `RO BOT detected: ${response.violationType}`,
             autoActionTaken: `Tier ${response.warningTier} warning issued in chat`,
           });
       }

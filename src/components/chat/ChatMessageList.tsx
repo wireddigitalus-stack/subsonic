@@ -632,13 +632,13 @@ export function ChatMessageList({
               <button
                 type="button"
                 onClick={() => {
-                  setInputText("hey plink ");
+                  setInputText("hey ro ");
                   playTacticalChirp(1100);
                 }}
                 className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold shrink-0"
-                title="Chat with Plink AI Range Marshal"
+                title="Chat with RO BOT, your AI Range Officer"
               >
-                🤖 &ldquo;Hey Plink&rdquo;
+                🤖 &ldquo;Hey RO&rdquo;
               </button>
               <button
                 type="button"

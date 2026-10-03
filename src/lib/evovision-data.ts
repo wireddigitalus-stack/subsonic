@@ -190,7 +190,7 @@ export const EVO_CLUSTERS = {
   },
   MODS: {
     title: "MODERATOR TEAM",
-    subtitle: "Plink AI Sentinel & Host Watch",
+    subtitle: "RO BOT AI Sentinel & Host Watch",
     color: "#F43F5E",
     accent: "#E11D48",
     glow: "rgba(244, 63, 94, 0.4)",
@@ -653,11 +653,11 @@ export const EVO_NODES: EvoNode[] = [
   {
     id: "mod-sentinel",
     parentId: "cluster-mods",
-    label: "PLINK AI MARSHAL",
+    label: "RO BOT AI RANGE OFFICER",
     sublabel: "Gemini 2.5 Sentinel",
     cluster: "MODS",
     role: "AI_SAFETY_ENGINE",
-    callsign: "PLINK",
+    callsign: "RO BOT",
     memberId: "AI-MOD-01",
     x: 690,
     y: -380,
@@ -981,7 +981,7 @@ export const EVO_NODES: EvoNode[] = [
     simulationTimeline: [
       { time: "2m ago", event: "Transmitted stage condition briefing", type: "chat" },
       { time: "14m ago", event: "Calculated dummy DOPE drop (1062 fps)", type: "dope" },
-      { time: "42m ago", event: "Generated boundary edge case for Plink AI Sentinel", type: "flag" },
+      { time: "42m ago", event: "Generated boundary edge case for RO BOT AI Sentinel", type: "flag" },
       { time: "1h ago", event: "Simulated peer ping response (12ms)", type: "ping" },
     ],
     botSpecs: {
@@ -1008,7 +1008,7 @@ export const EVO_NODES: EvoNode[] = [
       reactionsCount: 1,
     },
     details: {
-      protocol: "Autonomous Bad-Actor Stress Generator (tests Plink AI Sentinel)",
+      protocol: "Autonomous Bad-Actor Stress Generator (tests RO BOT AI Sentinel)",
     },
   },
   {

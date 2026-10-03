@@ -599,7 +599,7 @@ export default function EvosDashboardPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_#F43F5E]" />
-            <span className="text-slate-300">Plink AI Sentinel & Moderator Rooms</span>
+            <span className="text-slate-300">RO BOT AI Sentinel & Moderator Rooms</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_6px_#818CF8]" />
@@ -941,7 +941,7 @@ export default function EvosDashboardPage() {
                       ) : (
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                       )}
-                      <span>Plink AI Moderation Sentinel</span>
+                      <span>RO BOT AI Moderation Sentinel</span>
                     </span>
                     <span className={`text-[10px] px-2 py-0.5 rounded font-black ${
                       selectedNode.moderationData.standing === "FLAGGED"
