@@ -1684,31 +1684,19 @@ export default function AdminDashboardPage() {
       {/* Admin Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 animate-pulse" />
-              Live Site Intelligence & Admin Hub
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
+              Admin Hub
             </span>
             {adminSession && (
-              <span className={`text-[11px] px-3.5 py-1.5 rounded-full font-mono font-bold flex items-center gap-1.5 border shadow-sm ${
+              <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold flex items-center gap-1.5 border ${
                 adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN"
-                  ? "bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-emerald-500/20 text-emerald-300 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
-                  : "bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 text-amber-300 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                  ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
               }`}>
-                <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "#10b981" : "#f59e0b" }} />
-                <span>{adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "🎖️ OWNER ADMIN:" : "⚡ MASTER ADMIN:"}</span>
-                <span className="text-white font-extrabold">{adminSession.name} [{adminSession.callsign}]</span>
-                <span className="text-[9px] opacity-75 font-normal">({adminSession.memberId})</span>
-              </span>
-            )}
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>Durable Storage: data/telemetry-events.jsonl ({events.length} Recorded)</span>
-            </span>
-            {isSupabaseConfigured && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-mono flex items-center gap-1">
-                <Database className="w-3 h-3 text-blue-400" />
-                <span>Supabase Cloud Sync Active</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "#10b981" : "#f59e0b" }} />
+                <span>{adminSession.callsign === "ALLEN" || adminSession.role === "OWNER_ADMIN" ? "Owner Admin" : "Master Admin"}</span>
+                <span className="text-white">· {adminSession.name} [{adminSession.callsign}]</span>
               </span>
             )}
           </div>
