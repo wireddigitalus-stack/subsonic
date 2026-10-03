@@ -22,10 +22,8 @@ const STORAGE_KEY = "subsonic_comms_status";
 const EVENT_NAME = "subsonic_comms_status_change";
 
 const DEFAULT_STATE: CommsStatusState = {
-  level: "green", // Initial active radio ping for live stage net
-  unreadCount: 3,
-  noticeTitle: "Stage 8 DOPE Released",
-  noticeDetail: "Match Director Allen Hurley posted Stage 8 Hollow solution.",
+  level: "none",
+  unreadCount: 0,
   timestamp: Date.now(),
 };
 

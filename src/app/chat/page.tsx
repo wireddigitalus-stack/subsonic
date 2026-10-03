@@ -68,7 +68,7 @@ import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed } from "@/lib/chat-bots";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
-import { clearCommsAlert } from "@/lib/comms-status";
+import { clearCommsAlert, incrementUnreadMessages } from "@/lib/comms-status";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -384,6 +384,11 @@ export default function ChatPage() {
   // Unified Bot Message Handler — captures telemetry and dispatches abuse alerts on guidelines violations
   const handleIncomingBotMessage = useCallback((msg: ChatMessage) => {
     setMessages((prev) => [...prev, msg]);
+
+    // Fire mobile nav beacon when user isn't actively viewing chat
+    if (typeof document !== "undefined" && document.hidden) {
+      incrementUnreadMessages(1);
+    }
 
     // If bot message violates conduct/guidelines, record live abuse alert for Admin Console
     if (
