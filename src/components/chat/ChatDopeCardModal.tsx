@@ -152,7 +152,7 @@ export function ChatDopeCardModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-bold text-xs hover:brightness-110 shadow-tactical-glow flex items-center gap-2"
+              className="px-5 py-2 rounded-xl bg-amber-500 text-black font-medium text-xs flex items-center gap-2"
             >
               <Crosshair className="w-4 h-4" />
               <span>TRANSMIT DOPE</span>

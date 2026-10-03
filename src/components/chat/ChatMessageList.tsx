@@ -486,7 +486,7 @@ export function ChatMessageList({
 
                 {/* DOPE CARD */}
                 {msg.dopeCard && (
-                  <div className="p-2 md:p-3.5 rounded-lg md:rounded-2xl bg-black/85 border border-cyan-500/40 shadow-tactical-glow space-y-1 md:space-y-2.5">
+                  <div className="p-2 md:p-3.5 rounded-lg md:rounded-2xl bg-black/85 border border-cyan-500/40 space-y-1 md:space-y-2.5">
                     <div className="flex items-center justify-between pb-1.5 border-b border-cyan-500/20">
                       <div className="flex items-center gap-1.5 sm:gap-2 font-mono min-w-0">
                         <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />

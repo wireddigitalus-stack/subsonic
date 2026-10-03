@@ -263,7 +263,7 @@ export function ChatTour({ isOpen, onClose, onPlayChirp }: ChatTourProps) {
           <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-b-2 border-r-2 border-amber-300" />
 
           {/* Floating Focus Badge */}
-          <div className="absolute -top-3.5 right-2 px-2.5 py-0.5 rounded-full bg-amber-500 text-black font-mono font-black text-[10px] tracking-wider uppercase shadow-[0_0_12px_rgba(245,158,11,0.9)] flex items-center gap-1">
+          <div className="absolute -top-3.5 right-2 px-2.5 py-0.5 rounded-full bg-amber-500 text-black font-bold text-[10px] tracking-wider uppercase shadow-[0_0_12px_rgba(245,158,11,0.9)] flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" />
             <span>{step.badge.split("/")[1]?.trim() || "FOCUS"}</span>
           </div>
@@ -352,7 +352,7 @@ export function ChatTour({ isOpen, onClose, onPlayChirp }: ChatTourProps) {
           {/* Card Body: Feature Title & Explanation */}
           <div className="space-y-3">
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-black/60 border border-amber-500/30 flex items-center justify-center shrink-0 shadow-tactical-glow">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-black/60 border border-amber-500/30 flex items-center justify-center shrink-0">
                 {step.icon}
               </div>
               <div className="space-y-1">
@@ -404,7 +404,7 @@ export function ChatTour({ isOpen, onClose, onPlayChirp }: ChatTourProps) {
               <button
                 type="button"
                 onClick={handleNext}
-                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-mono font-black text-xs shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5"
+                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs active:scale-95 transition-all flex items-center gap-1.5"
               >
                 <span>{isLast ? "Finish Tour" : "Next Step"}</span>
                 {isLast ? <Check className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}

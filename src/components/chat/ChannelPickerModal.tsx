@@ -251,7 +251,7 @@ export function ChannelPickerModal({
             onClick={() => setActiveFilterTab("ALL")}
             className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all ${
               activeFilterTab === "ALL"
-                ? "bg-amber-500 text-black shadow-tactical-glow"
+                ? "bg-amber-500 text-black"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -263,7 +263,7 @@ export function ChannelPickerModal({
             onClick={() => setActiveFilterTab("MATCH")}
             className={`flex-1 py-1.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeFilterTab === "MATCH"
-                ? "bg-amber-500 text-black shadow-tactical-glow"
+                ? "bg-amber-500 text-black"
                 : "text-slate-400 hover:text-white"
             }`}
           >

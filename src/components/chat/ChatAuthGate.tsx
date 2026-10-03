@@ -46,7 +46,7 @@ export function ChatAuthGate({
 
       <div className="flex-1 flex items-center justify-center">
         <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
-        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
+        <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-white/20 mx-auto relative">
           <Image
             src="/images/SS-RWB-LOGO.png"
             alt="Subsonic Emblem"
@@ -77,7 +77,7 @@ export function ChatAuthGate({
 
         <form onSubmit={handleUnlockRoom} className="space-y-4 text-left">
           <div className="space-y-1">
-            <label className="text-xs font-mono text-slate-300 font-bold">Callsign *</label>
+            <label className="text-xs font-medium text-slate-300">Callsign *</label>
             <input
               type="text"
               required
@@ -90,7 +90,7 @@ export function ChatAuthGate({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-mono text-slate-300 font-bold flex items-center justify-between">
+            <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
               <span>Member Key or Security PIN</span>
               <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for SAID DONE • 2468 for RADAR</span>
             </label>
@@ -106,17 +106,17 @@ export function ChatAuthGate({
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
+            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
           >
             <Unlock className="w-4 h-4 fill-black" />
-            <span>UNLOCK PRIVATE CHAT ROOM</span>
+            <span>Unlock Chat Room</span>
           </button>
         </form>
 
         <div className="pt-3 border-t border-white/10 space-y-3">
-          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-2">
-            <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block tracking-wider">
-              MEMBERSHIP & CHAT BY INVITATION ONLY
+          <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-center space-y-2">
+            <span className="text-[11px] font-medium text-slate-300 block">
+              Membership & Chat by Invitation Only
             </span>
             <p className="text-[11px] text-slate-300">
               Have an invitation code from Allen or a Range Officer?
@@ -139,7 +139,7 @@ export function ChatAuthGate({
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1 font-mono">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1">
             <Link href="/" className="hover:text-slate-300 transition-colors">
               ← Return to Main Portal
             </Link>

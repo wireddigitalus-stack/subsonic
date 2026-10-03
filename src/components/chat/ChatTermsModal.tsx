@@ -91,7 +91,7 @@ export function ChatTermsModal({
 
         {/* Zero Tolerance Warning Callout */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-red-950/50 border border-red-500/40 space-y-2">
-          <div className="flex items-center gap-2 text-red-400 font-mono font-bold text-xs uppercase tracking-wider">
+          <div className="flex items-center gap-2 text-red-400 font-medium text-xs uppercase tracking-wider">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>ZERO-TOLERANCE: COMMERCE PROHIBITION</span>
           </div>
@@ -104,7 +104,7 @@ export function ChatTermsModal({
         <div className="space-y-2.5 pt-1">
           {/* Item 1: Decorum & Sportsmanship */}
           <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-xs uppercase">
+            <div className="flex items-center gap-2 text-amber-400 font-medium text-xs uppercase">
               <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>1. Competitor Sportsmanship &amp; Decorum</span>
             </div>
@@ -115,7 +115,7 @@ export function ChatTermsModal({
 
           {/* Item 2: AI Sentinel & Active Moderation */}
           <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold text-xs uppercase">
+            <div className="flex items-center gap-2 text-emerald-400 font-medium text-xs uppercase">
               <Radio className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>2. Real-Time Safety &amp; AI Moderation</span>
             </div>
@@ -126,7 +126,7 @@ export function ChatTermsModal({
 
           {/* Item 3: Data & DOPE Card Integrity */}
           <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-cyan-400 font-mono font-bold text-xs uppercase">
+            <div className="flex items-center gap-2 text-cyan-400 font-medium text-xs uppercase">
               <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <span>3. DOPE Cards &amp; Ballistic Data Integrity</span>
             </div>
@@ -137,7 +137,7 @@ export function ChatTermsModal({
 
           {/* Item 4: Invitation Credentials */}
           <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-indigo-400 font-mono font-bold text-xs uppercase">
+            <div className="flex items-center gap-2 text-indigo-400 font-medium text-xs uppercase">
               <Lock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
               <span>4. Invitation Pass &amp; Credential Security</span>
             </div>
@@ -165,7 +165,7 @@ export function ChatTermsModal({
           <button
             type="button"
             onClick={handleAcknowledge}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-mono font-bold text-xs flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all active:scale-95"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 text-black font-medium text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95"
           >
             <CheckCircle2 className="w-4 h-4 fill-black text-amber-500" />
             <span>I UNDERSTAND &amp; AGREE</span>

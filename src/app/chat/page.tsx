@@ -1585,7 +1585,7 @@ export default function ChatPage() {
                     playTacticalChirp(1100);
                   }}
                   title="Subsonic Society Terms of Use & Code of Conduct"
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-[10px] font-mono text-slate-300 hover:text-amber-300 transition-colors shrink-0"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 hover:bg-white/[0.06] border border-white/10 text-[11px] text-slate-400 hover:text-slate-200 transition-colors shrink-0"
                 >
                   <Scale className="w-3 h-3 text-amber-400 shrink-0" />
                   <span>TERMS &amp; CONDUCT</span>
@@ -1601,7 +1601,7 @@ export default function ChatPage() {
                     playTacticalChirp(400);
                   }}
                   title="Lock Private Chat Room"
-                  className="h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-mono font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
+                  className="h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 transition-all"
                 >
                   <Lock className="w-3 h-3 text-red-400 shrink-0" />
                   <span>Lock</span>
@@ -1615,7 +1615,7 @@ export default function ChatPage() {
                     setIsProfileModalOpen(true);
                   }}
                   data-telemetry="chat_edit_shooter_profile"
-                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] transition-all text-xs group"
                 >
                   <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
                     shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
@@ -1646,33 +1646,22 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* ROW 2: Weather & Range Telemetry (Left) + Tactical Utilities (Right) */}
+            {/* ROW 2: Compact Range Status (Left) + Utilities (Right) */}
             <div className="flex items-center justify-between gap-3">
-              {/* Left: Weather Telemetry */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-[11px] sm:text-xs font-mono">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
-                </div>
-
-                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                  <Compass className="w-3 h-3 text-amber-400" />
-                  <span>ELEV: <strong className="text-white">3,420 FT</strong></span>
-                </div>
-
-                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                  <Wind className="w-3 h-3 text-cyan-400" />
-                  <span>WIND: <strong className="text-cyan-300">9-14 MPH</strong></span>
-                </div>
-
-                <div className="flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                  <Thermometer className="w-3.5 h-3.5 text-orange-400" />
-                  <span>TEMP: <strong className="text-white">64°F</strong></span>
-                </div>
-
-                <div className="hidden md:flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-lg bg-black/40 border border-white/10 text-slate-300">
-                  <Target className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>DA: <strong className="text-emerald-300">+2,150 FT</strong></span>
+              {/* Left: Compact Range Status Chip */}
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="text-slate-300 font-medium">Holston Ridge</span>
+                  <span className="text-white/20">·</span>
+                  <span>3,420 ft</span>
+                  <span className="text-white/20">·</span>
+                  <Wind className="w-3 h-3 text-slate-500" />
+                  <span>9-14 mph</span>
+                  <span className="text-white/20">·</span>
+                  <span>64°F</span>
+                  <span className="hidden md:inline text-white/20">·</span>
+                  <span className="hidden md:inline">DA +2,150 ft</span>
                 </div>
               </div>
 
@@ -1696,7 +1685,7 @@ export default function ChatPage() {
                   type="button"
                   onClick={() => setIsFullscreen(true)}
                   data-telemetry="chat_enter_fullscreen"
-                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border-white/10 transition-colors"
+                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border-white/10 transition-colors"
                   title="Expand to Fullscreen Fill Hand Mode"
                 >
                   <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
@@ -1706,21 +1695,20 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`h-7 px-2 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1 font-mono font-semibold transition-all ${
+                  className={`h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-medium transition-all ${
                     soundEnabled
-                      ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                      : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-300"
+                      ? "bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/[0.08]"
+                      : "bg-transparent text-slate-500 border-white/5 hover:bg-white/[0.04] hover:text-slate-400"
                   }`}
                   title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
                   aria-label="Toggle Tactical Radio Audio"
                 >
                   {soundEnabled ? (
-                    <Volume2 className="w-3 h-3 text-amber-400 shrink-0" />
+                    <Volume2 className="w-3 h-3 text-slate-400 shrink-0" />
                   ) : (
-                    <VolumeX className="w-3 h-3 text-slate-400 shrink-0" />
+                    <VolumeX className="w-3 h-3 text-slate-500 shrink-0" />
                   )}
-                  <span className="text-slate-400 text-[9px] uppercase tracking-wider font-normal">Audio</span>
-                  <span>{soundEnabled ? "ON" : "OFF"}</span>
+                  <span>{soundEnabled ? "Audio" : "Muted"}</span>
                 </button>
 
                 <button
@@ -1847,7 +1835,7 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={handleBackToInvitational}
-                className="p-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-mono font-black text-xs flex items-center gap-1 shrink-0 shadow-tactical-glow active:scale-95 transition-all"
+                className="p-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-all"
                 title="Return to #invitational"
               >
                 <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -1860,7 +1848,7 @@ export default function ChatPage() {
                 setIsChannelModalOpen(true);
                 playTacticalChirp(1100);
               }}
-              className="w-full p-2 px-2.5 rounded-xl bg-black/70 border border-amber-500/40 hover:border-amber-400 shadow-tactical-glow flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
+              className="w-full p-2 px-2.5 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.06] flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <div className={`w-6 h-6 rounded-lg font-mono font-black text-xs flex items-center justify-center shrink-0 ${
@@ -1914,27 +1902,27 @@ export default function ChatPage() {
                     key={ch.id}
                     type="button"
                     onClick={() => setCurrentChannel(ch.id)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl font-mono text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
                       isActive
-                        ? "bg-amber-500 text-black font-bold border-amber-400 shadow-tactical-glow scale-[1.02]"
-                        : "bg-black/50 border-white/10 text-slate-300 hover:text-white hover:bg-white/10"
+                        ? "bg-amber-500 text-black font-bold border-amber-400"
+                        : "bg-white/[0.03] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.06]"
                     }`}
                   >
                     <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
                     <span>{ch.name}</span>
 
                     {/* Post Counter Badge on Pill */}
-                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold flex items-center gap-0.5 ${
+                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-medium flex items-center gap-0.5 ${
                       isActive
-                        ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 shadow-sm"
-                        : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                        ? "bg-black/30 text-white/80"
+                        : "bg-white/5 text-slate-400"
                     }`} title={`${engagement.postCount} posts in #${ch.name}`}>
-                      <MessageSquare className="w-2 h-2 text-cyan-400" />
+                      <MessageSquare className="w-2 h-2" />
                       <span>{engagement.postCount}</span>
                     </span>
 
                     {unread > 0 && !isActive ? (
-                      <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                      <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
                         {unread > 9 ? "9+" : unread}
                       </span>
                     ) : null}
@@ -1944,7 +1932,7 @@ export default function ChatPage() {
 
               {/* Active Direct Comms Pill */}
               {isDirectMode && activeDirectPartner && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs bg-emerald-950/60 border border-emerald-500/60 text-white shadow-tactical-glow shrink-0 animate-fadeIn">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-emerald-950/40 border border-emerald-500/30 text-white shrink-0 animate-fadeIn">
                   <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="text-emerald-300 font-bold truncate max-w-[200px]">
                     DM: {activeDirectPartner.name} [{activeDirectPartner.callsign}]
@@ -2091,10 +2079,10 @@ export default function ChatPage() {
 
         return (
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-            <div className="ios-glass rounded-3xl max-w-lg w-full border border-amber-500/40 shadow-2xl p-5 sm:p-7 space-y-4 max-h-[92dvh] overflow-y-auto ios-scrollbar">
+            <div className="ios-glass rounded-3xl max-w-lg w-full border border-white/10 shadow-2xl p-5 sm:p-7 space-y-4 max-h-[92dvh] overflow-y-auto ios-scrollbar">
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <div className="flex items-center gap-2.5">
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     isMasterOwner
                       ? "bg-cyan-500/20 border border-cyan-500/40 text-cyan-400"
                       : "bg-amber-500/20 border border-amber-500/40 text-amber-400"
@@ -2124,9 +2112,9 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={() => setProfileActiveTab("PASS")}
-                  className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
                     profileActiveTab === "PASS"
-                      ? "bg-emerald-500 text-black shadow-tactical-glow"
+                      ? "bg-emerald-500 text-black"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
@@ -2137,11 +2125,11 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={() => setProfileActiveTab("EDIT")}
-                  className={`flex-1 py-2 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
                     profileActiveTab === "EDIT"
                       ? isMasterOwner
-                        ? "bg-cyan-500 text-black shadow-tactical-glow"
-                        : "bg-amber-500 text-black shadow-tactical-glow"
+                        ? "bg-cyan-500 text-black"
+                        : "bg-amber-500 text-black"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
@@ -2353,7 +2341,7 @@ export default function ChatPage() {
                     <button
                       type="submit"
                       disabled={profileSaved}
-                      className={`px-5 py-2 rounded-xl font-mono font-bold text-xs shadow-tactical-glow transition-all ${
+                      className={`px-5 py-2 rounded-xl font-medium text-xs transition-all ${
                         profileSaved
                           ? "bg-emerald-500 text-white scale-105"
                           : isMasterOwner
