@@ -57,10 +57,15 @@ export default function JoinSocietyGatePage() {
     <div className="space-y-12 pb-32 sm:pb-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Top Protocol Header */}
       <section className="relative pt-6 pb-4 text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
-          <Lock className="w-3.5 h-3.5 text-amber-400" />
+        <Link
+          href="/invite"
+          title="Click to redeem invitation code"
+          className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/60 text-amber-400 text-xs font-mono font-semibold transition-all cursor-pointer active:scale-95"
+        >
+          <Lock className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
           <span>ACCESS BY • INVITATION ONLY</span>
-        </div>
+          <ArrowRight className="w-3 h-3 text-amber-400 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+        </Link>
 
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
           MEMBERSHIP BY <br />

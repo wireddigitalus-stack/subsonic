@@ -75,10 +75,15 @@ export function HeroInviteCard() {
                 WELCOME TO THE INVITATIONAL
               </h2>
               <div className="pt-0.5">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 text-black text-xs font-mono font-black uppercase tracking-wider shadow-sm">
-                  <Lock className="w-3.5 h-3.5 fill-black" />
+                <Link
+                  href="/invite"
+                  title="Click to redeem invitation code"
+                  className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-black text-xs font-mono font-black uppercase tracking-wider shadow-sm hover:shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all cursor-pointer active:scale-95"
+                >
+                  <Lock className="w-3.5 h-3.5 fill-black group-hover:scale-110 transition-transform" />
                   <span>ACCESS PROTOCOL • INVITATION ONLY</span>
-                </span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[3] group-hover:translate-x-0.5 transition-transform" />
+                </Link>
               </div>
             </div>
 
