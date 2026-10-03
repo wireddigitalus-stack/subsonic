@@ -62,7 +62,6 @@ import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
 import { evaluateChatMessage } from "@/lib/ai-moderator";
 import { recordTelemetryEvent } from "@/lib/telemetry";
 import { recordCommsAbuseAlert } from "@/lib/abuse-moderation";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { analyzeMsgForPlink, buildPlinkMessage, getRoDirectAnswer } from "@/lib/plink-engine";
 import { ChatTour } from "@/components/chat/ChatTour";
@@ -992,131 +991,9 @@ export default function ChatPage() {
 
 
 
-  // Supabase Hydration & Realtime Subscription
-  useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) return;
-
-    // Initial fetch from cloud
-    supabase
-      .from("chat_messages")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .limit(120)
-      .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
-          const cloudMsgs: ChatMessage[] = data.map((d: any) => ({
-            id: d.id,
-            channelId: d.channel_id,
-            type: d.content?.startsWith("[DOPE DROP]") ? "DOPE_DROP" : (d.message_type || "STANDARD"),
-            dopeCard: d.dope_card || undefined,
-            author: {
-              id: d.author_id,
-              name: d.author_name || "Verified Marksman",
-              callsign: d.author_callsign || "MARKSMAN",
-              role: d.author_role || "MEMBER",
-              badgeText: d.author_badge || "MEMBER",
-              division: d.author_division || "Open Division Pro",
-              rifleSetup: d.author_rifle || "Custom Precision Rimfire",
-            },
-            content: d.content,
-            timestamp: new Date(d.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            reactions: d.reactions || [],
-            moderationStatus: d.moderation_status || "APPROVED",
-            aiModerationReport: {
-              toxicityScore: d.ai_toxicity_score || 0,
-              threatScore: d.ai_threat_score || 0,
-              policyScore: d.ai_policy_score || 0,
-              sentiment: d.ai_sentiment || "NEUTRAL",
-              flagReason: d.ai_flag_reason || undefined,
-              aiEngine: d.ai_engine || "Google Gemini 2.5 Flash",
-            },
-          }));
-
-          setMessages((prev) => {
-            const existingIds = new Set(prev.map((m) => m.id));
-            const fresh = cloudMsgs.filter((cm) => !existingIds.has(cm.id));
-            return [...prev, ...fresh];
-          });
-        }
-      });
-
-    // Realtime changes
-    const channel = supabase
-      .channel("realtime-comms-room")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat_messages" },
-        (payload: any) => {
-          const row = payload.new;
-          if (!row) return;
-          const incoming: ChatMessage = {
-            id: row.id,
-            channelId: row.channel_id,
-            type: row.content?.startsWith("[DOPE DROP]") ? "DOPE_DROP" : (row.message_type || "STANDARD"),
-            dopeCard: row.dope_card || undefined,
-            author: {
-              id: row.author_id,
-              name: row.author_name || "Verified Marksman",
-              callsign: row.author_callsign || "MARKSMAN",
-              role: row.author_role || "MEMBER",
-              badgeText: row.author_badge || "MEMBER",
-              division: row.author_division || "Open Division Pro",
-              rifleSetup: row.author_rifle || "Custom Precision Rimfire",
-            },
-            content: row.content,
-            timestamp: new Date(row.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            reactions: row.reactions || [],
-            moderationStatus: row.moderation_status || "APPROVED",
-            aiModerationReport: {
-              toxicityScore: row.ai_toxicity_score || 0,
-              threatScore: row.ai_threat_score || 0,
-              policyScore: row.ai_policy_score || 0,
-              sentiment: row.ai_sentiment || "NEUTRAL",
-              flagReason: row.ai_flag_reason || undefined,
-              aiEngine: row.ai_engine || "Google Gemini 2.5 Flash",
-            },
-          };
-
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === incoming.id)) return prev;
-            return [...prev, incoming];
-          });
-
-          // Track unread count for channels user isn't currently viewing
-          const container = messagesContainerRef.current;
-          const distanceFromBottom = container
-            ? container.scrollHeight - container.scrollTop - container.clientHeight
-            : 0;
-          const isAtBottom = distanceFromBottom < 120;
-
-          if (isAtBottom) {
-            setTimeout(() => scrollContainerToBottom(true), 50);
-          } else {
-            // Increment unread badge for the incoming channel if not active
-            setUnreadCounts((prev) => ({
-              ...prev,
-              [incoming.channelId]: (prev[incoming.channelId] || 0) + 1,
-            }));
-          }
-
-          if (soundEnabled) {
-            const isBot = incoming.author.id.startsWith("bot-") || incoming.author.id.startsWith("bot_") || incoming.author.role === "AI_MODERATOR";
-            if (isBot) {
-              playBotTelemetryChirp();
-            } else {
-              playRealCommsChirp();
-            }
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      if (supabase) {
-        supabase.removeChannel(channel);
-      }
-    };
-  }, [soundEnabled]);
+  // Message history + live updates come from the server-backed sync above
+  // (/api/chat/messages, polled every 2.5s). The browser no longer talks to the
+  // database directly, so database access rules can stay locked down.
 
   // Handle Transmitting Message (Standard or DOPE Card)
   const handleTransmit = async (content: string, type: "STANDARD" | "DOPE_DROP" = "STANDARD", dopeCard?: DopeCardData) => {
@@ -1238,49 +1115,21 @@ export default function ChatPage() {
     // Smoothly scroll only within the container for user's own sent message
     setTimeout(() => scrollContainerToBottom(true), 50);
 
-    // Persist to Supabase Cloud Database (Strictly Schema-Aligned)
-    if (isSupabaseConfigured && supabase) {
-      const payloadContent = newMsg.dopeCard
-        ? `[DOPE DROP] 🎯 Target: ${newMsg.dopeCard.targetDistance} (${newMsg.dopeCard.targetDescription || ""}) | Elev: ${newMsg.dopeCard.elevationMils} | Wind: ${newMsg.dopeCard.windHoldMils} (${newMsg.dopeCard.windVelocity || ""}) | Ammo: ${newMsg.dopeCard.ammo || ""}\n${newMsg.content || ""}`.trim()
-        : newMsg.content;
-
-      supabase
-        .from("chat_messages")
-        .insert([
-          {
-            id: newMsg.id,
-            channel_id: newMsg.channelId,
-            author_id: newMsg.author.id,
-            author_name: newMsg.author.name,
-            author_callsign: newMsg.author.callsign,
-            author_role: newMsg.author.role,
-            author_badge: newMsg.author.badgeText,
-            content: payloadContent,
-            moderation_status: newMsg.moderationStatus,
-            ai_toxicity_score: Math.round((newMsg.aiModerationReport?.toxicityScore || 0) * 100),
-            ai_threat_score: Math.round((newMsg.aiModerationReport?.threatScore || 0) * 100),
-            ai_policy_score: Math.round((newMsg.aiModerationReport?.policyScore || 0) * 100),
-            ai_flag_reason: newMsg.aiModerationReport?.flagReason || null,
-            ai_sentiment: newMsg.aiModerationReport?.sentiment || "NEUTRAL",
-            reactions: newMsg.reactions || [],
-            created_at: new Date().toISOString(),
-          },
-        ])
-        .then(({ error }) => {
-          if (error) {
-            console.error("Supabase live chat persistence error:", error.message);
-          } else {
-            console.log("Supabase: chat message saved live to cloud database.");
-          }
+    // Persist via the server (writes to the database; other members receive it via sync)
+    const persistMessage = async (attempt = 1): Promise<void> => {
+      try {
+        const res = await fetch("/api/chat/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: newMsg }),
         });
-    }
-
-    // Persist to server-backed durable storage (enables cross-device sync)
-    fetch("/api/chat/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: newMsg }),
-    }).catch((err) => console.warn("Chat server persist warning:", err));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } catch (err) {
+        if (attempt < 2) return persistMessage(attempt + 1);
+        console.error("Chat message failed to save:", err);
+      }
+    };
+    void persistMessage();
 
     if (typeof window !== "undefined") {
       localStorage.setItem("subsonic_last_read_chat", Date.now().toString());

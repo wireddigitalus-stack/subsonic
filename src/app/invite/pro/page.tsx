@@ -256,139 +256,62 @@ function ProInviteContent() {
       const primaryImage = headshotResult?.dataUrl || "/images/SS-RWB-LOGO.png";
       const secondaryImage = actionPhotoResult?.dataUrl || primaryImage;
 
-      const profilePayload = {
-        name: fullName.trim(),
-        callsign: callsign.trim().toUpperCase(),
-        pin: pin.trim(),
-        division,
-        homeRange,
-        podiums: Number(podiums) || 0,
-        ranking: ranking.trim() || `${division} Competitor`,
-        featuredMatch: "Subsonic Society Invitational 2026",
-        quote: "",
-        accolades: accolades.length > 0 ? accolades : ["VIP COMPETITOR"],
-        sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
-        image: primaryImage,
-        actionPhoto: secondaryImage,
-        rifleSetup: {
-          action: "Match Rig (Classified)",
-          barrel: "Match Grade",
-          trigger: "Precision Match",
-          chassis: "Competition",
-          optic: "Precision Optic",
-          mount: "Precision Mount",
-          tuner: "Tuned",
-          ammoLot: "Match Lot",
-        },
-        interview: [],
-      };
-
-      // 1. Save shooter profile
-      const res = await fetch("/api/shooters", {
+      // One server call does everything (invite check → profile → member → claim),
+      // and only succeeds once the database has confirmed every step.
+      const res = await fetch("/api/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profilePayload),
+        body: JSON.stringify({
+          code: inviteCode,
+          fullName: fullName.trim(),
+          callsign: callsign.trim().toUpperCase(),
+          pin: pin.trim(),
+          division,
+          homeRange,
+          podiums: Number(podiums) || 0,
+          ranking: ranking.trim(),
+          accolades,
+          sponsors,
+          image: primaryImage,
+          actionPhoto: secondaryImage,
+        }),
       });
+      const data = await res.json().catch(() => ({}));
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed saving shooter profile.");
+      if (!res.ok || !data.success) {
+        if (data.code === "CALLSIGN_TAKEN") setIsCallsignValid(false);
+        throw new Error(data.error || "We couldn't finish creating your profile. Please try again.");
       }
 
-      const data = await res.json();
       const savedShooter = data.shooter;
+      const savedMember = data.member;
 
-      // 2. Claim invite code
-      try {
-        await fetch("/api/invites/claim", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            code: inviteCode,
-            callsign: savedShooter.callsign,
-            memberId: savedShooter.id,
-          }),
-        });
-      } catch (claimErr) {
-        console.warn("Invite claim warning:", claimErr);
-      }
-
-      // 2b. Also register as an official Society Member for Admin Dashboard tracking
-      try {
-        await fetch("/api/join", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            memberId: `SS-PRO-${savedShooter.callsign}`,
-            fullName: savedShooter.name,
-            callsign: savedShooter.callsign,
-            email: `${savedShooter.callsign.toLowerCase()}@competitor.subsonicsociety.com`,
-            state: "TN",
-            experienceLevel: savedShooter.division || "Pro Division Marksman",
-            rifleSetup: `${savedShooter.rifleSetup?.action || "Custom Precision Rimfire"} / ${savedShooter.rifleSetup?.optic || "Precision Scope"}`,
-            role: "MEMBER",
-            notes: `Pro VIP Onboarding (Code: ${inviteCode}). Home: ${savedShooter.homeRange}. Podiums: ${savedShooter.podiums}`,
-            inviteCode: inviteCode,
-            pin: savedShooter.pin,
-          }),
-        });
-      } catch (e) {
-        console.warn("Error registering pro shooter in society members:", e);
-      }
-
-      // 3. Save session and complete profile in localStorage for instant Chat auth & resilient profile viewing
+      // Save the session so the member lands in chat already signed in
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("subsonic_chat_authenticated", "true");
           localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(savedShooter));
-
-          // Also save in subsonic_all_shooters list
-          try {
-            const rawAll = localStorage.getItem("subsonic_all_shooters");
-            const list = rawAll ? JSON.parse(rawAll) : [];
-            const idx = list.findIndex(
-              (s: any) => s.id === savedShooter.id || s.callsign?.toLowerCase() === savedShooter.callsign?.toLowerCase()
-            );
-            if (idx >= 0) {
-              list[idx] = savedShooter;
-            } else {
-              list.unshift(savedShooter);
-            }
-            localStorage.setItem("subsonic_all_shooters", JSON.stringify(list));
-          } catch (e) { console.warn("localStorage save warning:", e); }
-
           localStorage.setItem(
             "subsonic_shooter_profile",
             JSON.stringify({
               name: savedShooter.name,
               callsign: savedShooter.callsign,
               division: savedShooter.division,
-              rifleSetup: `${savedShooter.rifleSetup.action} / ${savedShooter.rifleSetup.optic}`,
+              rifleSetup: "",
               badgeText: "PRO SHOOTER",
               role: "PRO_COMPETITOR",
               image: savedShooter.image,
-              pin: savedShooter.pin,
             })
           );
-          localStorage.setItem(
-            "subsonic_member_profile",
-            JSON.stringify({
-              member_id: `SS-PRO-${savedShooter.callsign}`,
-              full_name: savedShooter.name,
-              callsign: savedShooter.callsign,
-              state: "TN",
-              experience_level: savedShooter.division,
-              rifle_setup: savedShooter.rifleSetup.action,
-              created_at: new Date().toISOString(),
-            })
-          );
+          localStorage.setItem("subsonic_member_profile", JSON.stringify(savedMember));
         } catch (e) { console.warn("localStorage profile warning:", e); }
       }
 
-      setSubmissionSuccess(savedShooter);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Straight to the Competitor Information Page, with a welcome banner + chat link
+      router.push(`/competitor-packet?welcome=${encodeURIComponent(savedShooter.callsign)}`);
     } catch (err: any) {
       setFormError(err.message || "Failed generating your profile. Please try again.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
     }

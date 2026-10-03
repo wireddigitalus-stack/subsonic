@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, saveAllInvitesToStorage, ensureInviteExists } from "@/lib/invites";
+import { getInvitesFromStorage, saveInviteAsync, ensureInviteExists, refreshInvitesFromDb } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    await refreshInvitesFromDb();
     let invites = getInvitesFromStorage();
     let index = invites.findIndex((i) => i.code.toUpperCase() === rawCode);
 
@@ -60,8 +61,8 @@ export async function POST(req: NextRequest) {
       status: isNowExhausted ? ("EXHAUSTED" as const) : invite.status,
     };
 
-    invites[index] = updatedInvite;
-    saveAllInvitesToStorage(invites);
+    // Wait for the database to confirm the claim
+    await saveInviteAsync(updatedInvite);
 
     return NextResponse.json({
       success: true,

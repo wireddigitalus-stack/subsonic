@@ -36,3 +36,20 @@ export async function verifyPin(pin: string, storedHash: string): Promise<boolea
 export function isHashedPin(value: string): boolean {
   return /^[0-9a-f]{64}$/.test(value);
 }
+
+/**
+ * Synchronous variant (Node only) — produces the exact same hash as hashPin().
+ * Used by server storage mappers that cannot be async.
+ */
+export function hashPinSync(pin: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { createHash } = require("crypto") as typeof import("crypto");
+  return createHash("sha256").update(`${SALT}:${pin.trim()}`).digest("hex");
+}
+
+/** Return a hashed PIN, hashing plain values and passing hashed values through. */
+export function toPinHash(pin: string | undefined | null): string | null {
+  const clean = String(pin ?? "").trim();
+  if (!clean) return null;
+  return isHashedPin(clean) ? clean : hashPinSync(clean);
+}

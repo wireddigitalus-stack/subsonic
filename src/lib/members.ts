@@ -1,8 +1,9 @@
 import fs from "fs";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { db, isDbConfigured } from "@/lib/supabase-admin";
 import path from "path";
 import { SocietyMember } from "@/lib/types";
 import { getShootersFromStorage } from "@/lib/shooters";
+import { toPinHash } from "@/lib/pin-hash";
 
 // File paths
 const REPO_DATA_DIR = path.join(process.cwd(), "data");
@@ -14,6 +15,10 @@ const WRITABLE_DIR = IS_SERVERLESS ? "/tmp" : REPO_DATA_DIR;
 const WRITABLE_MEMBERS_FILE = IS_SERVERLESS
   ? path.join("/tmp", "subsonic-members.jsonl")
   : REPO_MEMBERS_FILE;
+
+// On the live (serverless) site the database is the single source of truth.
+// Local per-instance files are ignored there because they go stale across instances.
+const DB_AUTHORITATIVE = IS_SERVERLESS && isDbConfigured;
 
 export const SEED_MEMBERS: SocietyMember[] = [
   {
@@ -47,29 +52,103 @@ export const SEED_MEMBERS: SocietyMember[] = [
 ];
 
 let memoryMembers: SocietyMember[] = [...SEED_MEMBERS];
-let membersCacheRefreshed = false;
+let membersLastRefreshMs = 0;
+let membersRefreshInFlight: Promise<void> | null = null;
+
+// ---- Database mapping (live table stores the PIN as a hash in `pin_hash`) ----
+export function mapMemberToDb(m: SocietyMember) {
+  return {
+    member_id: m.member_id,
+    full_name: m.full_name,
+    callsign: m.callsign ?? null,
+    email: m.email ?? null,
+    state: m.state ?? "TN",
+    experience_level: m.experience_level ?? null,
+    rifle_setup: m.rifle_setup ?? null,
+    interests: m.interests ?? [],
+    created_at: m.created_at ?? new Date().toISOString(),
+    status: m.status ?? "ACTIVE",
+    role: m.role ?? "MEMBER",
+    notes: m.notes ?? null,
+    pin_hash: toPinHash(m.pin),
+  };
+}
+
+function mapDbToMember(row: any): SocietyMember {
+  return {
+    member_id: row.member_id,
+    full_name: row.full_name,
+    callsign: row.callsign ?? undefined,
+    email: row.email ?? undefined,
+    state: row.state ?? "TN",
+    experience_level: row.experience_level ?? "",
+    rifle_setup: row.rifle_setup ?? undefined,
+    interests: row.interests ?? [],
+    created_at: row.created_at,
+    status: row.status ?? "ACTIVE",
+    role: row.role ?? "MEMBER",
+    notes: row.notes ?? undefined,
+    pin: row.pin_hash ?? undefined,
+  } as SocietyMember;
+}
+
+/**
+ * Pull the latest members from the database into the in-memory cache.
+ * Await this at the top of any API route that needs up-to-date member data.
+ */
+export async function refreshMembersFromDb(maxAgeMs = 3000): Promise<void> {
+  if (!db) return;
+  if (Date.now() - membersLastRefreshMs < maxAgeMs) return;
+  if (membersRefreshInFlight) return membersRefreshInFlight;
+
+  membersRefreshInFlight = (async () => {
+    try {
+      const { data, error } = await db.from("society_members").select("*");
+      if (error) {
+        console.error("Error fetching members from database:", error.message);
+        return;
+      }
+      const rows = (data || []).map(mapDbToMember);
+      if (DB_AUTHORITATIVE) {
+        memoryMembers = rows;
+      } else {
+        const map = new Map<string, SocietyMember>();
+        for (const m of memoryMembers) map.set(m.member_id.toLowerCase(), m);
+        for (const m of rows) map.set(m.member_id.toLowerCase(), m);
+        memoryMembers = Array.from(map.values());
+      }
+      membersLastRefreshMs = Date.now();
+    } catch (err) {
+      console.error("Database refresh error (members):", err);
+    } finally {
+      membersRefreshInFlight = null;
+    }
+  })();
+  return membersRefreshInFlight;
+}
+
+function readMembersFile(file: string, into: Map<string, SocietyMember>) {
+  if (!fs.existsSync(file)) return;
+  try {
+    const raw = fs.readFileSync(file, "utf-8");
+    const lines = raw.split("\n").filter((l) => l.trim().length > 0);
+    for (const line of lines) {
+      try {
+        const m = JSON.parse(line) as SocietyMember;
+        if (m && m.member_id) {
+          into.set(m.member_id.toLowerCase(), m);
+          if (m.callsign) into.set(m.callsign.toLowerCase(), m);
+        }
+      } catch {}
+    }
+  } catch (err) {
+    console.warn("Error reading members file:", err);
+  }
+}
 
 export function getMembersFromStorage(): SocietyMember[] {
-  if (!membersCacheRefreshed && isSupabaseConfigured && supabase) {
-    membersCacheRefreshed = true;
-    (async () => {
-      try {
-        const { data, error } = await supabase.from("society_members").select("*");
-        if (error) {
-          console.error("Error fetching members from Supabase:", error);
-          return;
-        }
-        if (data && data.length > 0) {
-          const map = new Map<string, SocietyMember>();
-          for (const m of memoryMembers) map.set(m.member_id.toLowerCase(), m);
-          for (const m of (data as SocietyMember[])) map.set(m.member_id.toLowerCase(), m);
-          memoryMembers = Array.from(map.values());
-        }
-      } catch (err) {
-        console.error("Supabase refresh error:", err);
-      }
-    })();
-  }
+  // Kick off a background refresh for sync callers (routes should await refreshMembersFromDb()).
+  if (db && membersLastRefreshMs === 0) void refreshMembersFromDb();
 
   try {
     const memberMap = new Map<string, SocietyMember>();
@@ -80,48 +159,16 @@ export function getMembersFromStorage(): SocietyMember[] {
       if (sm.callsign) memberMap.set(sm.callsign.toLowerCase(), sm);
     }
 
-    // 2. Overlay from memory cache
+    // 2. Local files (skipped on the live site where the database is authoritative)
+    if (!DB_AUTHORITATIVE) {
+      readMembersFile(REPO_MEMBERS_FILE, memberMap);
+      if (IS_SERVERLESS) readMembersFile(WRITABLE_MEMBERS_FILE, memberMap);
+    }
+
+    // 3. Memory cache last — it holds the freshest database data + this instance's writes
     for (const mem of memoryMembers) {
       memberMap.set(mem.member_id.toLowerCase(), mem);
       if (mem.callsign) memberMap.set(mem.callsign.toLowerCase(), mem);
-    }
-
-    // 3. Overlay from repo JSONL file
-    if (fs.existsSync(REPO_MEMBERS_FILE)) {
-      try {
-        const raw = fs.readFileSync(REPO_MEMBERS_FILE, "utf-8");
-        const lines = raw.split("\n").filter((l) => l.trim().length > 0);
-        for (const line of lines) {
-          try {
-            const m = JSON.parse(line) as SocietyMember;
-            if (m && m.member_id) {
-              memberMap.set(m.member_id.toLowerCase(), m);
-              if (m.callsign) memberMap.set(m.callsign.toLowerCase(), m);
-            }
-          } catch {}
-        }
-      } catch (err) {
-        console.warn("Error reading repo members file:", err);
-      }
-    }
-
-    // 4. If serverless, overlay from /tmp
-    if (IS_SERVERLESS && fs.existsSync(WRITABLE_MEMBERS_FILE)) {
-      try {
-        const raw = fs.readFileSync(WRITABLE_MEMBERS_FILE, "utf-8");
-        const lines = raw.split("\n").filter((l) => l.trim().length > 0);
-        for (const line of lines) {
-          try {
-            const m = JSON.parse(line) as SocietyMember;
-            if (m && m.member_id) {
-              memberMap.set(m.member_id.toLowerCase(), m);
-              if (m.callsign) memberMap.set(m.callsign.toLowerCase(), m);
-            }
-          } catch {}
-        }
-      } catch (err) {
-        console.warn("Error reading /tmp members file:", err);
-      }
     }
 
     // 5. Cross-sync Shooters into Society Members
@@ -224,7 +271,15 @@ export function saveAllMembersToStorage(members: SocietyMember[]): void {
   }
 }
 
-export function addOrUpdateMember(member: SocietyMember): SocietyMember {
+export async function upsertMemberToDb(member: SocietyMember): Promise<void> {
+  if (!db) return;
+  const { error } = await db
+    .from("society_members")
+    .upsert(mapMemberToDb(member), { onConflict: "member_id" });
+  if (error) throw new Error(`Database save failed (member): ${error.message}`);
+}
+
+function applyMemberLocally(member: SocietyMember): SocietyMember {
   const current = getMembersFromStorage();
   const index = current.findIndex(
     (m) =>
@@ -249,17 +304,23 @@ export function addOrUpdateMember(member: SocietyMember): SocietyMember {
   }
 
   saveAllMembersToStorage(updatedList);
+  return savedMember;
+}
 
-  if (isSupabaseConfigured && supabase) {
-    (async () => {
-      try {
-        const { error } = await supabase.from('society_members').upsert(savedMember, { onConflict: 'member_id' });
-        if (error) console.error("Error upserting member to Supabase:", error);
-      } catch (err) {
-        console.error("Supabase upsert catch:", err);
-      }
-    })();
-  }
+/**
+ * Save a member and WAIT for the database to confirm. Throws if the database rejects it.
+ * Use this from API routes.
+ */
+export async function addOrUpdateMemberAsync(member: SocietyMember): Promise<SocietyMember> {
+  const savedMember = applyMemberLocally(member);
+  await upsertMemberToDb(savedMember);
+  return savedMember;
+}
+
+/** Legacy sync save (database write is best-effort). Prefer addOrUpdateMemberAsync. */
+export function addOrUpdateMember(member: SocietyMember): SocietyMember {
+  const savedMember = applyMemberLocally(member);
+  upsertMemberToDb(savedMember).catch((err) => console.error(err.message));
 
   return savedMember;
 }
@@ -334,21 +395,29 @@ export function deleteMemberFromStorage(memberId: string): boolean {
     // Avoid circular import errors
   }
 
-  if (isSupabaseConfigured && supabase) {
-    (async () => {
-      try {
-        await supabase.from('society_members').delete().eq('member_id', target.member_id);
-        if (targetCallsign) {
-          await supabase.from('society_members').delete().ilike('callsign', targetCallsign);
-        }
-        if (targetName) {
-          await supabase.from('society_members').delete().ilike('full_name', targetName);
-        }
-      } catch (err) {
-        console.error("Supabase delete catch:", err);
+  lastMemberDbDelete = (async () => {
+    if (!db) return;
+    try {
+      await db.from("society_members").delete().eq("member_id", target.member_id);
+      if (targetCallsign) {
+        await db.from("society_members").delete().ilike("callsign", targetCallsign);
       }
-    })();
-  }
+      if (targetName) {
+        await db.from("society_members").delete().ilike("full_name", targetName);
+      }
+    } catch (err) {
+      console.error("Database delete error (members):", err);
+    }
+  })();
 
   return true;
+}
+
+let lastMemberDbDelete: Promise<void> = Promise.resolve();
+
+/** Delete a member and wait for the database delete to finish. */
+export async function deleteMemberFromStorageAsync(memberId: string): Promise<boolean> {
+  const ok = deleteMemberFromStorage(memberId);
+  await lastMemberDbDelete;
+  return ok;
 }

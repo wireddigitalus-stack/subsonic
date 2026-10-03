@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkCallsignAvailability } from "@/lib/callsigns";
+import { refreshMembersFromDb } from "@/lib/members";
+import { refreshShootersFromDb } from "@/lib/shooters";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +12,7 @@ export async function GET(req: NextRequest) {
     const state = searchParams.get("state") || "TN";
     const excludeMemberId = searchParams.get("excludeMemberId") || undefined;
 
+    await Promise.all([refreshMembersFromDb(), refreshShootersFromDb()]);
     const result = checkCallsignAvailability(callsign, {
       state,
       excludeMemberId,

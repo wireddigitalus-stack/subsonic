@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { PacketWelcomeBanner } from "@/components/packet/PacketWelcomeBanner";
 import {
   FileText,
   Download,
@@ -343,6 +344,9 @@ export default function CompetitorPacketPage() {
 
   return (
     <div className="min-h-screen text-slate-100 pb-28">
+      {/* Post-registration welcome (only when ?welcome=CALLSIGN) */}
+      <PacketWelcomeBanner />
+
       {/* Top Banner / Breadcrumb */}
       <div className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">

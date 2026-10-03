@@ -1,5 +1,5 @@
 import fs from "fs";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { db, isDbConfigured } from "@/lib/supabase-admin";
 import path from "path";
 import { ShooterProfile } from "@/lib/types";
 
@@ -13,6 +13,9 @@ const WRITABLE_DIR = IS_SERVERLESS ? "/tmp" : REPO_DATA_DIR;
 const WRITABLE_SHOOTERS_FILE = IS_SERVERLESS
   ? path.join("/tmp", "subsonic-shooters.jsonl")
   : REPO_SHOOTERS_FILE;
+
+// On the live (serverless) site the database is the single source of truth.
+const DB_AUTHORITATIVE = IS_SERVERLESS && isDbConfigured;
 
 export const SEED_SHOOTERS: ShooterProfile[] = [
   {
@@ -111,65 +114,75 @@ function mapDbToShooter(row: any): ShooterProfile {
   };
 }
 
-let shootersCacheRefreshed = false;
-
 let memoryShooters: ShooterProfile[] = [...SEED_SHOOTERS];
+let shootersLastRefreshMs = 0;
+let shootersRefreshInFlight: Promise<void> | null = null;
+
+/**
+ * Pull the latest shooters from the database into the in-memory cache.
+ * Await this at the top of any API route that needs up-to-date shooter data.
+ */
+export async function refreshShootersFromDb(maxAgeMs = 3000): Promise<void> {
+  if (!db) return;
+  if (Date.now() - shootersLastRefreshMs < maxAgeMs) return;
+  if (shootersRefreshInFlight) return shootersRefreshInFlight;
+
+  shootersRefreshInFlight = (async () => {
+    try {
+      const { data, error } = await db.from("shooters").select("*");
+      if (error) {
+        console.error("Error fetching shooters from database:", error.message);
+        return;
+      }
+      const rows = (data || []).map(mapDbToShooter);
+      if (DB_AUTHORITATIVE) {
+        memoryShooters = rows;
+      } else {
+        const map = new Map<string, ShooterProfile>();
+        for (const s of memoryShooters) map.set(s.id.toLowerCase(), s);
+        for (const s of rows) map.set(s.id.toLowerCase(), s);
+        memoryShooters = Array.from(map.values());
+      }
+      shootersLastRefreshMs = Date.now();
+    } catch (err) {
+      console.error("Database refresh error (shooters):", err);
+    } finally {
+      shootersRefreshInFlight = null;
+    }
+  })();
+  return shootersRefreshInFlight;
+}
 
 export function getShootersFromStorage(): ShooterProfile[] {
-  if (!shootersCacheRefreshed && isSupabaseConfigured && supabase) {
-    shootersCacheRefreshed = true;
-    (async () => {
-      try {
-        const { data, error } = await supabase.from("shooters").select("*");
-        if (error) {
-          console.error("Error fetching shooters from Supabase:", error);
-          return;
-        }
-        if (data && data.length > 0) {
-          const map = new Map<string, ShooterProfile>();
-          for (const s of memoryShooters) map.set(s.id.toLowerCase(), s);
-          for (const row of data) {
-            const s = mapDbToShooter(row);
-            map.set(s.id.toLowerCase(), s);
-          }
-          memoryShooters = Array.from(map.values());
-        }
-      } catch (err) {
-        console.error("Supabase refresh error (shooters):", err);
-      }
-    })();
-  }
+  if (db && shootersLastRefreshMs === 0) void refreshShootersFromDb();
 
   try {
-    let raw = "";
-    if (fs.existsSync(WRITABLE_SHOOTERS_FILE)) {
-      raw = fs.readFileSync(WRITABLE_SHOOTERS_FILE, "utf-8");
-    } else if (fs.existsSync(REPO_SHOOTERS_FILE)) {
-      raw = fs.readFileSync(REPO_SHOOTERS_FILE, "utf-8");
-    }
+    const map = new Map<string, ShooterProfile>();
+    for (const seed of SEED_SHOOTERS) map.set(seed.id.toLowerCase(), seed);
 
-    if (raw) {
-      const lines = raw.split("\n").filter((l) => l.trim().length > 0);
-      const parsed = lines
-        .map((l) => {
+    // Local files (skipped on the live site where the database is authoritative)
+    if (!DB_AUTHORITATIVE) {
+      let raw = "";
+      if (fs.existsSync(WRITABLE_SHOOTERS_FILE)) {
+        raw = fs.readFileSync(WRITABLE_SHOOTERS_FILE, "utf-8");
+      } else if (fs.existsSync(REPO_SHOOTERS_FILE)) {
+        raw = fs.readFileSync(REPO_SHOOTERS_FILE, "utf-8");
+      }
+      if (raw) {
+        for (const l of raw.split("\n")) {
+          if (!l.trim()) continue;
           try {
-            return JSON.parse(l) as ShooterProfile;
-          } catch {
-            return null;
-          }
-        })
-        .filter((s): s is ShooterProfile => s !== null);
-
-      if (parsed.length > 0) {
-        const map = new Map<string, ShooterProfile>();
-        for (const seed of SEED_SHOOTERS) map.set(seed.id.toLowerCase(), seed);
-        for (const mem of memoryShooters) map.set(mem.id.toLowerCase(), mem);
-        for (const item of parsed) map.set(item.id.toLowerCase(), item);
-        memoryShooters = Array.from(map.values());
-        return memoryShooters;
+            const item = JSON.parse(l) as ShooterProfile;
+            if (item?.id) map.set(item.id.toLowerCase(), item);
+          } catch {}
+        }
       }
     }
 
+    // Memory last — freshest database data + this instance's writes
+    for (const mem of memoryShooters) map.set(mem.id.toLowerCase(), mem);
+
+    memoryShooters = Array.from(map.values());
     return memoryShooters;
   } catch (err) {
     console.error("Error reading shooters:", err);
@@ -177,43 +190,36 @@ export function getShootersFromStorage(): ShooterProfile[] {
   }
 }
 
+export async function upsertShooterToDb(shooter: ShooterProfile): Promise<void> {
+  if (!db) return;
+  const { error } = await db.from("shooters").upsert(mapShooterToDb(shooter), { onConflict: "id" });
+  if (error) throw new Error(`Database save failed (shooter): ${error.message}`);
+}
+
+function applyShooterLocally(shooter: ShooterProfile): void {
+  const current = getShootersFromStorage();
+  const index = current.findIndex((s) => s.id.toLowerCase() === shooter.id.toLowerCase());
+  let updated: ShooterProfile[];
+  if (index >= 0) {
+    updated = [...current];
+    updated[index] = shooter;
+  } else {
+    updated = [shooter, ...current];
+  }
+  saveAllShootersToStorage(updated);
+}
+
+/** Save a shooter and WAIT for the database to confirm. Throws on database error. */
+export async function saveShooterToStorageAsync(shooter: ShooterProfile): Promise<void> {
+  applyShooterLocally(shooter);
+  await upsertShooterToDb(shooter);
+}
+
+/** Legacy sync save (database write is best-effort). Prefer saveShooterToStorageAsync. */
 export function saveShooterToStorage(shooter: ShooterProfile): void {
   try {
-    const current = getShootersFromStorage();
-    const index = current.findIndex((s) => s.id.toLowerCase() === shooter.id.toLowerCase());
-    let updated: ShooterProfile[];
-    if (index >= 0) {
-      updated = [...current];
-      updated[index] = shooter;
-    } else {
-      updated = [shooter, ...current];
-    }
-
-    memoryShooters = updated;
-
-    if (!fs.existsSync(WRITABLE_DIR)) {
-      fs.mkdirSync(WRITABLE_DIR, { recursive: true });
-    }
-    const content = updated.map((s) => JSON.stringify(s)).join("\n") + "\n";
-    fs.writeFileSync(WRITABLE_SHOOTERS_FILE, content, "utf-8");
-    if (!IS_SERVERLESS) {
-      if (!fs.existsSync(REPO_DATA_DIR)) {
-        fs.mkdirSync(REPO_DATA_DIR, { recursive: true });
-      }
-      fs.writeFileSync(REPO_SHOOTERS_FILE, content, "utf-8");
-    }
-
-    if (isSupabaseConfigured && supabase) {
-      (async () => {
-        try {
-          const dbRow = mapShooterToDb(shooter);
-          const { error } = await supabase.from('shooters').upsert(dbRow, { onConflict: 'id' });
-          if (error) console.error("Error upserting shooter to Supabase:", error);
-        } catch (err) {
-          console.error("Supabase upsert catch (shooters):", err);
-        }
-      })();
-    }
+    applyShooterLocally(shooter);
+    upsertShooterToDb(shooter).catch((err) => console.error(err.message));
   } catch (err) {
     console.error("Error saving shooter:", err);
   }
@@ -281,16 +287,15 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   memoryShooters = filtered;
   saveAllShootersToStorage(filtered);
 
-  if (isSupabaseConfigured && supabase) {
-    (async () => {
-      try {
-        const { error } = await supabase.from("shooters").delete().eq("id", target.id);
-        if (error) console.error("Error deleting shooter from Supabase:", error);
-      } catch (err) {
-        console.error("Supabase delete catch (shooters):", err);
-      }
-    })();
-  }
+  lastShooterDbDelete = (async () => {
+    if (!db) return;
+    try {
+      const { error } = await db.from("shooters").delete().eq("id", target.id);
+      if (error) console.error("Error deleting shooter from database:", error.message);
+    } catch (err) {
+      console.error("Database delete error (shooters):", err);
+    }
+  })();
 
   // Cross-clean matching society member if exists
   try {
@@ -302,6 +307,15 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   }
 
   return true;
+}
+
+let lastShooterDbDelete: Promise<void> = Promise.resolve();
+
+/** Delete a shooter and wait for the database delete to finish. */
+export async function deleteShooterFromStorageAsync(idOrCallsign: string): Promise<boolean> {
+  const ok = deleteShooterFromStorage(idOrCallsign);
+  await lastShooterDbDelete;
+  return ok;
 }
 
 export function getShooterBySlug(slug: string): ShooterProfile | null {

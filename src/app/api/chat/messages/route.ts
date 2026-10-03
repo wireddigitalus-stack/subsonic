@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveStoredChatMessage, getStoredChatMessages, getLatestChatTimestamp } from "@/lib/chat-storage";
 import { ChatMessage } from "@/lib/types";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -75,34 +74,8 @@ export async function POST(req: NextRequest) {
       aiModerationReport: rawMsg.aiModerationReport,
     };
 
-    // 1. Save to durable server-side storage
+    // Save to the database (throws if the database rejects it)
     const saved = await saveStoredChatMessage(messageToSave);
-
-    // 2. Best-effort mirror to Supabase cloud if configured
-    if (isSupabaseConfigured && supabase) {
-      const payloadContent = saved.dopeCard
-        ? `[DOPE DROP] 🎯 Target: ${saved.dopeCard.targetDistance} | Elev: ${saved.dopeCard.elevationMils} | Wind: ${saved.dopeCard.windHoldMils}\n${saved.content || ""}`.trim()
-        : saved.content;
-
-      Promise.resolve(
-        supabase
-          .from("chat_messages")
-          .insert([
-            {
-              id: saved.id,
-              channel_id: saved.channelId,
-              author_id: saved.author.id,
-              author_name: saved.author.name,
-              author_callsign: saved.author.callsign,
-              author_role: saved.author.role,
-              author_badge: saved.author.badgeText,
-              content: payloadContent,
-              moderation_status: saved.moderationStatus,
-              created_at: new Date(saved.createdAtMs).toISOString(),
-            },
-          ])
-      ).catch(() => {});
-    }
 
     return NextResponse.json({
       success: true,

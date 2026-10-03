@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMembersFromStorage } from '@/lib/members';
-import { getShootersFromStorage } from '@/lib/shooters';
+import { getMembersFromStorage, refreshMembersFromDb } from '@/lib/members';
+import { getShootersFromStorage, refreshShootersFromDb } from '@/lib/shooters';
 import { verifyPin, isHashedPin } from '@/lib/pin-hash';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
     
     const cleanCallsign = callsign.trim().toUpperCase();
     const cleanPin = pin.trim();
+
+    // Always check against the latest database records (not a stale server cache)
+    await Promise.all([refreshMembersFromDb(0), refreshShootersFromDb(0)]);
     
     // 1. Executive override check (site owners)
     const execOverrides: Record<string, { pin: string; memberId: string; name: string; role: string; division: string; rifleSetup: string; badgeText: string }> = {
@@ -148,11 +151,13 @@ export async function POST(req: NextRequest) {
     const profileData = {
       name: shooter?.name || member?.full_name || cleanCallsign,
       callsign: cleanCallsign,
-      role: member?.role || shooter?.division ? 'PRO_COMPETITOR' : 'MEMBER',
+      // Keep elevated roles (admin, moderator, MD…); otherwise competitors with a profile are PRO
+      role: member?.role && member.role !== 'MEMBER'
+        ? member.role
+        : shooter ? 'PRO_COMPETITOR' : 'MEMBER',
       division: shooter?.division || member?.experience_level || 'Open Division',
-      rifleSetup: shooter?.rifleSetup 
-        ? `${shooter.rifleSetup.action || 'Precision Rig'} / ${shooter.rifleSetup.optic || 'Optic'}` 
-        : member?.rifle_setup || 'Precision Rimfire',
+      rifleSetup: [shooter?.rifleSetup?.action, shooter?.rifleSetup?.optic].filter(Boolean).join(' / ')
+        || member?.rifle_setup || '',
       badgeText: member?.role === 'MASTER_OWNER' ? 'MASTER ADMIN' 
         : member?.role === 'OWNER_ADMIN' ? 'OWNER ADMIN' 
         : shooter ? 'PRO SHOOTER' : 'SOCIETY MEMBER',

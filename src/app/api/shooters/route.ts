@@ -2,10 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { ShooterProfile } from "@/lib/types";
 import { 
   getShootersFromStorage, 
-  saveShooterToStorage, 
+  saveShooterToStorageAsync, 
   getShooterBySlug,
-  deleteShooterFromStorage
+  deleteShooterFromStorageAsync,
+  refreshShootersFromDb,
 } from "@/lib/shooters";
+import { refreshMembersFromDb } from "@/lib/members";
+
+/** Never send PIN hashes to the browser. */
+function publicShooter<T extends { pin?: unknown }>(s: T): T {
+  const { pin, ...rest } = s as any;
+  return rest as T;
+}
 import { checkCallsignAvailability } from "@/lib/callsigns";
 import { hashPin, isHashedPin } from "@/lib/pin-hash";
 import { validatePin } from "@/lib/pin-policy";
@@ -14,6 +22,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    await refreshShootersFromDb();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
@@ -26,10 +35,10 @@ export async function GET(req: NextRequest) {
       if (!shooter) {
         return NextResponse.json({ error: "Shooter not found" }, { status: 404 });
       }
-      return NextResponse.json({ shooter });
+      return NextResponse.json({ shooter: publicShooter(shooter) });
     }
 
-    return NextResponse.json({ shooters, count: shooters.length });
+    return NextResponse.json({ shooters: shooters.map(publicShooter), count: shooters.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -38,6 +47,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    await Promise.all([refreshShootersFromDb(), refreshMembersFromDb()]);
 
     if (!body.name || !body.callsign) {
       return NextResponse.json({ error: "Name and callsign are required" }, { status: 400 });
@@ -107,7 +117,10 @@ export async function POST(req: NextRequest) {
       id,
       name: finalName,
       callsign: candidateCallsign,
-      pin: body.pin ? (isHashedPin(body.pin.trim()) ? body.pin.trim() : await hashPin(body.pin.trim())) : undefined,
+      // Blank PIN = keep the existing one (admin edits don't resend PINs)
+      pin: body.pin && String(body.pin).trim()
+        ? (isHashedPin(String(body.pin).trim()) ? String(body.pin).trim() : await hashPin(String(body.pin).trim()))
+        : existingShooter?.pin,
       division: body.division || "Open Division Pro",
       ranking: body.ranking || "Appalachian Rimfire Competitor",
       homeRange: body.homeRange || "The Hideout, Bristol, TN",
@@ -138,12 +151,12 @@ export async function POST(req: NextRequest) {
       status: "PUBLISHED",
     };
 
-    saveShooterToStorage(newShooter);
+    await saveShooterToStorageAsync(newShooter);
 
     return NextResponse.json({
       success: true,
       message: `Shooter profile for ${newShooter.name} (${newShooter.callsign}) created successfully.`,
-      shooter: newShooter,
+      shooter: publicShooter(newShooter),
       url: `/shooters/${newShooter.id}`,
     });
   } catch (err: any) {
@@ -167,7 +180,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Shooter id is required" }, { status: 400 });
     }
 
-    const deleted = deleteShooterFromStorage(id);
+    await refreshShootersFromDb();
+    const deleted = await deleteShooterFromStorageAsync(id);
     if (!deleted) {
       return NextResponse.json(
         { error: "Shooter not found or cannot delete founder profile." },

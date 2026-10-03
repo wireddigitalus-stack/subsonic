@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 import { SocietyMember } from "@/lib/types";
 import { 
   getMembersFromStorage, 
-  addOrUpdateMember, 
-  deleteMemberFromStorage, 
-  saveAllMembersToStorage 
+  addOrUpdateMemberAsync, 
+  deleteMemberFromStorageAsync, 
+  refreshMembersFromDb,
 } from "@/lib/members";
-import { getShootersFromStorage, saveShooterToStorage } from "@/lib/shooters";
+import { getShootersFromStorage, saveShooterToStorageAsync, refreshShootersFromDb } from "@/lib/shooters";
+import { toPinHash } from "@/lib/pin-hash";
+
+/** Never send PINs / PIN hashes to the browser. */
+function publicMember(m: SocietyMember): SocietyMember {
+  const { pin, ...rest } = m as any;
+  return rest as SocietyMember;
+}
+
+async function refreshAll() {
+  await Promise.all([refreshMembersFromDb(), refreshShootersFromDb()]);
+}
 import { checkCallsignAvailability } from "@/lib/callsigns";
 import { validatePin } from "@/lib/pin-policy";
 
@@ -20,7 +30,8 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search")?.toLowerCase();
     const stateFilter = searchParams.get("state");
 
-    let members = getMembersFromStorage();
+    await refreshAll();
+    let members = getMembersFromStorage().map(publicMember);
 
     // Reverse chronological order
     members.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -96,6 +107,7 @@ export async function POST(req: NextRequest) {
       notes,
       inviteCode 
     } = body;
+    await refreshAll();
 
     let resolvedName = (fullName || full_name || "").trim();
     if (resolvedName === "VIP Pro Competitor" || resolvedName === "Invitational Competitor VIP") {
@@ -150,27 +162,18 @@ export async function POST(req: NextRequest) {
       notes: notes || (inviteCode ? `Enrolled via invite code: ${inviteCode}` : undefined),
     };
 
-    // Save to storage using members manager
-    const savedMember = addOrUpdateMember(newMember);
-
-    // Mirror to Supabase if configured
-    if (supabase) {
-      try {
-        await supabase.from("society_members").insert([savedMember]);
-      } catch (dbErr) {
-        console.warn("Supabase society_members error:", dbErr);
-      }
-    }
+    // Save and wait for the database to confirm
+    const savedMember = await addOrUpdateMemberAsync(newMember);
 
     return NextResponse.json({
       success: true,
-      member: savedMember,
+      member: publicMember(savedMember),
       message: `Welcome to Subsonic Society, Marksman! Your Member ID is ${savedMember.member_id}.`,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error joining society:", error);
     return NextResponse.json(
-      { error: "Internal server error during registration." },
+      { error: `Registration failed: ${error?.message || "internal error"}` },
       { status: 500 }
     );
   }
@@ -185,6 +188,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "member_id is required." }, { status: 400 });
     }
 
+    await refreshAll();
     const currentMembers = getMembersFromStorage();
     const index = currentMembers.findIndex((m) => m.member_id === member_id);
 
@@ -233,13 +237,14 @@ export async function PATCH(req: NextRequest) {
       ...(status !== undefined && { status }),
       ...(role !== undefined && { role }),
       ...(notes !== undefined && { notes }),
-      ...(pin !== undefined && { pin: pin ? String(pin).trim() : undefined }),
+      // Blank PIN = no change (admin form never receives existing PINs)
+      ...(pin && String(pin).trim() && { pin: String(pin).trim() }),
     };
 
-    const saved = addOrUpdateMember(updatedMember);
+    const saved = await addOrUpdateMemberAsync(updatedMember);
 
     // Cross-sync PIN to shooter record if linked shooter exists
-    if (pin !== undefined && saved.callsign) {
+    if (pin && String(pin).trim() && saved.callsign) {
       try {
         const shooters = getShootersFromStorage();
         const matchingShooter = shooters.find(
@@ -248,8 +253,8 @@ export async function PATCH(req: NextRequest) {
             s.id.toLowerCase() === saved.member_id.toLowerCase()
         );
         if (matchingShooter) {
-          matchingShooter.pin = pin ? String(pin).trim() : undefined;
-          saveShooterToStorage(matchingShooter);
+          matchingShooter.pin = toPinHash(String(pin)) ?? undefined;
+          await saveShooterToStorageAsync(matchingShooter);
         }
       } catch (syncErr) {
         console.warn("Could not sync pin to shooter record:", syncErr);
@@ -258,12 +263,12 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      member: saved,
+      member: publicMember(saved),
       message: `Member ${member_id} updated successfully.`,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating society member:", error);
-    return NextResponse.json({ error: "Failed to update member." }, { status: 500 });
+    return NextResponse.json({ error: `Failed to update member: ${error?.message || "unknown error"}` }, { status: 500 });
   }
 }
 
@@ -283,7 +288,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "member_id is required." }, { status: 400 });
     }
 
-    const deleted = deleteMemberFromStorage(member_id);
+    await refreshAll();
+    const deleted = await deleteMemberFromStorageAsync(member_id);
 
     if (!deleted) {
       return NextResponse.json(

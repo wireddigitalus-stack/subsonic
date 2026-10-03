@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, ensureInviteExists } from "@/lib/invites";
+import { getInvitesFromStorage, ensureInviteExists, refreshInvitesFromDb } from "@/lib/invites";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    await refreshInvitesFromDb();
     const invites = getInvitesFromStorage();
     let invite = invites.find((i) => i.code.toUpperCase() === rawCode);
 

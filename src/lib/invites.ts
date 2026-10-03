@@ -1,5 +1,5 @@
 import fs from "fs";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { db, isDbConfigured } from "@/lib/supabase-admin";
 import path from "path";
 import { SocietyInvite, InviteTier } from "@/lib/types";
 
@@ -13,6 +13,9 @@ const WRITABLE_DIR = IS_SERVERLESS ? "/tmp" : REPO_DATA_DIR;
 const WRITABLE_INVITES_FILE = IS_SERVERLESS
   ? path.join("/tmp", "subsonic-invites.jsonl")
   : REPO_INVITES_FILE;
+
+// On the live (serverless) site the database is the single source of truth.
+const DB_AUTHORITATIVE = IS_SERVERLESS && isDbConfigured;
 
 export const SEED_INVITES: SocietyInvite[] = [
   {
@@ -98,67 +101,66 @@ function mapDbToInvite(row: any): SocietyInvite {
   };
 }
 
-let invitesCacheRefreshed = false;
-
 let memoryInvites: SocietyInvite[] = [...SEED_INVITES];
+let invitesLastRefreshMs = 0;
+let invitesRefreshInFlight: Promise<void> | null = null;
+
+/** Pull the latest invites from the database. Await in API routes. */
+export async function refreshInvitesFromDb(maxAgeMs = 3000): Promise<void> {
+  if (!db) return;
+  if (Date.now() - invitesLastRefreshMs < maxAgeMs) return;
+  if (invitesRefreshInFlight) return invitesRefreshInFlight;
+
+  invitesRefreshInFlight = (async () => {
+    try {
+      const { data, error } = await db.from("invites").select("*");
+      if (error) {
+        console.error("Error fetching invites from database:", error.message);
+        return;
+      }
+      const rows = (data || []).map(mapDbToInvite);
+      if (DB_AUTHORITATIVE) {
+        memoryInvites = rows;
+      } else {
+        const map = new Map<string, SocietyInvite>();
+        for (const i of memoryInvites) map.set(i.code.toUpperCase(), i);
+        for (const inv of rows) map.set(inv.code.toUpperCase(), inv);
+        memoryInvites = Array.from(map.values());
+      }
+      invitesLastRefreshMs = Date.now();
+    } catch (err) {
+      console.error("Database refresh error (invites):", err);
+    } finally {
+      invitesRefreshInFlight = null;
+    }
+  })();
+  return invitesRefreshInFlight;
+}
 
 export function getInvitesFromStorage(): SocietyInvite[] {
-  if (!invitesCacheRefreshed && isSupabaseConfigured && supabase) {
-    invitesCacheRefreshed = true;
-    (async () => {
-      try {
-        const { data, error } = await supabase.from("invites").select("*");
-        if (error) {
-          console.error("Error fetching invites from Supabase:", error);
-          return;
-        }
-        if (data && data.length > 0) {
-          const map = new Map<string, SocietyInvite>();
-          for (const i of memoryInvites) map.set(i.code.toUpperCase(), i);
-          for (const row of data) {
-            const inv = mapDbToInvite(row);
-            map.set(inv.code.toUpperCase(), inv);
-          }
-          memoryInvites = Array.from(map.values());
-        }
-      } catch (err) {
-        console.error("Supabase refresh error (invites):", err);
-      }
-    })();
-  }
+  if (db && invitesLastRefreshMs === 0) void refreshInvitesFromDb();
 
   try {
-    // 1. Try reading from writable file first
-    let raw = "";
-    if (fs.existsSync(WRITABLE_INVITES_FILE)) {
-      raw = fs.readFileSync(WRITABLE_INVITES_FILE, "utf-8");
-    } else if (fs.existsSync(REPO_INVITES_FILE)) {
-      raw = fs.readFileSync(REPO_INVITES_FILE, "utf-8");
-    }
-
-    if (raw) {
-      const lines = raw.split("\n").filter((l) => l.trim().length > 0);
-      const parsed = lines
-        .map((l) => {
-          try {
-            return JSON.parse(l) as SocietyInvite;
-          } catch {
-            return null;
-          }
-        })
-        .filter((inv): inv is SocietyInvite => inv !== null);
-
-      if (parsed.length > 0) {
-        // Merge with memory cache
-        const map = new Map<string, SocietyInvite>();
-        for (const seed of SEED_INVITES) map.set(seed.code.toUpperCase(), seed);
-        for (const mem of memoryInvites) map.set(mem.code.toUpperCase(), mem);
-        for (const item of parsed) map.set(item.code.toUpperCase(), item);
-        memoryInvites = Array.from(map.values());
-        return memoryInvites;
+    const map = new Map<string, SocietyInvite>();
+    // On the live site the database is authoritative — seeds/files only used locally.
+    if (!DB_AUTHORITATIVE) {
+      for (const seed of SEED_INVITES) map.set(seed.code.toUpperCase(), seed);
+      let raw = "";
+      if (fs.existsSync(WRITABLE_INVITES_FILE)) {
+        raw = fs.readFileSync(WRITABLE_INVITES_FILE, "utf-8");
+      } else if (fs.existsSync(REPO_INVITES_FILE)) {
+        raw = fs.readFileSync(REPO_INVITES_FILE, "utf-8");
+      }
+      for (const l of raw.split("\n")) {
+        if (!l.trim()) continue;
+        try {
+          const inv = JSON.parse(l) as SocietyInvite;
+          if (inv?.code) map.set(inv.code.toUpperCase(), inv);
+        } catch {}
       }
     }
-
+    for (const mem of memoryInvites) map.set(mem.code.toUpperCase(), mem);
+    memoryInvites = Array.from(map.values());
     return memoryInvites;
   } catch (err) {
     console.error("Error reading invites:", err);
@@ -166,37 +168,52 @@ export function getInvitesFromStorage(): SocietyInvite[] {
   }
 }
 
-export function saveAllInvitesToStorage(invites: SocietyInvite[]): void {
+function writeInvitesLocally(invites: SocietyInvite[]): void {
+  memoryInvites = [...invites];
   try {
-    memoryInvites = [...invites];
-
     if (!fs.existsSync(WRITABLE_DIR)) {
       fs.mkdirSync(WRITABLE_DIR, { recursive: true });
     }
     const content = invites.map((inv) => JSON.stringify(inv)).join("\n") + "\n";
     fs.writeFileSync(WRITABLE_INVITES_FILE, content, "utf-8");
-
-    // Also attempt saving to repo data file if not in serverless
     if (!IS_SERVERLESS) {
       if (!fs.existsSync(REPO_DATA_DIR)) {
         fs.mkdirSync(REPO_DATA_DIR, { recursive: true });
       }
       fs.writeFileSync(REPO_INVITES_FILE, content, "utf-8");
     }
-
-    if (isSupabaseConfigured && supabase) {
-      (async () => {
-        try {
-          const dbRows = invites.map(mapInviteToDb);
-          const { error } = await supabase.from('invites').upsert(dbRows, { onConflict: 'id' });
-          if (error) console.error("Error upserting invites to Supabase:", error);
-        } catch (err) {
-          console.error("Supabase upsert catch (invites):", err);
-        }
-      })();
-    }
   } catch (err) {
-    console.error("Error saving invites:", err);
+    console.error("Error saving invites locally:", err);
+  }
+}
+
+/** Save ONE invite and wait for the database to confirm. Throws on database error. */
+export async function saveInviteAsync(invite: SocietyInvite): Promise<void> {
+  const current = getInvitesFromStorage();
+  const idx = current.findIndex((i) => i.code.toUpperCase() === invite.code.toUpperCase());
+  const next = [...current];
+  if (idx >= 0) next[idx] = invite;
+  else next.unshift(invite);
+  writeInvitesLocally(next);
+
+  if (db) {
+    const { error } = await db.from("invites").upsert(mapInviteToDb(invite), { onConflict: "id" });
+    if (error) throw new Error(`Database save failed (invite): ${error.message}`);
+  }
+}
+
+/** Save the full invite list (database write is best-effort). */
+export function saveAllInvitesToStorage(invites: SocietyInvite[]): void {
+  writeInvitesLocally(invites);
+  if (db) {
+    (async () => {
+      try {
+        const { error } = await db.from("invites").upsert(invites.map(mapInviteToDb), { onConflict: "id" });
+        if (error) console.error("Error upserting invites to database:", error.message);
+      } catch (err) {
+        console.error("Database upsert error (invites):", err);
+      }
+    })();
   }
 }
 
