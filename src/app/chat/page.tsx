@@ -1399,7 +1399,7 @@ export default function ChatPage() {
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
         <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] sm:pt-3">
-        <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-amber-500/20 shadow-tactical-glow">
+        <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-white/10">
           {/* Mobile Top Bar: Tactical Breadcrumbs + Quick Hub Switcher + Callsign + Actions */}
           <div className="flex sm:hidden items-center justify-between gap-1.5">
             <div className="flex items-center gap-1 min-w-0">
@@ -1428,11 +1428,11 @@ export default function ChatPage() {
                 className="flex items-center gap-1 px-1.5 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
                 title="View Shooter Pass"
               >
-                <div className={`w-4 h-4 rounded flex items-center justify-center text-[9px] shrink-0 overflow-hidden ${
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 overflow-hidden ${
                   shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                    ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                    ? "bg-blue-800 text-cyan-200 ring-1 ring-cyan-400"
                     : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
-                    ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
+                    ? "bg-emerald-500 text-black font-black ring-1 ring-emerald-300"
                     : "bg-amber-500 text-black font-bold"
                 }`}>
                   {shooterProfile.image ? (
@@ -1571,7 +1571,7 @@ export default function ChatPage() {
                     href="/admin"
                     target="_blank"
                     title="Open Staff Admin & Chat Moderation Dashboard"
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[11px] font-mono text-emerald-300 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[11px] text-emerald-300 transition-colors"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="font-bold">ADMIN / MODERATION</span>
@@ -1617,11 +1617,11 @@ export default function ChatPage() {
                   data-telemetry="chat_edit_shooter_profile"
                   className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
                 >
-                  <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
+                  <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
                     shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                      ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                      ? "bg-blue-800 text-cyan-200 ring-1 ring-cyan-400"
                       : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-black font-black border border-emerald-300"
+                      ? "bg-emerald-500 text-black font-black ring-1 ring-emerald-300"
                       : "bg-amber-500 text-black font-bold"
                   }`}>
                     {shooterProfile.image ? (
@@ -1651,7 +1651,7 @@ export default function ChatPage() {
               {/* Left: Weather Telemetry */}
               <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 text-[11px] sm:text-xs font-mono">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span className="text-white font-bold tracking-wider">HOLSTON RIDGE:</span>
                 </div>
 
@@ -1685,10 +1685,10 @@ export default function ChatPage() {
                     playTacticalChirp(1100);
                   }}
                   data-telemetry="chat_start_tour"
-                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 font-mono bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 hover:text-white border-amber-500/40 transition-all font-bold shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-white border-amber-500/30 transition-all font-medium"
                   title="Start Interactive Chat Tour"
                 >
-                  <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
+                  <Compass className="w-3.5 h-3.5 text-amber-400" />
                   <span>TOUR GUIDE</span>
                 </button>
 
@@ -1733,7 +1733,7 @@ export default function ChatPage() {
                   }}
                   title="View Digital Member Pass & Scannable QR Code"
                   data-telemetry="chat_view_digital_pass"
-                  className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-mono font-bold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/35 transition-all shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                  className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all"
                 >
                   <QrCode className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Pass</span>

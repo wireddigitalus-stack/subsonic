@@ -38,7 +38,7 @@ export function ChatChannelSidebar({
           <div>
             <div className="flex items-center justify-between px-1 mb-2.5 shrink-0">
               <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
                 Match Frequency
               </span>
               <span className="text-[10px] font-mono text-amber-400">
@@ -58,19 +58,19 @@ export function ChatChannelSidebar({
                     type="button"
                     onClick={() => setCurrentChannel(ch.id)}
                     data-telemetry={`chat_channel_${ch.id}`}
-                    className={`w-full p-3 rounded-2xl text-left transition-all border relative ${
+                    className={`w-full p-3 rounded-xl text-left transition-all border relative ${
                       isActive
-                        ? "ios-glass bg-amber-500/15 border-amber-500/40 shadow-tactical-glow text-white"
-                        : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] text-slate-300"
+                        ? "bg-white/[0.08] border-amber-500/30 text-white"
+                        : "bg-transparent border-transparent hover:bg-white/[0.04] text-slate-300"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5 font-mono font-bold text-sm">
-                        <span className={isActive ? "text-amber-400 font-black" : "text-slate-500"}>#</span>
+                        <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
                         <span>{ch.name}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold flex items-center gap-1 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded font-medium flex items-center gap-1 bg-white/5 text-slate-400">
                           <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
                           <span>{engagement.postCount}</span>
                         </span>
@@ -82,7 +82,7 @@ export function ChatChannelSidebar({
                         </span>
 
                         {unread > 0 && !isActive && (
-                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
                             {unread}
                           </span>
                         )}
@@ -131,8 +131,8 @@ export function ChatChannelSidebar({
                       key={partner.id}
                       className={`group w-full rounded-xl transition-all border flex items-center justify-between p-2.5 ${
                         isActive
-                          ? "bg-amber-500/20 border-amber-500/50 shadow-tactical-glow text-white"
-                          : "bg-white/[0.02] border-white/5 hover:bg-white/[0.05] text-slate-300"
+                          ? "bg-white/[0.08] border-amber-500/30 text-white"
+                          : "bg-transparent border-transparent hover:bg-white/[0.04] text-slate-300"
                       }`}
                     >
                       {/* Left: Switch to DM channel */}
@@ -143,14 +143,14 @@ export function ChatChannelSidebar({
                       >
                         {/* Avatar / Icon with Status Dot */}
                         <div className="relative shrink-0">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-mono font-bold text-xs border overflow-hidden ${
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 overflow-hidden ${
                             isRO
-                              ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                              ? "bg-amber-600 text-black ring-amber-400 font-black"
                               : isMasterOwner
-                              ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.4)]"
+                              ? "bg-blue-800 text-cyan-200 ring-cyan-400"
                               : isOwnerAdmin
-                              ? "bg-emerald-500 text-black border-emerald-300"
-                              : "bg-black/60 text-amber-400 border-white/10"
+                              ? "bg-emerald-500 text-black ring-emerald-300"
+                              : "bg-white/10 text-amber-400 ring-white/10"
                           }`}>
                             {partner.image ? (
                               <img src={partner.image} alt="" className="w-full h-full object-cover" />
@@ -199,7 +199,7 @@ export function ChatChannelSidebar({
                       {/* Right: Unread Badge + Dossier Info Trigger */}
                       <div className="flex items-center gap-1 shrink-0 ml-1.5">
                         {unread > 0 && !isActive && (
-                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
                             {unread}
                           </span>
                         )}
@@ -240,7 +240,7 @@ export function ChatChannelSidebar({
             type="button"
             onClick={() => setIsDopeModalOpen(true)}
             data-telemetry="chat_open_dope_modal"
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
+            className="w-full py-2.5 px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-xs font-medium flex items-center justify-center gap-2 transition-all"
           >
             <Crosshair className="w-4 h-4" />
             <span>DROP VERIFIED DOPE CARD</span>

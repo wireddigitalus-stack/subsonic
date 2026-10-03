@@ -275,28 +275,28 @@ export function ChatMessageList({
             return (
               <div
                 key={msg.id}
-                className={`p-2.5 md:p-5 rounded-xl md:rounded-2xl border transition-all space-y-1.5 md:space-y-3 scroll-mb-8 ${
+                className={`p-3 md:p-4 rounded-xl md:rounded-2xl transition-all space-y-1.5 md:space-y-2.5 scroll-mb-8 border-l-2 ${
                   isRO
                     ? roSeverity === "alert"
-                      ? "bg-gradient-to-r from-red-950/50 to-black/80 border-red-500/30"
+                      ? "bg-red-950/20 border-l-red-500 border-y border-r border-y-white/5 border-r-white/5"
                       : roSeverity === "warn"
-                      ? "bg-gradient-to-r from-amber-950/40 to-black/80 border-amber-500/30"
-                      : "bg-gradient-to-r from-amber-950/35 via-black/85 to-zinc-950 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+                      ? "bg-amber-950/15 border-l-amber-500 border-y border-r border-y-white/5 border-r-white/5"
+                      : "bg-amber-950/10 border-l-amber-400 border-y border-r border-y-white/5 border-r-white/5"
                     : isMasterOwner
-                    ? "bg-gradient-to-r from-blue-950/70 via-black/85 to-indigo-950/50 border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.3)]"
+                    ? "bg-blue-950/30 border-l-blue-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isOwnerAdmin
-                    ? "bg-gradient-to-r from-emerald-950/60 via-black/80 to-teal-950/40 border-emerald-400/60 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+                    ? "bg-emerald-950/25 border-l-emerald-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isAdmin
-                    ? "bg-gradient-to-r from-cyan-950/60 via-black/80 to-blue-950/40 border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.25)]"
+                    ? "bg-cyan-950/25 border-l-cyan-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isMod
-                    ? "bg-gradient-to-r from-purple-950/60 via-black/80 to-indigo-950/40 border-purple-400/60 shadow-[0_0_20px_rgba(168,85,247,0.25)]"
+                    ? "bg-purple-950/25 border-l-purple-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isMD
-                    ? "bg-gradient-to-r from-amber-950/40 to-black/60 border-amber-500/40 shadow-tactical-glow"
+                    ? "bg-amber-950/15 border-l-amber-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isDopeDrop
-                    ? "bg-black/70 border-cyan-500/30 shadow-lg"
+                    ? "bg-cyan-950/15 border-l-cyan-500 border-y border-r border-y-white/5 border-r-white/5"
                     : isFlagged
-                    ? "bg-amber-500/5 border-amber-500/20"
-                    : "bg-white/[0.02] border-white/5 hover:border-white/10"
+                    ? "bg-amber-500/5 border-l-amber-500 border-y border-r border-y-white/5 border-r-white/5"
+                    : "bg-white/[0.02] border-l-transparent border-y border-r border-y-transparent border-r-transparent hover:bg-white/[0.04]"
                 }`}
               >
                 {/* Message Header: Author, Badge, Timestamp */}
@@ -307,22 +307,22 @@ export function ChatMessageList({
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
                       title={`View ${msg.author.name} Profile & Direct Chat`}
-                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-xl items-center justify-center font-mono font-bold text-xs border shrink-0 transition-transform active:scale-95 hover:border-blue-400 cursor-pointer overflow-hidden ${
+                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-blue-400 cursor-pointer overflow-hidden ${
                         isRO
-                          ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                          ? "bg-amber-600 text-black ring-amber-400 font-black"
                           : isMasterOwner
-                          ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 font-black shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                          ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
                           : isOwnerAdmin
-                          ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                          ? "bg-emerald-500 text-black ring-emerald-300 font-black"
                           : isAdmin
-                          ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-black border-cyan-300 font-black shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                          ? "bg-cyan-600 text-black ring-cyan-300 font-black"
                           : isMod
-                          ? "bg-gradient-to-br from-purple-500 to-indigo-600 text-white border-purple-300 font-black shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                          ? "bg-purple-600 text-white ring-purple-300 font-black"
                           : isMD
-                          ? "bg-amber-500 text-black border-amber-400"
+                          ? "bg-amber-500 text-black ring-amber-400"
                           : isDopeDrop
-                          ? "bg-cyan-950 text-cyan-300 border-cyan-500/40"
-                          : "bg-black/60 text-amber-400 border-white/10"
+                          ? "bg-cyan-950 text-cyan-300 ring-cyan-500/40"
+                          : "bg-white/10 text-amber-400 ring-white/10"
                       }`}
                     >
                       {msg.author.avatarUrl ? (
@@ -349,7 +349,7 @@ export function ChatMessageList({
                           type="button"
                           onClick={() => handleAuthorClick(msg.author)}
                           title={`View ${msg.author.name} Profile & Direct Chat`}
-                          className={`text-xs md:text-sm font-bold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
+                          className={`text-sm font-semibold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
                             isRO ? "text-amber-300 font-black" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}
                         >
@@ -362,8 +362,8 @@ export function ChatMessageList({
                             type="button"
                             onClick={() => handleAuthorClick(msg.author)}
                             title={`View ${msg.author.callsign} Profile`}
-                            className={`hidden md:inline text-xs font-mono font-bold hover:underline ${
-                              isMasterOwner ? "text-blue-400 hover:text-blue-300" : "text-amber-400 hover:text-amber-300"
+                            className={`hidden md:inline text-xs font-mono font-medium hover:underline ${
+                              isMasterOwner ? "text-blue-400/80 hover:text-blue-300" : "text-slate-400 hover:text-slate-300"
                             }`}
                           >
                             [{msg.author.callsign}]
@@ -371,22 +371,22 @@ export function ChatMessageList({
                         )}
 
                         <span
-                          className={`text-[8px] md:text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                          className={`text-[10px] md:text-[11px] font-medium px-1.5 py-0.5 rounded uppercase ${
                             isRO
-                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/50 font-black"
+                              ? "bg-amber-500/15 text-amber-300"
                               : isMasterOwner
-                              ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-black border border-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+                              ? "bg-blue-500/20 text-blue-300"
                               : isOwnerAdmin
-                              ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black font-black border border-emerald-300"
+                              ? "bg-emerald-500/20 text-emerald-300"
                               : isAdmin
-                              ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black border border-cyan-300"
+                              ? "bg-cyan-500/20 text-cyan-300"
                               : isMod
-                              ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-black border border-purple-300"
+                              ? "bg-purple-500/20 text-purple-300"
                               : isMD
-                              ? "bg-amber-500 text-black font-extrabold"
+                              ? "bg-amber-500/20 text-amber-300"
                               : isPro
-                              ? "bg-blue-600/30 text-blue-300 border border-blue-500/30"
-                              : "bg-white/10 text-slate-300"
+                              ? "bg-blue-500/15 text-blue-300"
+                              : "bg-white/10 text-slate-400"
                           }`}
                         >
                           {isRO ? (
@@ -408,7 +408,7 @@ export function ChatMessageList({
                         </span>
 
                         {/* Timestamp — inline on mobile */}
-                        <span className="text-[10px] md:hidden text-slate-500 font-mono">{msg.timestamp}</span>
+                        <span className="text-[11px] md:hidden text-slate-500">{msg.timestamp}</span>
                       </div>
 
                       {/* Rig line or RO Subtitle */}

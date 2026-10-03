@@ -45,7 +45,7 @@ export function ChatAuthGate({
       </div>
 
       <div className="flex-1 flex items-center justify-center">
-        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
+        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-glow mx-auto relative">
           <Image
             src="/images/SS-RWB-LOGO.png"
@@ -56,7 +56,7 @@ export function ChatAuthGate({
         </div>
 
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-mono font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium">
             <Lock className="w-3 h-3" />
             <span>Restricted Network • Member Key Required</span>
           </div>

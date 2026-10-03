@@ -80,7 +80,7 @@ export function ChatInputBar({
             onClick={handlePushToTalk}
             className={`p-2.5 md:p-3 rounded-full md:rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
               isListening
-                ? "bg-red-500 border-red-400 text-white animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.5)]"
+                ? "bg-red-500 border-red-400 text-white animate-pulse"
                 : "bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white"
             }`}
             title={isListening ? "Listening…" : "Voice input"}
@@ -105,7 +105,7 @@ export function ChatInputBar({
             type="submit"
             disabled={isAiScanning}
             data-telemetry="chat_send_button"
-            className="p-2.5 md:p-3 md:px-5 rounded-full md:rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold hover:brightness-110 active:scale-95 transition-all shadow-tactical-glow flex items-center gap-1.5 text-sm font-mono disabled:opacity-50 shrink-0"
+            className="p-2.5 md:p-3 md:px-5 rounded-full md:rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-bold active:scale-95 transition-all flex items-center gap-1.5 text-sm disabled:opacity-50 shrink-0"
             title="Send"
           >
             {isAiScanning ? (
@@ -113,14 +113,14 @@ export function ChatInputBar({
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                <span className="hidden md:inline">TRANSMIT</span>
+                <span className="hidden md:inline">Send</span>
               </>
             )}
           </button>
         </div>
 
         {/* Transmitting footer: Hidden on mobile */}
-        <div className="hidden md:flex items-center justify-between text-xs font-mono text-slate-400 px-1 pt-1">
+        <div className="hidden md:flex items-center justify-between text-xs text-slate-500 px-1 pt-1">
           <span>
             Transmitting as: <strong className="text-slate-200">[{shooterProfile.callsign}]</strong>
           </span>
