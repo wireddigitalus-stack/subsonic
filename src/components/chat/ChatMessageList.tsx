@@ -26,7 +26,8 @@ import {
   Sparkles,
   ChevronRight,
   ShieldCheck,
-  Bot
+  Bot,
+  Radar
 } from "lucide-react";
 import Image from "next/image";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -310,7 +311,7 @@ export function ChatMessageList({
                         isRO
                           ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 font-black shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                           : isMasterOwner
-                          ? "bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white border-blue-400 font-black shadow-[0_0_12px_rgba(59,130,246,0.6)]"
+                          ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 font-black shadow-[0_0_15px_rgba(6,182,212,0.5)]"
                           : isOwnerAdmin
                           ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 font-black shadow-[0_0_10px_rgba(16,185,129,0.5)]"
                           : isAdmin
@@ -329,7 +330,7 @@ export function ChatMessageList({
                       ) : isRO ? (
                         "🤖"
                       ) : isMasterOwner ? (
-                        "👑"
+                        <Radar className="w-4 h-4 md:w-5 md:h-5 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_8px_rgba(6,182,212,0.85)] animate-pulse" />
                       ) : isOwnerAdmin ? (
                         "🎖️"
                       ) : isAdmin ? (
@@ -388,7 +389,22 @@ export function ChatMessageList({
                               : "bg-white/10 text-slate-300"
                           }`}
                         >
-                          {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 MASTER ADMIN" : isOwnerAdmin ? "🎖️ ADMIN" : isAdmin ? "🛡️ ADMIN" : isMod ? "⚖️ MOD" : (msg.author.badgeText || msg.author.role)}
+                          {isRO ? (
+                            "🤖 AI Range Officer"
+                          ) : isMasterOwner ? (
+                            <span className="inline-flex items-center gap-1">
+                              <Radar className="w-2.5 h-2.5 text-cyan-200 stroke-[2.5]" />
+                              <span>MASTER ADMIN</span>
+                            </span>
+                          ) : isOwnerAdmin ? (
+                            "🎖️ ADMIN"
+                          ) : isAdmin ? (
+                            "🛡️ ADMIN"
+                          ) : isMod ? (
+                            "⚖️ MOD"
+                          ) : (
+                            msg.author.badgeText || msg.author.role
+                          )}
                         </span>
 
                         {/* Timestamp — inline on mobile */}

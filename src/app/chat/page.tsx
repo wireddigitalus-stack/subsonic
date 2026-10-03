@@ -52,7 +52,8 @@ import {
   CheckCircle2,
   Mic,
   Bot,
-  Activity
+  Activity,
+  Radar
 } from "lucide-react";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -1413,10 +1414,22 @@ export default function ChatPage() {
                 className="flex items-center gap-1 px-1.5 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
                 title="View Shooter Pass"
               >
-                <div className="w-4 h-4 rounded bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] shrink-0">
-                  {shooterProfile.callsign.slice(0, 2)}
+                <div className={`w-4 h-4 rounded flex items-center justify-center text-[9px] shrink-0 ${
+                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                    ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                    : "bg-amber-500 text-black font-bold"
+                }`}>
+                  {shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                    <Radar className="w-2.5 h-2.5 text-cyan-300 stroke-[2.5]" />
+                  ) : (
+                    shooterProfile.callsign.slice(0, 2)
+                  )}
                 </div>
-                <span className="font-mono font-bold text-amber-300 text-[10px] truncate max-w-[62px]">
+                <span className={`font-mono font-bold text-[10px] truncate max-w-[62px] ${
+                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                    ? "text-cyan-300"
+                    : "text-amber-300"
+                }`}>
                   {shooterProfile.callsign}
                 </span>
                 <QrCode className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
@@ -1701,10 +1714,22 @@ export default function ChatPage() {
                 data-telemetry="chat_edit_shooter_profile"
                 className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/50 border border-amber-500/40 hover:border-amber-400 transition-all text-xs group"
               >
-                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg bg-amber-500 text-black font-bold flex items-center justify-center text-[9px] sm:text-[10px]">
-                  {shooterProfile.callsign.slice(0, 2)}
+                <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg flex items-center justify-center text-[9px] sm:text-[10px] ${
+                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                    ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+                    : "bg-amber-500 text-black font-bold"
+                }`}>
+                  {shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                    <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
+                  ) : (
+                    shooterProfile.callsign.slice(0, 2)
+                  )}
                 </div>
-                <span className="font-mono font-bold text-amber-300 group-hover:text-amber-200 text-[11px] sm:text-xs">
+                <span className={`font-mono font-bold text-[11px] sm:text-xs ${
+                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                    ? "text-cyan-300 group-hover:text-cyan-200"
+                    : "text-amber-300 group-hover:text-amber-200"
+                }`}>
                   {shooterProfile.callsign}
                 </span>
                 <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
@@ -2248,15 +2273,17 @@ export default function ChatPage() {
                           : "bg-amber-500/10 border-amber-500/30 text-amber-300"
                       }`}>
                         <span className="text-xl shrink-0">
-                          {profileForm.role === "MASTER_OWNER" || isMasterOwner
-                            ? "👑"
-                            : profileForm.role === "OWNER_ADMIN"
-                            ? "🎖️"
-                            : profileForm.role === "ADMIN"
-                            ? "🛡️"
-                            : profileForm.role === "MODERATOR"
-                            ? "⚖️"
-                            : "👑"}
+                          {profileForm.role === "MASTER_OWNER" || isMasterOwner ? (
+                            <Radar className="w-6 h-6 text-cyan-300 stroke-[2.2] animate-pulse" />
+                          ) : profileForm.role === "OWNER_ADMIN" ? (
+                            "🎖️"
+                          ) : profileForm.role === "ADMIN" ? (
+                            "🛡️"
+                          ) : profileForm.role === "MODERATOR" ? (
+                            "⚖️"
+                          ) : (
+                            "👑"
+                          )}
                         </span>
                         <div>
                           <div className="font-extrabold text-xs">

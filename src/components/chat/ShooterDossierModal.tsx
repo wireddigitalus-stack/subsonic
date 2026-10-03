@@ -12,7 +12,8 @@ import {
   CheckCircle2, 
   Compass,
   ArrowRight,
-  Bot
+  Bot,
+  Radar
 } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 
@@ -71,7 +72,7 @@ export function ShooterDossierModal({
             isRO
               ? "bg-gradient-to-br from-amber-500 to-amber-700 text-black border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
               : isMasterOwner
-              ? "bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+              ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
               : isOwnerAdmin
               ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
               : "bg-black/60 text-amber-400 border-white/15"
@@ -81,7 +82,7 @@ export function ShooterDossierModal({
             ) : isRO ? (
               "🤖"
             ) : isMasterOwner ? (
-              "👑"
+              <Radar className="w-7 h-7 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_12px_rgba(6,182,212,0.85)] animate-pulse" />
             ) : isOwnerAdmin ? (
               "🎖️"
             ) : (
@@ -111,7 +112,16 @@ export function ShooterDossierModal({
                   ? "bg-gradient-to-r from-emerald-400 to-teal-500 text-black border border-emerald-300"
                   : "bg-white/10 text-slate-300 border border-white/10"
               }`}>
-                {isRO ? "🤖 AI Range Officer" : isMasterOwner ? "👑 MASTER ADMIN" : shooter.badgeText || shooter.role}
+                {isRO ? (
+                  "🤖 AI Range Officer"
+                ) : isMasterOwner ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Radar className="w-2.5 h-2.5 text-cyan-200 stroke-[2.5]" />
+                    <span>MASTER ADMIN</span>
+                  </span>
+                ) : (
+                  shooter.badgeText || shooter.role
+                )}
               </span>
 
               <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">

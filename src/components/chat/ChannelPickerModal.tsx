@@ -16,7 +16,8 @@ import {
   Target, 
   Sparkles, 
   MessageSquare,
-  Bot
+  Bot,
+  Radar
 } from "lucide-react";
 import { ChannelConfig, DirectPartner } from "@/lib/types";
 
@@ -406,7 +407,7 @@ export function ChannelPickerModal({
                         isRO
                           ? "bg-amber-500 text-black border-amber-400 font-black shadow-[0_0_8px_rgba(245,158,11,0.4)]"
                           : isMasterOwner
-                          ? "bg-gradient-to-br from-blue-600 to-indigo-600 text-white border-blue-400 font-black shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                          ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 font-black shadow-[0_0_10px_rgba(6,182,212,0.4)]"
                           : isOwnerAdmin
                           ? "bg-emerald-500 text-black border-emerald-300 font-black"
                           : "bg-black/60 text-amber-400 border-white/10"
@@ -416,7 +417,7 @@ export function ChannelPickerModal({
                         ) : isRO ? (
                           "🤖"
                         ) : isMasterOwner ? (
-                          "👑"
+                          <Radar className="w-4 h-4 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_6px_rgba(6,182,212,0.85)] animate-pulse" />
                         ) : isOwnerAdmin ? (
                           "🎖️"
                         ) : (
