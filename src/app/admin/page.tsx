@@ -60,6 +60,7 @@ import {
   Crown,
   Shield,
   Key,
+  LogOut,
   Copy,
   Bot
 } from "lucide-react";
@@ -1708,113 +1709,101 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        {/* Global Actions */}
+        {/* Global Actions — consistent pill style, grouped: Go to · Tools · Session */}
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={handleSimulateTraffic}
-            data-telemetry="admin_simulate_traffic"
-            disabled={simulating}
-            className="px-3.5 py-2 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
-            title="Simulate visitor clicks and dwell times"
-          >
-            <Play className={`w-3.5 h-3.5 ${simulating ? "animate-spin text-amber-400" : ""}`} />
-            <span>{simulating ? "Generating Events..." : "Simulate Clicks"}</span>
-          </button>
-
-          <button
-            onClick={loadData}
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white"
-            title="Refresh Data"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-
-          {/* Autonomous Test Bots Fleet Launcher (Off-Chat Control) */}
-          <button
-            type="button"
-            onClick={() => setIsBotCardOpen(true)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              botsEnabled
-                ? "bg-cyan-500/25 hover:bg-cyan-500/35 text-cyan-300 border border-cyan-500/50 shadow-[0_0_14px_rgba(6,182,212,0.35)]"
-                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-            }`}
-            title="Configure and manage autonomous test bot fleet, simulation speed, and guidelines test runs"
-          >
-            <Bot className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Test Bots: <strong className={botsEnabled ? "text-cyan-300" : "text-slate-400"}>{botsEnabled ? "ON" : "OFF"}</strong></span>
-          </button>
-
+          {/* Go to */}
           <Link
             href="/chat"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(16,185,129,0.25)]"
-            title="Launch Competitor Comms in New Tab"
+            className="h-9 px-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Open the chat room in a new tab"
           >
-            <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+            <Radio className="w-3.5 h-3.5" />
             <span>Enter Room</span>
-            <ExternalLink className="w-3 h-3 text-emerald-400/80" />
+            <ExternalLink className="w-3 h-3 opacity-70" />
           </Link>
-
-          <button
-            onClick={() => downloadTelemetryExport("csv")}
-            className="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all"
-            title="Download CSV for Excel / Sheets"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
-          </button>
-
-          <button
-            onClick={handleExportJSON}
-            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center gap-1.5"
-            title="Download full JSON event dump"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Export JSON</span>
-          </button>
-
-          <button
-            onClick={handleClearTelemetry}
-            className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20"
-            title="Clear Local Event Buffer"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={handleOpenPasskeysModal}
-            className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
-            title="Configure Master Owner & Admin Passkeys"
-          >
-            <Key className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Admin Passkeys</span>
-          </button>
 
           <Link
             href="/evos1.0"
             target="_blank"
-            className="px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(6,182,212,0.25)]"
-            title="Launch EVOS 1.0 Dynamic Neural Network Topology"
+            className="h-9 px-3.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Open EVOS 1.0 in a new tab"
           >
-            <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <Activity className="w-3.5 h-3.5" />
             <span>EVOS 1.0</span>
           </Link>
 
+          <span className="hidden md:block w-px h-6 bg-white/10 mx-0.5" />
+
+          {/* Tools */}
           <button
-            onClick={handleLock}
-            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-mono font-bold text-slate-200 hover:text-white flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
-            title="Switch admin session (Sign out & enter new passkey)"
+            type="button"
+            onClick={() => setIsBotCardOpen(true)}
+            className={`h-9 px-3.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border ${
+              botsEnabled
+                ? "bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border-cyan-500/40"
+                : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10"
+            }`}
+            title="Manage the test bot fleet"
           >
-            <Key className="w-3.5 h-3.5 text-amber-400" />
-            <span>Switch Admin ⇄</span>
+            <Bot className="w-3.5 h-3.5" />
+            <span>Test Bots: <strong className={botsEnabled ? "text-cyan-300" : "text-slate-400"}>{botsEnabled ? "ON" : "OFF"}</strong></span>
+          </button>
+
+          <button
+            onClick={() => downloadTelemetryExport("csv")}
+            className="h-9 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Download CSV for Excel / Sheets"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>CSV</span>
+          </button>
+
+          <button
+            onClick={handleExportJSON}
+            className="h-9 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Download full JSON event dump"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>JSON</span>
+          </button>
+
+          <button
+            onClick={loadData}
+            className="h-9 w-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+            title="Refresh data"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={handleClearTelemetry}
+            className="h-9 w-9 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 flex items-center justify-center transition-colors"
+            title="Clear local event buffer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+
+          <span className="hidden md:block w-px h-6 bg-white/10 mx-0.5" />
+
+          {/* Session */}
+          <button
+            onClick={handleOpenPasskeysModal}
+            className="h-9 px-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            title="Configure Master Owner & Admin Passkeys"
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Passkeys</span>
           </button>
 
           <button
             onClick={handleLock}
-            className="px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-400 hover:text-white"
+            className="h-9 px-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 hover:text-white flex items-center gap-1.5 transition-colors"
+            title="Sign out & switch admin"
           >
-            Lock
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Switch Admin</span>
           </button>
         </div>
       </div>
