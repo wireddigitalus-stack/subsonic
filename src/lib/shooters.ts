@@ -59,16 +59,6 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
       "Hoz & Shield",
       "Arrow Products USA",
     ],
-    rifleSetup: {
-      action: "Zermatt RimX Precision Action",
-      barrel: "Bartlein MTU Match Fluted 22\" (1:16 Twist)",
-      trigger: "TriggerTech Diamond Pro Curved (4 oz)",
-      chassis: "MasterPiece Arms (MPA) BA PMR Pro Chassis",
-      optic: "Vortex Razor HD Gen III 6-36x56 EBR-7D",
-      mount: "Spuhr QDP 34mm Unimount with Integrated Level",
-      tuner: "EC Tuner Harmonic Brake",
-      ammoLot: "Lapua Midas+ Hand-Sorted Lot (1,060 FPS)",
-    },
     interview: [
       {
         question: "What is your mental preparation before a national championship stage?",
@@ -127,16 +117,6 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
       "Lapua Rimfire",
       "Subsonic Society",
     ],
-    rifleSetup: {
-      action: "Zermatt RimX Precision Rimfire Action",
-      barrel: "Bartlein MTU Match Fluted 22\" (1:16 Twist)",
-      trigger: "TriggerTech Diamond Pro Curved (4.5 oz)",
-      chassis: "MasterPiece Arms (MPA) Matrix Pro Competition Chassis",
-      optic: "Vortex Razor HD Gen III 6-36x56 EBR-7D",
-      mount: "Spuhr ISMS 34mm Mount with Integrated Level",
-      tuner: "EC Tuner Harmonic Brake",
-      ammoLot: "Lapua Center-X / Midas+ Hand-Sorted Lot (1,063 FPS)",
-    },
     interview: [
       {
         question: "What separates a PRS National Championship run from an ordinary match weekend?",

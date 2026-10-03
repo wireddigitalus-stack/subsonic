@@ -157,7 +157,7 @@ export interface AthleteProfile {
   division: string;
   ranking: string;
   homeRange: string;
-  rifleSetup: {
+  rifleSetup?: {
     action: string;
     barrel: string;
     chassis: string;
@@ -264,15 +264,15 @@ export interface ShooterProfile {
     top10?: number;
     nationalPlacements?: string[];
   };
-  rifleSetup: {
+  rifleSetup?: {
     action: string;
-    barrel: string;
-    trigger: string;
-    chassis: string;
-    optic: string;
-    mount: string;
+    barrel?: string;
+    trigger?: string;
+    chassis?: string;
+    optic?: string;
+    mount?: string;
     tuner?: string;
-    ammoLot: string;
+    ammoLot?: string;
   };
   pin?: string; // 6-digit personal login PIN for chat access
   interview?: {

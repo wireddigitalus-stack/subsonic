@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const pageTitle = `${shooter.name} (${shooter.callsign}) — Pro Marksman Profile | Subsonic Society`;
-  const pageDesc = `${shooter.name} [${shooter.callsign}] is a ${shooter.division} competitor with ${shooter.podiums} career podiums. Rifle rig: ${shooter.rifleSetup.action}, ${shooter.rifleSetup.optic}, ${shooter.rifleSetup.chassis}. Home range: ${shooter.homeRange}.`;
+  const pageDesc = `${shooter.name} [${shooter.callsign}] is a ${shooter.division} competitor with ${shooter.podiums} career podiums.${shooter.rifleSetup ? ` Rifle rig: ${shooter.rifleSetup.action}, ${shooter.rifleSetup.optic || ''}, ${shooter.rifleSetup.chassis || ''}.` : ''} Home range: ${shooter.homeRange}.`;
   const canonicalUrl = `https://subsonic-omega.vercel.app/shooters/${shooter.id}`;
 
   return {
@@ -51,8 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       "Subsonic Society",
       "Precision Rimfire",
       "PRS Rimfire",
-      shooter.rifleSetup.action,
-      shooter.rifleSetup.optic,
+      ...(shooter.rifleSetup ? [shooter.rifleSetup.action, shooter.rifleSetup.optic || ''] : []),
       shooter.homeRange,
       "The Hideout Bristol TN",
       ...(shooter.accolades || []),

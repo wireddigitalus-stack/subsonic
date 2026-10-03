@@ -151,6 +151,7 @@ export function MediaSpotlight() {
                   <span>Competition Match Rifle Specs</span>
                 </div>
 
+                {selectedAthlete.rifleSetup && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
                     { label: "PRECISION ACTION", value: selectedAthlete.rifleSetup.action },
@@ -159,7 +160,7 @@ export function MediaSpotlight() {
                     { label: "COMPETITION OPTIC", value: selectedAthlete.rifleSetup.optic },
                     { label: "MATCH AMMO", value: selectedAthlete.rifleSetup.ammo },
                     { label: "MUZZLE VELOCITY", value: "1055 FPS (Subsonic 0.94 Mach)" },
-                  ].map((spec) => (
+                  ].filter((spec) => spec.value).map((spec) => (
                     <div
                       key={spec.label}
                       className="p-3 rounded-xl bg-black/40 border border-white/5"
@@ -173,6 +174,7 @@ export function MediaSpotlight() {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             </div>
 
