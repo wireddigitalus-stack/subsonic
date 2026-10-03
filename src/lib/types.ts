@@ -201,7 +201,7 @@ export interface SocietyMember {
   status?: "ACTIVE" | "PROVISIONAL" | "HONORARY" | "PAUSED" | "BANNED";
   role?: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN" | "MODERATOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "PRO_COMPETITOR" | "MEMBER";
   notes?: string;
-  pin?: string; // 6-digit personal login PIN for chat access
+  pin?: string; // Personal login PIN for chat access (members: 4 digits, admins: 4–6)
 }
 
 export interface MatchRegistration {
@@ -274,7 +274,7 @@ export interface ShooterProfile {
     tuner?: string;
     ammoLot?: string;
   };
-  pin?: string; // 6-digit personal login PIN for chat access
+  pin?: string; // Personal login PIN for chat access (members: 4 digits, admins: 4–6)
   interview?: {
     question: string;
     answer: string;

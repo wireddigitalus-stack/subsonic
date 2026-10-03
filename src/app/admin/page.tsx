@@ -95,6 +95,7 @@ import { AdminShootersTab } from "@/components/admin/AdminShootersTab";
 import { MemberCredentialCard } from "@/components/member/MemberCredentialCard";
 import { AdminInviteGeneratorTab } from "@/components/admin/AdminInviteGeneratorTab";
 import { CallsignInput } from "@/components/common/CallsignInput";
+import { isAdminRole, pinMaxLength, generatePin } from "@/lib/pin-policy";
 import { setCommsAlertLevel, clearCommsAlert, getCommsStatus, CommsAlertLevel } from "@/lib/comms-status";
 
 const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
@@ -3435,16 +3436,23 @@ export default function AdminDashboardPage() {
                     <div className="sm:col-span-2">
                       <input
                         type="text"
+                        inputMode="numeric"
+                        maxLength={pinMaxLength(memberForm.role)}
                         value={memberForm.pin || ""}
-                        onChange={(e) => setMemberForm((prev) => ({ ...prev, pin: e.target.value }))}
-                        placeholder="Set 4-6 digit numeric or secret PIN..."
+                        onChange={(e) =>
+                          setMemberForm((prev) => ({
+                            ...prev,
+                            pin: e.target.value.replace(/[^0-9]/g, "").slice(0, pinMaxLength(prev.role)),
+                          }))
+                        }
+                        placeholder={isAdminRole(memberForm.role) ? "Set 4–6 digit admin PIN..." : "Set 4-digit member PIN..."}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-sm focus:outline-none focus:border-amber-400"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => {
-                        const randomPin = String(Math.floor(100000 + Math.random() * 900000));
+                        const randomPin = generatePin(memberForm.role);
                         setMemberForm((prev) => ({ ...prev, pin: randomPin }));
                       }}
                       className="px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5"

@@ -8,6 +8,7 @@ import {
 } from "@/lib/shooters";
 import { checkCallsignAvailability } from "@/lib/callsigns";
 import { hashPin, isHashedPin } from "@/lib/pin-hash";
+import { validatePin } from "@/lib/pin-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,15 @@ export async function POST(req: NextRequest) {
     const existingShooter = getShootersFromStorage().find(
       (s) => s.id.toLowerCase() === (body.id || "").toLowerCase()
     );
+
+    // PIN policy: new competitor profiles must use exactly 4 digits.
+    // (Already-hashed PINs and edits to existing profiles are left untouched.)
+    if (!existingShooter && body.pin && !isHashedPin(String(body.pin).trim())) {
+      const pinError = validatePin(String(body.pin), "MEMBER");
+      if (pinError) {
+        return NextResponse.json({ error: pinError, code: "INVALID_PIN" }, { status: 400 });
+      }
+    }
 
     // Enforce uniqueness and provide suggestions if taken
     const callsignCheck = checkCallsignAvailability(candidateCallsign, {

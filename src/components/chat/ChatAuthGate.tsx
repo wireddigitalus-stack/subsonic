@@ -91,14 +91,14 @@ export function ChatAuthGate({
 
           <div className="space-y-1">
             <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
-              <span>Member Key or Security PIN</span>
-              <span className="text-[10px] text-amber-400/90 font-normal normal-case">PIN 620620 for SAID DONE • 2468 for RADAR</span>
+              <span>Login PIN</span>
+              <span className="text-[10px] text-slate-500 font-normal normal-case">The 4-digit PIN you chose at registration</span>
             </label>
             <input
               type="password"
               value={loginPasscode}
               onChange={(e) => setLoginPasscode(e.target.value)}
-              placeholder="Enter PIN (e.g. 620620 or 2468)..."
+              placeholder="Enter your PIN..."
               autoComplete="current-password"
               className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:outline-none focus:border-amber-400 transition-colors"
             />

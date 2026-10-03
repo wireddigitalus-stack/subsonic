@@ -232,8 +232,8 @@ function ProInviteContent() {
       return;
     }
 
-    if (pin.trim().length < 4) {
-      setFormError("Please create a 4 to 6-digit login PIN code for chat access.");
+    if (!/^\d{4}$/.test(pin.trim())) {
+      setFormError("Please create a 4-digit login PIN code for chat access.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -621,30 +621,32 @@ function ProInviteContent() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-emerald-400 uppercase flex items-center justify-between">
-                <span>Personal 4–6 Digit Login PIN *</span>
+                <span>4-Digit Login PIN *</span>
                 <span className="text-[10px] text-slate-400 font-normal">For logging into chat</span>
               </label>
               <input
                 type="password"
                 required
-                maxLength={6}
+                inputMode="numeric"
+                maxLength={4}
                 value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, ""))}
-                placeholder="e.g. 749201"
+                onChange={(e) => setPin(e.target.value.replace(/[^0-9]/g, "").slice(0, 4))}
+                placeholder="e.g. 7492"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-emerald-500/40 text-emerald-300 font-mono tracking-widest text-xs sm:text-sm text-center focus:border-emerald-400 focus:outline-none"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-emerald-400 uppercase">
-                Confirm Login PIN *
+                Confirm 4-Digit PIN *
               </label>
               <input
                 type="password"
                 required
-                maxLength={6}
+                inputMode="numeric"
+                maxLength={4}
                 value={pinConfirm}
-                onChange={(e) => setPinConfirm(e.target.value.replace(/[^0-9]/g, ""))}
+                onChange={(e) => setPinConfirm(e.target.value.replace(/[^0-9]/g, "").slice(0, 4))}
                 placeholder="Re-enter PIN"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-emerald-500/40 text-emerald-300 font-mono tracking-widest text-xs sm:text-sm text-center focus:border-emerald-400 focus:outline-none"
               />

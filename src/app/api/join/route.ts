@@ -9,6 +9,7 @@ import {
 } from "@/lib/members";
 import { getShootersFromStorage, saveShooterToStorage } from "@/lib/shooters";
 import { checkCallsignAvailability } from "@/lib/callsigns";
+import { validatePin } from "@/lib/pin-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -209,6 +210,15 @@ export async function PATCH(req: NextRequest) {
           },
           { status: 409 }
         );
+      }
+    }
+
+    // PIN policy: members exactly 4 digits, admins (Rob / Allen) 4–6 digits.
+    if (pin && String(pin).trim() !== String(currentMembers[index].pin ?? "").trim()) {
+      const targetRole = role !== undefined ? role : currentMembers[index].role;
+      const pinError = validatePin(String(pin), targetRole);
+      if (pinError) {
+        return NextResponse.json({ error: pinError, code: "INVALID_PIN" }, { status: 400 });
       }
     }
 

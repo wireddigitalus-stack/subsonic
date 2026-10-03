@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Claim Invitation & Profile Setup | Subsonic Society",
   description:
-    "Membership by invitation only. Enter your serialized invitation key to claim your tactical callsign, set your 6-digit access PIN, and activate your verified marksman profile and Chat Room access.",
+    "Membership by invitation only. Enter your serialized invitation key to claim your tactical callsign, set your 4-digit access PIN, and activate your verified marksman profile and Chat Room access.",
   keywords: [
     "Subsonic Society Invitation",
     "Invitation Code Redeem",

@@ -97,7 +97,7 @@ export default function JoinSocietyGatePage() {
                 Enter Your Invite Code
               </h2>
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Received an invitation code via SMS or email? Enter it here to claim your unique tactical callsign and 6-digit access PIN.
+                Received an invitation code via SMS or email? Enter it here to claim your unique tactical callsign and 4-digit access PIN.
               </p>
             </div>
 
@@ -172,7 +172,7 @@ export default function JoinSocietyGatePage() {
                 Log In With Credentials
               </h2>
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Already claimed your tactical callsign and 6-digit access PIN? Sign directly into the Subsonic Chat Room.
+                Already claimed your tactical callsign and 4-digit access PIN? Sign directly into the Subsonic Chat Room.
               </p>
             </div>
 

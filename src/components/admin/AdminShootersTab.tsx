@@ -448,7 +448,7 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                     type="text"
                     value={editForm.pin || ""}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, pin: e.target.value }))}
-                    placeholder="4 to 6-digit numeric PIN"
+                    placeholder="4-digit numeric PIN"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-amber-400"
                   />
                 </div>

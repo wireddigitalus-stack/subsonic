@@ -33,7 +33,31 @@ export async function POST(req: NextRequest) {
     for (const key of execKeys) {
       if (cleanCallsign === key || (key.length >= 4 && cleanCallsign.includes(key))) {
         const exec = execOverrides[key];
-        if (cleanPin === exec.pin || cleanPin.toLowerCase() === 'subsonic2026') {
+
+        // If the admin has reset their PIN in the dashboard (4–6 digits), that saved
+        // PIN replaces the built-in default. Otherwise the default PIN applies.
+        const execRecord = getMembersFromStorage().find((m) => m.member_id === exec.memberId);
+        const savedPin = execRecord?.pin ? String(execRecord.pin).trim() : "";
+        let execPinValid = false;
+        if (savedPin) {
+          execPinValid = isHashedPin(savedPin) ? await verifyPin(cleanPin, savedPin) : cleanPin === savedPin;
+        } else {
+          execPinValid = cleanPin === exec.pin;
+        }
+
+        if (!execPinValid) {
+          // Exact executive callsign: never fall through to member/beta fallbacks.
+          if (cleanCallsign === key) {
+            return NextResponse.json(
+              { error: 'Invalid Callsign or PIN.' },
+              { status: 401 }
+            );
+          }
+          // Partial match (e.g. a member callsign containing "ALLEN"): keep checking normally.
+          continue;
+        }
+
+        {
           const finalCallsign = (key === 'ROB' || key === 'LTDAN' || key === 'RADAR')
             ? 'RADAR'
             : ['SAID DONE', 'SAIDDONE', 'ALLEN', 'AHURLEY', 'HURLEY'].includes(key)
@@ -108,8 +132,8 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // General beta fallback PINs
-    if (!pinValid && ['subsonic2026', '2468', '620620'].includes(cleanPin.toLowerCase())) {
+    // General beta fallback PIN (admin PINs are intentionally NOT accepted here)
+    if (!pinValid && cleanPin.toLowerCase() === 'subsonic2026') {
       pinValid = true;
     }
     
