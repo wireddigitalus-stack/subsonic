@@ -255,7 +255,8 @@ export default function AdminDashboardPage() {
 
   const [memberSearch, setMemberSearch] = useState("");
   const [memberStateFilter, setMemberStateFilter] = useState("ALL");
-  const [memberRoleFilter, setMemberRoleFilter] = useState<"ALL" | "STAFF" | "COMPETITORS">("ALL");
+  const [memberRoleFilter, setMemberRoleFilter] = useState<"ALL" | "ADMINS" | "MEMBERS">("ALL");
+  const [memberStatusFilter, setMemberStatusFilter] = useState<"ALL" | "ACTIVE" | "PAUSED" | "BANNED">("ALL");
   const [appointMemberId, setAppointMemberId] = useState("");
   const [appointRole, setAppointRole] = useState<SocietyMember["role"]>("MODERATOR");
   const [isAppointing, setIsAppointing] = useState(false);
@@ -279,6 +280,21 @@ export default function AdminDashboardPage() {
     role?: SocietyMember["role"];
     notes: string;
     pin?: string;
+    // Shooter Blueprint specs
+    shooterId?: string;
+    division?: string;
+    ranking?: string;
+    podiums?: number;
+    homeRange?: string;
+    action?: string;
+    barrel?: string;
+    trigger?: string;
+    chassis?: string;
+    optic?: string;
+    ammoLot?: string;
+    quote?: string;
+    accolades?: string[];
+    sponsors?: string[];
   }>({
     member_id: "",
     full_name: "",
@@ -290,8 +306,21 @@ export default function AdminDashboardPage() {
     status: "ACTIVE",
     notes: "",
     pin: "",
+    division: "Open Division",
+    ranking: "Pro Competitor",
+    podiums: 0,
+    homeRange: "The Hideout, Bristol TN",
+    action: "",
+    barrel: "",
+    trigger: "",
+    chassis: "",
+    optic: "",
+    ammoLot: "",
+    quote: "",
+    accolades: [],
+    sponsors: [],
   });
-  const [memberModalTab, setMemberModalTab] = useState<"DETAILS" | "PASS">("DETAILS");
+  const [memberModalTab, setMemberModalTab] = useState<"DETAILS" | "BLUEPRINT" | "PASS">("DETAILS");
   const [isSavingMember, setIsSavingMember] = useState(false);
   const [memberActionNotice, setMemberActionNotice] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -786,6 +815,13 @@ export default function AdminDashboardPage() {
 
   const handleOpenMemberModal = (member: SocietyMember) => {
     setSelectedMember(member);
+    const shooter = shooterProfiles.find(
+      (s) =>
+        s.callsign?.toUpperCase() === member.callsign?.toUpperCase() ||
+        s.id?.toLowerCase() === member.member_id?.toLowerCase() ||
+        s.name?.toLowerCase() === member.full_name?.toLowerCase()
+    );
+
     setMemberForm({
       member_id: member.member_id,
       full_name: member.full_name,
@@ -793,11 +829,26 @@ export default function AdminDashboardPage() {
       email: member.email,
       state: member.state,
       experience_level: member.experience_level,
-      rifle_setup: member.rifle_setup || "",
+      rifle_setup: member.rifle_setup || (shooter?.rifleSetup?.action ? `${shooter.rifleSetup.action}${shooter.rifleSetup.optic ? ` / ${shooter.rifleSetup.optic}` : ""}` : ""),
       status: member.status || "ACTIVE",
       role: member.role,
       notes: member.notes || "",
-      pin: member.pin || "",
+      pin: member.pin || shooter?.pin || "",
+      // Shooter blueprint specs
+      shooterId: shooter?.id,
+      division: shooter?.division || member.experience_level || "Open Division",
+      ranking: shooter?.ranking || (member.role === "PRO_COMPETITOR" ? "Pro Competitor" : "Society Marksman"),
+      podiums: shooter?.podiums ?? 0,
+      homeRange: shooter?.homeRange || "The Hideout, Bristol TN",
+      action: shooter?.rifleSetup?.action || "",
+      barrel: shooter?.rifleSetup?.barrel || "",
+      trigger: shooter?.rifleSetup?.trigger || "",
+      chassis: shooter?.rifleSetup?.chassis || "",
+      optic: shooter?.rifleSetup?.optic || "",
+      ammoLot: shooter?.rifleSetup?.ammoLot || "",
+      quote: shooter?.quote || "",
+      accolades: shooter?.accolades || [],
+      sponsors: shooter?.sponsors || [],
     });
     setMemberModalTab("DETAILS");
     setShowDeleteConfirm(false);
@@ -824,6 +875,58 @@ export default function AdminDashboardPage() {
           prev.map((m) => (m.member_id === memberForm.member_id ? data.member : m))
         );
         setSelectedMember(data.member);
+
+        // Also sync shooter profile if one exists or if blueprint specs were updated
+        const matchingShooter = shooterProfiles.find(
+          (s) =>
+            s.callsign?.toUpperCase() === memberForm.callsign.toUpperCase() ||
+            s.id?.toLowerCase() === memberForm.member_id.toLowerCase() ||
+            s.name?.toLowerCase() === memberForm.full_name.toLowerCase()
+        );
+
+        if (matchingShooter || memberForm.action || memberForm.optic || memberForm.shooterId || memberForm.role === "PRO_COMPETITOR") {
+          try {
+            const shooterPayload = {
+              id: memberForm.shooterId || matchingShooter?.id || memberForm.callsign.toLowerCase().replace(/[^a-z0-9]/g, "_"),
+              name: memberForm.full_name,
+              callsign: memberForm.callsign,
+              division: memberForm.division || memberForm.experience_level || "Open Division",
+              ranking: memberForm.ranking || "Pro Competitor",
+              podiums: Number(memberForm.podiums) || 0,
+              homeRange: memberForm.homeRange || "The Hideout, Bristol TN",
+              pin: memberForm.pin,
+              rifleSetup: {
+                action: memberForm.action || "",
+                barrel: memberForm.barrel || "",
+                trigger: memberForm.trigger || "",
+                chassis: memberForm.chassis || "",
+                optic: memberForm.optic || "",
+                ammoLot: memberForm.ammoLot || "",
+              },
+              quote: memberForm.quote || "",
+              accolades: memberForm.accolades || matchingShooter?.accolades || [],
+              sponsors: memberForm.sponsors || matchingShooter?.sponsors || [],
+              status: memberForm.status === "ACTIVE" ? "PUBLISHED" : "INACTIVE",
+            };
+
+            const sRes = await fetch("/api/shooters", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(shooterPayload),
+            });
+            const sData = await sRes.json();
+            if (sRes.ok && sData.shooter) {
+              setShooterProfiles((prev) => {
+                const exists = prev.some((s) => s.id === sData.shooter.id);
+                if (exists) return prev.map((s) => s.id === sData.shooter.id ? sData.shooter : s);
+                return [sData.shooter, ...prev];
+              });
+            }
+          } catch (sErr) {
+            console.warn("Shooter sync warning:", sErr);
+          }
+        }
+
         setMemberActionNotice(`Member ${memberForm.member_id} updated successfully.`);
       } else {
         setMemberActionNotice(data.error || "Failed to update member.");
@@ -847,11 +950,22 @@ export default function AdminDashboardPage() {
       `Home State: ${memberForm.state || selectedMember.state || "N/A"}`,
       `Role: ${memberForm.role || selectedMember.role || "MEMBER"}`,
       `Account Status: ${memberForm.status || selectedMember.status || "ACTIVE"}`,
-      `Classification / Division: ${memberForm.experience_level || selectedMember.experience_level || "N/A"}`,
-      `Primary Rifle & Optic: ${memberForm.rifle_setup || selectedMember.rifle_setup || "N/A"}`,
+      `Classification / Division: ${memberForm.division || memberForm.experience_level || selectedMember.experience_level || "N/A"}`,
+      `Primary Rifle Rig: ${memberForm.rifle_setup || selectedMember.rifle_setup || "N/A"}`,
+      memberForm.action ? `Rifle Action: ${memberForm.action}` : null,
+      memberForm.barrel ? `Barrel: ${memberForm.barrel}` : null,
+      memberForm.trigger ? `Trigger: ${memberForm.trigger}` : null,
+      memberForm.chassis ? `Chassis: ${memberForm.chassis}` : null,
+      memberForm.optic ? `Optic: ${memberForm.optic}` : null,
+      memberForm.ammoLot ? `Ammo Lot: ${memberForm.ammoLot}` : null,
+      memberForm.podiums !== undefined ? `Career Podiums: ${memberForm.podiums}` : null,
+      memberForm.homeRange ? `Home Range: ${memberForm.homeRange}` : null,
+      memberForm.accolades && memberForm.accolades.length > 0 ? `Accolades: ${memberForm.accolades.join(", ")}` : null,
+      memberForm.sponsors && memberForm.sponsors.length > 0 ? `Sponsors: ${memberForm.sponsors.join(", ")}` : null,
       `Login PIN: ${memberForm.pin || selectedMember.pin || "N/A"}`,
       `Registered: ${selectedMember.created_at || "N/A"}`,
       memberForm.notes ? `Staff Notes: ${memberForm.notes}` : (selectedMember.notes ? `Staff Notes: ${selectedMember.notes}` : null),
+      `Live Profile URL: https://subsonicsociety.com/shooters?id=${memberForm.shooterId || memberForm.member_id}`,
       `Portal Link: https://subsonicsociety.com/chat`,
       `========================================`
     ].filter(Boolean).join("\n");
@@ -1378,9 +1492,37 @@ export default function AdminDashboardPage() {
     );
   });
 
+  const isStaffMember = (m: SocietyMember) => {
+    return (
+      ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR", "MATCH_DIRECTOR", "OFFICIAL"].includes(m.role || "") ||
+      m.member_id === "SS-2026-0001" ||
+      m.member_id === "SS-2026-0002"
+    );
+  };
+
   const filteredMembers = members.filter((m) => {
+    // 1. Role filter: ALL, ADMINS, MEMBERS
+    if (memberRoleFilter === "ADMINS" && !isStaffMember(m)) return false;
+    if (memberRoleFilter === "MEMBERS" && isStaffMember(m)) return false;
+
+    // 2. Status filter: ALL, ACTIVE, PAUSED, BANNED
+    if (memberStatusFilter !== "ALL") {
+      const status = m.status || "ACTIVE";
+      if (status !== memberStatusFilter) return false;
+    }
+
+    // 3. Search query
     const q = memberSearch.trim().toLowerCase();
     if (!q) return true;
+
+    // Also look up shooter profile specs for deep search
+    const shooter = shooterProfiles.find(
+      (s) =>
+        s.callsign?.toLowerCase() === m.callsign?.toLowerCase() ||
+        s.id?.toLowerCase() === m.member_id?.toLowerCase() ||
+        s.name?.toLowerCase() === m.full_name?.toLowerCase()
+    );
+
     return (
       m.full_name.toLowerCase().includes(q) ||
       (m.callsign && m.callsign.toLowerCase().includes(q)) ||
@@ -1389,6 +1531,11 @@ export default function AdminDashboardPage() {
       m.member_id.toLowerCase().includes(q) ||
       (m.rifle_setup && m.rifle_setup.toLowerCase().includes(q)) ||
       (m.notes && m.notes.toLowerCase().includes(q)) ||
+      (shooter?.division && shooter.division.toLowerCase().includes(q)) ||
+      (shooter?.ranking && shooter.ranking.toLowerCase().includes(q)) ||
+      (shooter?.homeRange && shooter.homeRange.toLowerCase().includes(q)) ||
+      (shooter?.rifleSetup?.action && shooter.rifleSetup.action.toLowerCase().includes(q)) ||
+      (shooter?.rifleSetup?.optic && shooter.rifleSetup.optic.toLowerCase().includes(q)) ||
       ((q === "radar" || q === "ltdan" || q === "dan" || q === "rob" || q === "robert" || q.includes("smart") || q.includes("systems")) && m.member_id === "SS-2026-0001")
     );
   });
@@ -1683,24 +1830,23 @@ export default function AdminDashboardPage() {
       <div className="sticky top-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2.5 bg-[#07090E]/95 backdrop-blur-xl border-b border-white/10 shadow-2xl">
         {/* DESKTOP (md & up): 3 Stacked Command Sectors — 100% visible, zero horizontal overflow */}
         <div className="hidden md:grid md:grid-cols-3 gap-2.5">
-          {/* Sector 1: OPERATIVES & SQUAD */}
+          {/* Sector 1: OPERATIVES & ROSTER */}
           <div className={`p-2.5 rounded-2xl border transition-all ${
-            ["MEMBERS", "INVITES", "SHOOTERS", "REGISTRATIONS"].includes(activeAdminTab)
+            ["MEMBERS", "INVITES", "REGISTRATIONS"].includes(activeAdminTab)
               ? "bg-amber-500/[0.04] border-amber-500/35 shadow-[0_0_15px_rgba(245,158,11,0.06)]"
               : "bg-white/[0.02] border-white/10"
           }`}>
             <div className="flex items-center justify-between mb-1.5 px-1">
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <span>OPERATIVES &amp; SQUAD</span>
+                <span>OPERATIVES &amp; ROSTER</span>
               </span>
-              <span className="text-[9px] font-mono text-slate-500">4 MODULES</span>
+              <span className="text-[9px] font-mono text-slate-500">3 MODULES</span>
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               {[
-                { id: "MEMBERS", label: "Invited Shooters", icon: UserCheck, badge: `${members.length}` },
+                { id: "MEMBERS", label: "Members & Shooters", icon: Users, badge: `${members.length}`, colSpan2: true },
                 { id: "INVITES", label: "Invite Keys & VIP", icon: Key, badge: "INVITE ONLY", highlight: true },
-                { id: "SHOOTERS", label: "Shooter Profiles", icon: Users, badge: `${shooterProfiles.length}` },
                 { id: "REGISTRATIONS", label: "Registrations", icon: Trophy, badge: `${registrations.length}` },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -1710,6 +1856,8 @@ export default function AdminDashboardPage() {
                     key={tab.id}
                     onClick={() => setActiveAdminTab(tab.id as any)}
                     className={`px-2.5 py-2 rounded-xl text-xs font-semibold flex items-center justify-between gap-1.5 transition-all text-left ${
+                      (tab as any).colSpan2 ? "col-span-2" : ""
+                    } ${
                       isActive
                         ? "bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-tactical-glow"
                         : tab.highlight
@@ -1867,9 +2015,9 @@ export default function AdminDashboardPage() {
         <div className="md:hidden overflow-x-auto no-scrollbar">
           <div className="flex gap-1.5 min-w-max pb-1">
             {[
-              { id: "MEMBERS", label: "Shooters", icon: UserCheck, badge: `${members.length}` },
+              { id: "MEMBERS", label: "Members", icon: Users, badge: `${members.length}` },
               { id: "INVITES", label: "Invites & VIP", icon: Key, badge: "INVITE ONLY" },
-              { id: "REGISTRATIONS", label: "Shooters", icon: Trophy, badge: `${registrations.length}` },
+              { id: "REGISTRATIONS", label: "Registrations", icon: Trophy, badge: `${registrations.length}` },
               { 
                 id: "LEADS", 
                 label: "Leads", 
@@ -1877,7 +2025,6 @@ export default function AdminDashboardPage() {
                 badge: leads.filter((l) => l.status === "NEW").length > 0 ? `${leads.filter((l) => l.status === "NEW").length} NEW` : undefined,
                 isAlert: leads.filter((l) => l.status === "NEW").length > 0
               },
-              { id: "SHOOTERS", label: "Profiles", icon: Users, badge: `${shooterProfiles.length}` },
               { id: "DOCUMENTS", label: "Vault", icon: FileText, badge: `${competitionDocs.length}` },
               { id: "CHAT", label: "Chat", icon: MessageSquare },
               { id: "EVENTS", label: "Matches", icon: Calendar },
@@ -1928,18 +2075,21 @@ export default function AdminDashboardPage() {
         <AdminInviteGeneratorTab />
       )}
 
-      {/* TAB: ALL SOCIETY MEMBERS DIRECTORY */}
-      {activeAdminTab === "MEMBERS" && (
+      {/* TAB: ALL SOCIETY MEMBERS & SHOOTERS DIRECTORY */}
+      {(activeAdminTab === "MEMBERS" || activeAdminTab === "SHOOTERS") && (
         <AdminMembersTab
           members={members}
           filteredMembers={filteredMembers}
           staffMembers={staffMembers}
+          shooterProfiles={shooterProfiles}
           memberSearch={memberSearch}
           setMemberSearch={setMemberSearch}
           memberStateFilter={memberStateFilter}
           setMemberStateFilter={setMemberStateFilter}
           memberRoleFilter={memberRoleFilter}
           setMemberRoleFilter={setMemberRoleFilter}
+          memberStatusFilter={memberStatusFilter}
+          setMemberStatusFilter={setMemberStatusFilter}
           appointMemberId={appointMemberId}
           setAppointMemberId={setAppointMemberId}
           appointRole={appointRole}
@@ -2643,16 +2793,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* TAB: SHOOTER PROFILES (AUTO-INTAKE & ROSTER) */}
-      {activeAdminTab === "SHOOTERS" && (
-        <AdminShootersTab
-          shooterProfiles={shooterProfiles}
-          shooterSearch={shooterSearch}
-          setShooterSearch={setShooterSearch}
-          handleDeleteShooter={handleDeleteShooter}
-          onShooterUpdated={(updated) => setShooterProfiles((prev) => prev.map((s) => s.id === updated.id ? updated : s))}
-        />
-      )}
 
       {/* TAB: COMPETITION VAULT & DOCUMENTS */}
       {activeAdminTab === "DOCUMENTS" && (
@@ -2995,7 +3135,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Modal Tabs: Edit Details vs Digital Pass Preview */}
+            {/* Modal Tabs: Edit Details vs Shooter Blueprint vs Digital Pass Preview */}
             <div className="flex items-center gap-2 border-b border-white/10 pb-2">
               <button
                 type="button"
@@ -3007,7 +3147,20 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit Profile &amp; Access Controls</span>
+                <span>Account &amp; Access</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMemberModalTab("BLUEPRINT")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-all ${
+                  memberModalTab === "BLUEPRINT"
+                    ? "bg-cyan-500 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                    : "bg-white/5 text-slate-400 hover:text-white"
+                }`}
+              >
+                <Crosshair className="w-3.5 h-3.5" />
+                <span>Rifle Blueprint &amp; Specs</span>
               </button>
 
               <button
@@ -3020,7 +3173,7 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 <QrCode className="w-3.5 h-3.5" />
-                <span>Live Digital Pass (QR / Barcode)</span>
+                <span>Live Digital Pass</span>
               </button>
             </div>
 
@@ -3343,6 +3496,186 @@ export default function AdminDashboardPage() {
                       </button>
                     </div>
                   )}
+                </div>
+              </form>
+            ) : memberModalTab === "BLUEPRINT" ? (
+              /* Tab 2: Shooter Blueprint & Rig Specs */
+              <form onSubmit={handleSaveMember} className="space-y-4 pt-1">
+                {/* Blueprint Header Notice */}
+                <div className="p-3.5 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 flex items-center justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-mono font-bold text-cyan-300 flex items-center gap-1.5">
+                      <Target className="w-4 h-4 text-cyan-400" />
+                      <span>Rifle Rig Blueprint &amp; Competition DNA</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300">
+                      Syncs automatically to public shooter profiles and match DOPE telemetry.
+                    </p>
+                  </div>
+                  {memberForm.shooterId && (
+                    <Link
+                      href={`/shooters?id=${memberForm.shooterId}`}
+                      target="_blank"
+                      className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-slate-300 text-[10px] font-mono flex items-center gap-1 shrink-0"
+                    >
+                      <ExternalLink className="w-3 h-3 text-cyan-400" />
+                      <span>Public Card</span>
+                    </Link>
+                  )}
+                </div>
+
+                {/* Division, Ranking, Podiums, Home Range */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Shooting Division
+                    </label>
+                    <input
+                      type="text"
+                      value={memberForm.division || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, division: e.target.value }))}
+                      placeholder="e.g. Open Division / Production"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Tier / Ranking
+                    </label>
+                    <input
+                      type="text"
+                      value={memberForm.ranking || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, ranking: e.target.value }))}
+                      placeholder="e.g. Master Marksman / Pro Competitor"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Career Podiums Count
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={memberForm.podiums ?? 0}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, podiums: parseInt(e.target.value) || 0 }))}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs font-mono focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-mono text-slate-300 uppercase">
+                      Home Range / Club
+                    </label>
+                    <input
+                      type="text"
+                      value={memberForm.homeRange || ""}
+                      onChange={(e) => setMemberForm((prev) => ({ ...prev, homeRange: e.target.value }))}
+                      placeholder="e.g. The Hideout, Bristol TN"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Rifle Blueprint Hardware Components */}
+                <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                  <span className="text-[11px] font-mono text-amber-400 font-bold uppercase tracking-wider block">
+                    Precision Rifle Specs
+                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Action</label>
+                      <input
+                        type="text"
+                        value={memberForm.action || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, action: e.target.value }))}
+                        placeholder="e.g. Vudoo V-22 / RimX"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Optic</label>
+                      <input
+                        type="text"
+                        value={memberForm.optic || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, optic: e.target.value }))}
+                        placeholder="e.g. ZCO 527 5-27x56 MPCT2"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Barrel</label>
+                      <input
+                        type="text"
+                        value={memberForm.barrel || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, barrel: e.target.value }))}
+                        placeholder='e.g. 20" Bartlein Heavy Varmint'
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Trigger</label>
+                      <input
+                        type="text"
+                        value={memberForm.trigger || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, trigger: e.target.value }))}
+                        placeholder="e.g. Bix'n Andy TacSport PRO (8 oz)"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Chassis / Stock</label>
+                      <input
+                        type="text"
+                        value={memberForm.chassis || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, chassis: e.target.value }))}
+                        placeholder="e.g. MDT ACC Elite"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase">Ammo Lot</label>
+                      <input
+                        type="text"
+                        value={memberForm.ammoLot || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, ammoLot: e.target.value }))}
+                        placeholder="e.g. Lapua Center-X Lot 39281"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Save & Actions */}
+                <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      type="submit"
+                      disabled={isSavingMember}
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>{isSavingMember ? "Saving Specs..." : "Save Blueprint & Profile"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsMemberModalOpen(false)}
+                      className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </form>
             ) : (
