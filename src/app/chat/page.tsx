@@ -1510,7 +1510,7 @@ export default function ChatPage() {
                 className="h-7 px-2 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 flex items-center gap-1 text-[10px] font-semibold transition-colors"
               >
                 <LogOut className="w-3 h-3 shrink-0" />
-                <span>EXIT</span>
+                <span>LOGOUT</span>
               </button>
             </div>
           </div>

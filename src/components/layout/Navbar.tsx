@@ -28,6 +28,7 @@ import {
   Target,
   Mail,
   Lock,
+  LogOut,
   FileText,
   Key,
   BarChart3
@@ -516,10 +517,11 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={handleLockChat}
-                  title="Lock Chat & Sign Out"
-                  className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-amber-400 hover:bg-white/10 transition-colors"
+                  title="Log Out & Lock Session"
+                  className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 text-[11px] font-semibold flex items-center gap-1 transition-colors"
                 >
-                  <Lock className="w-3.5 h-3.5" />
+                  <LogOut className="w-3 h-3" />
+                  <span>Log Out</span>
                 </button>
               </div>
             ) : (
@@ -694,16 +696,48 @@ export function Navbar() {
               </div>
             )}
 
-            {/* Mobile Action: Invitation-Only Member Sign-In */}
+            {/* Mobile Action: Member status & actions */}
             <div className="pt-2 border-t border-white/10 space-y-2">
-              <Link
-                href="/invite/pro"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
-              >
-                <Key className="w-4 h-4 fill-black" />
-                <span>Redeem Pro Invitation Key</span>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <span className="text-xs font-mono font-bold text-white">Signed in as {callsign}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLockChat();
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                  {pathname !== "/chat" && (
+                    <Link
+                      href="/chat"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-black flex items-center justify-center gap-2 active:scale-95 transition-all"
+                    >
+                      <MessageSquare className="w-4 h-4 fill-black" />
+                      <span>Enter The Chat</span>
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href="/invite/pro"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
+                >
+                  <Key className="w-4 h-4 fill-black" />
+                  <span>Redeem Pro Invitation Key</span>
+                </Link>
+              )}
             </div>
           </div>
         )}
