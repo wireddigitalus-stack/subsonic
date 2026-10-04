@@ -83,8 +83,8 @@ export function ChatAuthGate({
               required
               value={loginCallsign}
               onChange={(e) => setLoginCallsign(e.target.value.toUpperCase())}
-              placeholder="e.g. SAID DONE, RADAR, or Callsign"
-              autoComplete="username"
+              placeholder="Enter your callsign..."
+              autoComplete="off"
               className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs font-bold uppercase focus:outline-none focus:border-amber-400 transition-colors"
             />
           </div>

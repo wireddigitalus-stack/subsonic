@@ -595,7 +595,6 @@ export default function ChatPage() {
             }
             setShooterProfile(parsedShooter);
             setProfileForm(parsedShooter);
-            if (parsedShooter.callsign) setLoginCallsign(parsedShooter.callsign);
           } catch {}
         }
 
