@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { saveStoredChatMessage, getStoredChatMessages, getLatestChatTimestamp } from "@/lib/chat-storage";
+import {
+  saveStoredChatMessage,
+  getStoredChatMessages,
+  getLatestChatTimestamp,
+  getUserDmConversations,
+} from "@/lib/chat-storage";
 import { ChatMessage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +17,7 @@ export async function GET(req: NextRequest) {
     const limitParam = searchParams.get("limit");
     const pollUnread = searchParams.get("pollUnread") === "true";
     const excludeCallsign = searchParams.get("excludeCallsign") || undefined;
+    const userCallsign = searchParams.get("userCallsign") || undefined;
 
     if (pollUnread) {
       const sinceMs = sinceParam ? parseInt(sinceParam, 10) : 0;
@@ -32,10 +38,21 @@ export async function GET(req: NextRequest) {
     const messages = await getStoredChatMessages(channel, limit, sinceMs);
     const latestTimestamp = messages.length > 0 ? messages[messages.length - 1].createdAtMs : (sinceMs || 0);
 
+    // If caller specified their callsign, fetch active DM threads and unread counts
+    const dmConversations = userCallsign ? await getUserDmConversations(userCallsign) : [];
+    const unreadSummary: Record<string, number> = {};
+    for (const c of dmConversations) {
+      if (c.unreadCount > 0) {
+        unreadSummary[c.channelId] = c.unreadCount;
+      }
+    }
+
     return NextResponse.json({
       messages,
       latestTimestamp,
       count: messages.length,
+      dmConversations,
+      unreadSummary,
     });
   } catch (err: any) {
     console.error("GET /api/chat/messages error:", err);

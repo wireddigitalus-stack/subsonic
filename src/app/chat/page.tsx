@@ -69,6 +69,7 @@ import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed, logBotActivity, subscribeToBotActivity } from "@/lib/chat-bots";
 import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
 import { clearCommsAlert, incrementUnreadMessages } from "@/lib/comms-status";
+import { getDmChannelId, parseDmParticipants, normalizeCallsign } from "@/lib/chat-utils";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -174,6 +175,25 @@ export default function ChatPage() {
     if (!isDirectMode) return null;
     const found = directPartners.find((p) => p.id === currentChannel);
     if (found) return found;
+
+    // Check if channel is canonical (e.g. dm_radar_testx)
+    const myCallsign = (shooterProfile.callsign || "").toUpperCase();
+    const parts = parseDmParticipants(currentChannel);
+    if (parts) {
+      const other = (parts[0].toUpperCase() === myCallsign ? parts[1] : parts[0]).toUpperCase();
+      const byCallsign = directPartners.find((p) => p.callsign.toUpperCase() === other);
+      if (byCallsign) return byCallsign;
+      return {
+        id: currentChannel,
+        callsign: other,
+        name: other,
+        role: "PRO_COMPETITOR" as const,
+        badgeText: "COMPETITOR",
+        status: "online" as const,
+        bio: "Verified competitor on direct encrypted frequency.",
+      };
+    }
+
     const clean = currentChannel.replace("dm_", "").toUpperCase();
     return {
       id: currentChannel,
@@ -184,7 +204,7 @@ export default function ChatPage() {
       status: "online" as const,
       bio: "Verified competitor on direct encrypted frequency.",
     };
-  }, [currentChannel, directPartners, isDirectMode]);
+  }, [currentChannel, directPartners, isDirectMode, shooterProfile.callsign]);
 
   // Tactical DOPE Drop Modal State
   const [isDopeModalOpen, setIsDopeModalOpen] = useState(false);
@@ -235,14 +255,26 @@ export default function ChatPage() {
   }, []);
 
   const handleStartDirectComms = useCallback((shooter: DirectPartner) => {
+    const myCallsign = shooterProfile.callsign || "";
+    const targetChannelId = shooter.id === "dm_ro"
+      ? "dm_ro"
+      : getDmChannelId(myCallsign, shooter.callsign);
+
+    const partnerWithId = { ...shooter, id: targetChannelId };
+
     setDirectPartners((prev) => {
-      if (prev.some((p) => p.id === shooter.id)) return prev;
-      return [shooter, ...prev];
+      const existsIndex = prev.findIndex((p) => p.callsign.toUpperCase() === shooter.callsign.toUpperCase());
+      if (existsIndex >= 0) {
+        const copy = [...prev];
+        copy[existsIndex] = partnerWithId;
+        return copy;
+      }
+      return [partnerWithId, ...prev];
     });
-    setCurrentChannel(shooter.id);
+    setCurrentChannel(targetChannelId);
     setIsDossierModalOpen(false);
     playTacticalChirp(1200);
-  }, []);
+  }, [shooterProfile.callsign]);
 
   const handleBackToInvitational = useCallback(() => {
     setCurrentChannel("invitational");
@@ -653,11 +685,13 @@ export default function ChatPage() {
     const syncMessages = async () => {
       try {
         const since = lastSyncTimestampRef.current;
-        const url = `/api/chat/messages?channel=${encodeURIComponent(currentChannel)}${since ? `&since=${since}` : "&limit=60"}`;
+        const myCallsign = shooterProfile.callsign || "";
+        const url = `/api/chat/messages?channel=${encodeURIComponent(currentChannel)}&userCallsign=${encodeURIComponent(myCallsign)}${since ? `&since=${since}` : "&limit=60"}`;
         const res = await fetch(url);
         if (!res.ok || !isMounted) return;
         const data = await res.json();
 
+        // 1. Process messages for active channel
         if (Array.isArray(data.messages) && data.messages.length > 0) {
           setMessages((prev) => {
             const existingIds = new Set(prev.map((m) => m.id));
@@ -666,7 +700,7 @@ export default function ChatPage() {
 
             // Chirp for incoming messages from other marksmen
             const hasExternalMsg = newIncoming.some(
-              (m: ChatMessage) => m.author.callsign?.toUpperCase() !== shooterProfile.callsign?.toUpperCase()
+              (m: ChatMessage) => m.author.callsign?.toUpperCase() !== myCallsign.toUpperCase()
             );
             if (hasExternalMsg && soundEnabledRef.current) {
               playRealCommsChirp();
@@ -681,6 +715,55 @@ export default function ChatPage() {
 
           if (typeof window !== "undefined") {
             localStorage.setItem("subsonic_last_read_chat", Date.now().toString());
+          }
+        }
+
+        // 2. Process active DM conversations & unread badges across channels
+        if (Array.isArray(data.dmConversations) && data.dmConversations.length > 0) {
+          setDirectPartners((prev) => {
+            let changed = false;
+            const updated = [...prev];
+            for (const conv of data.dmConversations) {
+              const partnerCall = (conv.partnerCallsign || "").toUpperCase();
+              if (!partnerCall || partnerCall === myCallsign.toUpperCase()) continue;
+              const exists = updated.some(
+                (p) => p.callsign.toUpperCase() === partnerCall || p.id === conv.channelId
+              );
+              if (!exists) {
+                updated.push({
+                  id: conv.channelId,
+                  callsign: conv.partnerCallsign,
+                  name: conv.partnerName || conv.partnerCallsign,
+                  role: conv.partnerRole || "PRO_COMPETITOR",
+                  badgeText: conv.partnerRole === "MASTER_OWNER" ? "DEV ADVISOR" : conv.partnerRole === "OWNER_ADMIN" ? "OWNER ADMIN" : "PRO SHOOTER",
+                  division: conv.partnerDivision || "Pro Division",
+                  status: "online",
+                  bio: "Verified competitor on direct encrypted frequency.",
+                });
+                changed = true;
+              }
+            }
+            return changed ? updated : prev;
+          });
+
+          if (data.unreadSummary && typeof data.unreadSummary === "object") {
+            setUnreadCounts((prev) => {
+              const updated = { ...prev };
+              let hasNewIncoming = false;
+              for (const [chId, count] of Object.entries(data.unreadSummary)) {
+                if (chId !== currentChannel) {
+                  const num = count as number;
+                  if (num > (prev[chId] || 0)) {
+                    hasNewIncoming = true;
+                  }
+                  updated[chId] = num;
+                }
+              }
+              if (hasNewIncoming && soundEnabledRef.current) {
+                playRealCommsChirp();
+              }
+              return updated;
+            });
           }
         }
       } catch {
@@ -698,6 +781,107 @@ export default function ChatPage() {
       clearInterval(pollInterval);
     };
   }, [currentChannel, isAuthenticated, shooterProfile.callsign]);
+
+  // ── Load Registered Shooters & Competitors into Direct Partners ──────────
+  useEffect(() => {
+    if (!isAuthenticated || !shooterProfile.callsign) return;
+    let isCancelled = false;
+
+    const loadShooters = async () => {
+      try {
+        const res = await fetch("/api/shooters");
+        if (!res.ok || isCancelled) return;
+        const data = await res.json();
+        const shooters: any[] = Array.isArray(data.shooters) ? data.shooters : [];
+
+        setDirectPartners((prev) => {
+          const myCallsign = (shooterProfile.callsign || "").toUpperCase();
+          const partnersMap = new Map<string, DirectPartner>();
+
+          // 1. Ensure RO BOT is always the first partner
+          const roBot = prev.find((p) => p.id === "dm_ro") || INITIAL_DIRECT_PARTNERS[0];
+          partnersMap.set("dm_ro", roBot);
+
+          // 2. Add Executives if not current user
+          if (myCallsign !== "SAID DONE" && myCallsign !== "ALLEN") {
+            const allenId = getDmChannelId(myCallsign, "SAID DONE");
+            partnersMap.set(allenId, {
+              id: allenId,
+              callsign: "SAID DONE",
+              name: "Allen Hurley",
+              role: "OWNER_ADMIN",
+              badgeText: "OWNER ADMIN",
+              division: "Owner Admin / Executive",
+              status: "online",
+              bio: "Executive Match Host & Founder of The Hideout Invitational.",
+              rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+            });
+          }
+
+          if (myCallsign !== "RADAR" && myCallsign !== "ROB" && myCallsign !== "LTDAN") {
+            const radarId = getDmChannelId(myCallsign, "RADAR");
+            partnersMap.set(radarId, {
+              id: radarId,
+              callsign: "RADAR",
+              name: "Rob Neilson",
+              role: "MASTER_OWNER",
+              badgeText: "MASTER ADMIN",
+              division: "Master Admin",
+              status: "online",
+              bio: "Master Admin",
+              rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
+            });
+          }
+
+          // 3. Map all registered shooters from database
+          for (const s of shooters) {
+            const sCallsign = (s.callsign || "").toUpperCase();
+            if (!sCallsign || sCallsign === myCallsign) continue;
+
+            const chId = getDmChannelId(myCallsign, sCallsign);
+            const isOwner = sCallsign === "SAID DONE" || sCallsign === "ALLEN";
+            const isMaster = sCallsign === "RADAR" || sCallsign === "ROB";
+
+            const existing = partnersMap.get(chId);
+            partnersMap.set(chId, {
+              id: chId,
+              callsign: s.callsign,
+              name: s.name || s.callsign,
+              role: isMaster ? "MASTER_OWNER" : isOwner ? "OWNER_ADMIN" : (s.role || "PRO_COMPETITOR"),
+              badgeText: isMaster ? "DEV ADVISOR" : isOwner ? "OWNER ADMIN" : (s.ranking || s.division || "PRO SHOOTER"),
+              division: s.division || "Pro Invitational Division",
+              status: "online",
+              bio: s.bio || s.quote || "Verified competitor on direct encrypted frequency.",
+              rifleSetup: typeof s.rifleSetup === "object"
+                ? `${s.rifleSetup.action || ""} ${s.rifleSetup.optic || ""}`.trim()
+                : (s.rifleSetup || "Precision Rimfire"),
+              image: s.image,
+              ...(existing || {}),
+            });
+          }
+
+          // 4. Preserve any existing DM partners added dynamically
+          for (const p of prev) {
+            if (p.callsign.toUpperCase() !== myCallsign) {
+              const canonicalId = p.id === "dm_ro" ? "dm_ro" : getDmChannelId(myCallsign, p.callsign);
+              if (!partnersMap.has(canonicalId)) {
+                partnersMap.set(canonicalId, { ...p, id: canonicalId });
+              }
+            }
+          }
+
+          return Array.from(partnersMap.values());
+        });
+      } catch (err) {
+        console.error("Failed to load shooters for direct partners:", err);
+      }
+    };
+
+    loadShooters();
+    return () => {
+      isCancelled = true;
+    };
+  }, [isAuthenticated, shooterProfile.callsign]);
 
   // ── First-Login Welcome: Allen only ───────────────────────────────────────
   // Allen's welcome (with Competitor Packet button) shows ONE time per user —
@@ -899,6 +1083,7 @@ export default function ChatPage() {
     if (prevChannelRef.current !== currentChannel) {
       setUnreadCounts((prev) => ({ ...prev, [currentChannel]: 0 }));
       prevChannelRef.current = currentChannel;
+      lastSyncTimestampRef.current = 0;
       scrollContainerToBottom(false);
     }
   }, [currentChannel, scrollContainerToBottom]);

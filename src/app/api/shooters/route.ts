@@ -7,7 +7,7 @@ import {
   deleteShooterFromStorageAsync,
   refreshShootersFromDb,
 } from "@/lib/shooters";
-import { refreshMembersFromDb } from "@/lib/members";
+import { refreshMembersFromDb, getMembersFromStorage } from "@/lib/members";
 
 /** Never send PIN hashes to the browser. */
 function publicShooter<T extends { pin?: unknown }>(s: T): T {
@@ -22,23 +22,59 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    await refreshShootersFromDb();
+    await Promise.all([refreshShootersFromDb(), refreshMembersFromDb()]);
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
 
     const shooters = getShootersFromStorage();
+    const members = getMembersFromStorage();
+
+    // Synthesize registered members into shooter list so any competitor appears in directory & chat
+    const shooterCallsigns = new Set(shooters.map((s) => (s.callsign || "").toUpperCase()));
+    const allShooters: ShooterProfile[] = [...shooters];
+
+    for (const m of members) {
+      const call = (m.callsign || "").toUpperCase();
+      if (!call || shooterCallsigns.has(call)) continue;
+      const isOwner = call === "SAID DONE" || call === "ALLEN" || m.role === "OWNER_ADMIN";
+      const isMaster = call === "RADAR" || call === "ROB" || m.role === "MASTER_OWNER";
+      allShooters.push({
+        id: `shooter_${m.member_id || call.toLowerCase()}`,
+        name: m.full_name || call,
+        callsign: m.callsign || call,
+        division: isMaster ? "Master Admin" : isOwner ? "Owner Admin / Executive" : (m.experience_level || "Society Member"),
+        ranking: isMaster ? "Master Admin • Dev Advisor" : isOwner ? "Founder • Subsonic Society" : "Verified Competitor",
+        homeRange: m.state ? `${m.state} Home Range` : "The Hideout, Bristol, TN",
+        podiums: 0,
+        image: "/images/SS-RWB-LOGO.png",
+        quote: "Precision rimfire competitor.",
+        accolades: isMaster ? ["DEV ADVISOR", "MASTER ADMIN"] : isOwner ? ["FOUNDER", "OWNER ADMIN"] : ["COMPETITOR"],
+        sponsors: ["Subsonic Society"],
+        rifleSetup: {
+          action: m.rifle_setup || "Precision Rimfire",
+          optic: "Precision Optic",
+        },
+        createdAt: m.created_at || new Date().toISOString(),
+        status: "PUBLISHED",
+      });
+      shooterCallsigns.add(call);
+    }
 
     if (id || slug) {
-      const target = id || slug || "";
-      const shooter = getShooterBySlug(target);
+      const target = (id || slug || "").toLowerCase();
+      const shooter = allShooters.find(
+        (s) =>
+          s.id.toLowerCase() === target ||
+          s.callsign.toLowerCase() === target
+      );
       if (!shooter) {
         return NextResponse.json({ error: "Shooter not found" }, { status: 404 });
       }
       return NextResponse.json({ shooter: publicShooter(shooter) });
     }
 
-    return NextResponse.json({ shooters: shooters.map(publicShooter), count: shooters.length });
+    return NextResponse.json({ shooters: allShooters.map(publicShooter), count: allShooters.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
