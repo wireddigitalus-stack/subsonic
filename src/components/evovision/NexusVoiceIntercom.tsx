@@ -381,7 +381,7 @@ export function NexusVoiceIntercom({
               <span className="font-mono text-xs font-black tracking-wider text-white uppercase">
                 NEXUS UPLINK
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/5 border border-white/10 uppercase tracking-widest font-bold text-cyan-400">
+              <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-white/5 border border-white/10 uppercase tracking-wider font-bold text-cyan-400">
                 {voiceState === "listening"
                   ? "LISTENING"
                   : voiceState === "thinking"
@@ -477,13 +477,13 @@ export function NexusVoiceIntercom({
                   }`}
                 >
                   <div
-                    className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider ${
+                    className={`flex items-center gap-2 text-xs uppercase font-bold tracking-wider ${
                       item.role === "user" ? "justify-end text-slate-400" : "text-cyan-400"
                     }`}
                   >
                     <span>{item.role === "user" ? "YOU" : "◆ NEXUS"}</span>
                     <span className="text-slate-600">•</span>
-                    <span className="text-slate-500">{item.timestamp}</span>
+                    <span className="text-slate-400">{item.timestamp}</span>
                   </div>
 
                   <div
@@ -501,8 +501,8 @@ export function NexusVoiceIntercom({
               {/* Live Streaming Transcribing Preview */}
               {interimTranscript && (
                 <div className="space-y-1.5 text-right animate-in fade-in slide-in-from-bottom-2">
-                  <div className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest flex items-center justify-end gap-1.5">
-                    <Radio className="w-3 h-3 animate-pulse" />
+                  <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center justify-end gap-1.5">
+                    <Radio className="w-3.5 h-3.5 animate-pulse" />
                     <span>TRANSMITTING...</span>
                   </div>
                   <div className="inline-block p-3 sm:p-4 rounded-2xl bg-cyan-950/40 border border-cyan-400/50 text-cyan-200 text-xs sm:text-sm max-w-[88%] text-left animate-pulse">
@@ -632,22 +632,22 @@ export function NexusVoiceIntercom({
                   {voiceState === "listening" ? (
                     <>
                       <Radio className="w-8 h-8 animate-pulse text-slate-950" />
-                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">SEND</span>
+                      <span className="text-xs font-mono font-black tracking-wider uppercase">SEND</span>
                     </>
                   ) : voiceState === "thinking" ? (
                     <>
                       <Sparkles className="w-8 h-8 animate-spin text-slate-950" />
-                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">AI</span>
+                      <span className="text-xs font-mono font-black tracking-wider uppercase">AI</span>
                     </>
                   ) : voiceState === "speaking" ? (
                     <>
                       <Volume2 className="w-8 h-8 animate-pulse text-slate-950" />
-                      <span className="text-[9px] font-mono font-black tracking-tight uppercase">MUTE</span>
+                      <span className="text-xs font-mono font-black tracking-wider uppercase">MUTE</span>
                     </>
                   ) : (
                     <>
                       <Mic className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform" />
-                      <span className="text-[9px] font-mono font-bold tracking-tight uppercase text-cyan-300">TALK</span>
+                      <span className="text-xs font-mono font-bold tracking-wider uppercase text-cyan-300">TALK</span>
                     </>
                   )}
                 </button>
@@ -665,7 +665,7 @@ export function NexusVoiceIntercom({
                   ? "NEXUS TRANSMITTING • TAP TO HALT"
                   : "TAP OR HOLD TO SPEAK"}
               </p>
-              <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-slate-500">
+              <div className="flex items-center justify-center gap-3 text-xs font-mono text-slate-400">
                 <button
                   type="button"
                   onClick={() => setShowTextFallback(!showTextFallback)}

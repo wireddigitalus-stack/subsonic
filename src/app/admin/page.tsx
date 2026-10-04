@@ -2500,21 +2500,21 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className="text-2xl font-black text-amber-400">{members.length}</div>
-                <div className="text-[10px] font-mono text-slate-400 uppercase">Active Chatters</div>
+                <div className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Active Chatters</div>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className="text-2xl font-black text-emerald-400">7</div>
-                <div className="text-[10px] font-mono text-slate-400 uppercase">Active Channels</div>
+                <div className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Active Channels</div>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className="text-2xl font-black text-red-400">{flaggedMessages.length}</div>
-                <div className="text-[10px] font-mono text-slate-400 uppercase">Flagged Messages</div>
+                <div className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Flagged Messages</div>
               </div>
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
                 <div className={`text-2xl font-black ${botsEnabled ? "text-cyan-400 animate-pulse" : "text-slate-400"}`}>
                   {botsEnabled ? "ON" : "OFF"}
                 </div>
-                <div className="text-[10px] font-mono text-cyan-300/80 uppercase">Test Bot Fleet</div>
+                <div className="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider">Test Bot Fleet</div>
               </div>
             </div>
 
@@ -2526,10 +2526,10 @@ export default function AdminDashboardPage() {
                   <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">
                     Autonomous Test Bot Fleet (Off-Chat Controller)
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold ${
                     botsEnabled
                       ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                      : "bg-white/10 text-slate-400 border border-white/10"
+                      : "bg-white/10 text-slate-300 border border-white/10"
                   }`}>
                     {botsEnabled ? "SIMULATION ACTIVE" : "OFFLINE"}
                   </span>
@@ -2685,69 +2685,69 @@ export default function AdminDashboardPage() {
                       clearBotActivityLog();
                       setBotActivityMessages([]);
                     }}
-                    className="text-[10px] font-mono text-red-300 hover:text-red-200 underline"
+                    className="text-xs font-mono font-medium text-red-300 hover:text-red-200 underline"
                   >
                     Clear Bot Logs
                   </button>
                 )}
-                <span className="text-[10px] font-mono text-slate-400">Last 50 messages</span>
+                <span className="text-xs font-mono text-slate-300 font-medium">Last 50 messages</span>
               </div>
             </div>
 
             {flaggedMessages.length === 0 && botActivityMessages.length === 0 ? (
               <div className="p-8 text-center space-y-3">
                 <ShieldCheck className="w-10 h-10 text-emerald-400 mx-auto opacity-60" />
-                <p className="text-sm text-slate-400 font-mono">No recent transmissions recorded.</p>
-                <p className="text-xs text-slate-500">Transmissions and moderation flags will appear here in real time.</p>
+                <p className="text-sm text-slate-300 font-mono">No recent transmissions recorded.</p>
+                <p className="text-xs text-slate-400">Transmissions and moderation flags will appear here in real time.</p>
               </div>
             ) : (
               <div className="divide-y divide-white/5">
                 {[...flaggedMessages, ...botActivityMessages.filter((b) => !flaggedMessages.some((f) => f.id === b.id))].slice(0, 50).map((msg) => (
                   <div key={msg.id} className="p-4 hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1 space-y-1">
+                      <div className="min-w-0 flex-1 space-y-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-mono text-[10px] font-bold text-amber-400">[{msg.author.callsign}]</span>
-                          <span className="text-xs font-semibold text-white">{msg.author.name}</span>
-                          <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">#{msg.channelId}</span>
+                          <span className="font-mono text-xs font-bold text-amber-400">[{msg.author.callsign}]</span>
+                          <span className="text-sm font-semibold text-white">{msg.author.name}</span>
+                          <span className="text-xs text-slate-300">{msg.timestamp}</span>
+                          <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">#{msg.channelId}</span>
                           {msg.moderationStatus === "FLAGGED" && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse">FLAGGED</span>
+                            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse">FLAGGED</span>
                           )}
                           {msg.author.id.startsWith("bot-") && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">BOT</span>
+                            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">BOT</span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-300 break-words">{msg.content}</p>
+                        <p className="text-sm text-slate-200 break-words leading-relaxed">{msg.content}</p>
                         {msg.aiModerationReport?.flagReason && (
-                          <p className="text-[10px] text-red-300 font-mono">⚠ {msg.aiModerationReport.flagReason}</p>
+                          <p className="text-xs text-red-300 font-mono font-medium">⚠ {msg.aiModerationReport.flagReason}</p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
                         <button
                           type="button"
                           onClick={() => {
                             setFlaggedMessages((prev) => prev.filter((m) => m.id !== msg.id));
                             setBotActivityMessages((prev) => prev.filter((m) => m.id !== msg.id));
                           }}
-                          className="px-2 py-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1.5"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                           <span>Delete</span>
                         </button>
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold flex items-center gap-1.5"
                         >
-                          <AlertTriangle className="w-3 h-3" />
+                          <AlertTriangle className="w-3.5 h-3.5" />
                           <span>Warn</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => handleQuickStatusChange(msg.author.id, "BANNED")}
-                          className="px-2 py-1 rounded-lg bg-red-950/60 hover:bg-red-950/80 text-red-200 border border-red-500/30 text-[10px] font-mono font-bold flex items-center gap-1"
+                          className="px-2.5 py-1.5 rounded-lg bg-red-950/60 hover:bg-red-950/80 text-red-200 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1.5"
                         >
-                          <Ban className="w-3 h-3" />
+                          <Ban className="w-3.5 h-3.5" />
                           <span>Ban</span>
                         </button>
                       </div>
@@ -3617,74 +3617,74 @@ export default function AdminDashboardPage() {
 
                 {/* Rifle Blueprint Hardware Components */}
                 <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-                  <span className="text-[11px] font-mono text-amber-400 font-bold uppercase tracking-wider block">
+                  <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider block">
                     Precision Rifle Specs
                   </span>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Action</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Action</label>
                       <input
                         type="text"
                         value={memberForm.action || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, action: e.target.value }))}
                         placeholder="e.g. Vudoo V-22 / RimX"
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Optic</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Optic</label>
                       <input
                         type="text"
                         value={memberForm.optic || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, optic: e.target.value }))}
                         placeholder="e.g. ZCO 527 5-27x56 MPCT2"
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Barrel</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Barrel</label>
                       <input
                         type="text"
                         value={memberForm.barrel || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, barrel: e.target.value }))}
                         placeholder='e.g. 20" Bartlein Heavy Varmint'
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Trigger</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Trigger</label>
                       <input
                         type="text"
                         value={memberForm.trigger || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, trigger: e.target.value }))}
                         placeholder="e.g. Bix'n Andy TacSport PRO (8 oz)"
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Chassis / Stock</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Chassis / Stock</label>
                       <input
                         type="text"
                         value={memberForm.chassis || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, chassis: e.target.value }))}
                         placeholder="e.g. MDT ACC Elite"
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">Ammo Lot</label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider">Ammo Lot</label>
                       <input
                         type="text"
                         value={memberForm.ammoLot || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, ammoLot: e.target.value }))}
                         placeholder="e.g. Lapua Center-X Lot 39281"
-                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+                        className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
                       />
                     </div>
                   </div>

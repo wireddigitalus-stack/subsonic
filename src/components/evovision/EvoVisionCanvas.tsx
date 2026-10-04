@@ -2157,19 +2157,19 @@ export function EvoVisionCanvas({
                 className="w-2.5 h-2.5 rounded-full shrink-0 shadow-[0_0_8px_currentColor]"
                 style={{ backgroundColor: hoveredNode.color, color: hoveredNode.color }}
               />
-              <span className="font-black text-white truncate text-[12px]">{hoveredNode.label}</span>
+              <span className="font-black text-white truncate text-sm">{hoveredNode.label}</span>
             </div>
             {hoveredNode.callsign && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-amber-300 font-bold shrink-0">
+              <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-amber-300 font-bold shrink-0">
                 [{hoveredNode.callsign}]
               </span>
             )}
           </div>
 
-          <div className="flex items-center justify-between text-[10px] text-slate-300 pt-0.5">
-            <span className="text-cyan-300 uppercase font-bold text-[9px]">{hoveredNode.cluster}</span>
+          <div className="flex items-center justify-between text-xs text-slate-200 pt-0.5">
+            <span className="text-cyan-300 uppercase font-bold text-xs">{hoveredNode.cluster}</span>
             <span
-              className={`px-1.5 py-0.5 rounded font-bold text-[9px] border ${
+              className={`px-2 py-0.5 rounded font-bold text-xs border ${
                 hoveredNode.status === "ALERT"
                   ? "bg-red-500/20 text-red-300 border-red-500/30"
                   : hoveredNode.status === "AWAY"
@@ -2182,14 +2182,14 @@ export function EvoVisionCanvas({
           </div>
 
           {hoveredNode.sublabel && (
-            <div className="text-[10px] text-slate-300 truncate">
+            <div className="text-xs text-slate-200 truncate">
               {hoveredNode.sublabel}
             </div>
           )}
 
-          <div className="text-[8px] text-slate-400 flex items-center justify-between border-t border-white/5 pt-1 mt-0.5 font-bold">
+          <div className="text-xs text-slate-300 flex items-center justify-between border-t border-white/5 pt-1.5 mt-1 font-semibold">
             <span className="tracking-wider">CLICK TO INSPECT PROFILE</span>
-            <span className="text-cyan-400 text-xs">➔</span>
+            <span className="text-cyan-400 text-sm">➔</span>
           </div>
         </div>
       )}
@@ -2332,7 +2332,7 @@ export function EvoVisionCanvas({
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
-                <span className="text-[11px] font-mono font-extrabold tracking-wider text-purple-200">
+                <span className="text-xs font-mono font-black tracking-wider text-purple-200">
                   CONSTELLATION & CELESTIAL TELEMETRY
                 </span>
               </div>
@@ -2347,39 +2347,39 @@ export function EvoVisionCanvas({
             </div>
 
             {/* Telemetry Metric Grid */}
-            <div className="grid grid-cols-2 gap-2 font-mono text-[10px]">
-              <div className="p-2 rounded-xl bg-purple-950/20 border border-purple-500/20">
-                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Cataloged Formations</div>
+            <div className="grid grid-cols-2 gap-2.5 font-mono text-xs">
+              <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/20">
+                <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">Cataloged Formations</div>
                 <div className="text-sm font-extrabold text-purple-300 mt-0.5">11 Major Constellations</div>
-                <div className="text-[8px] text-slate-400 mt-0.5">Orion, Ursa Major, Cassiopeia, etc.</div>
+                <div className="text-xs text-slate-400 mt-0.5">Orion, Ursa Major, Cassiopeia, etc.</div>
               </div>
 
-              <div className="p-2 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
-                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Navigational Beacons</div>
+              <div className="p-2.5 rounded-xl bg-cyan-950/20 border border-cyan-500/20">
+                <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">Navigational Beacons</div>
                 <div className="text-sm font-extrabold text-cyan-300 mt-0.5">52 Calibrated Stars</div>
-                <div className="text-[8px] text-slate-400 mt-0.5">Magnitudes 0.0 to 4.5 • Spectral Class</div>
+                <div className="text-xs text-slate-400 mt-0.5">Magnitudes 0.0 to 4.5 • Spectral Class</div>
               </div>
 
-              <div className="p-2 rounded-xl bg-amber-950/20 border border-amber-500/20">
-                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Diurnal Earth Velocity</div>
+              <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/20">
+                <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">Diurnal Earth Velocity</div>
                 <div className="text-sm font-extrabold text-amber-300 mt-0.5">15.041° / Hour</div>
-                <div className="text-[8px] text-slate-400 mt-0.5">Angle: {((etInfo.celestialAngleRad * 180 / Math.PI) % 360).toFixed(1)}° RA Synced</div>
+                <div className="text-xs text-slate-400 mt-0.5">Angle: {((etInfo.celestialAngleRad * 180 / Math.PI) % 360).toFixed(1)}° RA Synced</div>
               </div>
 
-              <div className="p-2 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
-                <div className="text-[9px] text-slate-400 uppercase tracking-wider">Celestial Pivot Point</div>
+              <div className="p-2.5 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
+                <div className="text-xs text-slate-300 uppercase tracking-wider font-semibold">Celestial Pivot Point</div>
                 <div className="text-sm font-extrabold text-indigo-300 mt-0.5">Polaris (α UMi)</div>
-                <div className="text-[8px] text-slate-400 mt-0.5">Dec +89° 15′ 51″ • True North</div>
+                <div className="text-xs text-slate-400 mt-0.5">Dec +89° 15′ 51″ • True North</div>
               </div>
             </div>
 
             {/* Constellation Index List */}
-            <div className="p-2 rounded-xl bg-white/[0.03] border border-white/10 space-y-1">
-              <div className="text-[9px] font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+              <div className="text-xs font-mono font-bold text-slate-200 uppercase tracking-wider flex items-center justify-between">
                 <span>Active Tracked Constellations</span>
                 <span className="text-purple-400">11 Cataloged</span>
               </div>
-              <div className="flex flex-wrap gap-1 pt-1">
+              <div className="flex flex-wrap gap-1.5 pt-1">
                 {[
                   "Ursa Major", "Orion", "Cassiopeia", "Cygnus",
                   "Lyra", "Taurus", "Canis Major", "Leo",
@@ -2387,7 +2387,7 @@ export function EvoVisionCanvas({
                 ].map((name) => (
                   <span
                     key={name}
-                    className="px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-[9px] font-mono text-purple-200"
+                    className="px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-xs font-mono text-purple-200"
                   >
                     {name}
                   </span>
@@ -2396,9 +2396,9 @@ export function EvoVisionCanvas({
             </div>
 
             {/* Real-time Status Footer */}
-            <div className="text-[9px] font-mono text-slate-400 flex items-center justify-between border-t border-white/5 pt-1.5 px-0.5">
+            <div className="text-xs font-mono text-slate-300 flex items-center justify-between border-t border-white/5 pt-2 px-0.5">
               <span>Time Datum: <span className="text-white font-bold">{etInfo.timeString24} ET</span> (Bristol, TN)</span>
-              <span className={etInfo.isDaylight ? "text-amber-400" : "text-indigo-400"}>
+              <span className={etInfo.isDaylight ? "text-amber-400 font-semibold" : "text-indigo-400 font-semibold"}>
                 {etInfo.isDaylight ? "☀️ Daylight" : "🌙 Nighttime"}
               </span>
             </div>
@@ -2426,13 +2426,13 @@ export function EvoVisionCanvas({
         </button>
         <button
           onClick={handleResetZoom}
-          className="px-2.5 h-8 rounded-xl bg-cyan-950/50 hover:bg-cyan-900/70 active:scale-95 text-cyan-300 font-mono text-[10px] font-bold flex items-center gap-1.5 transition-all border border-cyan-500/30 cursor-pointer"
+          className="px-3 h-8 rounded-xl bg-cyan-950/50 hover:bg-cyan-900/70 active:scale-95 text-cyan-300 font-mono text-xs font-bold flex items-center gap-1.5 transition-all border border-cyan-500/30 cursor-pointer"
           title="Auto-Fit Network to Screen"
           aria-label="Auto-Fit Network"
         >
-          <Maximize2 className="w-3 h-3 text-cyan-400" />
+          <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
           <span className="hidden sm:inline">FIT</span>
-          <span className="text-[9px] text-cyan-400/90 font-mono font-bold">{zoomPercent}%</span>
+          <span className="text-xs text-cyan-400/90 font-mono font-bold">{zoomPercent}%</span>
         </button>
       </div>
     </div>

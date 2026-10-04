@@ -437,7 +437,7 @@ export function ChatMessageList({
                         )}
 
                         <span
-                          className={`text-[11px] font-medium px-1.5 py-0.5 rounded uppercase ${
+                          className={`text-xs font-semibold px-2 py-0.5 rounded uppercase ${
                             isRO
                               ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
                               : isMasterOwner
@@ -452,7 +452,7 @@ export function ChatMessageList({
                               ? "bg-amber-500/20 text-amber-300"
                               : isPro
                               ? "bg-blue-500/15 text-blue-300"
-                              : "bg-white/10 text-slate-400"
+                              : "bg-white/10 text-slate-300"
                           }`}
                         >
                           {isRO ? (
@@ -474,20 +474,20 @@ export function ChatMessageList({
                         </span>
 
                         {/* Timestamp — inline on mobile */}
-                        <span className="text-[11px] md:hidden text-slate-500">
+                        <span className="text-xs md:hidden text-slate-400 font-medium">
                           {msg.timestamp}
-                          {msg.isEdited && <span className="text-[9px] text-slate-500 italic ml-1">(edited)</span>}
+                          {msg.isEdited && <span className="text-xs text-slate-400 italic ml-1">(edited)</span>}
                         </span>
                       </div>
 
                       {/* Rig line or RO Subtitle */}
                       {isRO ? (
-                        <div className="hidden md:flex text-[11px] text-cyan-300/80 items-center gap-1.5 font-medium">
+                        <div className="hidden md:flex text-xs text-cyan-200 items-center gap-1.5 font-medium">
                           <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block shadow-[0_0_6px_rgba(6,182,212,0.8)]" />
                           <span>Autonomous AI Match Assistant · The Hideout Official Guide</span>
                         </div>
                       ) : msg.author.rifleSetup ? (
-                        <div className="hidden md:block text-[11px] text-slate-400 truncate max-w-md">
+                        <div className="hidden md:block text-xs text-slate-300 font-medium truncate max-w-md">
                           Rig: {msg.author.rifleSetup}
                         </div>
                       ) : null}
@@ -495,18 +495,18 @@ export function ChatMessageList({
                   </div>
 
                   {/* Right Meta: Timestamp, Actions & Status */}
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-400 shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-300 shrink-0 font-medium">
                     {/* Action buttons (Edit & Delete) */}
                     {(canEdit || canDelete) && (
-                      <div className="flex items-center gap-0.5 sm:gap-1 opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         {canEdit && editingMessageId !== msg.id && (
                           <button
                             type="button"
                             onClick={() => startEditing(msg)}
                             title="Edit transmission"
-                            className="p-1 rounded-md text-slate-400 hover:text-amber-300 hover:bg-white/10 transition-colors"
+                            className="p-1 rounded-md text-slate-300 hover:text-amber-300 hover:bg-white/10 transition-colors"
                           >
-                            <Pencil className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            <Pencil className="w-3.5 h-3.5" />
                           </button>
                         )}
                         {canDelete && deletingMessageId !== msg.id && (
@@ -514,17 +514,17 @@ export function ChatMessageList({
                             type="button"
                             onClick={() => setDeletingMessageId(msg.id)}
                             title="Delete transmission"
-                            className="p-1 rounded-md text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors"
+                            className="p-1 rounded-md text-slate-300 hover:text-red-400 hover:bg-white/10 transition-colors"
                           >
-                            <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
                     )}
 
-                    <div className="hidden md:flex items-center gap-1">
+                    <div className="hidden md:flex items-center gap-1 text-xs text-slate-300 font-medium">
                       {msg.isEdited && (
-                        <span className="text-[10px] text-slate-500 italic select-none" title={msg.editedAt ? `Edited at ${msg.editedAt}` : "Edited"}>
+                        <span className="text-xs text-slate-400 italic select-none" title={msg.editedAt ? `Edited at ${msg.editedAt}` : "Edited"}>
                           (edited)
                         </span>
                       )}
@@ -532,40 +532,40 @@ export function ChatMessageList({
                     </div>
 
                     {isFlagged ? (
-                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
-                        <AlertTriangle className="w-2.5 h-2.5" />
+                      <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
+                        <AlertTriangle className="w-3 h-3" />
                         REVIEW
                       </span>
                     ) : isRO ? (
-                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1">
-                        <Bot className="w-3 h-3 text-cyan-400" />
+                      <span className="text-xs px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1">
+                        <Bot className="w-3.5 h-3.5 text-cyan-400" />
                         AI RO
                       </span>
                     ) : (
-                      <Check className="hidden md:inline w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="hidden md:inline w-4 h-4 text-emerald-400" />
                     )}
                   </div>
                 </div>
 
                 {/* Inline Delete Confirmation */}
                 {deletingMessageId === msg.id && (
-                  <div className="p-2 sm:p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200 flex items-center justify-between gap-2 animate-fadeIn">
-                    <div className="flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs sm:text-sm text-red-200 flex items-center justify-between gap-2 animate-fadeIn">
+                    <div className="flex items-center gap-2 font-medium">
+                      <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                       <span>Delete transmission permanently?</span>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         type="button"
                         onClick={() => setDeletingMessageId(null)}
-                        className="px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[11px] transition-colors"
+                        className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         type="button"
                         onClick={() => confirmDelete(msg.id)}
-                        className="px-2.5 py-1 rounded-md bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-colors"
+                        className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-colors"
                       >
                         Delete
                       </button>
@@ -588,18 +588,18 @@ export function ChatMessageList({
                         }
                       }}
                       rows={2}
-                      className="w-full px-3 py-2 rounded-xl bg-black/70 border border-amber-500/40 text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-sans resize-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/70 border border-amber-500/40 text-white text-sm focus:outline-none focus:border-amber-400 font-sans resize-none"
                       placeholder="Edit message..."
                       autoFocus
                     />
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500 hidden sm:inline">Enter to save • Esc to cancel</span>
+                    <div className="flex items-center justify-between text-xs text-slate-400 pt-0.5">
+                      <span className="hidden sm:inline">Press Enter to save • Esc to cancel</span>
                       <div className="flex items-center gap-2 ml-auto">
                         <button
                           type="button"
                           onClick={cancelEditing}
                           disabled={isSubmittingEdit}
-                          className="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                          className="px-3 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold transition-colors"
                         >
                           Cancel
                         </button>
@@ -607,9 +607,9 @@ export function ChatMessageList({
                           type="button"
                           onClick={() => submitEdit(msg.id)}
                           disabled={isSubmittingEdit || !editContent.trim()}
-                          className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold transition-all disabled:opacity-50 flex items-center gap-1"
+                          className="px-3.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-all disabled:opacity-50 flex items-center gap-1"
                         >
-                          <Check className="w-3 h-3" />
+                          <Check className="w-3.5 h-3.5" />
                           <span>Save</span>
                         </button>
                       </div>
@@ -618,7 +618,7 @@ export function ChatMessageList({
                 ) : (
                   msg.content && (
                     <div className="space-y-2">
-                      <p className={`text-xs sm:text-sm leading-relaxed font-normal whitespace-pre-line ${
+                      <p className={`text-sm sm:text-base leading-relaxed font-normal whitespace-pre-line ${
                         isRO ? "text-cyan-50/95" : "text-slate-200"
                       }`}>
                         {msg.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
@@ -686,21 +686,21 @@ export function ChatMessageList({
                       key={reaction.emoji}
                       type="button"
                       onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                      className="px-1.5 md:px-2.5 py-0.5 rounded-full bg-black/50 border border-white/10 text-[11px] md:text-xs text-slate-300 hover:border-amber-500/40 flex items-center gap-1 transition-all active:scale-95"
+                      className="px-2 md:px-3 py-1 rounded-full bg-black/50 border border-white/10 text-xs md:text-sm text-slate-200 hover:border-amber-500/40 flex items-center gap-1.5 transition-all active:scale-95"
                     >
-                      <span>{reaction.emoji}</span>
-                      <span className="font-mono text-[10px] font-bold">{reaction.count}</span>
+                      <span className="text-sm md:text-base">{reaction.emoji}</span>
+                      <span className="font-mono text-xs font-bold">{reaction.count}</span>
                     </button>
                   ))}
 
                   {/* Quick Reactions Palette */}
-                  <div className="hidden md:flex items-center gap-1 pl-2 border-l border-white/10 opacity-60 hover:opacity-100 transition-opacity">
+                  <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-white/10 opacity-70 hover:opacity-100 transition-opacity">
                     {["🎯", "🔥", "⛰️", "💡"].map((emoji) => (
                       <button
                         key={emoji}
                         type="button"
                         onClick={() => handleAddReaction(msg.id, emoji)}
-                        className="p-1 text-xs hover:scale-125 transition-transform active:scale-95"
+                        className="p-1 text-sm hover:scale-125 transition-transform active:scale-95"
                         title={`React with ${emoji}`}
                       >
                         {emoji}
@@ -724,7 +724,7 @@ export function ChatMessageList({
           className="w-full shrink-0 flex items-center justify-center gap-2 py-1.5 md:py-2 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent border-t border-amber-500/20 text-amber-400 hover:text-amber-300 transition-all animate-fadeIn group"
           title="Jump to latest"
         >
-          <span className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-0.5 md:py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold">
+          <span className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1 rounded-full bg-black/50 border border-amber-500/30 text-xs font-mono font-bold">
             <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
             <span className="hidden md:inline">New transmissions — tap to jump down</span>
             <span className="md:hidden">New messages ↓</span>
@@ -734,7 +734,7 @@ export function ChatMessageList({
 
       {/* Blocked Notice */}
       {aiBlockedNotice && (
-        <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs flex items-center gap-2 animate-shake shrink-0">
+        <div className="p-3 bg-red-950/90 border-t border-red-500/50 text-red-200 text-xs sm:text-sm flex items-center gap-2 animate-shake shrink-0">
           <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
           <div className="flex-1 font-medium">{aiBlockedNotice}</div>
         </div>
@@ -742,41 +742,41 @@ export function ChatMessageList({
 
       {/* Typing Indicator */}
       {isTyping && (
-        <div className="px-4 py-1.5 bg-black/60 border-t border-white/5 shrink-0 flex items-center gap-2">
-          <div className="flex gap-0.5">
+        <div className="px-4 py-2 bg-black/60 border-t border-white/5 shrink-0 flex items-center gap-2">
+          <div className="flex gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "0ms" }} />
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "150ms" }} />
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: "300ms" }} />
           </div>
-          <span className="text-[10px] font-mono text-slate-400">[{shooterProfile.callsign}] transmitting...</span>
+          <span className="text-xs font-mono text-slate-300 font-medium">[{shooterProfile.callsign}] transmitting...</span>
         </div>
       )}
 
       {/* Quick Radio Chips above input — hidden on mobile to maximize room */}
-      <div id="tour-step-plink" className="hidden sm:flex px-3 pt-2 pb-1 bg-black/70 items-center justify-between gap-1.5 border-t border-white/10 shrink-0">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Radio className="w-3 h-3 text-cyan-400 shrink-0" />
+      <div id="tour-step-plink" className="hidden sm:flex px-3 pt-2.5 pb-1.5 bg-black/70 items-center justify-between gap-2 border-t border-white/10 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <Radio className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
           {isDirectMode ? (
             (activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") ? (
               <>
                 <button
                   type="button"
                   onClick={() => quickBroadcast("What are the recommended hotels in Bristol?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 border border-cyan-500/40 transition-all shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.15)]"
+                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-200 border border-cyan-500/40 transition-all shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.15)]"
                 >
                   🏨 &ldquo;Bristol Lodging&rdquo;
                 </button>
                 <button
                   type="button"
                   onClick={() => quickBroadcast("What are the best dinner and BBQ spots near the match?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-950/25 hover:bg-cyan-900/40 text-slate-300 hover:text-cyan-200 border border-white/10 hover:border-cyan-500/30 transition-all shrink-0"
+                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-950/25 hover:bg-cyan-900/40 text-slate-200 hover:text-cyan-100 border border-white/10 hover:border-cyan-500/30 transition-all shrink-0"
                 >
                   🍖 &ldquo;Bristol Food&rdquo;
                 </button>
                 <button
                   type="button"
                   onClick={() => quickBroadcast("How do the $2,500 cash side matches work?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 transition-all shrink-0"
+                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 transition-all shrink-0"
                 >
                   💵 &ldquo;Cash Matches&rdquo;
                 </button>
@@ -786,14 +786,14 @@ export function ChatMessageList({
                 <button
                   type="button"
                   onClick={() => quickBroadcast("Copy that. On frequency.")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-slate-300 hover:text-amber-200 border border-white/10 transition-all shrink-0"
+                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-slate-200 hover:text-amber-200 border border-white/10 transition-all shrink-0"
                 >
                   📻 &ldquo;Copy that&rdquo;
                 </button>
                 <button
                   type="button"
                   onClick={() => quickBroadcast("What squad are you running in?")}
-                  className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all shrink-0"
+                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-all shrink-0"
                 >
                   🎯 &ldquo;Which squad?&rdquo;
                 </button>
@@ -807,7 +807,7 @@ export function ChatMessageList({
                   setInputText("hey ro ");
                   playTacticalChirp(1100);
                 }}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/35 transition-all flex items-center gap-1 font-bold shrink-0"
+                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-500/35 transition-all flex items-center gap-1.5 shrink-0"
                 title="Chat with RO BOT, your AI Range Officer"
               >
                 🤖 &ldquo;Hey RO&rdquo;
@@ -815,21 +815,21 @@ export function ChatMessageList({
               <button
                 type="button"
                 onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/5 transition-all shrink-0"
+                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition-all shrink-0"
               >
                 🎯 &ldquo;Impact!&rdquo;
               </button>
               <button
                 type="button"
                 onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/5 transition-all shrink-0"
+                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/10 transition-all shrink-0"
               >
                 🛑 &ldquo;Cold&rdquo;
               </button>
               <button
                 type="button"
                 onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
-                className="whitespace-nowrap text-[10px] font-mono px-2 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-300 border border-white/5 transition-all shrink-0"
+                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-200 border border-white/10 transition-all shrink-0"
               >
                 💨 &ldquo;Wind switch 12mph&rdquo;
               </button>
@@ -843,9 +843,9 @@ export function ChatMessageList({
             setIsChannelModalOpen(true);
             playTacticalChirp(1000);
           }}
-          className="text-[10px] font-mono text-amber-400/80 hover:text-amber-300 flex items-center gap-0.5 shrink-0 px-1 py-0.5"
+          className="text-xs font-mono font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors"
         >
-          <span className="truncate max-w-[120px]">
+          <span className="truncate max-w-[140px]">
             {isDirectMode ? `🔒 ${activeDirectPartner?.callsign || "DM"}` : `#${currentChannelData.name}`}
           </span>
         </button>

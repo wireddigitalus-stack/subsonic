@@ -1721,12 +1721,12 @@ export default function ChatPage() {
               <Link
                 href="/"
                 title="Return to Main Portal"
-                className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all shrink-0"
               >
                 <ChevronLeft className="w-4 h-4 text-amber-400 -mr-0.5" />
-                <span className="font-extrabold text-[11px] text-slate-200">HOME</span>
-                <span className="text-white/30 text-[10px]">/</span>
-                <span className="text-amber-400 font-extrabold text-[11px]">CHAT ROOM</span>
+                <span className="font-extrabold text-xs text-slate-100">HOME</span>
+                <span className="text-white/40 text-xs">/</span>
+                <span className="text-amber-400 font-extrabold text-xs">CHAT</span>
               </Link>
 
               {/* Shooter Callsign & Pass Pill */}
@@ -1739,10 +1739,10 @@ export default function ChatPage() {
                   setIsProfileModalOpen(true);
                 }}
                 data-telemetry="chat_mobile_view_pass"
-                className="flex items-center gap-1 px-1.5 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
                 title="View Shooter Pass"
               >
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 overflow-hidden ${
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 overflow-hidden ${
                   shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
                     ? "bg-blue-800 text-cyan-200 ring-1 ring-cyan-400"
                     : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
@@ -1752,21 +1752,21 @@ export default function ChatPage() {
                   {shooterProfile.image ? (
                     <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
                   ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
-                    <Radar className="w-2.5 h-2.5 text-cyan-300 stroke-[2.5]" />
+                    <Radar className="w-3 h-3 text-cyan-300 stroke-[2.5]" />
                   ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
                     "A"
                   ) : (
                     shooterProfile.callsign.slice(0, 2)
                   )}
                 </div>
-                <span className={`font-mono font-bold text-[10px] truncate max-w-[62px] ${
+                <span className={`font-mono font-bold text-xs truncate max-w-[80px] ${
                   shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
                     ? "text-cyan-300"
                     : "text-amber-300"
                 }`}>
                   {shooterProfile.callsign}
                 </span>
-                <QrCode className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
+                <QrCode className="w-3 h-3 text-emerald-400 shrink-0" />
               </button>
             </div>
 
@@ -1774,10 +1774,10 @@ export default function ChatPage() {
             <div className="flex items-center gap-1 shrink-0">
               <Link
                 href="/shooters"
-                className="h-7 px-2 rounded-lg bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 text-purple-300 font-mono text-[10px] font-bold flex items-center gap-1 transition-all shrink-0"
+                className="h-7 px-2.5 rounded-lg bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 text-purple-300 font-mono text-xs font-bold flex items-center gap-1 transition-all shrink-0"
                 title="View Full Shooter Profiles"
               >
-                <Users className="w-3 h-3 text-purple-400 shrink-0" />
+                <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                 <span>PROFILES</span>
               </Link>
 
@@ -1796,7 +1796,7 @@ export default function ChatPage() {
               <button
                 type="button"
                 onClick={() => setIsFullscreen(true)}
-                className="h-7 px-1.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[9px] font-bold flex items-center gap-1 hover:bg-amber-500/25 transition-all"
+                className="h-7 px-2 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center gap-1 hover:bg-amber-500/25 transition-all"
                 title="Fullscreen Hand Mode"
               >
                 <Maximize2 className="w-3 h-3 text-amber-400" />
@@ -1824,9 +1824,9 @@ export default function ChatPage() {
                 type="button"
                 onClick={handleLogout}
                 title="Log Out of Chat"
-                className="h-7 px-2 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 flex items-center gap-1 text-[10px] font-semibold transition-colors"
+                className="h-7 px-2.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 flex items-center gap-1.5 text-xs font-semibold transition-colors"
               >
-                <LogOut className="w-3 h-3 shrink-0" />
+                <LogOut className="w-3.5 h-3.5 shrink-0" />
                 <span>LOGOUT</span>
               </button>
             </div>
@@ -2068,21 +2068,21 @@ export default function ChatPage() {
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <Link
               href="/"
-              className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all"
               title="Return to Main Portal"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-amber-400 -mr-0.5" />
-              <span className="font-extrabold text-[10px] sm:text-[11px]">HOME</span>
+              <ChevronLeft className="w-4 h-4 text-amber-400 -mr-0.5" />
+              <span className="font-extrabold text-xs text-slate-100">HOME</span>
             </Link>
 
             <button
               type="button"
               onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold active:scale-95 transition-all"
               title="Exit Fullscreen Mode"
             >
-              <Minimize2 className="w-3 h-3 text-amber-400" />
-              <span className="text-[10px]">EXIT</span>
+              <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs font-bold">EXIT</span>
             </button>
           </div>
 
@@ -2093,29 +2093,29 @@ export default function ChatPage() {
               setIsChannelModalOpen(true);
               playTacticalChirp(1100);
             }}
-            className="flex items-center gap-1 sm:gap-1.5 font-mono text-left min-w-0 group flex-1 justify-center px-1"
+            className="flex items-center gap-1.5 sm:gap-2 font-mono text-left min-w-0 group flex-1 justify-center px-1"
             title="Switch room"
           >
-            <span className="text-amber-400 font-bold text-xs sm:text-sm md:text-base">#</span>
-            <span className="font-mono font-bold text-xs sm:text-sm md:text-base text-white whitespace-nowrap truncate max-w-[90px] xs:max-w-[140px] sm:max-w-[200px] md:max-w-none group-hover:text-amber-300 transition-colors">
+            <span className="text-amber-400 font-bold text-sm sm:text-base md:text-lg">#</span>
+            <span className="font-mono font-bold text-sm sm:text-base md:text-lg text-white whitespace-nowrap truncate max-w-[110px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none group-hover:text-amber-300 transition-colors">
               {currentChannelData.name}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-mono px-1 sm:px-1.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-0.5 sm:gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
-              <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+            <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
+              <MessageSquare className="w-3 h-3 text-cyan-400" />
               <span>{currentChannelEngagement.postCount}</span>
             </span>
-            <ChevronDown className="w-3 h-3 text-amber-400/70 group-hover:text-amber-300 shrink-0" />
+            <ChevronDown className="w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-300 shrink-0" />
           </button>
 
           {/* Right: Controls */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop-only: Weather, Staff Moderated */}
-            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded bg-black/40 border border-white/10 text-slate-300 text-[10px] font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude} ft` : "Live Wind Telemetry"}>
-              <Wind className="w-3 h-3 text-cyan-400" />
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 border border-white/10 text-slate-200 text-xs font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude} ft` : "Live Wind Telemetry"}>
+              <Wind className="w-3.5 h-3.5 text-cyan-400" />
               <span>{liveWeather ? `${liveWeather.windSpeed}-${liveWeather.windGusts} MPH ${liveWeather.windDirection}` : "4-6 MPH SE"}</span>
             </div>
-            <div className="hidden md:flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-[9px] text-emerald-300 font-mono" title="Staff Moderated">
-              <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 font-mono font-medium" title="Staff Moderated">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
               <span>Moderated</span>
             </div>
 
@@ -2126,10 +2126,10 @@ export default function ChatPage() {
                 setIsTermsModalOpen(true);
                 playTacticalChirp(1100);
               }}
-              className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-[9px] text-slate-300 hover:text-amber-300 font-mono transition-colors"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-xs text-slate-200 hover:text-amber-300 font-mono transition-colors font-semibold"
               title="Terms of Use & Code of Conduct"
             >
-              <Scale className="w-2.5 h-2.5 text-amber-400" />
+              <Scale className="w-3 h-3 text-amber-400" />
               <span>TERMS</span>
             </button>
 
@@ -2137,7 +2137,7 @@ export default function ChatPage() {
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`h-7 w-7 sm:h-8 sm:w-8 md:h-7 md:w-auto md:px-2 rounded-lg sm:rounded-xl border flex items-center justify-center md:gap-1 font-mono font-semibold transition-all ${
+              className={`h-7 w-7 sm:h-8 sm:w-8 md:h-7 md:w-auto md:px-2 rounded-lg sm:rounded-xl border flex items-center justify-center md:gap-1.5 font-mono font-semibold transition-all ${
                 soundEnabled
                   ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
                   : "bg-white/5 text-slate-400 border-white/10"
@@ -2150,7 +2150,7 @@ export default function ChatPage() {
               ) : (
                 <VolumeX className="w-3.5 h-3.5 text-slate-400" />
               )}
-              <span className="hidden md:inline text-[10px]">{soundEnabled ? "ON" : "OFF"}</span>
+              <span className="hidden md:inline text-xs font-bold">{soundEnabled ? "ON" : "OFF"}</span>
             </button>
           </div>
         </div>
@@ -2178,20 +2178,20 @@ export default function ChatPage() {
                 setIsChannelModalOpen(true);
                 playTacticalChirp(1100);
               }}
-              className="w-full p-2 px-2.5 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.06] flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
+              className="w-full p-2.5 px-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.06] flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <div className={`w-6 h-6 rounded-lg font-mono font-black text-xs flex items-center justify-center shrink-0 ${
+                <div className={`w-7 h-7 rounded-lg font-mono font-black text-sm flex items-center justify-center shrink-0 ${
                   isDirectMode ? "bg-emerald-500 text-black" : "bg-amber-500 text-black"
                 }`}>
                   {isDirectMode ? "🔒" : "#"}
                 </div>
                 <div className="min-w-0 text-left">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-white text-xs whitespace-nowrap truncate max-w-[140px]">
+                    <span className="font-mono font-bold text-white text-sm whitespace-nowrap truncate max-w-[150px]">
                       {currentChannelData.name}
                     </span>
-                    <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded font-bold border shrink-0 ${
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded font-bold border shrink-0 ${
                       isDirectMode
                         ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
                         : "bg-amber-500/20 text-amber-300 border-amber-500/30"
@@ -2204,14 +2204,14 @@ export default function ChatPage() {
 
               <div className="flex items-center gap-2 shrink-0">
                 {!isDirectMode && (
-                  <span className="text-[10px] font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 px-1.5 py-0.5 rounded flex items-center gap-1 font-bold">
-                    <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
-                    {currentChannelEngagement.postCount} posts
+                  <span className="text-xs font-mono text-cyan-200 bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
+                    <MessageSquare className="w-3 h-3 text-cyan-400" />
+                    {currentChannelEngagement.postCount}
                   </span>
                 )}
-                <div className="px-2 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-[9px] font-bold text-amber-300 flex items-center gap-1">
+                <div className="px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-xs font-bold text-amber-300 flex items-center gap-1">
                   <span>{isDirectMode ? "SWITCH" : "ROOMS"}</span>
-                  <ChevronDown className="w-3 h-3 text-amber-400" />
+                  <ChevronDown className="w-3.5 h-3.5 text-amber-400" />
                 </div>
               </div>
             </button>
@@ -2238,21 +2238,21 @@ export default function ChatPage() {
                         : "bg-white/[0.03] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.06]"
                     }`}
                   >
-                    <span className={isActive ? "text-black" : "text-amber-400"}>#</span>
-                    <span>{ch.name}</span>
+                    <span className={isActive ? "text-black font-bold" : "text-amber-400"}>#</span>
+                    <span className="font-medium">{ch.name}</span>
 
                     {/* Post Counter Badge on Pill */}
-                    <span className={`text-[9px] px-1.5 py-0.2 rounded font-medium flex items-center gap-0.5 ${
+                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5 ${
                       isActive
-                        ? "bg-black/30 text-white/80"
-                        : "bg-white/5 text-slate-400"
+                        ? "bg-black/30 text-white"
+                        : "bg-white/10 text-slate-300"
                     }`} title={`${engagement.postCount} posts in #${ch.name}`}>
-                      <MessageSquare className="w-2 h-2" />
+                      <MessageSquare className="w-2.5 h-2.5" />
                       <span>{engagement.postCount}</span>
                     </span>
 
                     {unread > 0 && !isActive ? (
-                      <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                      <span className="min-w-[18px] h-4.5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
                         {unread > 9 ? "9+" : unread}
                       </span>
                     ) : null}

@@ -474,12 +474,12 @@ export default function EvosDashboardPage() {
 
           {/* 3D Revolution Control (if in 3D Mode) */}
           {is3DMode && (
-            <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px]">
-              <span className="text-slate-400 font-mono">3D REVOLUTION:</span>
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs">
+              <span className="text-slate-300 font-mono font-medium">3D REVOLUTION:</span>
               <button
                 onClick={() => setAutoRotate(!autoRotate)}
-                className={`px-2 py-0.5 rounded font-bold ${
-                  autoRotate ? "text-cyan-300 bg-cyan-500/20 border border-cyan-500/40" : "text-slate-400 bg-white/5"
+                className={`px-2.5 py-1 rounded font-bold text-xs ${
+                  autoRotate ? "text-cyan-300 bg-cyan-500/20 border border-cyan-500/40" : "text-slate-300 bg-white/5"
                 }`}
               >
                 {autoRotate ? "▶ REVOLVING" : "⏸ PAUSED"}
@@ -488,54 +488,54 @@ export default function EvosDashboardPage() {
           )}
 
           {/* Cluster Filter Strip */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1 border-t border-white/10">
-            <span className="text-[9px] text-slate-400 font-bold uppercase shrink-0">CLUSTERS:</span>
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pt-1.5 border-t border-white/10">
+            <span className="text-xs text-slate-300 font-bold uppercase shrink-0">CLUSTERS:</span>
             <button
               onClick={() => setActiveClusterFilter(null)}
-              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+              className={`px-2.5 py-1 rounded-md border shrink-0 transition-all font-mono font-bold text-xs ${
                 activeClusterFilter === null
                   ? "bg-cyan-500/25 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-300 border-white/10"
               }`}
             >
               ALL ({EVO_NODES.length})
             </button>
             <button
               onClick={() => setActiveClusterFilter("USERS")}
-              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+              className={`px-2.5 py-1 rounded-md border shrink-0 transition-all font-mono font-bold text-xs ${
                 activeClusterFilter === "USERS"
                   ? "bg-sky-500/25 text-sky-300 border-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-300 border-white/10"
               }`}
             >
               COMPETITORS (8)
             </button>
             <button
               onClick={() => setActiveClusterFilter("MODS")}
-              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+              className={`px-2.5 py-1 rounded-md border shrink-0 transition-all font-mono font-bold text-xs ${
                 activeClusterFilter === "MODS"
                   ? "bg-rose-500/25 text-rose-300 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-300 border-white/10"
               }`}
             >
               MODS (6)
             </button>
             <button
               onClick={() => setActiveClusterFilter("ADMIN")}
-              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+              className={`px-2.5 py-1 rounded-md border shrink-0 transition-all font-mono font-bold text-xs ${
                 activeClusterFilter === "ADMIN"
                   ? "bg-indigo-500/25 text-indigo-300 border-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-300 border-white/10"
               }`}
             >
               ADMIN (6)
             </button>
             <button
               onClick={() => setActiveClusterFilter("BOTS")}
-              className={`px-2 py-1 rounded-md border shrink-0 transition-all font-mono font-bold ${
+              className={`px-2.5 py-1 rounded-md border shrink-0 transition-all font-mono font-bold text-xs ${
                 activeClusterFilter === "BOTS"
                   ? "bg-amber-500/25 text-amber-300 border-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.3)]"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-300 border-white/10"
               }`}
             >
               AI BOTS (6)
@@ -584,35 +584,35 @@ export default function EvosDashboardPage() {
         />
 
         {/* Floating Macro Legend & Status Key (Left Bottom) */}
-        <div className="absolute bottom-4 left-4 p-3.5 rounded-2xl bg-black/80 backdrop-blur-md border border-white/10 text-[10px] space-y-1.5 pointer-events-none hidden sm:block shadow-2xl">
-          <div className="text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-            <Compass className="w-3 h-3 text-cyan-400" />
+        <div className="absolute bottom-4 left-4 p-4 rounded-2xl bg-black/85 backdrop-blur-md border border-white/10 text-xs space-y-2 pointer-events-none hidden sm:block shadow-2xl">
+          <div className="text-slate-200 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <Compass className="w-3.5 h-3.5 text-cyan-400" />
             <span>EVOS 1.0 System Registry</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06B6D4]" />
-            <span className="text-slate-300">Central Nexus & Telemetry Stream</span>
+            <span className="text-slate-200 font-medium">Central Nexus & Telemetry Stream</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_6px_#38BDF8]" />
-            <span className="text-slate-300">Competitors & Active Shooters</span>
+            <span className="text-slate-200 font-medium">Competitors & Active Shooters</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_#F43F5E]" />
-            <span className="text-slate-300">RO BOT AI Sentinel & Moderator Rooms</span>
+            <span className="text-slate-200 font-medium">RO BOT AI Sentinel & Moderator Rooms</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_6px_#818CF8]" />
-            <span className="text-slate-300">Master Admin (RADAR) & Admin Engine</span>
+            <span className="text-slate-200 font-medium">Master Admin (RADAR) & Admin Engine</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_#F59E0B]" />
-            <span className="text-slate-300">Autonomous Chat Bots (incl. Marcus Webb)</span>
+            <span className="text-slate-200 font-medium">Autonomous Chat Bots (incl. Marcus Webb)</span>
           </div>
         </div>
 
         {/* Floating Quick Hint (Bottom Center) */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-slate-400 pointer-events-none hidden md:block">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-white/10 text-xs font-medium text-slate-300 pointer-events-none hidden md:block">
           Drag to pan • Pinch / Scroll to zoom • Double-click blank space to close card
         </div>
 
@@ -639,15 +639,15 @@ export default function EvosDashboardPage() {
                       {selectedNode.label}
                     </h3>
                     {selectedNode.callsign && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-amber-300 font-bold">
+                      <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-amber-300 font-bold">
                         [{selectedNode.callsign}]
                       </span>
                     )}
                   </div>
-                  <p className="text-[10px] text-slate-400 truncate flex items-center gap-1 mt-0.5">
+                  <p className="text-xs text-slate-300 font-medium truncate flex items-center gap-1.5 mt-0.5">
                     <span>{selectedNode.memberId || selectedNode.id}</span>
                     <span>•</span>
-                    <span className="text-cyan-300">{selectedNode.cluster}</span>
+                    <span className="text-cyan-300 font-semibold">{selectedNode.cluster}</span>
                   </p>
                 </div>
               </div>
@@ -735,30 +735,30 @@ export default function EvosDashboardPage() {
               {selectedNode.rankBadge && (
                 <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-950/30 via-black/40 to-slate-900/40 border border-amber-500/30 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-amber-300 font-bold text-[10px] uppercase flex items-center gap-1.5">
+                    <span className="text-amber-300 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
                       <Trophy className="w-3.5 h-3.5 text-amber-400" />
                       <span>Competitive Standing</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-black text-[9px] border border-amber-500/30">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/30">
                       {selectedNode.rankBadge.tier}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-center">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block uppercase">Rating</span>
-                      <span className="text-sm font-black text-amber-300 font-mono">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Rating</span>
+                      <span className="text-base font-black text-amber-300 font-mono">
                         {selectedNode.rankBadge.rating}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block uppercase">Standing</span>
-                      <span className="text-sm font-black text-sky-300 font-mono">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Standing</span>
+                      <span className="text-base font-black text-sky-300 font-mono">
                         {selectedNode.rankBadge.percentile}
                       </span>
                     </div>
                   </div>
                   {selectedNode.rankBadge.regionalRank && (
-                    <div className="text-[9px] text-amber-200/90 text-center font-bold">
+                    <div className="text-xs text-amber-200 text-center font-bold">
                       🏆 {selectedNode.rankBadge.regionalRank}
                     </div>
                   )}
@@ -768,28 +768,28 @@ export default function EvosDashboardPage() {
               {/* Recent Verified Matches */}
               {selectedNode.matchHistory && selectedNode.matchHistory.length > 0 && (
                 <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-sky-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-sky-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Award className="w-3.5 h-3.5 text-sky-400" />
                       <span>Recent Verified Matches</span>
                     </span>
-                    <span className="text-slate-400">{selectedNode.matchHistory.length} Matches</span>
+                    <span className="text-slate-300 font-medium">{selectedNode.matchHistory.length} Matches</span>
                   </div>
                   <div className="space-y-1.5">
                     {selectedNode.matchHistory.map((m, idx) => (
                       <div
                         key={idx}
-                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-[10px]"
+                        className="p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-center justify-between text-xs"
                       >
                         <div className="min-w-0 pr-2">
                           <div className="font-bold text-white truncate">{m.matchName}</div>
-                          <div className="text-[9px] text-slate-400">
+                          <div className="text-xs text-slate-300 font-medium">
                             {m.date} • {m.division}
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <div className="font-black text-emerald-400">{m.finish}</div>
-                          <div className="text-[9px] text-slate-400 font-mono">{m.points}</div>
+                          <div className="font-bold text-emerald-400">{m.finish}</div>
+                          <div className="text-xs text-slate-300 font-mono">{m.points}</div>
                         </div>
                       </div>
                     ))}
@@ -799,9 +799,9 @@ export default function EvosDashboardPage() {
 
               {/* Home Range & Territory */}
               {selectedNode.homeRange && (
-                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400 uppercase flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3 text-rose-400" />
+                <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+                  <span className="text-slate-300 uppercase font-medium flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-rose-400" />
                     <span>Home Range</span>
                   </span>
                   <span className="font-semibold text-white truncate max-w-[200px] text-right">
@@ -813,44 +813,44 @@ export default function EvosDashboardPage() {
               {/* Equipment / Rifle Rig Specs */}
               {(selectedNode.rifleSetup || selectedNode.action || selectedNode.ammo) && (
                 <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="flex items-center gap-1.5 text-amber-300 font-bold text-[10px] uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs uppercase tracking-wider">
                     <Crosshair className="w-3.5 h-3.5 text-amber-400" />
                     <span>Rifle Rig & Ballistics Setup</span>
                   </div>
 
-                  <div className="space-y-1.5 text-[11px]">
+                  <div className="space-y-1.5 text-xs">
                     {selectedNode.action && (
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span className="text-slate-400 text-[10px]">Action</span>
-                        <span className="font-semibold text-right">{selectedNode.action}</span>
+                      <div className="flex items-center justify-between text-slate-200">
+                        <span className="text-slate-400">Action</span>
+                        <span className="font-semibold text-right text-white">{selectedNode.action}</span>
                       </div>
                     )}
                     {selectedNode.barrel && (
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span className="text-slate-400 text-[10px]">Barrel</span>
-                        <span className="font-semibold text-right">{selectedNode.barrel}</span>
+                      <div className="flex items-center justify-between text-slate-200">
+                        <span className="text-slate-400">Barrel</span>
+                        <span className="font-semibold text-right text-white">{selectedNode.barrel}</span>
                       </div>
                     )}
                     {selectedNode.optic && (
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span className="text-slate-400 text-[10px]">Optic</span>
-                        <span className="font-semibold text-right">{selectedNode.optic}</span>
+                      <div className="flex items-center justify-between text-slate-200">
+                        <span className="text-slate-400">Optic</span>
+                        <span className="font-semibold text-right text-white">{selectedNode.optic}</span>
                       </div>
                     )}
                     {selectedNode.chassis && (
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span className="text-slate-400 text-[10px]">Chassis</span>
-                        <span className="font-semibold text-right">{selectedNode.chassis}</span>
+                      <div className="flex items-center justify-between text-slate-200">
+                        <span className="text-slate-400">Chassis</span>
+                        <span className="font-semibold text-right text-white">{selectedNode.chassis}</span>
                       </div>
                     )}
                     {selectedNode.ammo && (
-                      <div className="flex items-center justify-between text-slate-300">
-                        <span className="text-slate-400 text-[10px]">Match Ammo</span>
-                        <span className="font-bold text-amber-400 text-right">{selectedNode.ammo}</span>
+                      <div className="flex items-center justify-between text-slate-200">
+                        <span className="text-slate-400">Match Ammo</span>
+                        <span className="font-bold text-amber-300 text-right">{selectedNode.ammo}</span>
                       </div>
                     )}
                     {!selectedNode.action && selectedNode.rifleSetup && (
-                      <div className="text-slate-200 font-mono text-[10px] bg-black/40 p-2 rounded-lg border border-white/5">
+                      <div className="text-slate-200 font-mono text-xs bg-black/40 p-2.5 rounded-lg border border-white/5">
                         {selectedNode.rifleSetup}
                       </div>
                     )}
@@ -862,38 +862,38 @@ export default function EvosDashboardPage() {
               {selectedNode.dopeCard && (
                 <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-amber-300 font-bold text-[10px] uppercase flex items-center gap-1.5">
+                    <span className="text-amber-300 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
                       <Target className="w-3.5 h-3.5 text-amber-400" />
                       <span>Verified DOPE Card</span>
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-200 font-black">
+                    <span className="text-xs px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-200 font-bold">
                       {selectedNode.dopeCard.targetDistance}
                     </span>
                   </div>
 
-                  <p className="text-[10px] text-slate-300 italic">
+                  <p className="text-xs text-slate-300 italic">
                     {selectedNode.dopeCard.targetDescription}
                   </p>
 
                   <div className="grid grid-cols-2 gap-2 text-center pt-1">
-                    <div className="p-2 rounded-xl bg-black/40 border border-amber-500/20">
-                      <span className="text-[9px] text-slate-400 block uppercase">Elevation</span>
-                      <span className="text-sm font-black text-amber-300 font-mono">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/20">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Elevation</span>
+                      <span className="text-base font-black text-amber-300 font-mono">
                         {selectedNode.dopeCard.elevationMils}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-amber-500/20">
-                      <span className="text-[9px] text-slate-400 block uppercase">Wind Hold</span>
-                      <span className="text-sm font-black text-sky-300 font-mono">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-amber-500/20">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Wind Hold</span>
+                      <span className="text-base font-black text-sky-300 font-mono">
                         {selectedNode.dopeCard.windHoldMils}
                       </span>
                     </div>
                   </div>
 
-                  <div className="text-[9px] text-slate-400 pt-0.5">
+                  <div className="text-xs text-slate-300 pt-0.5 space-y-0.5">
                     <span>DA: {selectedNode.dopeCard.densityAltitude}</span>
                     {selectedNode.dopeCard.notes && (
-                      <span className="block mt-1 text-slate-300">
+                      <span className="block text-slate-200">
                         Note: {selectedNode.dopeCard.notes}
                       </span>
                     )}
@@ -904,24 +904,24 @@ export default function EvosDashboardPage() {
               {/* Latest Live Chat Transmission */}
               {selectedNode.latestTransmission && (
                 <div className="p-3 rounded-2xl bg-sky-950/20 border border-sky-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-sky-300 font-bold uppercase flex items-center gap-1.5">
-                      <MessageSquare className="w-3 h-3 text-sky-400" />
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-sky-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <MessageSquare className="w-3.5 h-3.5 text-sky-400" />
                       <span>Latest Comms Transmission</span>
                     </span>
-                    <span className="text-slate-400">{selectedNode.latestTransmission.timestamp}</span>
+                    <span className="text-slate-300 font-medium">{selectedNode.latestTransmission.timestamp}</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-200 leading-relaxed">
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs sm:text-sm text-slate-100 leading-relaxed">
                     "{selectedNode.latestTransmission.content}"
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
-                    <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-cyan-300">
+                  <div className="flex items-center justify-between text-xs text-slate-300 pt-0.5">
+                    <span className="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-cyan-300 font-medium">
                       #{selectedNode.latestTransmission.channel}
                     </span>
                     {selectedNode.latestTransmission.reactionsCount !== undefined && (
-                      <span>🎯 {selectedNode.latestTransmission.reactionsCount} reactions</span>
+                      <span className="font-medium text-slate-300">🎯 {selectedNode.latestTransmission.reactionsCount} reactions</span>
                     )}
                   </div>
                 </div>
@@ -935,7 +935,7 @@ export default function EvosDashboardPage() {
                     : "bg-emerald-950/20 border-emerald-500/30"
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[10px] uppercase flex items-center gap-1.5">
+                    <span className="font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
                       {selectedNode.moderationData.standing === "FLAGGED" ? (
                         <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
                       ) : (
@@ -943,7 +943,7 @@ export default function EvosDashboardPage() {
                       )}
                       <span>RO BOT AI Moderation Sentinel</span>
                     </span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-black ${
+                    <span className={`text-xs px-2.5 py-0.5 rounded font-black ${
                       selectedNode.moderationData.standing === "FLAGGED"
                         ? "bg-red-600 text-white"
                         : "bg-emerald-500/20 text-emerald-300"
@@ -954,15 +954,15 @@ export default function EvosDashboardPage() {
 
                   {/* Toxicity Gauge Bar */}
                   <div className="space-y-1">
-                    <div className="flex justify-between text-[10px]">
-                      <span className="text-slate-400">Toxicity Metric</span>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-300 font-medium">Toxicity Metric</span>
                       <span className={`font-mono font-bold ${
                         selectedNode.moderationData.toxicityScore > 30 ? "text-red-400" : "text-emerald-400"
                       }`}>
                         {selectedNode.moderationData.toxicityScore}%
                       </span>
                     </div>
-                    <div className="w-full h-1.5 rounded-full bg-black/60 overflow-hidden">
+                    <div className="w-full h-2 rounded-full bg-black/60 overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
                           selectedNode.moderationData.toxicityScore > 50
@@ -977,7 +977,7 @@ export default function EvosDashboardPage() {
                   </div>
 
                   {selectedNode.moderationData.lastFlagReason && (
-                    <div className="p-2 rounded-lg bg-red-900/30 border border-red-500/30 text-[10px] text-red-200">
+                    <div className="p-2.5 rounded-lg bg-red-900/30 border border-red-500/30 text-xs text-red-200">
                       Flag: {selectedNode.moderationData.lastFlagReason}
                     </div>
                   )}
@@ -987,27 +987,27 @@ export default function EvosDashboardPage() {
               {/* Enforcement Metrics (Moderation Sentinel Engine) */}
               {selectedNode.enforcementStats && (
                 <div className="p-3 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-rose-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
                       <span>Sentinel Enforcement Metrics</span>
                     </span>
-                    <span className="text-[9px] text-rose-200 bg-rose-500/20 px-1.5 py-0.5 rounded font-bold border border-rose-500/30">
+                    <span className="text-xs text-rose-200 bg-rose-500/20 px-2 py-0.5 rounded font-bold border border-rose-500/30">
                       {selectedNode.enforcementStats.cleanRate} Clean
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-1.5 text-center text-[10px]">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[8px] text-slate-400 block uppercase">Flags</span>
-                      <span className="font-black text-rose-300">{selectedNode.enforcementStats.flagsProcessed}</span>
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Flags</span>
+                      <span className="text-sm font-black text-rose-300">{selectedNode.enforcementStats.flagsProcessed}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[8px] text-slate-400 block uppercase">Warnings</span>
-                      <span className="font-black text-amber-300">{selectedNode.enforcementStats.warnings}</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Warnings</span>
+                      <span className="text-sm font-black text-amber-300">{selectedNode.enforcementStats.warnings}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[8px] text-slate-400 block uppercase">Mutes</span>
-                      <span className="font-black text-slate-300">{selectedNode.enforcementStats.mutesIssued}</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block uppercase font-medium">Mutes</span>
+                      <span className="text-sm font-black text-slate-200">{selectedNode.enforcementStats.mutesIssued}</span>
                     </div>
                   </div>
                 </div>
@@ -1016,21 +1016,21 @@ export default function EvosDashboardPage() {
               {/* Monitored Comms Rooms */}
               {selectedNode.channelCoverage && selectedNode.channelCoverage.length > 0 && (
                 <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-rose-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Radio className="w-3.5 h-3.5 text-rose-400" />
                       <span>Monitored Comms Rooms</span>
                     </span>
-                    <span className="text-slate-400">{selectedNode.channelCoverage.length} Rooms</span>
+                    <span className="text-slate-300 font-medium">{selectedNode.channelCoverage.length} Rooms</span>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {selectedNode.channelCoverage.map((c, idx) => (
                       <div
                         key={idx}
-                        className="p-1.5 px-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-[10px]"
+                        className="p-2 px-3 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between text-xs"
                       >
-                        <span className="text-slate-200">#{c.roomName}</span>
-                        <span className="text-[9px] text-cyan-300 font-mono">{c.activeShooters} marksmen</span>
+                        <span className="text-slate-200 font-semibold">#{c.roomName}</span>
+                        <span className="text-xs text-cyan-300 font-mono font-medium">{c.activeShooters} marksmen</span>
                       </div>
                     ))}
                   </div>
@@ -1040,38 +1040,38 @@ export default function EvosDashboardPage() {
               {/* Bot Persona Engine Readout */}
               {selectedNode.botSpecs && (
                 <div className="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-amber-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Bot className="w-3.5 h-3.5 text-amber-400" />
                       <span>Bot Simulation Specs</span>
                     </span>
                     {selectedNode.botSpecs.isBadActor && (
-                      <span className="px-2 py-0.5 rounded bg-red-600 text-white font-black text-[9px] animate-pulse">
+                      <span className="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-xs animate-pulse">
                         STRESS ACTOR
                       </span>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[10px]">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">Personality</span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">Personality</span>
                       <span className="font-semibold text-white capitalize">
                         {selectedNode.botSpecs.personality.replace("-", " ")}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">DOPE Drop Rate</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">DOPE Drop Rate</span>
                       <span className="font-semibold text-amber-300">
                         {Math.round(selectedNode.botSpecs.dopeDropRate * 100)}%
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 text-[10px]">
-                    <span className="text-[9px] text-slate-400 block mb-1">Favored Channels</span>
-                    <div className="flex flex-wrap gap-1">
+                  <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 text-xs">
+                    <span className="text-xs text-slate-300 block mb-1 font-medium">Favored Channels</span>
+                    <div className="flex flex-wrap gap-1.5">
                       {selectedNode.botSpecs.primaryChannels.map((c) => (
-                        <span key={c} className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300 text-[9px]">
+                        <span key={c} className="px-2 py-0.5 rounded bg-white/5 text-slate-200 text-xs font-medium">
                           #{c}
                         </span>
                       ))}
@@ -1083,21 +1083,21 @@ export default function EvosDashboardPage() {
               {/* Autonomous Simulation Event Stream */}
               {selectedNode.simulationTimeline && selectedNode.simulationTimeline.length > 0 && (
                 <div className="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-amber-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <History className="w-3.5 h-3.5 text-amber-400" />
                       <span>Autonomous Event Stream</span>
                     </span>
-                    <span className="text-[9px] text-amber-300 font-bold">Sim Loop</span>
+                    <span className="text-xs text-amber-300 font-bold">Sim Loop</span>
                   </div>
                   <div className="space-y-1.5">
                     {selectedNode.simulationTimeline.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-[10px] gap-2"
+                        className="p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-xs gap-2"
                       >
                         <div className="text-slate-200 leading-snug">{item.event}</div>
-                        <span className="text-[9px] text-slate-400 shrink-0 font-mono">{item.time}</span>
+                        <span className="text-xs text-slate-300 shrink-0 font-mono font-medium">{item.time}</span>
                       </div>
                     ))}
                   </div>
@@ -1107,29 +1107,29 @@ export default function EvosDashboardPage() {
               {/* System Health & Node Engine */}
               {selectedNode.systemHealth && (
                 <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2.5">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-cyan-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-cyan-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Server className="w-3.5 h-3.5 text-cyan-400" />
                       <span>System Health & Node Engine</span>
                     </span>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#10B981]" />
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-[10px]">
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">Uptime</span>
-                      <span className="font-bold text-emerald-300">{selectedNode.systemHealth.uptime}</span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">Uptime</span>
+                      <span className="font-bold text-sm text-emerald-300">{selectedNode.systemHealth.uptime}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">Throughput</span>
-                      <span className="font-bold text-cyan-300">{selectedNode.systemHealth.throughput}</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">Throughput</span>
+                      <span className="font-bold text-sm text-cyan-300">{selectedNode.systemHealth.throughput}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">Memory</span>
-                      <span className="font-bold text-amber-300">{selectedNode.systemHealth.memoryUsed}</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">Memory</span>
+                      <span className="font-bold text-sm text-amber-300">{selectedNode.systemHealth.memoryUsed}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                      <span className="text-[9px] text-slate-400 block">DB Latency</span>
-                      <span className="font-bold text-sky-300">{selectedNode.systemHealth.dbLag}</span>
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-xs text-slate-300 block font-medium">DB Latency</span>
+                      <span className="font-bold text-sm text-sky-300">{selectedNode.systemHealth.dbLag}</span>
                     </div>
                   </div>
                 </div>
@@ -1138,12 +1138,12 @@ export default function EvosDashboardPage() {
               {/* Security Audit Trail */}
               {selectedNode.securityLog && selectedNode.securityLog.length > 0 && (
                 <div className="p-3 rounded-2xl bg-indigo-950/20 border border-indigo-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-indigo-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-indigo-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Shield className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Security Audit Trail</span>
                     </span>
-                    <span className="text-[9px] text-indigo-200 bg-indigo-500/20 px-1.5 py-0.5 rounded font-bold border border-indigo-500/30">
+                    <span className="text-xs text-indigo-200 bg-indigo-500/20 px-2 py-0.5 rounded font-bold border border-indigo-500/30">
                       PASSKEY
                     </span>
                   </div>
@@ -1151,10 +1151,10 @@ export default function EvosDashboardPage() {
                     {selectedNode.securityLog.map((log, idx) => (
                       <div
                         key={idx}
-                        className="p-2 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-[10px] gap-2"
+                        className="p-2.5 rounded-xl bg-black/40 border border-white/5 flex items-start justify-between text-xs gap-2"
                       >
                         <div className="text-slate-200">{log.event}</div>
-                        <span className="text-[9px] text-slate-400 shrink-0 font-mono">{log.timestamp}</span>
+                        <span className="text-xs text-slate-300 shrink-0 font-mono font-medium">{log.timestamp}</span>
                       </div>
                     ))}
                   </div>
@@ -1164,23 +1164,23 @@ export default function EvosDashboardPage() {
               {/* Master Telemetry Stats (For Master Admin or Core DB) */}
               {selectedNode.telemetryStats && (
                 <div className="p-3 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-2">
-                  <div className="text-[10px] text-cyan-300 font-bold uppercase flex items-center gap-1.5">
-                    <Activity className="w-3 h-3 text-cyan-400" />
+                  <div className="text-xs text-cyan-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Recorded Site Telemetry</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-center text-[10px]">
+                  <div className="grid grid-cols-2 gap-2 text-center text-xs">
                     {selectedNode.telemetryStats.totalClicks !== undefined && (
-                      <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                        <span className="text-[9px] text-slate-400 block">Clicks</span>
-                        <span className="text-sm font-bold text-cyan-300">
+                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                        <span className="text-xs text-slate-300 block font-medium">Clicks</span>
+                        <span className="text-base font-bold text-cyan-300">
                           {selectedNode.telemetryStats.totalClicks}
                         </span>
                       </div>
                     )}
                     {selectedNode.telemetryStats.dwellSeconds !== undefined && (
-                      <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                        <span className="text-[9px] text-slate-400 block">Dwell Time</span>
-                        <span className="text-sm font-bold text-amber-400">
+                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5">
+                        <span className="text-xs text-slate-300 block font-medium">Dwell Time</span>
+                        <span className="text-base font-bold text-amber-400">
                           {Math.round(selectedNode.telemetryStats.dwellSeconds / 60)}m
                         </span>
                       </div>
@@ -1192,27 +1192,27 @@ export default function EvosDashboardPage() {
               {/* Direct Synaptic Connections (Interactive Map) */}
               {connectedNodes.length > 0 && (
                 <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-cyan-300 font-bold uppercase flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-cyan-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                       <Network className="w-3.5 h-3.5 text-cyan-400" />
                       <span>Synaptic Peer Links</span>
                     </span>
-                    <span className="text-slate-400">{connectedNodes.length} Links</span>
+                    <span className="text-slate-300 font-medium">{connectedNodes.length} Links</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {connectedNodes.map(({ link, peer }) => (
                       <button
                         key={peer.id}
                         onClick={() => setSelectedNode(peer)}
-                        className="px-2.5 py-1.5 rounded-xl bg-black/50 hover:bg-white/10 border border-white/10 hover:border-cyan-400/50 text-[10px] text-slate-300 hover:text-white flex items-center gap-1.5 transition-all group shadow-sm"
+                        className="px-3 py-1.5 rounded-xl bg-black/50 hover:bg-white/10 border border-white/10 hover:border-cyan-400/50 text-xs text-slate-200 hover:text-white flex items-center gap-2 transition-all group shadow-sm"
                         title={`Jump camera to [${peer.callsign || peer.label}]`}
                       >
                         <span
-                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          className="w-2 h-2 rounded-full shrink-0"
                           style={{ backgroundColor: peer.color }}
                         />
                         <span className="font-bold">{peer.callsign || peer.label}</span>
-                        <span className="text-[9px] text-slate-500 font-mono group-hover:text-cyan-300">
+                        <span className="text-xs text-slate-300 font-mono group-hover:text-cyan-300 font-medium">
                           {link.latencyLabel || "2ms"}
                         </span>
                       </button>
@@ -1245,17 +1245,17 @@ export default function EvosDashboardPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Link
                     href="/chat"
-                    className="py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-center"
+                    className="py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-center"
                   >
-                    <MessageSquare className="w-3 h-3 text-sky-400" />
+                    <MessageSquare className="w-3.5 h-3.5 text-sky-400" />
                     <span>Live Chat</span>
                   </Link>
 
                   <Link
                     href="/shooters"
-                    className="py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-center"
+                    className="py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all text-center"
                   >
-                    <Trophy className="w-3 h-3 text-emerald-400" />
+                    <Trophy className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Shooter Profiles</span>
                   </Link>
                 </div>
@@ -1263,11 +1263,11 @@ export default function EvosDashboardPage() {
             </div>
 
             {/* 3. Card Footer */}
-            <div className="shrink-0 p-3 border-t border-white/10 bg-black/80 flex items-center justify-between text-[10px] text-slate-400">
-              <span className="font-mono truncate max-w-[180px]">ID: {selectedNode.id}</span>
+            <div className="shrink-0 p-3 border-t border-white/10 bg-black/80 flex items-center justify-between text-xs text-slate-300">
+              <span className="font-mono font-medium truncate max-w-[180px]">ID: {selectedNode.id}</span>
               <button
                 onClick={() => setSelectedNode(null)}
-                className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold transition-all"
+                className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all"
               >
                 Dismiss
               </button>

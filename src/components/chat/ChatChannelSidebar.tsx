@@ -73,11 +73,11 @@ export function ChatChannelSidebar({
                   <span className="text-sm font-bold text-white truncate font-mono leading-tight">
                     {shooterProfile.callsign}
                   </span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 shrink-0">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 shrink-0">
                     YOU
                   </span>
                 </div>
-                <div className="text-[11px] text-slate-400 truncate leading-tight">
+                <div className="text-xs text-slate-300 font-medium truncate leading-tight">
                   {shooterProfile.name || "Society Member"}
                 </div>
               </div>
@@ -87,9 +87,9 @@ export function ChatChannelSidebar({
                 type="button"
                 onClick={onLogout}
                 title="Log Out of Chat"
-                className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1 text-[10px] font-medium"
+                className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1.5 text-xs font-semibold"
               >
-                <LogOut className="w-3 h-3" />
+                <LogOut className="w-3.5 h-3.5" />
                 <span>LOGOUT</span>
               </button>
             )}
@@ -102,11 +102,11 @@ export function ChatChannelSidebar({
           {/* Section 1: Official Match Frequency */}
           <div>
             <div className="flex items-center justify-between px-1 mb-2.5 shrink-0">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+              <span className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
                 Match Frequency
               </span>
-              <span className="text-[10px] font-mono text-amber-400">
+              <span className="text-xs font-mono font-semibold text-amber-400">
                 {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Shooters
               </span>
             </div>
@@ -135,31 +135,31 @@ export function ChatChannelSidebar({
                         <span>{ch.name}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded font-medium flex items-center gap-1 bg-white/5 text-slate-400">
-                          <MessageSquare className="w-2.5 h-2.5 text-cyan-400" />
+                        <span className="text-xs font-mono px-2 py-0.5 rounded font-medium flex items-center gap-1 bg-white/5 text-slate-300">
+                          <MessageSquare className="w-3 h-3 text-cyan-400" />
                           <span>{engagement.postCount}</span>
                         </span>
 
-                        <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold ${
-                          isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-300"
+                        <span className={`text-xs font-mono px-2 py-0.5 rounded font-bold ${
+                          isActive ? "bg-amber-500 text-black" : "bg-white/10 text-slate-200"
                         }`}>
                           {ch.badge}
                         </span>
 
                         {unread > 0 && !isActive && (
-                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                          <span className="min-w-[18px] h-4.5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
                             {unread}
                           </span>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] text-slate-400 line-clamp-1 flex-1">
+                      <p className="text-xs text-slate-300 line-clamp-1 flex-1 font-normal">
                         {ch.desc}
                       </p>
                       {engagement.reactionCount > 0 && (
-                        <span className="text-[9px] font-mono text-amber-300/80 flex items-center gap-0.5 shrink-0 font-bold">
-                          <Flame className="w-2.5 h-2.5 text-amber-400" />
+                        <span className="text-xs font-mono text-amber-300 flex items-center gap-0.5 shrink-0 font-bold">
+                          <Flame className="w-3 h-3 text-amber-400" />
                           {engagement.reactionCount}
                         </span>
                       )}
@@ -174,11 +174,11 @@ export function ChatChannelSidebar({
           {directPartners.length > 0 && (
             <div>
               <div className="flex items-center justify-between px-1 mb-2.5 shrink-0 pt-2 border-t border-white/10">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-emerald-400" />
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-emerald-400" />
                   Direct Chat (1-on-1)
                 </span>
-                <span className="text-[9px] font-mono text-emerald-400/90 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-xs font-mono font-medium text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                   Closed Net
                 </span>
               </div>
@@ -242,36 +242,36 @@ export function ChatChannelSidebar({
                         {/* Partner Name & Subtitle */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <span className={`text-xs font-bold truncate ${
+                            <span className={`text-sm font-bold truncate ${
                               isActive ? (isRO ? "text-cyan-300" : isMasterOwner ? "text-blue-300" : "text-amber-300") : "text-white"
                             }`}>
                               {partner.name}
                             </span>
-                            <span className={`text-[10px] font-mono font-bold shrink-0 ${
-                              isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-slate-400"
+                            <span className={`text-xs font-mono font-bold shrink-0 ${
+                              isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-slate-300"
                             }`}>
                               [{partner.callsign}]
                             </span>
                           </div>
-                          <div className="text-[10px] font-mono text-slate-400 truncate flex items-center gap-1">
+                          <div className="text-xs font-mono text-slate-300 truncate flex items-center gap-1">
                             {isRO ? (
-                              <span className="text-cyan-300 font-bold flex items-center gap-1">
-                                <Bot className="w-2.5 h-2.5 text-cyan-400" />
+                              <span className="text-cyan-300 font-semibold flex items-center gap-1">
+                                <Bot className="w-3 h-3 text-cyan-400" />
                                 <span>AI Range Officer · 24/7 Intel</span>
                               </span>
                             ) : isOnline ? (
-                              <span className="text-emerald-400/90 flex items-center gap-1 font-medium">
+                              <span className="text-emerald-400 flex items-center gap-1 font-medium">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
                                 <span>Online</span>
                                 <span className="text-slate-500">•</span>
-                                <span className="text-slate-400 truncate">{partner.division || "Competitor"}</span>
+                                <span className="text-slate-300 truncate">{partner.division || "Competitor"}</span>
                               </span>
                             ) : (
-                              <span className="text-slate-500 flex items-center gap-1">
+                              <span className="text-slate-400 flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 inline-block shrink-0" />
                                 <span>Offline</span>
                                 <span className="text-slate-600">•</span>
-                                <span className="text-slate-500 truncate">{partner.division || "Competitor"}</span>
+                                <span className="text-slate-400 truncate">{partner.division || "Competitor"}</span>
                               </span>
                             )}
                           </div>
@@ -281,7 +281,7 @@ export function ChatChannelSidebar({
                       {/* Right: Unread Badge + Dossier Info Trigger */}
                       <div className="flex items-center gap-1 shrink-0 ml-1.5">
                         {unread > 0 && !isActive && (
-                          <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                          <span className="min-w-[18px] h-4.5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
                             {unread}
                           </span>
                         )}
