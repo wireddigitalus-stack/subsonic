@@ -112,7 +112,7 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     role: "OWNER_ADMIN",
     badgeText: "OWNER ADMIN",
     division: "Owner Admin / Executive",
-    status: "online",
+    status: "offline",
     bio: "Executive Match Host & Founder of The Hideout Invitational.",
     rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
   },
@@ -123,7 +123,7 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     role: "MASTER_OWNER",
     badgeText: "MASTER ADMIN",
     division: "Master Admin",
-    status: "online",
+    status: "offline",
     bio: "Master Admin",
     rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
   },
@@ -766,6 +766,19 @@ export default function ChatPage() {
             });
           }
         }
+
+        // 3. Update real-time online/offline presence for direct partners
+        if (Array.isArray(data.onlineCallsigns)) {
+          const onlineSet = new Set(data.onlineCallsigns.map((c: string) => c.toUpperCase()));
+          setDirectPartners((prev) =>
+            prev.map((p) => {
+              if (p.isBot) return { ...p, status: "online" };
+              const isOnline = onlineSet.has(p.callsign.toUpperCase());
+              const newStatus: "online" | "offline" = isOnline ? "online" : "offline";
+              return p.status !== newStatus ? { ...p, status: newStatus } : p;
+            })
+          );
+        }
       } catch {
         // silent
       }
@@ -812,7 +825,7 @@ export default function ChatPage() {
               role: "OWNER_ADMIN",
               badgeText: "OWNER ADMIN",
               division: "Owner Admin / Executive",
-              status: "online",
+              status: "offline",
               bio: "Executive Match Host & Founder of The Hideout Invitational.",
               rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
             });
@@ -827,7 +840,7 @@ export default function ChatPage() {
               role: "MASTER_OWNER",
               badgeText: "MASTER ADMIN",
               division: "Master Admin",
-              status: "online",
+              status: "offline",
               bio: "Master Admin",
               rifleSetup: "Systems & Infrastructure Architecture (Non-Shooter)",
             });
@@ -850,7 +863,7 @@ export default function ChatPage() {
               role: isMaster ? "MASTER_OWNER" : isOwner ? "OWNER_ADMIN" : (s.role || "PRO_COMPETITOR"),
               badgeText: isMaster ? "DEV ADVISOR" : isOwner ? "OWNER ADMIN" : (s.ranking || s.division || "PRO SHOOTER"),
               division: s.division || "Pro Invitational Division",
-              status: "online",
+              status: "offline",
               bio: s.bio || s.quote || "Verified competitor on direct encrypted frequency.",
               rifleSetup: typeof s.rifleSetup === "object"
                 ? `${s.rifleSetup.action || ""} ${s.rifleSetup.optic || ""}`.trim()
@@ -1512,6 +1525,7 @@ export default function ChatPage() {
         setMemberState(data.member.state || "TN");
       }
 
+      setCurrentChannel("invitational");
       setShooterProfile(profile);
       setProfileForm(profile);
       setAuthError(null);
@@ -1534,6 +1548,7 @@ export default function ChatPage() {
   };
 
   const handleLogout = () => {
+    const prevCallsign = shooterProfile.callsign;
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("subsonic_chat_authenticated");
@@ -1542,8 +1557,22 @@ export default function ChatPage() {
       } catch (e) {
         console.warn("Failed to clear chat authentication from storage:", e);
       }
+      // Signal server that this marksman logged out
+      if (prevCallsign && prevCallsign !== "GUEST") {
+        try {
+          fetch("/api/chat/presence", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ callsign: prevCallsign, action: "logout" }),
+            keepalive: true,
+          }).catch(() => {});
+        } catch {}
+      }
     }
     setIsAuthenticated(false);
+    setCurrentChannel("invitational");
+    setDirectPartners(INITIAL_DIRECT_PARTNERS);
+    setUnreadCounts({});
     setShooterProfile(DEFAULT_PROFILE);
     setProfileForm(DEFAULT_PROFILE);
     setLoginCallsign("");

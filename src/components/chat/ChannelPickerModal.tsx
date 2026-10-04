@@ -386,6 +386,7 @@ export function ChannelPickerModal({
                 const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                 const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "SAID DONE" || partner.callsign === "ALLEN";
                 const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
+                const isOnline = isRO || partner.status === "online";
 
                 return (
                   <button
@@ -424,7 +425,7 @@ export function ChannelPickerModal({
                           partner.callsign.slice(0, 2)
                         )}
                         <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
-                          partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
+                          isOnline ? "bg-emerald-400" : partner.status === "on_range" ? "bg-amber-400" : "bg-zinc-600"
                         }`} />
                       </div>
 
@@ -444,9 +445,11 @@ export function ChannelPickerModal({
                             [{partner.callsign}]
                           </span>
 
-                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                            <Lock className="w-2.5 h-2.5" />
-                            <span>DIRECT</span>
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase flex items-center gap-1 ${
+                            isOnline ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" : "bg-white/5 text-slate-400 border border-white/10"
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400" : "bg-zinc-600"}`} />
+                            <span>{isOnline ? "ONLINE" : "OFFLINE"}</span>
                           </span>
 
                           {isActive && (

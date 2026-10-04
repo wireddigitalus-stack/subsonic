@@ -190,6 +190,7 @@ export function ChatChannelSidebar({
                   const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                   const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "SAID DONE" || partner.callsign === "ALLEN";
                   const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
+                  const isOnline = isRO || partner.status === "online";
 
                   return (
                     <div
@@ -229,8 +230,12 @@ export function ChatChannelSidebar({
                               partner.callsign.slice(0, 2)
                             )}
                           </div>
-                          <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black ${
-                            partner.status === "on_range" ? "bg-amber-400" : "bg-emerald-400"
+                          <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black transition-colors ${
+                            isOnline
+                              ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
+                              : partner.status === "on_range"
+                              ? "bg-amber-400"
+                              : "bg-zinc-600 ring-1 ring-zinc-700/50"
                           }`} />
                         </div>
 
@@ -254,8 +259,20 @@ export function ChatChannelSidebar({
                                 <Bot className="w-2.5 h-2.5 text-cyan-400" />
                                 <span>AI Range Officer · 24/7 Intel</span>
                               </span>
+                            ) : isOnline ? (
+                              <span className="text-emerald-400/90 flex items-center gap-1 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
+                                <span>Online</span>
+                                <span className="text-slate-500">•</span>
+                                <span className="text-slate-400 truncate">{partner.division || "Competitor"}</span>
+                              </span>
                             ) : (
-                              partner.division || partner.badgeText || "Competitor"
+                              <span className="text-slate-500 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 inline-block shrink-0" />
+                                <span>Offline</span>
+                                <span className="text-slate-600">•</span>
+                                <span className="text-slate-500 truncate">{partner.division || "Competitor"}</span>
+                              </span>
                             )}
                           </div>
                         </div>

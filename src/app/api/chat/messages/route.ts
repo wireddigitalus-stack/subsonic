@@ -5,6 +5,7 @@ import {
   getLatestChatTimestamp,
   getUserDmConversations,
 } from "@/lib/chat-storage";
+import { recordHeartbeat, getOnlineCallsigns } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,11 @@ export async function GET(req: NextRequest) {
     const excludeCallsign = searchParams.get("excludeCallsign") || undefined;
     const userCallsign = searchParams.get("userCallsign") || undefined;
 
+    if (userCallsign) {
+      recordHeartbeat(userCallsign);
+    }
+    const onlineCallsigns = getOnlineCallsigns();
+
     if (pollUnread) {
       const sinceMs = sinceParam ? parseInt(sinceParam, 10) : 0;
       const latest = await getLatestChatTimestamp(excludeCallsign);
@@ -29,6 +35,7 @@ export async function GET(req: NextRequest) {
         hasUnread,
         unreadCount: hasUnread ? 1 : 0,
         latestAuthor: latest.latestMessage?.author.callsign || latest.latestMessage?.author.name,
+        onlineCallsigns,
       });
     }
 
@@ -53,6 +60,7 @@ export async function GET(req: NextRequest) {
       count: messages.length,
       dmConversations,
       unreadSummary,
+      onlineCallsigns,
     });
   } catch (err: any) {
     console.error("GET /api/chat/messages error:", err);
