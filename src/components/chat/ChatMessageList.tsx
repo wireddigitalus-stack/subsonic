@@ -27,7 +27,10 @@ import {
   ChevronRight,
   ShieldCheck,
   Bot,
-  Radar
+  Radar,
+  Pencil,
+  Trash2,
+  X
 } from "lucide-react";
 import Image from "next/image";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
@@ -61,6 +64,8 @@ export interface ChatMessageListProps {
   activeDirectPartner?: DirectPartner | null;
   onBackToInvitational?: () => void;
   onSelectShooter?: (shooter: DirectPartner) => void;
+  onEditMessage?: (id: string, newContent: string) => Promise<void> | void;
+  onDeleteMessage?: (id: string) => Promise<void> | void;
 }
 
 export function ChatMessageList({
@@ -92,8 +97,59 @@ export function ChatMessageList({
   activeDirectPartner,
   onBackToInvitational,
   onSelectShooter,
+  onEditMessage,
+  onDeleteMessage,
 }: ChatMessageListProps) {
   const isDirectMode = currentChannel.startsWith("dm_");
+
+  const [editingMessageId, setEditingMessageId] = React.useState<string | null>(null);
+  const [editContent, setEditContent] = React.useState("");
+  const [deletingMessageId, setDeletingMessageId] = React.useState<string | null>(null);
+  const [isSubmittingEdit, setIsSubmittingEdit] = React.useState(false);
+
+  const isCurrentUserAdmin = Boolean(
+    shooterProfile &&
+    (
+      shooterProfile.role === "MASTER_OWNER" ||
+      shooterProfile.role === "DEV_ADMIN" ||
+      shooterProfile.role === "OWNER_ADMIN" ||
+      shooterProfile.role === "ADMIN" ||
+      shooterProfile.role === "MODERATOR" ||
+      ["RADAR", "ROB", "LTDAN", "SAID DONE", "ALLEN", "AHURLEY", "HURLEY"].includes(shooterProfile.callsign?.toUpperCase())
+    )
+  );
+
+  const startEditing = (msg: ChatMessage) => {
+    setEditingMessageId(msg.id);
+    setEditContent(msg.content);
+    setDeletingMessageId(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingMessageId(null);
+    setEditContent("");
+  };
+
+  const submitEdit = async (msgId: string) => {
+    if (!editContent.trim() || isSubmittingEdit) return;
+    setIsSubmittingEdit(true);
+    try {
+      if (onEditMessage) {
+        await onEditMessage(msgId, editContent.trim());
+      }
+      setEditingMessageId(null);
+      setEditContent("");
+    } finally {
+      setIsSubmittingEdit(false);
+    }
+  };
+
+  const confirmDelete = async (msgId: string) => {
+    if (onDeleteMessage) {
+      await onDeleteMessage(msgId);
+    }
+    setDeletingMessageId(null);
+  };
 
   const handleAuthorClick = (author: ChatMessage["author"]) => {
     if (!onSelectShooter) return;
@@ -272,10 +328,20 @@ export function ChatMessageList({
                 : "info"
               : "info";
 
+            const isAuthor = Boolean(
+              shooterProfile &&
+              (
+                (shooterProfile.callsign && msg.author?.callsign && msg.author.callsign.toUpperCase() === shooterProfile.callsign.toUpperCase()) ||
+                (shooterProfile.id && msg.author?.id && msg.author.id === shooterProfile.id)
+              )
+            );
+            const canEdit = (isAuthor || isCurrentUserAdmin) && !isRO;
+            const canDelete = isAuthor || isCurrentUserAdmin;
+
             return (
               <div
                 key={msg.id}
-                className={`p-3 md:p-4 rounded-xl md:rounded-2xl transition-all space-y-1.5 md:space-y-2.5 scroll-mb-8 border-l-2 ${
+                className={`group relative p-3 md:p-4 rounded-xl md:rounded-2xl transition-all space-y-1.5 md:space-y-2.5 scroll-mb-8 border-l-2 ${
                   isRO
                     ? roSeverity === "alert"
                       ? "bg-red-950/20 border-l-red-500 border-y border-r border-y-white/5 border-r-white/5"
@@ -408,7 +474,10 @@ export function ChatMessageList({
                         </span>
 
                         {/* Timestamp — inline on mobile */}
-                        <span className="text-[11px] md:hidden text-slate-500">{msg.timestamp}</span>
+                        <span className="text-[11px] md:hidden text-slate-500">
+                          {msg.timestamp}
+                          {msg.isEdited && <span className="text-[9px] text-slate-500 italic ml-1">(edited)</span>}
+                        </span>
                       </div>
 
                       {/* Rig line or RO Subtitle */}
@@ -425,9 +494,43 @@ export function ChatMessageList({
                     </div>
                   </div>
 
-                  {/* Right Meta: Timestamp & Status */}
-                  <div className="hidden md:flex items-center gap-2 text-xs text-slate-400 shrink-0">
-                    <span>{msg.timestamp}</span>
+                  {/* Right Meta: Timestamp, Actions & Status */}
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-400 shrink-0">
+                    {/* Action buttons (Edit & Delete) */}
+                    {(canEdit || canDelete) && (
+                      <div className="flex items-center gap-0.5 sm:gap-1 opacity-70 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        {canEdit && editingMessageId !== msg.id && (
+                          <button
+                            type="button"
+                            onClick={() => startEditing(msg)}
+                            title="Edit transmission"
+                            className="p-1 rounded-md text-slate-400 hover:text-amber-300 hover:bg-white/10 transition-colors"
+                          >
+                            <Pencil className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          </button>
+                        )}
+                        {canDelete && deletingMessageId !== msg.id && (
+                          <button
+                            type="button"
+                            onClick={() => setDeletingMessageId(msg.id)}
+                            title="Delete transmission"
+                            className="p-1 rounded-md text-slate-400 hover:text-red-400 hover:bg-white/10 transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="hidden md:flex items-center gap-1">
+                      {msg.isEdited && (
+                        <span className="text-[10px] text-slate-500 italic select-none" title={msg.editedAt ? `Edited at ${msg.editedAt}` : "Edited"}>
+                          (edited)
+                        </span>
+                      )}
+                      <span>{msg.timestamp}</span>
+                    </div>
+
                     {isFlagged ? (
                       <span className="text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 font-bold">
                         <AlertTriangle className="w-2.5 h-2.5" />
@@ -439,60 +542,129 @@ export function ChatMessageList({
                         AI RO
                       </span>
                     ) : (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="hidden md:inline w-3.5 h-3.5 text-emerald-400" />
                     )}
                   </div>
                 </div>
 
-                {/* Standard Content with Clickable URLs & Competitor Packet Badge */}
-                {msg.content && (
-                  <div className="space-y-2">
-                    <p className={`text-xs sm:text-sm leading-relaxed font-normal whitespace-pre-line ${
-                      isRO ? "text-cyan-50/95" : "text-slate-200"
-                    }`}>
-                      {msg.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
-                        if (part.match(/^https?:\/\//)) {
-                          return (
-                            <a
-                              key={i}
-                              href={part}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`inline-flex items-center gap-1 font-mono font-bold underline underline-offset-4 break-all transition-colors ${
-                                isRO
-                                  ? "text-cyan-300 hover:text-cyan-200 decoration-cyan-400/60 hover:decoration-cyan-200"
-                                  : "text-amber-400 hover:text-amber-300 decoration-amber-500/60 hover:decoration-amber-300"
-                              }`}
-                            >
-                              <span>{part}</span>
-                              <ExternalLink className="w-3 h-3 inline shrink-0" />
-                            </a>
-                          );
-                        }
-                        return part;
-                      })}
-                    </p>
-
-                    {/* Dedicated Interactive Button if message references the competitor packet */}
-                    {(msg.content.includes("competitor-packet") || msg.id.startsWith("welcome-allen")) && (
-                      <div className="pt-1">
-                        <a
-                          href="/competitor-packet"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all shadow-sm active:scale-95 ${
-                            isRO
-                              ? "bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
-                              : "bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200"
-                          }`}
-                        >
-                          <FileText className={`w-3.5 h-3.5 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
-                          <span>Open 2026 Competitor Packet (Guide & PDF)</span>
-                          <ExternalLink className={`w-3 h-3 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
-                        </a>
-                      </div>
-                    )}
+                {/* Inline Delete Confirmation */}
+                {deletingMessageId === msg.id && (
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 text-xs text-red-200 flex items-center justify-between gap-2 animate-fadeIn">
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                      <span>Delete transmission permanently?</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setDeletingMessageId(null)}
+                        className="px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 text-[11px] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => confirmDelete(msg.id)}
+                        className="px-2.5 py-1 rounded-md bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
+                )}
+
+                {/* Inline Edit Form OR Standard Content */}
+                {editingMessageId === msg.id ? (
+                  <div className="space-y-2 pt-1">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          submitEdit(msg.id);
+                        } else if (e.key === "Escape") {
+                          cancelEditing();
+                        }
+                      }}
+                      rows={2}
+                      className="w-full px-3 py-2 rounded-xl bg-black/70 border border-amber-500/40 text-white text-xs sm:text-sm focus:outline-none focus:border-amber-400 font-sans resize-none"
+                      placeholder="Edit message..."
+                      autoFocus
+                    />
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500 hidden sm:inline">Enter to save • Esc to cancel</span>
+                      <div className="flex items-center gap-2 ml-auto">
+                        <button
+                          type="button"
+                          onClick={cancelEditing}
+                          disabled={isSubmittingEdit}
+                          className="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => submitEdit(msg.id)}
+                          disabled={isSubmittingEdit || !editContent.trim()}
+                          className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-semibold transition-all disabled:opacity-50 flex items-center gap-1"
+                        >
+                          <Check className="w-3 h-3" />
+                          <span>Save</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  msg.content && (
+                    <div className="space-y-2">
+                      <p className={`text-xs sm:text-sm leading-relaxed font-normal whitespace-pre-line ${
+                        isRO ? "text-cyan-50/95" : "text-slate-200"
+                      }`}>
+                        {msg.content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => {
+                          if (part.match(/^https?:\/\//)) {
+                            return (
+                              <a
+                                key={i}
+                                href={part}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`inline-flex items-center gap-1 font-mono font-bold underline underline-offset-4 break-all transition-colors ${
+                                  isRO
+                                    ? "text-cyan-300 hover:text-cyan-200 decoration-cyan-400/60 hover:decoration-cyan-200"
+                                    : "text-amber-400 hover:text-amber-300 decoration-amber-500/60 hover:decoration-amber-300"
+                                }`}
+                              >
+                                <span>{part}</span>
+                                <ExternalLink className="w-3 h-3 inline shrink-0" />
+                              </a>
+                            );
+                          }
+                          return part;
+                        })}
+                      </p>
+
+                      {/* Dedicated Interactive Button if message references the competitor packet */}
+                      {(msg.content.includes("competitor-packet") || msg.id.startsWith("welcome-allen")) && (
+                        <div className="pt-1">
+                          <a
+                            href="/competitor-packet"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all shadow-sm active:scale-95 ${
+                              isRO
+                                ? "bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                                : "bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 hover:text-amber-200"
+                            }`}
+                          >
+                            <FileText className={`w-3.5 h-3.5 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
+                            <span>Open 2026 Competitor Packet (Guide & PDF)</span>
+                            <ExternalLink className={`w-3 h-3 shrink-0 ${isRO ? "text-cyan-400" : "text-amber-400"}`} />
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )
                 )}
 
                 {/* DOPE CARD — hidden for initial onboarding */}

@@ -53,7 +53,10 @@ function mapToDb(m: StoredChatMessage) {
     channel_id: m.channelId,
     type: m.type && VALID_TYPES.has(m.type) ? m.type : "STANDARD",
     dope_card: m.dopeCard ?? null,
-    author: m.author,
+    author: {
+      ...m.author,
+      ...(m.isEdited ? { isEdited: true, editedAt: m.editedAt } : {}),
+    },
     content: m.content ?? "",
     created_at: new Date(m.createdAtMs).toISOString(),
     reactions: m.reactions ?? [],
@@ -64,6 +67,8 @@ function mapToDb(m: StoredChatMessage) {
 
 function mapFromDb(row: any): StoredChatMessage {
   const createdAtMs = new Date(row.created_at).getTime();
+  const isEdited = Boolean(row.is_edited || row.author?.isEdited || row.author?.is_edited);
+  const editedAt = row.edited_at || row.author?.editedAt || row.author?.edited_at || undefined;
   return {
     id: row.id,
     channelId: row.channel_id,
@@ -76,6 +81,8 @@ function mapFromDb(row: any): StoredChatMessage {
     moderationStatus: row.moderation_status || "APPROVED",
     aiModerationReport: row.ai_moderation_report || undefined,
     createdAtMs,
+    isEdited,
+    editedAt,
   };
 }
 
@@ -320,3 +327,156 @@ export async function getLatestChatTimestamp(
     return { timestamp: 0, unreadCount: 0 };
   }
 }
+
+/**
+ * Retrieves a single stored chat message by ID.
+ */
+export async function getStoredChatMessageById(id: string): Promise<StoredChatMessage | null> {
+  if (db) {
+    const { data, error } = await db.from("chat_messages").select("*").eq("id", id).maybeSingle();
+    if (error || !data) return null;
+    return mapFromDb(data);
+  }
+
+  // Offline fallback
+  try {
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    for (const line of raw.trim().split("\n").filter(Boolean)) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.id === id) return parsed;
+      } catch {}
+    }
+  } catch {}
+  return null;
+}
+
+/**
+ * Updates an existing chat message's content and sets edited flag.
+ */
+export async function updateStoredChatMessage(
+  id: string,
+  newContent: string,
+  editorCallsign: string
+): Promise<StoredChatMessage | null> {
+  const nowIso = new Date().toISOString();
+
+  if (db) {
+    const { data: existing, error: fetchErr } = await db
+      .from("chat_messages")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchErr || !existing) {
+      throw new Error(`Message ${id} not found.`);
+    }
+
+    const updatedAuthor = {
+      ...(existing.author || {}),
+      isEdited: true,
+      editedAt: nowIso,
+      lastEditedBy: editorCallsign,
+    };
+
+    const { data: updated, error: updateErr } = await db
+      .from("chat_messages")
+      .update({
+        content: newContent,
+        author: updatedAuthor,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (updateErr) {
+      throw new Error(`Database update failed: ${updateErr.message}`);
+    }
+
+    return mapFromDb(updated);
+  }
+
+  // Offline fallback
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const lines = raw.trim().split("\n").filter(Boolean);
+    let updatedRecord: StoredChatMessage | null = null;
+    const newLines: string[] = [];
+
+    for (const line of lines) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.id === id) {
+          parsed.content = newContent;
+          parsed.isEdited = true;
+          parsed.editedAt = nowIso;
+          parsed.author = {
+            ...(parsed.author || {}),
+            isEdited: true,
+            editedAt: nowIso,
+          };
+          updatedRecord = parsed;
+          newLines.push(JSON.stringify(parsed));
+        } else {
+          newLines.push(line);
+        }
+      } catch {
+        newLines.push(line);
+      }
+    }
+
+    if (updatedRecord) {
+      await fs.writeFile(CHAT_FILE, newLines.join("\n") + (newLines.length > 0 ? "\n" : ""), "utf-8");
+      return updatedRecord;
+    }
+  } catch (err: any) {
+    console.error("Error updating stored chat message offline:", err);
+  }
+
+  return null;
+}
+
+/**
+ * Deletes a chat message by ID.
+ */
+export async function deleteStoredChatMessage(id: string): Promise<boolean> {
+  if (db) {
+    const { error } = await db.from("chat_messages").delete().eq("id", id);
+    if (error) {
+      throw new Error(`Database delete failed: ${error.message}`);
+    }
+    return true;
+  }
+
+  // Offline fallback
+  try {
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const lines = raw.trim().split("\n").filter(Boolean);
+    const newLines: string[] = [];
+    let deleted = false;
+
+    for (const line of lines) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.id === id) {
+          deleted = true;
+          continue;
+        }
+        newLines.push(line);
+      } catch {
+        newLines.push(line);
+      }
+    }
+
+    if (deleted) {
+      await fs.writeFile(CHAT_FILE, newLines.join("\n") + (newLines.length > 0 ? "\n" : ""), "utf-8");
+      return true;
+    }
+  } catch (err: any) {
+    console.error("Error deleting stored chat message offline:", err);
+  }
+
+  return false;
+}
+

@@ -4,11 +4,31 @@ import {
   getStoredChatMessages,
   getLatestChatTimestamp,
   getUserDmConversations,
+  getStoredChatMessageById,
+  updateStoredChatMessage,
+  deleteStoredChatMessage,
 } from "@/lib/chat-storage";
 import { recordHeartbeat, getOnlineCallsigns } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+function isCallerAdmin(callsign?: string, role?: string): boolean {
+  const normRole = (role || "").toUpperCase();
+  const normCallsign = (callsign || "").toUpperCase();
+  const adminRoles = ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR"];
+  const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SAID DONE", "ALLEN", "AHURLEY", "HURLEY"];
+  return adminRoles.includes(normRole) || adminCallsigns.includes(normCallsign);
+}
+
+function isCallerAuthor(message: ChatMessage, callsign?: string, authorId?: string): boolean {
+  if (!callsign && !authorId) return false;
+  const msgCallsign = (message.author?.callsign || "").toUpperCase();
+  const testCallsign = (callsign || "").toUpperCase();
+  if (msgCallsign && testCallsign && msgCallsign === testCallsign) return true;
+  if (authorId && message.author?.id === authorId) return true;
+  return false;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -111,3 +131,96 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to persist chat message." }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id, content, editorCallsign, editorRole, editorId } = body;
+
+    if (!id || typeof content !== "string" || !content.trim()) {
+      return NextResponse.json({ error: "Message ID and content are required." }, { status: 400 });
+    }
+
+    const existing = await getStoredChatMessageById(id);
+    if (!existing) {
+      return NextResponse.json({ error: "Message not found." }, { status: 404 });
+    }
+
+    const isAdmin = isCallerAdmin(editorCallsign, editorRole);
+    const isAuthor = isCallerAuthor(existing, editorCallsign, editorId);
+
+    if (!isAdmin && !isAuthor) {
+      return NextResponse.json(
+        { error: "Permission denied. Only the author or an administrator can edit transmissions." },
+        { status: 403 }
+      );
+    }
+
+    const updated = await updateStoredChatMessage(id, content.trim(), editorCallsign || "ADMIN");
+    if (!updated) {
+      return NextResponse.json({ error: "Failed to update transmission." }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: updated,
+    });
+  } catch (err: any) {
+    console.error("PATCH /api/chat/messages error:", err);
+    return NextResponse.json({ error: "Failed to edit transmission." }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    let id = searchParams.get("id");
+    let requesterCallsign = searchParams.get("callsign");
+    let requesterRole = searchParams.get("role");
+    let requesterId = searchParams.get("authorId");
+
+    // Also support JSON body if sent via DELETE body
+    if (!id) {
+      try {
+        const body = await req.json();
+        id = body.id;
+        requesterCallsign = body.requesterCallsign || body.callsign;
+        requesterRole = body.requesterRole || body.role;
+        requesterId = body.requesterId || body.authorId;
+      } catch {}
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
+    }
+
+    const existing = await getStoredChatMessageById(id);
+    if (!existing) {
+      return NextResponse.json({ error: "Message not found." }, { status: 404 });
+    }
+
+    const isAdmin = isCallerAdmin(requesterCallsign || undefined, requesterRole || undefined);
+    const isAuthor = isCallerAuthor(existing, requesterCallsign || undefined, requesterId || undefined);
+
+    if (!isAdmin && !isAuthor) {
+      return NextResponse.json(
+        { error: "Permission denied. Only the author or an administrator can delete transmissions." },
+        { status: 403 }
+      );
+    }
+
+    const deleted = await deleteStoredChatMessage(id);
+    if (!deleted) {
+      return NextResponse.json({ error: "Failed to delete transmission." }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      id,
+    });
+  } catch (err: any) {
+    console.error("DELETE /api/chat/messages error:", err);
+    return NextResponse.json({ error: "Failed to delete transmission." }, { status: 500 });
+  }
+}
+

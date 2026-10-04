@@ -117,6 +117,9 @@ export interface ChatMessage {
     badgeText?: string;
     division?: string;
     rifleSetup?: string;
+    isEdited?: boolean;
+    editedAt?: string;
+    lastEditedBy?: string;
   };
   content: string;
   timestamp: string;
@@ -134,6 +137,8 @@ export interface ChatMessage {
     sentiment: "POSITIVE" | "NEUTRAL" | "SUSPICIOUS" | "TOXIC";
     aiEngine?: string;
   };
+  isEdited?: boolean;
+  editedAt?: string;
 }
 
 export interface FacebookPostItem {

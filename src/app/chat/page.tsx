@@ -684,29 +684,67 @@ export default function ChatPage() {
 
     const syncMessages = async () => {
       try {
-        const since = lastSyncTimestampRef.current;
         const myCallsign = shooterProfile.callsign || "";
-        const url = `/api/chat/messages?channel=${encodeURIComponent(currentChannel)}&userCallsign=${encodeURIComponent(myCallsign)}${since ? `&since=${since}` : "&limit=60"}`;
+        const url = `/api/chat/messages?channel=${encodeURIComponent(currentChannel)}&userCallsign=${encodeURIComponent(myCallsign)}&limit=60`;
         const res = await fetch(url);
         if (!res.ok || !isMounted) return;
         const data = await res.json();
 
         // 1. Process messages for active channel
-        if (Array.isArray(data.messages) && data.messages.length > 0) {
+        if (Array.isArray(data.messages)) {
           setMessages((prev) => {
-            const existingIds = new Set(prev.map((m) => m.id));
-            const newIncoming = data.messages.filter((m: ChatMessage) => !existingIds.has(m.id));
-            if (newIncoming.length === 0) return prev;
-
-            // Chirp for incoming messages from other marksmen
-            const hasExternalMsg = newIncoming.some(
-              (m: ChatMessage) => m.author.callsign?.toUpperCase() !== myCallsign.toUpperCase()
+            const incomingMap = new Map<string, ChatMessage>(
+              data.messages.map((m: ChatMessage) => [m.id, m])
             );
-            if (hasExternalMsg && soundEnabledRef.current) {
-              playRealCommsChirp();
+            const prevIds = new Set(prev.map((m) => m.id));
+
+            // Check if any new external messages arrived for the comms chirp
+            const newIncoming = data.messages.filter((m: ChatMessage) => !prevIds.has(m.id));
+            if (newIncoming.length > 0) {
+              const hasExternalMsg = newIncoming.some(
+                (m: ChatMessage) => m.author.callsign?.toUpperCase() !== myCallsign.toUpperCase()
+              );
+              if (hasExternalMsg && soundEnabledRef.current) {
+                playRealCommsChirp();
+              }
             }
 
-            return [...prev, ...newIncoming];
+            // Update existing messages with edited content, reactions, or status
+            let updated = prev.map((m) => {
+              const serverMsg = incomingMap.get(m.id);
+              if (serverMsg) {
+                if (
+                  serverMsg.content !== m.content ||
+                  serverMsg.isEdited !== m.isEdited ||
+                  JSON.stringify(serverMsg.reactions) !== JSON.stringify(m.reactions) ||
+                  serverMsg.moderationStatus !== m.moderationStatus
+                ) {
+                  return { ...m, ...serverMsg };
+                }
+              }
+              return m;
+            });
+
+            // Reconcile deleted messages: if a message in this channel was created within the server window but is absent, remove it
+            if (data.messages.length > 0) {
+              const oldestServerMs = data.messages[0].createdAtMs || 0;
+              const serverIdSet = new Set(data.messages.map((m: ChatMessage) => m.id));
+              updated = updated.filter((m: any) => {
+                if (m.channelId && m.channelId !== currentChannel) return true;
+                if (m.createdAtMs && m.createdAtMs >= oldestServerMs && !serverIdSet.has(m.id)) {
+                  if (m.id.startsWith("msg_local_") || m.id.startsWith("mock_")) return true;
+                  return false;
+                }
+                return true;
+              });
+            }
+
+            // Append new incoming messages
+            if (newIncoming.length > 0) {
+              updated = [...updated, ...newIncoming];
+            }
+
+            return updated;
           });
 
           if (data.latestTimestamp > lastSyncTimestampRef.current) {
@@ -1335,6 +1373,72 @@ export default function ChatPage() {
     const summaryText = `[DOPE CARD] Target: ${dopeFormData.targetDistance} • Dial: ${dopeFormData.elevationMils} • Wind Hold: ${dopeFormData.windHoldMils}`;
     handleTransmit(summaryText, "DOPE_DROP", dopeFormData);
     setIsDopeModalOpen(false);
+  };
+
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    if (!newContent.trim()) return;
+
+    // Optimistic update
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === messageId
+          ? {
+              ...m,
+              content: newContent.trim(),
+              isEdited: true,
+              editedAt: new Date().toISOString(),
+            }
+          : m
+      )
+    );
+
+    try {
+      const res = await fetch("/api/chat/messages", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: messageId,
+          content: newContent.trim(),
+          editorCallsign: shooterProfile.callsign,
+          editorRole: shooterProfile.role,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Edit message failed:", errData.error);
+      } else {
+        playTacticalChirp(900);
+      }
+    } catch (err) {
+      console.error("Network error editing message:", err);
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    // Optimistic update
+    setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+    try {
+      const res = await fetch("/api/chat/messages", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: messageId,
+          requesterCallsign: shooterProfile.callsign,
+          requesterRole: shooterProfile.role,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Delete message failed:", errData.error);
+      } else {
+        playTacticalChirp(700);
+      }
+    } catch (err) {
+      console.error("Network error deleting message:", err);
+    }
   };
 
   // Push-to-Talk voice input
@@ -2268,6 +2372,8 @@ export default function ChatPage() {
             activeDirectPartner={activeDirectPartner}
             onBackToInvitational={handleBackToInvitational}
             onSelectShooter={handleOpenDossier}
+            onEditMessage={handleEditMessage}
+            onDeleteMessage={handleDeleteMessage}
           />
           <ChatInputBar
             handleSendMessage={handleSendMessage}
