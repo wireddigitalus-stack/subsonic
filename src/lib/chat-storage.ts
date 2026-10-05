@@ -267,6 +267,25 @@ export async function getUserDmConversations(userCallsign: string): Promise<User
 
     if (!partnerCallsign || partnerCallsign === userCallsign.toUpperCase()) continue;
 
+    // Filter out deleted/unknown members so deleted accounts never ghost back into the chat
+    const isExecutiveOrBot = ["RO", "RO BOT", "RADAR", "ROB", "ALLEN", "SAID DONE", "LTDAN", "AHURLEY"].includes(partnerCallsign);
+    if (!isExecutiveOrBot) {
+      try {
+        const { getMembersFromStorage } = require("./members");
+        const { getShootersFromStorage } = require("./shooters");
+        const activeMembers = getMembersFromStorage();
+        const activeShooters = getShootersFromStorage();
+        const exists =
+          activeMembers.some((m: any) => normalizeCallsign(m.callsign || "") === normalizeCallsign(partnerCallsign)) ||
+          activeShooters.some((s: any) => normalizeCallsign(s.callsign || "") === normalizeCallsign(partnerCallsign));
+        if (!exists) {
+          continue; // Account was deleted in admin! Do not include in DM list.
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
     const canonicalChannel = getDmChannelId(normUser, partnerCallsign);
     const existing = convMap.get(canonicalChannel);
     const isIncoming = !isAuthor;
@@ -478,5 +497,77 @@ export async function deleteStoredChatMessage(id: string): Promise<boolean> {
   }
 
   return false;
+}
+
+/**
+ * Purges all chat messages authored by a callsign OR belonging to a DM thread with this callsign.
+ * Used when an account is deleted by an admin so it cleanly vanishes from chat lists.
+ */
+export async function purgeChatForCallsign(callsign: string): Promise<number> {
+  const norm = normalizeCallsign(callsign);
+  if (!norm) return 0;
+  let count = 0;
+
+  if (db) {
+    try {
+      // 1. Delete all DM channels involving this callsign (e.g. dm_radar_testx or dm_testx)
+      const { data: dmData } = await db
+        .from("chat_messages")
+        .select("id")
+        .ilike("channel_id", `%${norm}%`);
+
+      if (dmData && dmData.length > 0) {
+        const dmIds = dmData.map((d: any) => d.id);
+        await db.from("chat_messages").delete().in("id", dmIds);
+        count += dmIds.length;
+      }
+
+      // 2. Delete any remaining messages where author callsign matches
+      const { data: authData } = await db
+        .from("chat_messages")
+        .select("id, author");
+
+      if (authData && authData.length > 0) {
+        const authIds = authData
+          .filter((d: any) => normalizeCallsign(d.author?.callsign || "") === norm)
+          .map((d: any) => d.id);
+
+        if (authIds.length > 0) {
+          await db.from("chat_messages").delete().in("id", authIds);
+          count += authIds.length;
+        }
+      }
+    } catch (err: any) {
+      console.error("Database purgeChatForCallsign error:", err);
+    }
+  }
+
+  // Offline fallback cleanup
+  try {
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const lines = raw.trim().split("\n").filter(Boolean);
+    const newLines: string[] = [];
+
+    for (const line of lines) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        const ch = (parsed.channelId || "").toLowerCase();
+        const authorCall = normalizeCallsign(parsed.author?.callsign || "");
+        if (ch.includes(norm) || authorCall === norm) {
+          count++;
+          continue;
+        }
+        newLines.push(line);
+      } catch {
+        newLines.push(line);
+      }
+    }
+
+    await fs.writeFile(CHAT_FILE, newLines.join("\n") + (newLines.length > 0 ? "\n" : ""), "utf-8");
+  } catch (err: any) {
+    if (err.code !== "ENOENT") console.error("Offline purgeChatForCallsign error:", err);
+  }
+
+  return count;
 }
 

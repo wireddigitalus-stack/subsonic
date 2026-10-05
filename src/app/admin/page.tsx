@@ -675,6 +675,7 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         setShooterProfiles((prev) => prev.filter((s) => s.id !== id && s.callsign?.toLowerCase() !== id.toLowerCase()));
         setMembers((prev) => prev.filter((m) => m.member_id !== id && m.callsign?.toLowerCase() !== id.toLowerCase()));
+        fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => {});
       } else {
         const data = await res.json().catch(() => ({}));
         alert(data.error || "Failed to delete shooter profile.");
@@ -1092,12 +1093,14 @@ export default function AdminDashboardPage() {
         method: "DELETE",
       }).catch(() => {});
 
-      // 2. Cross-delete by callsign and ID from shooters API
+      // 2. Cross-delete by callsign and ID from shooters API and chat messages
       if (targetCallsign) {
         fetch(`/api/shooters?id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
         fetch(`/api/join?member_id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
+        fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
       }
       fetch(`/api/shooters?id=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
+      fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
 
       // 3. Unconditionally remove from local state
       setMembers((prev) =>

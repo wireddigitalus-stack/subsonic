@@ -7,6 +7,7 @@ import {
   getStoredChatMessageById,
   updateStoredChatMessage,
   deleteStoredChatMessage,
+  purgeChatForCallsign,
 } from "@/lib/chat-storage";
 import { recordHeartbeat, getOnlineCallsigns } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
@@ -174,20 +175,30 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
+    const purgeCallsign = searchParams.get("purgeCallsign");
     let id = searchParams.get("id");
     let requesterCallsign = searchParams.get("callsign");
     let requesterRole = searchParams.get("role");
     let requesterId = searchParams.get("authorId");
 
     // Also support JSON body if sent via DELETE body
-    if (!id) {
+    if (!id && !purgeCallsign) {
       try {
         const body = await req.json();
         id = body.id;
         requesterCallsign = body.requesterCallsign || body.callsign;
         requesterRole = body.requesterRole || body.role;
         requesterId = body.requesterId || body.authorId;
+        if (body.purgeCallsign) {
+          const count = await purgeChatForCallsign(body.purgeCallsign);
+          return NextResponse.json({ success: true, purged: body.purgeCallsign, count });
+        }
       } catch {}
+    }
+
+    if (purgeCallsign) {
+      const count = await purgeChatForCallsign(purgeCallsign);
+      return NextResponse.json({ success: true, purged: purgeCallsign, count });
     }
 
     if (!id) {

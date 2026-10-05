@@ -149,6 +149,25 @@ const DEFAULT_PROFILE: ShooterProfile = {
 };
 
 
+function getChannelReadMap(callsign: string): Record<string, number> {
+  if (typeof window === "undefined" || !callsign) return {};
+  try {
+    const raw = localStorage.getItem(`subsonic_read_map_${callsign.toLowerCase()}`);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function markChannelRead(callsign: string, channelId: string, timestampMs = Date.now()) {
+  if (typeof window === "undefined" || !callsign || !channelId) return;
+  try {
+    const map = getChannelReadMap(callsign);
+    map[channelId] = Math.max(map[channelId] || 0, timestampMs);
+    localStorage.setItem(`subsonic_read_map_${callsign.toLowerCase()}`, JSON.stringify(map));
+  } catch {}
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CHAT_MESSAGES);
   const [activeNetTab, setActiveNetTab] = useState<"PRO" | "PUBLIC">("PRO");
@@ -272,6 +291,8 @@ export default function ChatPage() {
       return [partnerWithId, ...prev];
     });
     setCurrentChannel(targetChannelId);
+    markChannelRead(myCallsign, targetChannelId, Date.now());
+    setUnreadCounts((prev) => ({ ...prev, [targetChannelId]: 0 }));
     setIsDossierModalOpen(false);
     playTacticalChirp(1200);
   }, [shooterProfile.callsign]);
@@ -757,13 +778,25 @@ export default function ChatPage() {
         }
 
         // 2. Process active DM conversations & unread badges across channels
-        if (Array.isArray(data.dmConversations) && data.dmConversations.length > 0) {
+        if (Array.isArray(data.dmConversations)) {
+          const myCall = (shooterProfile.callsign || "").toUpperCase();
+          const readMap = getChannelReadMap(myCall);
+          const deletedRaw = typeof window !== "undefined" ? localStorage.getItem("subsonic_deleted_members") : null;
+          const deletedList = new Set(deletedRaw ? (JSON.parse(deletedRaw) as string[]).map((x) => x.toLowerCase()) : []);
+
           setDirectPartners((prev) => {
-            let changed = false;
-            const updated = [...prev];
+            // Prune any deleted partners or partners that have been purged
+            const filtered = prev.filter(
+              (p) => !deletedList.has(p.callsign.toLowerCase()) && !deletedList.has(p.id.toLowerCase())
+            );
+            let changed = filtered.length !== prev.length;
+            const updated = [...filtered];
+
             for (const conv of data.dmConversations) {
               const partnerCall = (conv.partnerCallsign || "").toUpperCase();
-              if (!partnerCall || partnerCall === myCallsign.toUpperCase()) continue;
+              if (!partnerCall || partnerCall === myCall) continue;
+              if (deletedList.has(partnerCall.toLowerCase()) || deletedList.has(conv.channelId.toLowerCase())) continue;
+
               const exists = updated.some(
                 (p) => p.callsign.toUpperCase() === partnerCall || p.id === conv.channelId
               );
@@ -784,25 +817,30 @@ export default function ChatPage() {
             return changed ? updated : prev;
           });
 
-          if (data.unreadSummary && typeof data.unreadSummary === "object") {
-            setUnreadCounts((prev) => {
-              const updated = { ...prev };
-              let hasNewIncoming = false;
-              for (const [chId, count] of Object.entries(data.unreadSummary)) {
-                if (chId !== currentChannel) {
-                  const num = count as number;
-                  if (num > (prev[chId] || 0)) {
-                    hasNewIncoming = true;
-                  }
-                  updated[chId] = num;
+          // Unread badges: only count as unread if the latest transmission arrived AFTER user last read this channel
+          setUnreadCounts((prev) => {
+            const updated: Record<string, number> = {};
+            let hasNewIncoming = false;
+
+            for (const conv of data.dmConversations) {
+              if (conv.channelId === currentChannel) {
+                markChannelRead(myCall, currentChannel, Math.max(conv.createdAtMs || 0, Date.now()));
+                continue;
+              }
+              const lastRead = readMap[conv.channelId] || 0;
+              if ((conv.createdAtMs || 0) > lastRead && conv.unreadCount > 0) {
+                updated[conv.channelId] = conv.unreadCount;
+                if (conv.unreadCount > (prev[conv.channelId] || 0)) {
+                  hasNewIncoming = true;
                 }
               }
-              if (hasNewIncoming && soundEnabledRef.current) {
-                playRealCommsChirp();
-              }
-              return updated;
-            });
-          }
+            }
+
+            if (hasNewIncoming && soundEnabledRef.current) {
+              playRealCommsChirp();
+            }
+            return updated;
+          });
         }
 
         // 3. Update real-time online/offline presence for direct partners
@@ -844,6 +882,8 @@ export default function ChatPage() {
         if (!res.ok || isCancelled) return;
         const data = await res.json();
         const shooters: any[] = Array.isArray(data.shooters) ? data.shooters : [];
+        const deletedRaw = typeof window !== "undefined" ? localStorage.getItem("subsonic_deleted_members") : null;
+        const deletedList = new Set(deletedRaw ? (JSON.parse(deletedRaw) as string[]).map((x) => x.toLowerCase()) : []);
 
         setDirectPartners((prev) => {
           const myCallsign = (shooterProfile.callsign || "").toUpperCase();
@@ -884,10 +924,11 @@ export default function ChatPage() {
             });
           }
 
-          // 3. Map all registered shooters from database
+          // 3. Map all registered shooters from database (excluding deleted members)
           for (const s of shooters) {
             const sCallsign = (s.callsign || "").toUpperCase();
             if (!sCallsign || sCallsign === myCallsign) continue;
+            if (deletedList.has(sCallsign.toLowerCase()) || (s.id && deletedList.has(s.id.toLowerCase()))) continue;
 
             const chId = getDmChannelId(myCallsign, sCallsign);
             const isOwner = sCallsign === "SAID DONE" || sCallsign === "ALLEN";
@@ -911,9 +952,10 @@ export default function ChatPage() {
             });
           }
 
-          // 4. Preserve any existing DM partners added dynamically
+          // 4. Preserve any existing DM partners added dynamically (excluding deleted members)
           for (const p of prev) {
             if (p.callsign.toUpperCase() !== myCallsign) {
+              if (deletedList.has(p.callsign.toLowerCase()) || deletedList.has(p.id.toLowerCase())) continue;
               const canonicalId = p.id === "dm_ro" ? "dm_ro" : getDmChannelId(myCallsign, p.callsign);
               if (!partnersMap.has(canonicalId)) {
                 partnersMap.set(canonicalId, { ...p, id: canonicalId });
@@ -921,7 +963,9 @@ export default function ChatPage() {
             }
           }
 
-          return Array.from(partnersMap.values());
+          return Array.from(partnersMap.values()).filter(
+            (p) => !deletedList.has(p.callsign.toLowerCase()) && !deletedList.has(p.id.toLowerCase())
+          );
         });
       } catch (err) {
         console.error("Failed to load shooters for direct partners:", err);
@@ -1133,11 +1177,14 @@ export default function ChatPage() {
   useEffect(() => {
     if (prevChannelRef.current !== currentChannel) {
       setUnreadCounts((prev) => ({ ...prev, [currentChannel]: 0 }));
+      if (shooterProfile.callsign) {
+        markChannelRead(shooterProfile.callsign, currentChannel, Date.now());
+      }
       prevChannelRef.current = currentChannel;
       lastSyncTimestampRef.current = 0;
       scrollContainerToBottom(false);
     }
-  }, [currentChannel, scrollContainerToBottom]);
+  }, [currentChannel, scrollContainerToBottom, shooterProfile.callsign]);
 
   // Scroll inner container to bottom only when switching channels (initial)
   useEffect(() => {
