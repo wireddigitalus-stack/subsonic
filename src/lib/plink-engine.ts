@@ -100,8 +100,8 @@ const UNSPORTSMANLIKE_PATTERNS: RegExp[] = [
 ];
 
 const SPAM_PATTERNS: RegExp[] = [
-  /(.{4,})\1{2,}/i,
-  /^(.)\1{8,}$/,
+  /(.{8,})\1{4,}/i,
+  /^(.)\1{15,}$/,
 ];
 
 const COMMERCIAL_PATTERNS: RegExp[] = [

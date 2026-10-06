@@ -365,8 +365,10 @@ export default function ChatPage() {
   // Plink AI Moderator state
   const [plinkWarningHistory, setPlinkWarningHistory] = useState<Record<string, number>>({});
   const allenWelcomedRef = useRef<Set<string>>(new Set());
-  // track last non-Plink message content per user for spam detection
-  const lastUserMessageRef = useRef<Record<string, string>>({});
+  // RO moderator: message IDs already evaluated, session start, per-author recent texts (flood window)
+  const roProcessedIdsRef = useRef<Set<string>>(new Set());
+  const roSessionStartRef = useRef<number>(Date.now());
+  const roRecentByAuthorRef = useRef<Record<string, { text: string; t: number }[]>>({});
 
   // Live Mountain Weather Telemetry state
   const [liveWeather, setLiveWeather] = useState<{
@@ -1042,12 +1044,33 @@ export default function ChatPage() {
     // If in 1-on-1 with RO, handleTransmit already provides RO's direct reply
     if (currentChannel === "dm_ro") return;
 
-    const isDirect = currentChannel.startsWith("dm_");
-    const lastContent = lastUserMessageRef.current[lastMsg.author.id];
-    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, lastContent, isDirect);
+    // FIX 1: Each message is evaluated exactly once (re-renders/sync must not re-trigger)
+    if (roProcessedIdsRef.current.has(lastMsg.id)) return;
+    roProcessedIdsRef.current.add(lastMsg.id);
 
-    // Update the last message ref for spam detection
-    lastUserMessageRef.current[lastMsg.author.id] = lastMsg.content;
+    // FIX 2 + 3: Only moderate live transmissions authored in THIS browser
+    // (the sender's own device) or local simulation bots. Synced history from
+    // other users is moderated on their own device — prevents every viewer
+    // spawning duplicate warnings for someone who may already be offline.
+    const myCall = (shooterProfile.callsign || "").toUpperCase();
+    const isMine = (lastMsg.author.callsign || "").toUpperCase() === myCall && !!myCall;
+    const isLocalBot = lastMsg.id.startsWith("bot_");
+    if (!isMine && !isLocalBot) return;
+    const msgMs = (lastMsg as any).createdAtMs as number | undefined;
+    if (msgMs && msgMs < roSessionStartRef.current) return;
+
+    // FIX 4: Flood = same text 3+ times from same author within 30 seconds
+    const now = Date.now();
+    const authorKey = lastMsg.author.id;
+    const normalized = (lastMsg.content || "").trim().toLowerCase();
+    const recent = (roRecentByAuthorRef.current[authorKey] || []).filter((r) => now - r.t < 30000);
+    recent.push({ text: normalized, t: now });
+    roRecentByAuthorRef.current[authorKey] = recent;
+    const dupCount = recent.filter((r) => r.text === normalized).length;
+    const floodPrev = dupCount >= 3 && normalized.length > 5 ? lastMsg.content : undefined;
+
+    const isDirect = currentChannel.startsWith("dm_");
+    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, floodPrev, isDirect);
 
     if (!response) return;
 
