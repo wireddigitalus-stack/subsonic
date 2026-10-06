@@ -1696,26 +1696,81 @@ export default function ChatPage() {
   };
 
 
-  const handleAddReaction = (messageId: string, emoji: string) => {
+  const handleAddReaction = async (messageId: string, emoji: string) => {
+    const myCallsign = (shooterProfile?.callsign || "RADAR").toUpperCase();
+
+    // Optimistic local update
     setMessages((prev) =>
       prev.map((msg) => {
         if (msg.id !== messageId) return msg;
-        const existing = msg.reactions.find((r) => r.emoji === emoji);
+        const currentReactions = msg.reactions || [];
+        const existing = currentReactions.find((r) => r.emoji === emoji);
         if (existing) {
-          return {
-            ...msg,
-            reactions: msg.reactions.map((r) =>
-              r.emoji === emoji ? { ...r, count: r.count + 1 } : r
-            ),
-          };
+          const userHasReacted = (existing.users || []).some(
+            (u) => u.toUpperCase() === myCallsign || u.toLowerCase() === "you"
+          );
+          if (userHasReacted) {
+            // Toggle off
+            const remainingUsers = (existing.users || []).filter(
+              (u) => u.toUpperCase() !== myCallsign && u.toLowerCase() !== "you"
+            );
+            if (remainingUsers.length === 0 || existing.count <= 1) {
+              return {
+                ...msg,
+                reactions: currentReactions.filter((r) => r.emoji !== emoji),
+              };
+            }
+            return {
+              ...msg,
+              reactions: currentReactions.map((r) =>
+                r.emoji === emoji ? { ...r, count: Math.max(1, r.count - 1), users: remainingUsers } : r
+              ),
+            };
+          } else {
+            // Increment
+            return {
+              ...msg,
+              reactions: currentReactions.map((r) =>
+                r.emoji === emoji ? { ...r, count: r.count + 1, users: [...(r.users || []), myCallsign] } : r
+              ),
+            };
+          }
         } else {
+          // Brand new reaction
           return {
             ...msg,
-            reactions: [...msg.reactions, { emoji, count: 1, users: ["you"] }],
+            reactions: [...currentReactions, { emoji, count: 1, users: [myCallsign] }],
           };
         }
       })
     );
+
+    // Audio tactical confirmation
+    playTacticalChirp(900);
+
+    // Persist to server
+    try {
+      const res = await fetch("/api/chat/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reaction",
+          messageId,
+          emoji,
+          userCallsign: myCallsign,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.message) {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, ...data.message } : m))
+          );
+        }
+      }
+    } catch (err) {
+      console.warn("Reaction persistence warning:", err);
+    }
   };
 
   const copyDopeToClipboard = (msgId: string, dope: DopeCardData) => {

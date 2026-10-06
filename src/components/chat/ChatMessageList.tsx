@@ -711,26 +711,37 @@ export function ChatMessageList({
 
                 {/* Reactions Bar */}
                 <div className="flex items-center gap-1 md:gap-2 pt-0.5 flex-wrap">
-                  {msg.reactions.map((reaction) => (
-                    <button
-                      key={reaction.emoji}
-                      type="button"
-                      onClick={() => handleAddReaction(msg.id, reaction.emoji)}
-                      className="px-2 md:px-3 py-1 rounded-full bg-black/50 border border-white/10 text-xs md:text-sm text-slate-200 hover:border-amber-500/40 flex items-center gap-1.5 transition-all active:scale-95"
-                    >
-                      <span className="text-sm md:text-base">{reaction.emoji}</span>
-                      <span className="font-mono text-xs font-bold">{reaction.count}</span>
-                    </button>
-                  ))}
+                  {msg.reactions.map((reaction) => {
+                    const myCallsign = (shooterProfile?.callsign || "").toUpperCase();
+                    const hasReacted = (reaction.users || []).some(
+                      (u) => u.toUpperCase() === myCallsign || u.toLowerCase() === "you"
+                    );
+                    return (
+                      <button
+                        key={reaction.emoji}
+                        type="button"
+                        onClick={() => handleAddReaction(msg.id, reaction.emoji)}
+                        className={`px-2 md:px-2.5 py-0.5 rounded-full border text-xs md:text-sm flex items-center gap-1.5 transition-all active:scale-95 ${
+                          hasReacted
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-300 font-bold"
+                            : "bg-black/50 border-white/10 text-slate-200 hover:border-amber-500/40"
+                        }`}
+                        title={hasReacted ? `Remove ${reaction.emoji}` : `React with ${reaction.emoji}`}
+                      >
+                        <span className="text-xs md:text-base">{reaction.emoji}</span>
+                        <span className="font-mono text-[11px] md:text-xs font-bold">{reaction.count}</span>
+                      </button>
+                    );
+                  })}
 
-                  {/* Quick Reactions Palette */}
-                  <div className="hidden md:flex items-center gap-1.5 pl-2 border-l border-white/10 opacity-70 hover:opacity-100 transition-opacity">
+                  {/* Quick Reactions Palette (Visible on mobile & desktop) */}
+                  <div className="flex items-center gap-1 sm:gap-1.5 pl-1.5 sm:pl-2 border-l border-white/10 opacity-75 hover:opacity-100 transition-opacity">
                     {["🎯", "🔥", "⛰️", "💡"].map((emoji) => (
                       <button
                         key={emoji}
                         type="button"
                         onClick={() => handleAddReaction(msg.id, emoji)}
-                        className="p-1 text-sm hover:scale-125 transition-transform active:scale-95"
+                        className="p-1 sm:p-1.5 text-xs sm:text-sm hover:scale-125 transition-transform active:scale-95"
                         title={`React with ${emoji}`}
                       >
                         {emoji}

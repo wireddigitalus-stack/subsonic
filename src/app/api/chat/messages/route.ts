@@ -8,6 +8,7 @@ import {
   updateStoredChatMessage,
   deleteStoredChatMessage,
   purgeChatForCallsign,
+  toggleStoredChatMessageReaction,
 } from "@/lib/chat-storage";
 import { recordHeartbeat, getPresenceSnapshot } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
@@ -94,6 +95,30 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // Check if this is an emoji reaction action
+    if (body.action === "reaction" || (body.messageId && body.emoji)) {
+      const { messageId, emoji, userCallsign } = body;
+      if (!messageId || !emoji) {
+        return NextResponse.json({ error: "messageId and emoji are required for reaction." }, { status: 400 });
+      }
+      if (userCallsign) {
+        recordHeartbeat(userCallsign);
+      }
+      const updated = await toggleStoredChatMessageReaction(
+        messageId,
+        emoji,
+        userCallsign || "MARKSMAN"
+      );
+      if (!updated) {
+        return NextResponse.json({ error: "Message not found or reaction failed." }, { status: 404 });
+      }
+      return NextResponse.json({
+        success: true,
+        message: updated,
+      });
+    }
+
     const rawMsg = body.message as ChatMessage;
 
     if (!rawMsg || (!rawMsg.content?.trim() && !rawMsg.dopeCard)) {

@@ -457,6 +457,157 @@ export async function updateStoredChatMessage(
 }
 
 /**
+ * Toggles or adds a reaction on a chat message.
+ * If the user has already reacted with this emoji, removes their reaction.
+ * Otherwise, adds their reaction.
+ */
+export async function toggleStoredChatMessageReaction(
+  id: string,
+  emoji: string,
+  userCallsign: string
+): Promise<StoredChatMessage | null> {
+  const normUser = (userCallsign || "MARKSMAN").trim().toUpperCase();
+
+  if (db) {
+    const { data: existing, error: fetchErr } = await db
+      .from("chat_messages")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchErr || !existing) {
+      throw new Error(`Message ${id} not found.`);
+    }
+
+    const currentReactions: Array<{ emoji: string; count: number; users: string[] }> = Array.isArray(existing.reactions)
+      ? existing.reactions
+      : [];
+
+    let updatedReactions = [...currentReactions];
+    const existingIndex = updatedReactions.findIndex((r) => r.emoji === emoji);
+
+    if (existingIndex >= 0) {
+      const target = updatedReactions[existingIndex];
+      const userList = Array.isArray(target.users) ? target.users : [];
+      const userIndex = userList.findIndex(
+        (u) => u.trim().toUpperCase() === normUser || u === "you"
+      );
+
+      if (userIndex >= 0) {
+        // Toggle OFF: Remove user
+        const newUsers = userList.filter((_, idx) => idx !== userIndex);
+        if (newUsers.length === 0 || target.count <= 1) {
+          updatedReactions.splice(existingIndex, 1);
+        } else {
+          updatedReactions[existingIndex] = {
+            ...target,
+            count: Math.max(1, target.count - 1),
+            users: newUsers,
+          };
+        }
+      } else {
+        // Add user to existing emoji
+        updatedReactions[existingIndex] = {
+          ...target,
+          count: target.count + 1,
+          users: [...userList, normUser],
+        };
+      }
+    } else {
+      // New reaction emoji
+      updatedReactions.push({
+        emoji,
+        count: 1,
+        users: [normUser],
+      });
+    }
+
+    const { data: updated, error: updateErr } = await db
+      .from("chat_messages")
+      .update({ reactions: updatedReactions })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (updateErr) {
+      throw new Error(`Failed to update reactions: ${updateErr.message}`);
+    }
+
+    return mapFromDb(updated);
+  }
+
+  // Offline fallback
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const lines = raw.trim().split("\n").filter(Boolean);
+    let updatedRecord: StoredChatMessage | null = null;
+    const newLines: string[] = [];
+
+    for (const line of lines) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.id === id) {
+          const currentReactions = Array.isArray(parsed.reactions) ? parsed.reactions : [];
+          let updatedReactions = [...currentReactions];
+          const existingIndex = updatedReactions.findIndex((r) => r.emoji === emoji);
+
+          if (existingIndex >= 0) {
+            const target = updatedReactions[existingIndex];
+            const userList = Array.isArray(target.users) ? target.users : [];
+            const userIndex = userList.findIndex(
+              (u) => u.trim().toUpperCase() === normUser || u === "you"
+            );
+
+            if (userIndex >= 0) {
+              const newUsers = userList.filter((_, idx) => idx !== userIndex);
+              if (newUsers.length === 0 || target.count <= 1) {
+                updatedReactions.splice(existingIndex, 1);
+              } else {
+                updatedReactions[existingIndex] = {
+                  ...target,
+                  count: Math.max(1, target.count - 1),
+                  users: newUsers,
+                };
+              }
+            } else {
+              updatedReactions[existingIndex] = {
+                ...target,
+                count: target.count + 1,
+                users: [...userList, normUser],
+              };
+            }
+          } else {
+            updatedReactions.push({
+              emoji,
+              count: 1,
+              users: [normUser],
+            });
+          }
+
+          parsed.reactions = updatedReactions;
+          updatedRecord = parsed;
+          newLines.push(JSON.stringify(parsed));
+        } else {
+          newLines.push(line);
+        }
+      } catch {
+        newLines.push(line);
+      }
+    }
+
+    if (updatedRecord) {
+      await fs.writeFile(CHAT_FILE, newLines.join("\n") + (newLines.length > 0 ? "\n" : ""), "utf-8");
+      return updatedRecord;
+    }
+  } catch (err: any) {
+    console.error("Error updating reactions offline:", err);
+  }
+
+  return null;
+}
+
+/**
  * Deletes a chat message by ID.
  */
 export async function deleteStoredChatMessage(id: string): Promise<boolean> {
