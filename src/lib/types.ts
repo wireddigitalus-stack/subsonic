@@ -43,6 +43,7 @@ export interface DirectPartner {
   badgeText?: string;
   division?: string;
   avatarUrl?: string;
+  avatarColor?: string;
   image?: string;
   rifleSetup?: string;
   status: "online" | "on_range" | "offline";
@@ -113,6 +114,7 @@ export interface ChatMessage {
     name: string;
     callsign?: string;
     avatarUrl?: string;
+    avatarColor?: string;
     role: "MASTER_OWNER" | "DEV_ADMIN" | "OWNER_ADMIN" | "ADMIN" | "MODERATOR" | "PRO_COMPETITOR" | "MATCH_DIRECTOR" | "OFFICIAL" | "VIP" | "MEMBER" | "AI_MODERATOR";
     badgeText?: string;
     division?: string;

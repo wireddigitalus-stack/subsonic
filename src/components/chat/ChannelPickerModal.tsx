@@ -20,6 +20,7 @@ import {
   Radar
 } from "lucide-react";
 import { ChannelConfig, DirectPartner } from "@/lib/types";
+import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
 
 export interface ChannelEngagementInfo {
   postCount: number;
@@ -407,28 +408,30 @@ export function ChannelPickerModal({
                     }`}
                   >
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 border relative overflow-hidden ${
-                        isRO
-                          ? "bg-cyan-950 text-cyan-300 border border-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                          : isMasterOwner
-                          ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 font-black shadow-[0_0_10px_rgba(6,182,212,0.4)]"
-                          : isOwnerAdmin
-                          ? "bg-emerald-500 text-black border-emerald-300 font-black"
-                          : "bg-black/60 text-slate-300 border-white/10"
-                      }`}>
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs shrink-0 ring-2 ring-white/20 text-white relative overflow-hidden shadow-sm"
+                        style={
+                          !partner.image && !isRO
+                            ? {
+                                backgroundColor: getAvatarColor(partner.avatarColor, partner.callsign || partner.name).hex,
+                                borderColor: getAvatarColor(partner.avatarColor, partner.callsign || partner.name).borderHex,
+                              }
+                            : undefined
+                        }
+                      >
                         {partner.image ? (
                           <img src={partner.image} alt="" className="w-full h-full object-cover" />
                         ) : isRO ? (
                           "🤖"
                         ) : isMasterOwner ? (
                           <Radar className="w-4 h-4 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_6px_rgba(6,182,212,0.85)] animate-pulse" />
-                        ) : isOwnerAdmin ? (
-                          <span className="font-mono font-black text-xs text-black">A</span>
                         ) : (
-                          partner.callsign.slice(0, 2)
+                          <span className="text-white font-bold tracking-wider text-[11px]">
+                            {getUserInitials(partner.name, partner.callsign)}
+                          </span>
                         )}
                         <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
-                          isOnline ? "bg-emerald-400" : partner.status === "on_range" ? "bg-amber-400" : "bg-zinc-600"
+                          isOnline ? "bg-emerald-400 animate-pulse" : partner.status === "on_range" ? "bg-amber-400" : "bg-zinc-600"
                         }`} />
                       </div>
 

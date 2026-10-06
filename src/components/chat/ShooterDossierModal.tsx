@@ -19,6 +19,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
+import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
 
 export interface ShooterDossierModalProps {
   isOpen: boolean;
@@ -73,25 +74,27 @@ export function ShooterDossierModal({
 
         {/* Identity Card */}
         <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/[0.03] border border-white/10">
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 overflow-hidden ${
-            isRO
-              ? "bg-gradient-to-br from-cyan-900 via-cyan-950 to-black text-cyan-300 border-cyan-400/80 shadow-[0_0_20px_rgba(6,182,212,0.35)]"
-              : isMasterOwner
-              ? "bg-gradient-to-br from-blue-700 via-indigo-900 to-cyan-950 text-cyan-200 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-              : isOwnerAdmin
-              ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-black border-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
-              : "bg-black/60 text-amber-400 border-white/15"
-          }`}>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-mono font-black border shrink-0 overflow-hidden text-white"
+            style={
+              !shooter.image && !isRO
+                ? {
+                    backgroundColor: getAvatarColor(shooter.avatarColor, shooter.callsign || shooter.name).hex,
+                    borderColor: getAvatarColor(shooter.avatarColor, shooter.callsign || shooter.name).borderHex,
+                  }
+                : undefined
+            }
+          >
             {shooter.image ? (
               <img src={shooter.image} alt="" className="w-full h-full object-cover" />
             ) : isRO ? (
               "🤖"
             ) : isMasterOwner ? (
               <Radar className="w-7 h-7 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_12px_rgba(6,182,212,0.85)] animate-pulse" />
-            ) : isOwnerAdmin ? (
-              <span className="font-mono font-black text-2xl text-black">A</span>
             ) : (
-              shooter.callsign?.slice(0, 2) || "SS"
+              <span className="text-white font-black tracking-wider text-xl">
+                {getUserInitials(shooter.name, shooter.callsign)}
+              </span>
             )}
           </div>
 

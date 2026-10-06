@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
+import { getUserInitials, getAvatarColor, formatLastActive } from "@/lib/avatar-colors";
 
 export interface ChatMessageListProps {
   pinnedAnnouncement: string | null;
@@ -66,6 +67,8 @@ export interface ChatMessageListProps {
   onSelectShooter?: (shooter: DirectPartner) => void;
   onEditMessage?: (id: string, newContent: string) => Promise<void> | void;
   onDeleteMessage?: (id: string) => Promise<void> | void;
+  onlineCallsigns?: string[];
+  lastActiveMap?: Record<string, number>;
 }
 
 export function ChatMessageList({
@@ -99,6 +102,8 @@ export function ChatMessageList({
   onSelectShooter,
   onEditMessage,
   onDeleteMessage,
+  onlineCallsigns = [],
+  lastActiveMap = {},
 }: ChatMessageListProps) {
   const isDirectMode = currentChannel.startsWith("dm_");
 
@@ -338,6 +343,22 @@ export function ChatMessageList({
             const canEdit = (isAuthor || isCurrentUserAdmin) && !isRO;
             const canDelete = isAuthor || isCurrentUserAdmin;
 
+            const authorCallsign = (msg.author.callsign || "").toUpperCase();
+            const authorName = msg.author.name || msg.author.callsign || "Marksman";
+            const initials = getUserInitials(msg.author.name, msg.author.callsign);
+            const avatarColorObj = getAvatarColor(msg.author.avatarColor, authorCallsign || authorName);
+
+            // Last active presence calculation
+            const authorLastSeen =
+              (lastActiveMap && authorCallsign && lastActiveMap[authorCallsign]) ||
+              (msg as any).createdAtMs ||
+              0;
+            const isOnline =
+              isRO ||
+              (onlineCallsigns && authorCallsign && onlineCallsigns.some((c) => c.toUpperCase() === authorCallsign)) ||
+              (authorLastSeen > 0 && Date.now() - authorLastSeen < 30_000);
+            const lastActiveText = formatLastActive(authorLastSeen, isOnline);
+
             return (
               <div
                 key={msg.id}
@@ -373,38 +394,26 @@ export function ChatMessageList({
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
                       title={`View ${msg.author.name} Profile & Direct Chat`}
-                      className={`flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-cyan-400 cursor-pointer overflow-hidden ${
-                        isRO
-                          ? "bg-cyan-950 text-cyan-300 ring-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                          : isMasterOwner
-                          ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
-                          : isOwnerAdmin
-                          ? "bg-emerald-500 text-black ring-emerald-300 font-black"
-                          : isAdmin
-                          ? "bg-cyan-600 text-black ring-cyan-300 font-black"
-                          : isMod
-                          ? "bg-purple-600 text-white ring-purple-300 font-black"
-                          : isMD
-                          ? "bg-amber-500 text-black ring-amber-400"
-                          : isDopeDrop
-                          ? "bg-cyan-950 text-cyan-300 ring-cyan-500/40"
-                          : "bg-white/10 text-slate-300 ring-white/10"
-                      }`}
+                      className="flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-cyan-400 cursor-pointer overflow-hidden shadow-sm"
+                      style={
+                        !msg.author.avatarUrl && !isRO
+                          ? {
+                              backgroundColor: avatarColorObj.hex,
+                              boxShadow: `inset 0 0 0 1px ${avatarColorObj.borderHex}`,
+                            }
+                          : undefined
+                      }
                     >
                       {msg.author.avatarUrl ? (
                         <img src={msg.author.avatarUrl} alt="" className="w-full h-full object-cover" />
                       ) : isRO ? (
-                        "🤖"
+                        <span className="text-sm">🤖</span>
                       ) : isMasterOwner ? (
                         <Radar className="w-4 h-4 md:w-5 md:h-5 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_8px_rgba(6,182,212,0.85)] animate-pulse" />
-                      ) : isOwnerAdmin ? (
-                        <span className="font-mono font-black text-sm md:text-base text-black">A</span>
-                      ) : isAdmin ? (
-                        "🛡️"
-                      ) : isMod ? (
-                        "⚖️"
                       ) : (
-                        msg.author.callsign?.slice(0, 2) || "SS"
+                        <span className="text-white font-bold tracking-wider text-[11px] md:text-xs">
+                          {initials}
+                        </span>
                       )}
                     </button>
 
@@ -435,6 +444,27 @@ export function ChatMessageList({
                             [{msg.author.callsign}]
                           </button>
                         )}
+
+                        {/* Last Active Time next to user's name */}
+                        <span
+                          className={`inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                            isOnline
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25"
+                              : "bg-white/[0.04] text-slate-400 border border-white/5"
+                          }`}
+                          title={
+                            isOnline
+                              ? `${isRO ? "RO BOT" : msg.author.name} is currently connected to chat net`
+                              : `${msg.author.name}'s last transmission or active session recorded`
+                          }
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              isOnline ? "bg-emerald-400 animate-pulse" : "bg-slate-500"
+                            }`}
+                          />
+                          <span>{lastActiveText}</span>
+                        </span>
 
                         <span
                           className={`text-xs font-semibold px-2 py-0.5 rounded uppercase ${

@@ -20,6 +20,7 @@ import {
   ChevronRight,
   MessageSquare
 } from "lucide-react";
+import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
 
 interface ChatMobileMenuModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ interface ChatMobileMenuModalProps {
     rifleSetup: string;
     badgeText: string;
     image?: string;
+    avatarColor?: string;
   };
   onOpenPass: () => void;
   onOpenChannels: () => void;
@@ -107,13 +109,10 @@ export function ChatMobileMenuModal({
           <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 space-y-2.5">
             <div className="flex items-center gap-3">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-sm ring-2 shrink-0 overflow-hidden ${
-                  isMasterOwner
-                    ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
-                    : isOwnerAdmin
-                    ? "bg-emerald-500 text-black ring-emerald-300 font-black"
-                    : "bg-amber-500 text-black font-bold ring-amber-400/50"
-                }`}
+                className="w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-sm ring-2 ring-white/20 shrink-0 overflow-hidden text-white shadow-sm"
+                style={{
+                  backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                }}
               >
                 {shooterProfile.image ? (
                   <img
@@ -123,10 +122,10 @@ export function ChatMobileMenuModal({
                   />
                 ) : isMasterOwner ? (
                   <Radar className="w-5 h-5 text-cyan-300 stroke-[2.2]" />
-                ) : isOwnerAdmin ? (
-                  "A"
                 ) : (
-                  shooterProfile.callsign.slice(0, 2)
+                  <span className="text-white font-bold tracking-wider text-xs">
+                    {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                  </span>
                 )}
               </div>
 

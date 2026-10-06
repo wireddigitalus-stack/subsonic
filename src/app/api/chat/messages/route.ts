@@ -9,7 +9,7 @@ import {
   deleteStoredChatMessage,
   purgeChatForCallsign,
 } from "@/lib/chat-storage";
-import { recordHeartbeat, getOnlineCallsigns } from "@/lib/chat-presence";
+import { recordHeartbeat, getPresenceSnapshot } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     if (userCallsign) {
       recordHeartbeat(userCallsign);
     }
-    const onlineCallsigns = getOnlineCallsigns();
+    const { onlineCallsigns, lastActiveMap } = getPresenceSnapshot();
 
     if (pollUnread) {
       const sinceMs = sinceParam ? parseInt(sinceParam, 10) : 0;
@@ -57,6 +57,7 @@ export async function GET(req: NextRequest) {
         unreadCount: hasUnread ? 1 : 0,
         latestAuthor: latest.latestMessage?.author.callsign || latest.latestMessage?.author.name,
         onlineCallsigns,
+        lastActiveMap,
       });
     }
 
@@ -82,6 +83,7 @@ export async function GET(req: NextRequest) {
       dmConversations,
       unreadSummary,
       onlineCallsigns,
+      lastActiveMap,
     });
   } catch (err: any) {
     console.error("GET /api/chat/messages error:", err);
@@ -98,6 +100,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Message content or DOPE card required." }, { status: 400 });
     }
 
+    // Record heartbeat for author on transmit
+    if (rawMsg.author?.callsign) {
+      recordHeartbeat(rawMsg.author.callsign);
+    }
+
     // Ensure valid author and channel
     const messageToSave: ChatMessage = {
       id: rawMsg.id || "msg_" + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
@@ -112,6 +119,8 @@ export async function POST(req: NextRequest) {
         badgeText: rawMsg.author?.badgeText || "MEMBER",
         division: rawMsg.author?.division || "Open Division",
         rifleSetup: rawMsg.author?.rifleSetup || "Precision Rimfire",
+        avatarUrl: rawMsg.author?.avatarUrl,
+        avatarColor: rawMsg.author?.avatarColor,
       },
       content: rawMsg.content,
       timestamp: rawMsg.timestamp || new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),

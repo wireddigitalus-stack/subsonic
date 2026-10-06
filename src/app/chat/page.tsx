@@ -81,6 +81,12 @@ import {
 } from "@/lib/chat-audio";
 import { clearCommsAlert, incrementUnreadMessages } from "@/lib/comms-status";
 import { getDmChannelId, parseDmParticipants, normalizeCallsign } from "@/lib/chat-utils";
+import {
+  DARK_AVATAR_COLORS,
+  getAvatarColor,
+  getUserInitials,
+  formatLastActive,
+} from "@/lib/avatar-colors";
 
 // Tactical Network Definition
 interface ChannelConfig {
@@ -148,6 +154,7 @@ interface ShooterProfile {
   rifleSetup: string;
   badgeText: string;
   image?: string;
+  avatarColor?: string;
 }
 
 const DEFAULT_PROFILE: ShooterProfile = {
@@ -157,6 +164,7 @@ const DEFAULT_PROFILE: ShooterProfile = {
   division: "Pro Invitational Division",
   rifleSetup: "Unclaimed Rig",
   badgeText: "SOCIETY GUEST",
+  avatarColor: "#0f172a",
 };
 
 
@@ -380,6 +388,10 @@ export default function ChatPage() {
     }, 0);
   }, [unreadCounts]);
   const prevChannelRef = useRef(currentChannel);
+
+  // Real-time marksmen presence & last active timestamps
+  const [onlineCallsigns, setOnlineCallsigns] = useState<string[]>([]);
+  const [lastActiveMap, setLastActiveMap] = useState<Record<string, number>>({});
 
   // iOS visual viewport height for keyboard avoidance
   const [chatHeight, setChatHeight] = useState<string>("calc(100dvh - 10rem)");
@@ -695,6 +707,9 @@ export default function ChatPage() {
                 }));
               } catch {}
             }
+            if (!parsedShooter.avatarColor) {
+              parsedShooter.avatarColor = getAvatarColor(undefined, parsedShooter.callsign || parsedShooter.name).hex;
+            }
             setShooterProfile(parsedShooter);
             setProfileForm(parsedShooter);
           } catch {}
@@ -896,8 +911,13 @@ export default function ChatPage() {
           });
         }
 
-        // 3. Update real-time online/offline presence for direct partners
+        // 3. Update real-time online/offline presence & last active timestamps
+        if (data.lastActiveMap && typeof data.lastActiveMap === "object") {
+          setLastActiveMap((prev) => ({ ...prev, ...data.lastActiveMap }));
+        }
+
         if (Array.isArray(data.onlineCallsigns)) {
+          setOnlineCallsigns(data.onlineCallsigns);
           const onlineSet = new Set(data.onlineCallsigns.map((c: string) => c.toUpperCase()));
           setDirectPartners((prev) =>
             prev.map((p) => {
@@ -1406,6 +1426,8 @@ export default function ChatPage() {
         badgeText: shooterProfile.badgeText,
         division: shooterProfile.division,
         rifleSetup: shooterProfile.rifleSetup,
+        avatarUrl: shooterProfile.image,
+        avatarColor: shooterProfile.avatarColor,
       },
       content: content,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
@@ -1865,21 +1887,20 @@ export default function ChatPage() {
                 className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
                 title="View Shooter Pass"
               >
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 overflow-hidden ${
-                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                    ? "bg-blue-800 text-cyan-200 ring-1 ring-cyan-400"
-                    : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
-                    ? "bg-emerald-500 text-black font-black ring-1 ring-emerald-300"
-                    : "bg-amber-500 text-black font-bold"
-                }`}>
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                  style={{
+                    backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                  }}
+                >
                   {shooterProfile.image ? (
                     <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
                   ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
                     <Radar className="w-3 h-3 text-cyan-300 stroke-[2.5]" />
-                  ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
-                    "A"
                   ) : (
-                    shooterProfile.callsign.slice(0, 2)
+                    <span className="text-white font-bold tracking-tight text-[10px]">
+                      {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                    </span>
                   )}
                 </div>
                 <span className={`font-mono font-bold text-xs truncate max-w-[80px] ${
@@ -2038,21 +2059,20 @@ export default function ChatPage() {
                   data-telemetry="chat_edit_shooter_profile"
                   className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] transition-all text-xs group"
                 >
-                  <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ${
-                    shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                      ? "bg-blue-800 text-cyan-200 ring-1 ring-cyan-400"
-                      : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN"
-                      ? "bg-emerald-500 text-black font-black ring-1 ring-emerald-300"
-                      : "bg-amber-500 text-black font-bold"
-                  }`}>
+                  <div
+                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                    style={{
+                      backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                    }}
+                  >
                     {shooterProfile.image ? (
                       <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
                     ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
                       <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
-                    ) : shooterProfile.callsign === "SAID DONE" || shooterProfile.callsign === "ALLEN" || shooterProfile.role === "OWNER_ADMIN" ? (
-                      "A"
                     ) : (
-                      shooterProfile.callsign.slice(0, 2)
+                      <span className="text-white font-bold tracking-tight text-[9px] sm:text-[10px]">
+                        {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                      </span>
                     )}
                   </div>
                   <span className={`font-mono font-bold text-[11px] sm:text-xs ${
@@ -2501,6 +2521,8 @@ export default function ChatPage() {
             onOpenDossier={handleOpenDossier}
             shooterProfile={shooterProfile}
             onLogout={handleLogout}
+            onlineCallsigns={onlineCallsigns}
+            lastActiveMap={lastActiveMap}
           />
         )}
 
@@ -2541,6 +2563,8 @@ export default function ChatPage() {
             onSelectShooter={handleOpenDossier}
             onEditMessage={handleEditMessage}
             onDeleteMessage={handleDeleteMessage}
+            onlineCallsigns={onlineCallsigns}
+            lastActiveMap={lastActiveMap}
           />
           <ChatInputBar
             handleSendMessage={handleSendMessage}
@@ -2814,6 +2838,69 @@ export default function ChatPage() {
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  {/* Tactical Avatar Color (When no profile photo is uploaded) */}
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="text-xs font-mono font-bold text-slate-200">
+                          Tactical Avatar Color
+                        </label>
+                        <p className="text-[11px] text-slate-400">
+                          Chosen insignia tone with white initials when no photo is uploaded
+                        </p>
+                      </div>
+
+                      {/* Live Avatar Preview */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">Preview:</span>
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-white/20 text-white shrink-0 shadow-lg transition-transform active:scale-95"
+                          style={{
+                            backgroundColor: getAvatarColor(profileForm.avatarColor, profileForm.callsign || profileForm.name).hex,
+                            borderColor: getAvatarColor(profileForm.avatarColor, profileForm.callsign || profileForm.name).borderHex,
+                          }}
+                        >
+                          <span className="text-white font-bold tracking-wider text-xs">
+                            {getUserInitials(profileForm.name, profileForm.callsign)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Dark Tactical Color Swatches */}
+                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 pt-1">
+                      {DARK_AVATAR_COLORS.map((c) => {
+                        const isSelected =
+                          getAvatarColor(profileForm.avatarColor, profileForm.callsign || profileForm.name).id === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => setProfileForm({ ...profileForm, avatarColor: c.hex })}
+                            title={c.name}
+                            className={`group relative h-8 rounded-lg flex items-center justify-center transition-all ${
+                              isSelected
+                                ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-black scale-105"
+                                : "hover:scale-105 border border-white/15"
+                            }`}
+                            style={{ backgroundColor: c.hex }}
+                          >
+                            {isSelected && (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-white drop-shadow" />
+                            )}
+                            <span className="sr-only">{c.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                      <span>Selected color:</span>
+                      <span className="text-amber-300 font-bold">
+                        {getAvatarColor(profileForm.avatarColor, profileForm.callsign || profileForm.name).name}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-3 pt-2">

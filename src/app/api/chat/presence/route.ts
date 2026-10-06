@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { recordHeartbeat, recordLogout, getOnlineCallsigns } from "@/lib/chat-presence";
+import { recordHeartbeat, recordLogout, getPresenceSnapshot } from "@/lib/chat-presence";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const online = getOnlineCallsigns();
-  return NextResponse.json({ online, count: online.length });
+  const { onlineCallsigns, lastActiveMap } = getPresenceSnapshot();
+  return NextResponse.json({ online: onlineCallsigns, lastActiveMap, count: onlineCallsigns.length });
 }
 
 export async function POST(req: NextRequest) {
@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
       recordHeartbeat(callsign);
     }
 
-    const online = getOnlineCallsigns();
-    return NextResponse.json({ success: true, online, count: online.length });
+    const { onlineCallsigns, lastActiveMap } = getPresenceSnapshot();
+    return NextResponse.json({ success: true, online: onlineCallsigns, lastActiveMap, count: onlineCallsigns.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

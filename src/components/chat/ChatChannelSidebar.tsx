@@ -3,6 +3,7 @@
 import React from "react";
 import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, LogOut } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
+import { getUserInitials, getAvatarColor, formatLastActive } from "@/lib/avatar-colors";
 
 export interface ChatChannelSidebarProps {
   activeNetTab: "PRO" | "PUBLIC";
@@ -18,10 +19,13 @@ export interface ChatChannelSidebarProps {
     name?: string;
     callsign: string;
     image?: string;
+    avatarColor?: string;
     role?: string;
     badgeText?: string;
   };
   onLogout?: () => void;
+  onlineCallsigns?: string[];
+  lastActiveMap?: Record<string, number>;
 }
 
 export function ChatChannelSidebar({
@@ -36,6 +40,8 @@ export function ChatChannelSidebar({
   onOpenDossier,
   shooterProfile,
   onLogout,
+  onlineCallsigns = [],
+  lastActiveMap = {},
 }: ChatChannelSidebarProps) {
   const selfCallsign = (shooterProfile?.callsign || "").toUpperCase();
   const selfIsMaster = shooterProfile?.role === "MASTER_OWNER" || selfCallsign === "RADAR" || selfCallsign === "ROB";
@@ -51,19 +57,20 @@ export function ChatChannelSidebar({
           <div className="pb-3 mb-3 border-b border-white/10 flex items-center justify-between gap-2 shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="relative shrink-0">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 overflow-hidden ${
-                  selfIsMaster
-                    ? "bg-blue-800 text-cyan-200 ring-cyan-400"
-                    : selfIsOwner
-                    ? "bg-emerald-500 text-black ring-emerald-300"
-                    : "bg-white/10 text-amber-400 ring-amber-500/40"
-                }`}>
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-white/20 text-white overflow-hidden shadow-sm"
+                  style={{
+                    backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                  }}
+                >
                   {shooterProfile.image ? (
                     <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
                   ) : selfIsMaster ? (
                     <Radar className="w-4 h-4 text-cyan-300" />
                   ) : (
-                    shooterProfile.callsign?.slice(0, 2) || "SS"
+                    <span className="text-white font-bold tracking-wider text-xs">
+                      {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                    </span>
                   )}
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black bg-emerald-400" />
@@ -188,9 +195,17 @@ export function ChatChannelSidebar({
                   const isActive = currentChannel === partner.id;
                   const unread = unreadCounts[partner.id] || 0;
                   const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
-                  const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "SAID DONE" || partner.callsign === "ALLEN";
-                  const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
-                  const isOnline = isRO || partner.status === "online";
+                  const pCallsign = (partner.callsign || "").toUpperCase();
+                  const isMasterOwner = partner.role === "MASTER_OWNER" || pCallsign === "ROB" || pCallsign === "RADAR";
+                  const pLastSeen = (lastActiveMap && lastActiveMap[pCallsign]) || 0;
+                  const isOnline =
+                    isRO ||
+                    (onlineCallsigns && onlineCallsigns.some((c) => c.toUpperCase() === pCallsign)) ||
+                    partner.status === "online" ||
+                    (pLastSeen > 0 && Date.now() - pLastSeen < 30_000);
+                  const pColor = getAvatarColor(partner.avatarColor, pCallsign || partner.name);
+                  const pInitials = getUserInitials(partner.name, partner.callsign);
+                  const lastActiveText = formatLastActive(pLastSeen, isOnline);
 
                   return (
                     <div
@@ -209,30 +224,32 @@ export function ChatChannelSidebar({
                       >
                         {/* Avatar / Icon with Status Dot */}
                         <div className="relative shrink-0">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 overflow-hidden ${
-                            isRO
-                              ? "bg-cyan-950 text-cyan-300 ring-cyan-400/60 font-black shadow-[0_0_10px_rgba(6,182,212,0.25)]"
-                              : isMasterOwner
-                              ? "bg-blue-800 text-cyan-200 ring-cyan-400"
-                              : isOwnerAdmin
-                              ? "bg-emerald-500 text-black ring-emerald-300"
-                              : "bg-white/10 text-slate-300 ring-white/10"
-                          }`}>
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-white/20 text-white overflow-hidden shadow-sm shrink-0"
+                            style={
+                              !partner.image && !isRO
+                                ? {
+                                    backgroundColor: pColor.hex,
+                                    boxShadow: `inset 0 0 0 1px ${pColor.borderHex}`,
+                                  }
+                                : undefined
+                            }
+                          >
                             {partner.image ? (
                               <img src={partner.image} alt="" className="w-full h-full object-cover" />
                             ) : isRO ? (
                               "🤖"
                             ) : isMasterOwner ? (
                               <Radar className="w-4 h-4 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_6px_rgba(6,182,212,0.85)] animate-pulse" />
-                            ) : isOwnerAdmin ? (
-                              <span className="font-mono font-black text-xs text-black">A</span>
                             ) : (
-                              partner.callsign.slice(0, 2)
+                              <span className="text-white font-bold tracking-wider text-[11px]">
+                                {pInitials}
+                              </span>
                             )}
                           </div>
                           <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black transition-colors ${
                             isOnline
-                              ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
+                              ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)] animate-pulse"
                               : partner.status === "on_range"
                               ? "bg-amber-400"
                               : "bg-zinc-600 ring-1 ring-zinc-700/50"
@@ -261,15 +278,15 @@ export function ChatChannelSidebar({
                               </span>
                             ) : isOnline ? (
                               <span className="text-emerald-400 flex items-center gap-1 font-medium">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0" />
-                                <span>Online</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0 animate-pulse" />
+                                <span>Active now</span>
                                 <span className="text-slate-500">•</span>
                                 <span className="text-slate-300 truncate">{partner.division || "Competitor"}</span>
                               </span>
                             ) : (
                               <span className="text-slate-400 flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 inline-block shrink-0" />
-                                <span>Offline</span>
+                                <span>{lastActiveText}</span>
                                 <span className="text-slate-600">•</span>
                                 <span className="text-slate-400 truncate">{partner.division || "Competitor"}</span>
                               </span>
