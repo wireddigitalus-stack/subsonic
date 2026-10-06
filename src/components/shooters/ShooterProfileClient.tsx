@@ -10,6 +10,7 @@ import {
   Quote,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   CheckCircle2,
   Camera,
@@ -384,33 +385,46 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
       />
 
       {/* ─── TOP TOURNAMENT NAV & ACTION BAR ─────────────────────────── */}
-      <div className="border-b border-white/10 bg-black/60 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-            <Link href="/" className="hover:text-white transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <Link href="/shooters" className="hover:text-white transition-colors">Marksmen Directory</Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-amber-400 font-bold">{shooter.callsign}</span>
+      <div className="border-b border-white/10 bg-black/70 backdrop-blur-xl sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
+          {/* Dedicated Back Button & Clean Breadcrumbs */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Link
+              href="/shooters"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-mono font-bold border border-white/10 transition-all shrink-0 active:scale-95 shadow-sm"
+              title="Return to Competitors Directory"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400" />
+              <span>← Competitors</span>
+            </Link>
+
+            <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 truncate">
+              <Link href="/" className="hover:text-white transition-colors shrink-0">Home</Link>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <Link href="/shooters" className="hover:text-white transition-colors shrink-0">Competitors</Link>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+              <span className="text-amber-400 font-bold truncate max-w-[140px] md:max-w-none">{shooter.callsign || displayName}</span>
+            </nav>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
             <button
               onClick={() => setShowPosterModal(true)}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0"
             >
               <Maximize2 className="w-3.5 h-3.5" />
-              <span>Spotlight Poster</span>
+              <span className="hidden sm:inline">Spotlight</span> Poster
             </button>
 
             <button
               onClick={handleCopyShareLink}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shrink-0"
             >
               {copiedLink ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Link Copied!</span>
+                  <span className="text-emerald-400">Copied</span>
                 </>
               ) : (
                 <>
@@ -420,21 +434,21 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               )}
             </button>
 
-            {/* Yellow Competitor Packet Button */}
+            {/* Competitor Packet Button */}
             <Link
               href="/competitor-packet"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-[0_0_20px_rgba(245,158,11,0.5)] border border-amber-300"
+              className="px-3 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.4)] border border-amber-300 shrink-0"
             >
               <FileText className="w-3.5 h-3.5 fill-black text-black" />
-              <span>Competitor Packet</span>
+              <span className="hidden sm:inline">Competitor</span> Packet
             </Link>
 
             <Link
               href="/chat"
-              className="px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-tactical-glow"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:brightness-110 text-black transition-all flex items-center gap-1.5 shadow-tactical-glow shrink-0"
             >
               <MessageSquare className="w-3.5 h-3.5 fill-black" />
-              <span>Chat Room</span>
+              <span>Chat</span>
             </Link>
           </div>
         </div>
@@ -906,6 +920,35 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             </div>
           </div>
         </section>
+
+        {/* ─── BOTTOM NAVIGATION & RETURN BANNER ──────────────────────── */}
+        <div className="pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Link
+            href="/shooters"
+            className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 text-white text-xs sm:text-sm font-mono font-bold flex items-center justify-center gap-2 transition-all hover:border-amber-400/50 active:scale-95 shadow-sm"
+          >
+            <ChevronLeft className="w-4 h-4 text-amber-400" />
+            <span>← Return to Competitors Directory</span>
+          </Link>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Link
+              href="/competitor-packet"
+              className="w-1/2 sm:w-auto px-4 py-3 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs sm:text-sm font-mono font-bold flex items-center justify-center gap-2 transition-all"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Packet</span>
+            </Link>
+
+            <Link
+              href="/chat"
+              className="w-1/2 sm:w-auto px-5 py-3 rounded-2xl bg-emerald-500 hover:brightness-110 text-black text-xs sm:text-sm font-mono font-bold flex items-center justify-center gap-2 transition-all shadow-tactical-glow"
+            >
+              <MessageSquare className="w-4 h-4 fill-black" />
+              <span>Live Comms</span>
+            </Link>
+          </div>
+        </div>
 
       </div>
 

@@ -13,6 +13,7 @@ import {
   Quote, 
   Sparkles, 
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   CheckCircle2,
   Search,
@@ -230,6 +231,9 @@ function ShootersContent() {
               );
               if (matched) {
                 setSelectedShooter(matched);
+                if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                  window.location.replace(`/shooters/${matched.id}`);
+                }
                 return;
               }
             }
@@ -271,6 +275,9 @@ function ShootersContent() {
         );
         if (matched) {
           setSelectedShooter(matched);
+          if (typeof window !== "undefined" && window.innerWidth < 1024) {
+            window.location.replace(`/shooters/${matched.id}`);
+          }
           return;
         }
       }
@@ -305,7 +312,16 @@ function ShootersContent() {
   });
 
   return (
-    <div className="space-y-12 pb-24">
+    <div className="space-y-8 sm:space-y-12 pb-24">
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+          <span className="text-amber-400 font-bold">Competitor Profiles</span>
+        </nav>
+      </div>
+
       {/* Header with Call-to-Action */}
       <section className="relative pt-6 pb-8 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
@@ -406,28 +422,38 @@ function ShootersContent() {
               ))}
             </div>
 
-            {/* Shooter List */}
-            <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible no-scrollbar gap-3 pb-2 lg:pb-0">
+            {/* Shooter List - Clean Vertical Cards on Mobile and Desktop */}
+            <div className="flex flex-col gap-3">
               {filteredShooters.length === 0 ? (
-                <div className="p-4 rounded-xl ios-glass text-center text-xs text-slate-400">
+                <div className="p-6 rounded-2xl ios-glass text-center text-xs sm:text-sm text-slate-400 border border-white/10">
                   No competitors matched your search.
                 </div>
               ) : (
                 filteredShooters.map((shooter) => {
-                  const isSelected = selectedShooter.id === shooter.id;
+                  const isSelected = selectedShooter?.id === shooter.id;
+                  const rifleSummary = shooter.rifleSetup?.action || (typeof shooter.rifleSetup === "string" ? shooter.rifleSetup : null);
+
                   return (
-                    <button
+                    <Link
                       key={shooter.id}
-                      onClick={() => setSelectedShooter(shooter)}
-                      className={`w-[280px] sm:w-[320px] lg:w-full shrink-0 lg:shrink text-left p-4 sm:p-4 rounded-2xl transition-all border ${
+                      href={`/shooters/${shooter.id}`}
+                      onClick={(e) => {
+                        // On desktop (lg screens), clicking selects the competitor for live preview on the right
+                        if (typeof window !== "undefined" && window.innerWidth >= 1024) {
+                          e.preventDefault();
+                          setSelectedShooter(shooter);
+                        }
+                      }}
+                      className={`w-full text-left p-3.5 sm:p-4 rounded-2xl transition-all border block group ${
                         isSelected
                           ? "ios-glass-card border-amber-500/60 shadow-tactical-glow bg-amber-500/5"
-                          : "ios-glass border-white/5 hover:border-white/20"
+                          : "ios-glass border-white/5 hover:border-white/20 hover:bg-white/[0.04]"
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-11 h-11 rounded-full overflow-hidden border border-amber-400/60 shadow-sm relative shrink-0 bg-black">
+                          {/* Competitor Avatar */}
+                          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-md relative shrink-0 bg-black">
                             {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") ? (
                               <img
                                 src={shooter.image}
@@ -435,29 +461,59 @@ function ShootersContent() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-amber-400 font-bold text-xs">
+                              <div className="w-full h-full flex items-center justify-center text-amber-400 font-black text-sm">
                                 {shooter.callsign?.slice(0, 2) || "SS"}
                               </div>
                             )}
                           </div>
-                          <div className="min-w-0">
-                            <div className="text-[10px] font-mono text-amber-400 font-bold uppercase truncate">
-                              {shooter.division}
+
+                          {/* Shooter Info */}
+                          <div className="min-w-0 space-y-0.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold uppercase">
+                                {shooter.callsign || "MARKS"}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400 uppercase truncate">
+                                {shooter.division}
+                              </span>
                             </div>
-                            <h3 className="text-sm font-black text-white truncate">
+
+                            <h3 className="text-sm sm:text-base font-black text-white truncate group-hover:text-amber-300 transition-colors">
                               {getShooterDisplayName(shooter)}
                             </h3>
-                            <p className="text-[10px] text-slate-400 mt-0.5 truncate">
-                              {shooter.ranking}
+
+                            <p className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+                              <span className="text-emerald-400 font-semibold">{shooter.ranking}</span>
+                              {shooter.homeRange && (
+                                <>
+                                  <span className="text-slate-600">•</span>
+                                  <span className="truncate">{shooter.homeRange}</span>
+                                </>
+                              )}
                             </p>
+
+                            {rifleSummary && (
+                              <p className="text-[10px] font-mono text-slate-500 truncate hidden sm:block">
+                                Rig: {rifleSummary}
+                              </p>
+                            )}
                           </div>
                         </div>
 
-                        <div className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-mono font-bold shrink-0">
-                          {shooter.podiums} Podiums
+                        {/* Podiums & View Full Profile Chevron */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-mono font-bold flex items-center gap-1 border border-white/5">
+                            <Trophy className="w-3 h-3 text-amber-400" />
+                            <span>{shooter.podiums}</span>
+                            <span className="hidden sm:inline text-[9px] text-slate-400">Podiums</span>
+                          </div>
+
+                          <div className="w-8 h-8 rounded-xl bg-white/5 group-hover:bg-amber-500/20 group-hover:text-amber-400 text-slate-400 flex items-center justify-center transition-colors">
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
                         </div>
                       </div>
-                    </button>
+                    </Link>
                   );
                 })
               )}
@@ -482,8 +538,8 @@ function ShootersContent() {
             </div>
           </div>
 
-          {/* Right Column: Deep Profile & Rifle Breakdown */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Right Column: Deep Profile & Rifle Breakdown (Desktop Live Preview) */}
+          <div className="hidden lg:block lg:col-span-2 space-y-6">
             {/* Header Card */}
             <div className="ios-glass rounded-3xl p-5 sm:p-8 border border-white/10 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
