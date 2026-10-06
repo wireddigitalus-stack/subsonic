@@ -53,10 +53,10 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * REAL HUMAN COMMS CHIRP
- * Dual-pulse tactical VHF radio mic-key burst (820 Hz -> 1,240 Hz -> 1,720 Hz)
+ * TRANSMISSION SENT TONE / REAL HUMAN COMMS CHIRP
+ * Dual-pulse tactical VHF radio mic-key burst & roger chirp (820 Hz -> 1,280 Hz -> 1,840 Hz)
  */
-export function playRealCommsChirp() {
+export function playTransmitChirp() {
   const ctx = getAudioContext();
   if (!ctx) return;
 
@@ -66,31 +66,169 @@ export function playRealCommsChirp() {
     }
     const now = ctx.currentTime;
 
-    // Pulse 1: Tactical VHF mic-key snap (820 Hz -> 1240 Hz)
+    // Pulse 1: Tactical VHF mic-key snap (820 Hz -> 1280 Hz)
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
     osc1.type = "sine";
     osc1.frequency.setValueAtTime(820, now);
-    osc1.frequency.exponentialRampToValueAtTime(1240, now + 0.045);
-    gain1.gain.setValueAtTime(0.22, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+    osc1.frequency.exponentialRampToValueAtTime(1280, now + 0.05);
+    gain1.gain.setValueAtTime(0.28, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
     osc1.connect(gain1);
     gain1.connect(ctx.destination);
     osc1.start(now);
-    osc1.stop(now + 0.045);
+    osc1.stop(now + 0.05);
 
-    // Pulse 2: High radio roger burst (1240 Hz -> 1720 Hz)
+    // Pulse 2: High radio roger burst (1380 Hz -> 1840 Hz)
     const osc2 = ctx.createOscillator();
     const gain2 = ctx.createGain();
     osc2.type = "sine";
-    osc2.frequency.setValueAtTime(1240, now + 0.05);
-    osc2.frequency.exponentialRampToValueAtTime(1720, now + 0.11);
-    gain2.gain.setValueAtTime(0.25, now + 0.05);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+    osc2.frequency.setValueAtTime(1380, now + 0.055);
+    osc2.frequency.exponentialRampToValueAtTime(1840, now + 0.13);
+    gain2.gain.setValueAtTime(0.32, now + 0.055);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
     osc2.connect(gain2);
     gain2.connect(ctx.destination);
-    osc2.start(now + 0.05);
-    osc2.stop(now + 0.11);
+    osc2.start(now + 0.055);
+    osc2.stop(now + 0.13);
+  } catch {
+    // Silent fallback
+  }
+}
+
+// Alias for backwards compatibility
+export const playRealCommsChirp = playTransmitChirp;
+
+/**
+ * INCOMING MESSAGE CHIME
+ * Crisp, pleasant tactical two-tone notification chime for incoming broadcasts
+ */
+export function playIncomingChirp() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+
+    // First tone: 1046 Hz (C6)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(1046, now);
+    gain1.gain.setValueAtTime(0.26, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.07);
+
+    // Second tone: 1396 Hz (F6 - bright harmonic bell)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(1396, now + 0.065);
+    gain2.gain.setValueAtTime(0.32, now + 0.065);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.065);
+    osc2.stop(now + 0.18);
+  } catch {
+    // Silent fallback
+  }
+}
+
+/**
+ * DIRECT MESSAGE ALERT CHIME
+ * Three-tone rising priority alert for 1-on-1 private encrypted comms
+ */
+export function playDirectMessageChirp() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+
+    [
+      { freq: 880, start: 0, dur: 0.055, gain: 0.24 },
+      { freq: 1175, start: 0.06, dur: 0.055, gain: 0.28 },
+      { freq: 1568, start: 0.12, dur: 0.14, gain: 0.32 },
+    ].forEach((tone) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(tone.freq, now + tone.start);
+      gain.gain.setValueAtTime(tone.gain, now + tone.start);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + tone.start + tone.dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + tone.start);
+      osc.stop(now + tone.start + tone.dur);
+    });
+  } catch {
+    // Silent fallback
+  }
+}
+
+/**
+ * AUDIO TOGGLE FEEDBACK TONE
+ * Immediate auditory confirmation when clicking the Audio On/Off toggle
+ */
+export function playToggleAudioTone(enabled: boolean) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+
+    if (enabled) {
+      // Rising positive double chirp (800 Hz -> 1440 Hz)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(800, now);
+      osc1.frequency.exponentialRampToValueAtTime(1100, now + 0.06);
+      gain1.gain.setValueAtTime(0.26, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.06);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(1100, now + 0.065);
+      osc2.frequency.exponentialRampToValueAtTime(1440, now + 0.15);
+      gain2.gain.setValueAtTime(0.32, now + 0.065);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.065);
+      osc2.stop(now + 0.15);
+    } else {
+      // Falling soft mute blip (920 Hz -> 460 Hz)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(920, now);
+      osc.frequency.exponentialRampToValueAtTime(460, now + 0.08);
+      gain.gain.setValueAtTime(0.20, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    }
   } catch {
     // Silent fallback
   }

@@ -69,7 +69,16 @@ import { analyzeMsgForPlink, buildPlinkMessage, getRoDirectAnswer } from "@/lib/
 import { ChatTour } from "@/components/chat/ChatTour";
 import { ChannelPickerModal } from "@/components/chat/ChannelPickerModal";
 import { startBotEngine, BotSpeed, logBotActivity, subscribeToBotActivity } from "@/lib/chat-bots";
-import { playRealCommsChirp, playBotTelemetryChirp, playTacticalChirp, unlockAudio } from "@/lib/chat-audio";
+import {
+  playTransmitChirp,
+  playIncomingChirp,
+  playDirectMessageChirp,
+  playToggleAudioTone,
+  playRealCommsChirp,
+  playBotTelemetryChirp,
+  playTacticalChirp as rawPlayTacticalChirp,
+  unlockAudio,
+} from "@/lib/chat-audio";
 import { clearCommsAlert, incrementUnreadMessages } from "@/lib/comms-status";
 import { getDmChannelId, parseDmParticipants, normalizeCallsign } from "@/lib/chat-utils";
 
@@ -175,7 +184,13 @@ export default function ChatPage() {
   const [activeNetTab, setActiveNetTab] = useState<"PRO" | "PUBLIC">("PRO");
   const [currentChannel, setCurrentChannel] = useState("invitational");
   const [inputText, setInputText] = useState("");
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("subsonic_chat_sound_enabled");
+      if (stored !== null) return stored === "true";
+    }
+    return true;
+  });
 
   // Fullscreen / Handheld Immersive Mode
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -444,6 +459,28 @@ export default function ChatPage() {
   soundEnabledRef.current = soundEnabled;
   const currentChannelRef = useRef(currentChannel);
   currentChannelRef.current = currentChannel;
+
+  // Safe tactical audio chirp that respects mute state
+  const playTacticalChirp = useCallback((frequency = 940) => {
+    if (soundEnabledRef.current) {
+      rawPlayTacticalChirp(frequency);
+    }
+  }, []);
+
+  // Tactical Audio Toggle with instant feedback and persistent preference
+  const handleToggleSound = useCallback(() => {
+    unlockAudio();
+    setSoundEnabled((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("subsonic_chat_sound_enabled", String(next));
+        } catch {}
+      }
+      playToggleAudioTone(next);
+      return next;
+    });
+  }, []);
 
   // Unified Bot Message Handler — captures telemetry and dispatches abuse alerts on guidelines violations
   const handleIncomingBotMessage = useCallback((msg: ChatMessage) => {
@@ -738,7 +775,11 @@ export default function ChatPage() {
                 (m: ChatMessage) => m.author.callsign?.toUpperCase() !== myCallsign.toUpperCase()
               );
               if (hasExternalMsg && soundEnabledRef.current) {
-                playRealCommsChirp();
+                if (currentChannel.startsWith("dm_")) {
+                  playDirectMessageChirp();
+                } else {
+                  playIncomingChirp();
+                }
               }
             }
 
@@ -849,7 +890,7 @@ export default function ChatPage() {
             }
 
             if (hasNewIncoming && soundEnabledRef.current) {
-              playRealCommsChirp();
+              playDirectMessageChirp();
             }
             return updated;
           });
@@ -1407,7 +1448,7 @@ export default function ChatPage() {
     }
 
     if (soundEnabled) {
-      playRealCommsChirp();
+      playTransmitChirp();
     }
     // Haptic feedback on send (Android/PWA)
     if (typeof navigator !== "undefined" && navigator.vibrate) {
@@ -1856,20 +1897,21 @@ export default function ChatPage() {
             <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`h-7 w-7 rounded-lg border flex items-center justify-center transition-all ${
+                onClick={handleToggleSound}
+                className={`h-7 px-2 rounded-lg border flex items-center gap-1 text-[11px] font-mono font-bold transition-all ${
                   soundEnabled
                     ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                    : "bg-white/5 text-slate-400 border-white/10"
+                    : "bg-white/5 text-slate-500 border-white/10"
                 }`}
-                title={soundEnabled ? "Audio ON" : "Audio OFF"}
-                aria-label="Toggle Audio"
+                title={soundEnabled ? "Audio Tones: ON (Tap to mute)" : "Audio Tones: OFF (Tap to unmute)"}
+                aria-label="Toggle Tactical Audio Tones"
               >
                 {soundEnabled ? (
-                  <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                  <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 ) : (
-                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                  <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                 )}
+                <span className="text-[10px]">{soundEnabled ? "TONES" : "MUTED"}</span>
               </button>
 
               <button
@@ -2083,21 +2125,21 @@ export default function ChatPage() {
 
                 <button
                   type="button"
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`h-7 px-2 rounded-lg border text-[11px] flex items-center gap-1 font-medium transition-all ${
+                  onClick={handleToggleSound}
+                  className={`h-7 px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-mono font-semibold transition-all ${
                     soundEnabled
-                      ? "bg-white/[0.06] text-slate-300 border-white/10 hover:bg-white/[0.08]"
+                      ? "bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
                       : "bg-transparent text-slate-500 border-white/5 hover:bg-white/[0.04] hover:text-slate-400"
                   }`}
-                  title={soundEnabled ? "Audio Chirps: ON (Click to mute)" : "Audio Chirps: OFF (Click to unmute)"}
+                  title={soundEnabled ? "Tactical Audio Tones: ON (Click to mute)" : "Tactical Audio Tones: MUTED (Click to unmute)"}
                   aria-label="Toggle Tactical Radio Audio"
                 >
                   {soundEnabled ? (
-                    <Volume2 className="w-3 h-3 text-slate-400 shrink-0" />
+                    <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   ) : (
-                    <VolumeX className="w-3 h-3 text-slate-500 shrink-0" />
+                    <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                   )}
-                  <span>{soundEnabled ? "Audio" : "Muted"}</span>
+                  <span>{soundEnabled ? "TONES ON" : "MUTED"}</span>
                 </button>
 
                 <button
@@ -2195,21 +2237,21 @@ export default function ChatPage() {
             {/* Audio Toggle */}
             <button
               type="button"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`h-7 w-7 sm:h-8 sm:w-8 md:h-7 md:w-auto md:px-2 rounded-lg sm:rounded-xl border flex items-center justify-center md:gap-1.5 font-mono font-semibold transition-all ${
+              onClick={handleToggleSound}
+              className={`h-7 px-2 rounded-lg border flex items-center justify-center gap-1 font-mono font-semibold transition-all ${
                 soundEnabled
                   ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                  : "bg-white/5 text-slate-400 border-white/10"
+                  : "bg-white/5 text-slate-500 border-white/10"
               }`}
-              title={soundEnabled ? "Audio ON" : "Audio OFF"}
+              title={soundEnabled ? "Audio Tones: ON (Click to mute)" : "Audio Tones: MUTED (Click to unmute)"}
               aria-label="Toggle Audio"
             >
               {soundEnabled ? (
-                <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               ) : (
-                <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
               )}
-              <span className="hidden md:inline text-xs font-bold">{soundEnabled ? "ON" : "OFF"}</span>
+              <span className="text-[10px] font-bold">{soundEnabled ? "TONES ON" : "MUTED"}</span>
             </button>
           </div>
         </div>
@@ -2883,7 +2925,7 @@ export default function ChatPage() {
         }}
         unreadDmCount={unreadDmCount}
         soundEnabled={soundEnabled}
-        onToggleSound={() => setSoundEnabled(!soundEnabled)}
+        onToggleSound={handleToggleSound}
         isFullscreen={isFullscreen}
         onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
         onOpenTour={() => setIsTourOpen(true)}
