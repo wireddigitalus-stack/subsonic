@@ -130,6 +130,25 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   },
 ];
 
+const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string }): boolean => {
+  const name = (s.name || "").toUpperCase();
+  const call = (s.callsign || "").toUpperCase();
+  const id = (s.id || "").toLowerCase();
+  return (
+    name.includes("ROB NEILSON") ||
+    call === "RADAR" ||
+    call === "ROB" ||
+    call === "LTDAN" ||
+    id === "rob-neilson" ||
+    id === "radar" ||
+    name.includes("JOHN DOE") ||
+    call === "DOE" ||
+    call === "JOHNDOE" ||
+    id === "john-doe" ||
+    id === "johndoe"
+  );
+};
+
 export default function AdminDashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminSession, setAdminSession] = useState<{
@@ -438,7 +457,9 @@ export default function AdminDashboardPage() {
             const deletedList: string[] = rawDeleted ? JSON.parse(rawDeleted) : [];
             const isDeletedOrExec = (id?: string, cs?: string, name?: string) => {
               const cleanCs = (cs || "").trim().toUpperCase();
+              const cleanName = (name || "").trim().toUpperCase();
               if (["RADAR", "ROB", "LTDAN", "ALLEN", "SAID DONE", "AHURLEY", "HURLEY"].includes(cleanCs)) return true;
+              if (cleanName.includes("JOHN DOE") || cleanCs === "DOE" || cleanCs === "JOHNDOE") return true;
               return (
                 (id && deletedList.includes(id.toLowerCase())) ||
                 (cs && deletedList.includes(cs.toLowerCase())) ||
@@ -538,6 +559,16 @@ export default function AdminDashboardPage() {
           return m;
         });
 
+        // Filter out John Doe test profile from member display
+        apiMembers = apiMembers.filter(
+          (m) =>
+            !(
+              (m.full_name || "").toUpperCase().includes("JOHN DOE") ||
+              (m.callsign || "").toUpperCase() === "DOE" ||
+              (m.callsign || "").toUpperCase() === "JOHNDOE"
+            )
+        );
+
         setMembers(apiMembers);
       }
     } catch (err) {
@@ -576,13 +607,26 @@ export default function AdminDashboardPage() {
         // Hybrid merge with local storage for newly registered pro shooters
         if (typeof window !== "undefined") {
           try {
+            // Auto-clean stale VIP Pro boilerplate or test profiles in browser storage
+            for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
+              const raw = localStorage.getItem(key);
+              if (raw) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (isExcludedShooter(parsed) && String(parsed.name || parsed.full_name).toUpperCase().includes("JOHN DOE")) {
+                    localStorage.removeItem(key);
+                  }
+                } catch {}
+              }
+            }
+
             const rawPro = localStorage.getItem("subsonic_pro_full_profile");
             if (rawPro) {
               const pro = JSON.parse(rawPro);
               if (pro?.name === "VIP Pro Competitor" || pro?.name === "Invitational Competitor VIP") {
                 pro.name = pro.callsign || "TEST";
               }
-              if (pro?.id && !list.some((s) => s.id === pro.id || s.callsign === pro.callsign)) {
+              if (!isExcludedShooter(pro) && pro?.id && !list.some((s) => s.id === pro.id || s.callsign === pro.callsign)) {
                 list.unshift(pro);
               }
             }
@@ -590,7 +634,11 @@ export default function AdminDashboardPage() {
             if (rawAll) {
               const all = JSON.parse(rawAll);
               if (Array.isArray(all)) {
-                for (const item of all) {
+                const cleanAll = all.filter((item) => !isExcludedShooter(item));
+                try {
+                  localStorage.setItem("subsonic_all_shooters", JSON.stringify(cleanAll));
+                } catch {}
+                for (const item of cleanAll) {
                   if (item?.name === "VIP Pro Competitor" || item?.name === "Invitational Competitor VIP") {
                     item.name = item.callsign || "TEST";
                   }
@@ -608,7 +656,10 @@ export default function AdminDashboardPage() {
                 const curCallsign = cur.callsign || "TEST";
                 const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
                 const curId = curCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-                if (!list.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
+                if (
+                  !isExcludedShooter({ name: curName, callsign: curCallsign, id: curId }) &&
+                  !list.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())
+                ) {
                   list.unshift({
                     id: curId,
                     name: curName,
@@ -649,6 +700,9 @@ export default function AdminDashboardPage() {
           }
           return s;
         });
+
+        // Filter out any occurrences of Rob Neilson or John Doe
+        list = list.filter((s) => !isExcludedShooter(s));
 
         setShooterProfiles(list);
       }

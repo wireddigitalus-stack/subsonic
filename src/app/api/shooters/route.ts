@@ -36,20 +36,33 @@ export async function GET(req: NextRequest) {
 
     for (const m of members) {
       const call = (m.callsign || "").toUpperCase();
+      const name = (m.full_name || "").toUpperCase();
+      // Exclude non-shooters (Rob Neilson / RADAR / Master Owner) and test accounts (John Doe)
+      if (
+        call === "RADAR" ||
+        call === "ROB" ||
+        call === "LTDAN" ||
+        m.role === "MASTER_OWNER" ||
+        name.includes("ROB NEILSON") ||
+        name.includes("JOHN DOE") ||
+        call === "DOE" ||
+        call === "JOHNDOE"
+      ) {
+        continue;
+      }
       if (!call || shooterCallsigns.has(call)) continue;
       const isOwner = call === "SAID DONE" || call === "ALLEN" || m.role === "OWNER_ADMIN";
-      const isMaster = call === "RADAR" || call === "ROB" || m.role === "MASTER_OWNER";
       allShooters.push({
         id: `shooter_${m.member_id || call.toLowerCase()}`,
         name: m.full_name || call,
         callsign: m.callsign || call,
-        division: isMaster ? "Master Admin" : isOwner ? "Owner Admin / Executive" : (m.experience_level || "Society Member"),
-        ranking: isMaster ? "Master Admin • Dev Advisor" : isOwner ? "Founder • Subsonic Society" : "Verified Competitor",
+        division: isOwner ? "Owner Admin / Executive" : (m.experience_level || "Society Member"),
+        ranking: isOwner ? "Founder • Subsonic Society" : "Verified Competitor",
         homeRange: m.state ? `${m.state} Home Range` : "The Hideout, Bristol, TN",
         podiums: 0,
         image: "/images/SS-RWB-LOGO.png",
         quote: "Precision rimfire competitor.",
-        accolades: isMaster ? ["DEV ADVISOR", "MASTER ADMIN"] : isOwner ? ["FOUNDER", "OWNER ADMIN"] : ["COMPETITOR"],
+        accolades: isOwner ? ["FOUNDER", "OWNER ADMIN"] : ["COMPETITOR"],
         sponsors: ["Subsonic Society"],
         rifleSetup: {
           action: m.rifle_setup || "Precision Rimfire",
@@ -61,9 +74,29 @@ export async function GET(req: NextRequest) {
       shooterCallsigns.add(call);
     }
 
+    // Filter out any occurrences of Rob Neilson or John Doe from shooters
+    const cleanShooters = allShooters.filter((s) => {
+      const name = (s.name || "").toUpperCase();
+      const call = (s.callsign || "").toUpperCase();
+      const id = (s.id || "").toLowerCase();
+      return (
+        !name.includes("ROB NEILSON") &&
+        call !== "RADAR" &&
+        call !== "ROB" &&
+        call !== "LTDAN" &&
+        id !== "rob-neilson" &&
+        id !== "radar" &&
+        !name.includes("JOHN DOE") &&
+        call !== "DOE" &&
+        call !== "JOHNDOE" &&
+        id !== "john-doe" &&
+        id !== "johndoe"
+      );
+    });
+
     if (id || slug) {
       const target = (id || slug || "").toLowerCase();
-      const shooter = allShooters.find(
+      const shooter = cleanShooters.find(
         (s) =>
           s.id.toLowerCase() === target ||
           s.callsign.toLowerCase() === target
@@ -74,7 +107,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ shooter: publicShooter(shooter) });
     }
 
-    return NextResponse.json({ shooters: allShooters.map(publicShooter), count: allShooters.length });
+    return NextResponse.json({ shooters: cleanShooters.map(publicShooter), count: cleanShooters.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

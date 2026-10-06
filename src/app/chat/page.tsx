@@ -936,10 +936,12 @@ export default function ChatPage() {
             });
           }
 
-          // 3. Map all registered shooters from database (excluding deleted members)
+          // 3. Map all registered shooters from database (excluding deleted members and test accounts)
           for (const s of shooters) {
             const sCallsign = (s.callsign || "").toUpperCase();
+            const sName = (s.name || "").toUpperCase();
             if (!sCallsign || sCallsign === myCallsign) continue;
+            if (sCallsign === "DOE" || sCallsign === "JOHNDOE" || sName.includes("JOHN DOE")) continue;
             if (deletedList.has(sCallsign.toLowerCase()) || (s.id && deletedList.has(s.id.toLowerCase()))) continue;
 
             const chId = getDmChannelId(myCallsign, sCallsign);

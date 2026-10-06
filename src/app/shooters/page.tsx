@@ -73,6 +73,25 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
   }
 ];
 
+const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string }): boolean => {
+  const name = (s.name || "").toUpperCase();
+  const call = (s.callsign || "").toUpperCase();
+  const id = (s.id || "").toLowerCase();
+  return (
+    name.includes("ROB NEILSON") ||
+    call === "RADAR" ||
+    call === "ROB" ||
+    call === "LTDAN" ||
+    id === "rob-neilson" ||
+    id === "radar" ||
+    name.includes("JOHN DOE") ||
+    call === "DOE" ||
+    call === "JOHNDOE" ||
+    id === "john-doe" ||
+    id === "johndoe"
+  );
+};
+
 function ShootersContent() {
   const searchParams = useSearchParams();
   const requestedId = searchParams.get("id");
@@ -88,7 +107,7 @@ function ShootersContent() {
       let localList: ShooterProfile[] = [];
       if (typeof window !== "undefined") {
         try {
-          // Auto-sanitize any stale generic boilerplate from previous invite tests
+          // Auto-sanitize any stale generic boilerplate or test profiles from previous invite tests
           for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
             const raw = localStorage.getItem(key);
             if (raw) {
@@ -102,6 +121,12 @@ function ShootersContent() {
                 if (parsed.full_name) parsed.full_name = parsed.callsign || "TEST";
                 localStorage.setItem(key, JSON.stringify(parsed));
               }
+              if (isExcludedShooter(parsed)) {
+                // If it is John Doe, purge it from test storage
+                if (String(parsed.name).toUpperCase().includes("JOHN DOE")) {
+                  localStorage.removeItem(key);
+                }
+              }
             }
           }
 
@@ -113,7 +138,9 @@ function ShootersContent() {
                 if (item.name === "VIP Pro Competitor" || item.name === "Invitational Competitor VIP") {
                   item.name = item.callsign || "TEST";
                 }
-                localList.push(item);
+                if (!isExcludedShooter(item)) {
+                  localList.push(item);
+                }
               }
             }
           }
@@ -124,7 +151,7 @@ function ShootersContent() {
               if (pro.name === "VIP Pro Competitor" || pro.name === "Invitational Competitor VIP") {
                 pro.name = pro.callsign || "TEST";
               }
-              if (!localList.some((s) => s.id === pro.id)) {
+              if (!isExcludedShooter(pro) && !localList.some((s) => s.id === pro.id)) {
                 localList.unshift(pro);
               }
             }
@@ -136,7 +163,7 @@ function ShootersContent() {
               const curCallsign = cur.callsign || "TEST";
               const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
               const curId = curCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-              if (!localList.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
+              if (!isExcludedShooter({ name: curName, callsign: curCallsign, id: curId }) && !localList.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
                 localList.unshift({
                   id: curId,
                   name: curName,
@@ -190,7 +217,7 @@ function ShootersContent() {
               }
               map.set(s.id.toLowerCase(), s);
             }
-            const finalShooters = Array.from(map.values());
+            const finalShooters = Array.from(map.values()).filter((s) => !isExcludedShooter(s));
             setShooters(finalShooters);
 
             if (requestedId) {
@@ -206,7 +233,9 @@ function ShootersContent() {
                 return;
               }
             }
-            setSelectedShooter(finalShooters[0]);
+            if (finalShooters.length > 0) {
+              setSelectedShooter(finalShooters[0]);
+            }
             return;
           }
         }
@@ -230,7 +259,7 @@ function ShootersContent() {
         }
         fallbackMap.set(s.id.toLowerCase(), s);
       }
-      const combined = Array.from(fallbackMap.values());
+      const combined = Array.from(fallbackMap.values()).filter((s) => !isExcludedShooter(s));
       setShooters(combined);
       if (requestedId) {
         const reqLower = requestedId.toLowerCase().replace(/^dm_/, "").trim();
