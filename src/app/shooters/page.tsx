@@ -101,7 +101,6 @@ function ShootersContent() {
   const [selectedShooter, setSelectedShooter] = useState<ShooterProfile>(FALLBACK_SHOOTERS[0]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [divisionFilter, setDivisionFilter] = useState("ALL");
 
   useEffect(() => {
     const fetchShooters = async () => {
@@ -294,21 +293,19 @@ function ShootersContent() {
     return s.name;
   };
 
-  // Handle filtering
+  // Handle search filtering
   const filteredShooters = shooters.filter((shooter) => {
-    const matchesDiv = divisionFilter === "ALL" || shooter.division.toLowerCase().includes(divisionFilter.toLowerCase());
     const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
     const displayName = getShooterDisplayName(shooter).toLowerCase();
-    const matchesSearch = 
-      !query ||
+    return (
       displayName.includes(query) ||
       shooter.name.toLowerCase().includes(query) ||
       shooter.callsign.toLowerCase().includes(query) ||
       shooter.ranking.toLowerCase().includes(query) ||
       shooter.homeRange.toLowerCase().includes(query) ||
-      (shooter.sponsors && shooter.sponsors.some((s) => s.toLowerCase().includes(query)));
-
-    return matchesDiv && matchesSearch;
+      (shooter.sponsors && shooter.sponsors.some((s) => s.toLowerCase().includes(query)))
+    );
   });
 
   return (
@@ -400,28 +397,6 @@ function ShootersContent() {
               />
             </div>
 
-            {/* Division Filters */}
-            <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-              {[
-                { id: "ALL", label: "All" },
-                { id: "Open", label: "Open Pro" },
-                { id: "Production", label: "Production" },
-                { id: "Ladies", label: "Ladies" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setDivisionFilter(tab.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold whitespace-nowrap transition-colors ${
-                    divisionFilter === tab.id
-                      ? "bg-amber-500 text-black"
-                      : "bg-white/5 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
             {/* Shooter List - Clean Vertical Cards on Mobile and Desktop */}
             <div className="flex flex-col gap-3">
               {filteredShooters.length === 0 ? (
@@ -473,8 +448,8 @@ function ShootersContent() {
                               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold uppercase">
                                 {shooter.callsign || "MARKS"}
                               </span>
-                              <span className="text-[10px] font-mono text-slate-400 uppercase truncate">
-                                {shooter.division}
+                              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                                SHOOTER
                               </span>
                             </div>
 
