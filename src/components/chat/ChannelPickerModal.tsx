@@ -37,6 +37,7 @@ interface ChannelPickerModalProps {
   engagementCounts?: Record<string, ChannelEngagementInfo>;
   onPlayChirp?: (freq?: number) => void;
   directPartners?: DirectPartner[];
+  initialTab?: "ALL" | "MATCH" | "DIRECT";
 }
 
 export function ChannelPickerModal({
@@ -49,16 +50,18 @@ export function ChannelPickerModal({
   engagementCounts = {},
   onPlayChirp,
   directPartners = [],
+  initialTab = "ALL",
 }: ChannelPickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilterTab, setActiveFilterTab] = useState<"ALL" | "MATCH" | "DIRECT">("ALL");
+  const [activeFilterTab, setActiveFilterTab] = useState<"ALL" | "MATCH" | "DIRECT">(initialTab);
   const [isVoiceListening, setIsVoiceListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus input when opened
+  // Focus input when opened and sync tab
   useEffect(() => {
     if (isOpen) {
+      if (initialTab) setActiveFilterTab(initialTab);
       setTimeout(() => inputRef.current?.focus(), 150);
     } else {
       setSearchQuery("");
