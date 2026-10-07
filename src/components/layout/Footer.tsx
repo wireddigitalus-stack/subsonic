@@ -62,7 +62,7 @@ export function Footer() {
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
                 <Mountain className="w-3.5 h-3.5 text-amber-400" />
-                <span>The Hideout (3,420 FT ELEV)</span>
+                <span>3,420 FT ELEVATION</span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
                 <MapPin className="w-3.5 h-3.5 text-blue-400" />
@@ -71,26 +71,15 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Column 2: The Society & Facility */}
+          {/* Column 2: The Society */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
               The Society
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/society" className="hover:text-amber-400 transition-colors">
-                  Story & Philosophy
-                </Link>
-              </li>
-              <li>
                 <Link href="/chat" className="hover:text-emerald-400 transition-colors flex items-center gap-1 font-semibold text-emerald-400/90">
                   <span>Chat Room (Live)</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/the-hideout" className="hover:text-amber-400 transition-colors flex items-center gap-1">
-                  <span>The Hideout Range</span>
-                  <span className="text-[9px] px-1 rounded bg-blue-500/20 text-blue-300 font-mono">3,420&apos;</span>
                 </Link>
               </li>
               <li>
@@ -104,8 +93,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/invite" className="text-amber-400 font-bold hover:underline transition-all">
-                  Claim Invitation Code
+                <Link href="/invite/pro" className="text-amber-400 font-bold hover:underline transition-all">
+                  Redeem Code
                 </Link>
               </li>
               <li>
@@ -116,15 +105,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Competitions */}
+          {/* Column 3: The 2026 Invitational */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
-              Competitions
+              The 2026 Invitational
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <Link
-                  href="/matches"
+                  href="/invitational"
                   className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold text-amber-400/90"
                 >
                   <Trophy className="w-3 h-3 text-amber-400" />
@@ -132,43 +121,29 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/matches" className="hover:text-amber-400 transition-colors">
-                  300X Long Gong Challenge
+                <Link href="/competitor-packet" className="hover:text-amber-400 transition-colors flex items-center gap-1">
+                  <Award className="w-3 h-3 text-amber-400" />
+                  <span>Competitor Packet & Guide (PDF)</span>
                 </Link>
               </li>
               <li>
-                <Link href="/bristol-pro" className="hover:text-amber-400 transition-colors">
-                  Bristol Mountain Pro (18 Stages)
-                </Link>
-              </li>
-              <li>
-                <Link href="/calendar" className="hover:text-white transition-colors">
-                  2026 Match Schedule
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="text-emerald-400 font-semibold hover:underline">
+                <Link href="/register?match=subsonic-invitational-2026" className="text-emerald-400 font-semibold hover:underline">
                   Squad Slot Registration
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Profiles & Chat Room */}
+          {/* Column 4: Competitor Profiles & Chat Room */}
           <div className="space-y-3">
             <h4 className="text-xs font-mono uppercase tracking-wider text-white font-bold">
-              Competitor Profiles &amp; Chat Room
+              Marksmen & Comms
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/competitor-packet" className="hover:text-amber-400 transition-colors flex items-center gap-1">
-                  <Award className="w-3 h-3 text-amber-400" />
-                  <span>2026 Competitor Packet (PDF)</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/shooters" className="hover:text-purple-300 transition-colors">
-                  Shooter Profiles
+                <Link href="/shooters" className="hover:text-purple-300 transition-colors flex items-center gap-1">
+                  <Users className="w-3 h-3 text-purple-400" />
+                  <span>Shooter Profiles</span>
                 </Link>
               </li>
               <li>

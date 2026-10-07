@@ -317,66 +317,6 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Submenu 2: Competitions */}
-            <div 
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("matches")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                type="button"
-                onClick={() => setActiveDropdown(activeDropdown === "matches" ? null : "matches")}
-                data-telemetry="nav_dropdown_matches"
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  pathname.startsWith("/matches") || pathname.startsWith("/shooters") || pathname.startsWith("/bristol-pro") || pathname.startsWith("/calendar") || pathname.startsWith("/invitational") || pathname.startsWith("/competitor-packet") || activeDropdown === "matches"
-                    ? "bg-white/15 text-white shadow-sm"
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <span>Matches</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === "matches" ? "rotate-180 text-amber-400" : "text-slate-400"}`} />
-              </button>
-
-              {activeDropdown === "matches" && (
-                <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
-                  <Link
-                    href="/invitational"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Trophy className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
-                        <span>The 2026 Invitational</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">$7.5K Purse</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Nov 13–15 schedule, packet, lodging & dining
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/shooters"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-purple-400">
-                        Shooter Profiles
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Competitor profiles, rifle builds & advice
-                      </p>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
-
             {/* Direct Link: The 2026 Invitational */}
             <Link
               href="/invitational"
@@ -388,9 +328,22 @@ export function Navbar() {
               }`}
             >
               <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>The Invitational</span>
+              <span>The 2026 Invitational</span>
             </Link>
 
+            {/* Direct Link: Shooter Profiles */}
+            <Link
+              href="/shooters"
+              data-telemetry="nav_link_shooters"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                pathname.startsWith("/shooters")
+                  ? "bg-white/15 text-white shadow-sm"
+                  : "text-slate-300 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 text-purple-400" />
+              <span>Shooter Profiles</span>
+            </Link>
           </div>
 
           {/* Right Action: Private Comms controls, Join CTA, and Mobile toggle */}
@@ -439,7 +392,7 @@ export function Navbar() {
                   className="hidden sm:flex px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all items-center gap-1.5"
                 >
                   <Key className="w-3.5 h-3.5 fill-black" />
-                  <span>Claim Invite</span>
+                  <span>Redeem Code</span>
                 </Link>
               </div>
             )}
@@ -586,7 +539,7 @@ export function Navbar() {
                   className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
                   <Key className="w-4 h-4 fill-black" />
-                  <span>Redeem Pro Invitation Key</span>
+                  <span>Redeem Code</span>
                 </Link>
               )}
             </div>
