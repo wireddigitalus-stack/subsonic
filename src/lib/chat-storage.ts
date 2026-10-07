@@ -268,7 +268,7 @@ export async function getUserDmConversations(userCallsign: string): Promise<User
     if (!partnerCallsign || partnerCallsign === userCallsign.toUpperCase()) continue;
 
     // Filter out deleted/unknown members so deleted accounts never ghost back into the chat
-    const isExecutiveOrBot = ["RO", "RO BOT", "RADAR", "ROB", "ALLEN", "SAID DONE", "LTDAN", "AHURLEY"].includes(partnerCallsign);
+    const isExecutiveOrBot = ["RO", "RO BOT", "RADAR", "ROB", "ALLEN", "SUBX", "LTDAN", "AHURLEY"].includes(partnerCallsign);
     if (!isExecutiveOrBot) {
       try {
         const { getMembersFromStorage } = require("./members");

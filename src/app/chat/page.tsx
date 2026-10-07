@@ -124,7 +124,7 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
   },
   {
     id: "dm_allen",
-    callsign: "SAID DONE",
+    callsign: "SUBX",
     name: "Allen Hurley",
     role: "OWNER_ADMIN",
     badgeText: "OWNER ADMIN",
@@ -682,24 +682,27 @@ export default function ChatPage() {
                 }));
               } catch {}
             } else if (
+              parsedShooter.callsign === "SUBX" ||
               parsedShooter.callsign === "SAID DONE" ||
               parsedShooter.callsign === "SAIDDONE" ||
               parsedShooter.callsign === "ALLEN" ||
               parsedShooter.callsign === "AHURLEY" ||
+              parsedShooter.member_id === "SS-PRO-SUBX" ||
+              parsedShooter.member_id === "SS-2026-0002" ||
               (parsedShooter.name && parsedShooter.name.toLowerCase().includes("hurley"))
             ) {
-              parsedShooter.member_id = "SS-2026-0002";
+              parsedShooter.member_id = "SS-PRO-SUBX";
               parsedShooter.name = "Allen Hurley";
               parsedShooter.role = "OWNER_ADMIN";
               parsedShooter.division = "Owner Admin / Executive";
               parsedShooter.badgeText = "OWNER ADMIN";
-              parsedShooter.callsign = "SAID DONE";
+              parsedShooter.callsign = "SUBX";
               try {
                 localStorage.setItem("subsonic_shooter_profile", JSON.stringify(parsedShooter));
                 localStorage.setItem("subsonic_member_profile", JSON.stringify({
-                  member_id: "SS-2026-0002",
+                  member_id: "SS-PRO-SUBX",
                   full_name: "Allen Hurley",
-                  callsign: "SAID DONE",
+                  callsign: "SUBX",
                   state: "TN",
                   experience_level: "Owner Admin / Executive",
                   rifle_setup: parsedShooter.rifleSetup || "Modacam Custom Precision V-22 / ZCO 527",
@@ -967,11 +970,11 @@ export default function ChatPage() {
           partnersMap.set("dm_ro", roBot);
 
           // 2. Add Executives if not current user
-          if (myCallsign !== "SAID DONE" && myCallsign !== "ALLEN") {
-            const allenId = getDmChannelId(myCallsign, "SAID DONE");
+          if (myCallsign !== "SUBX" && myCallsign !== "ALLEN" && myCallsign !== "SAID DONE") {
+            const allenId = getDmChannelId(myCallsign, "SUBX");
             partnersMap.set(allenId, {
               id: allenId,
-              callsign: "SAID DONE",
+              callsign: "SUBX",
               name: "Allen Hurley",
               role: "OWNER_ADMIN",
               badgeText: "OWNER ADMIN",
@@ -1006,7 +1009,7 @@ export default function ChatPage() {
             if (deletedList.has(sCallsign.toLowerCase()) || (s.id && deletedList.has(s.id.toLowerCase()))) continue;
 
             const chId = getDmChannelId(myCallsign, sCallsign);
-            const isOwner = sCallsign === "SAID DONE" || sCallsign === "ALLEN";
+            const isOwner = sCallsign === "SUBX" || sCallsign === "SAID DONE" || sCallsign === "ALLEN";
             const isMaster = sCallsign === "RADAR" || sCallsign === "ROB";
 
             const existing = partnersMap.get(chId);
@@ -1083,7 +1086,7 @@ export default function ChatPage() {
       author: {
         id: "user-allen",
         name: "Allen Hurley",
-        callsign: "SAID DONE",
+        callsign: "SUBX",
         role: "OWNER_ADMIN",
         badgeText: "FOUNDER",
         division: "Executive / Match Host",
@@ -1490,7 +1493,7 @@ export default function ChatPage() {
         setTimeout(() => scrollContainerToBottom(true), 50);
       }, delay);
     }
-    // Direct messages to real marksmen/admins (e.g. Allen Hurley / SAID DONE) do not have simulated auto-replies.
+    // Direct messages to real marksmen/admins (e.g. Allen Hurley / SUBX) do not have simulated auto-replies.
   };
 
   const handleInputChange = (val: string) => {
@@ -2068,7 +2071,7 @@ export default function ChatPage() {
                 {(shooterProfile?.role === "MASTER_OWNER" || 
                   shooterProfile?.role === "OWNER_ADMIN" || 
                   shooterProfile?.callsign === "RADAR" || 
-                  shooterProfile?.callsign === "SAID DONE" || 
+                  shooterProfile?.callsign === "SUBX" || 
                   shooterProfile?.callsign === "ALLEN") && (
                   <Link
                     href="/admin"

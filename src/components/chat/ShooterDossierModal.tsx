@@ -38,7 +38,7 @@ export function ShooterDossierModal({
 
   const isRO = shooter.callsign === "RO" || shooter.callsign === "RO BOT" || shooter.name === "RO" || shooter.name === "RO BOT" || shooter.id === "dm_ro";
   const isMasterOwner = shooter.role === "MASTER_OWNER" || shooter.callsign === "ROB" || shooter.callsign === "RADAR";
-  const isOwnerAdmin = shooter.role === "OWNER_ADMIN" || shooter.callsign === "SAID DONE" || shooter.callsign === "ALLEN";
+  const isOwnerAdmin = shooter.role === "OWNER_ADMIN" || shooter.callsign === "SUBX" || shooter.callsign === "ALLEN";
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">

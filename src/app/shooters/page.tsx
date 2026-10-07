@@ -29,19 +29,19 @@ import { ShooterProfile } from "@/lib/types";
 // Seed fallback data to guarantee immediate rendering even if network lags
 const FALLBACK_SHOOTERS: ShooterProfile[] = [
   {
-    id: "allen-hurley",
+    id: "subx",
     name: "Allen Hurley",
-    callsign: "SAID DONE",
+    callsign: "SUBX",
     division: "Owner Admin / Executive",
     ranking: "Founder • Subsonic Society",
     homeRange: "The Hideout, Bristol, TN",
-    podiums: 12,
+    podiums: 21,
     featuredMatch: "Subsonic Society Invitational Money Match 2026",
     image: "/images/SS-RWB-LOGO.png",
     actionPhoto: "/images/SS-RWB-LOGO.png",
-    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously. Said. Done.",
+    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously.",
     signature: "Allen Hurley",
-    accolades: ["FOUNDER 👑", "MATCH HOST", "EXECUTIVE RO"],
+    accolades: ["FOUNDER 👑", "TEAM USA 🇺🇸", "NATIONAL CHAMPION 🏆", "MATCH HOST", "EXECUTIVE RO"],
     careerStats: {
       matches: 38,
       states: 9,

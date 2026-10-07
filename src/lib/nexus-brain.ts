@@ -42,7 +42,7 @@ CORE DOMAIN KNOWLEDGE:
    - Location: 111 Hwy 44, Bristol, TN 37620.
    - Property: 220 acres of private Appalachian mountain ridgeline.
    - Range Features: 300-yard dedicated precision rimfire range (barricades, tank traps, rooftop simulator, natural rock ledges), 1,000-yard centerfire course, sporting clays, air-conditioned clubhouse (no on-site RV hookups at the clubhouse at this time; recommend nearby Bristol RV parks including Hilltop Campground and Lakeview RV Resort).
-   - Leadership: Founded by Allen Hurley (Callsign: "SAID DONE", "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
+   - Leadership: Founded by Allen Hurley (Callsign: "SUBX", personal standard "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
@@ -119,9 +119,10 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("allen") ||
     lower.includes("hurley") ||
     lower.includes("match director") ||
+    lower.includes("subx") ||
     lower.includes("said done")
   ) {
-    return `Allen Hurley, callsign SAID DONE, is the founder and Match Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the 20-stage championship course.`;
+    return `Allen Hurley, callsign SUBX, is the founder and Match Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the 20-stage championship course.`;
   }
 
   if (

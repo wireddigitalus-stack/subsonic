@@ -23,12 +23,10 @@ export async function POST(req: NextRequest) {
     const execOverrides: Record<string, { pin: string; memberId: string; name: string; role: string; division: string; rifleSetup: string; badgeText: string }> = {
       'RADAR': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
       'ROB': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
-      'LTDAN': { pin: '2468', memberId: 'SS-2026-0001', name: 'Rob Neilson', role: 'MASTER_OWNER', division: 'Master Admin', rifleSetup: 'Systems & Infrastructure Architecture (Non-Shooter)', badgeText: 'MASTER ADMIN' },
-      'SAID DONE': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
-      'SAIDDONE': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
-      'ALLEN': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
-      'AHURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
-      'HURLEY': { pin: '620620', memberId: 'SS-2026-0002', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
+      'SUBX': { pin: '620620', memberId: 'SS-PRO-SUBX', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
+      'ALLEN': { pin: '620620', memberId: 'SS-PRO-SUBX', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
+      'AHURLEY': { pin: '620620', memberId: 'SS-PRO-SUBX', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
+      'HURLEY': { pin: '620620', memberId: 'SS-PRO-SUBX', name: 'Allen Hurley', role: 'OWNER_ADMIN', division: 'Owner Admin / Executive', rifleSetup: 'Modacam Custom Precision V-22 / ZCO 527', badgeText: 'OWNER ADMIN' },
     };
     
     // Check executive aliases
@@ -63,8 +61,8 @@ export async function POST(req: NextRequest) {
         {
           const finalCallsign = (key === 'ROB' || key === 'LTDAN' || key === 'RADAR')
             ? 'RADAR'
-            : ['SAID DONE', 'SAIDDONE', 'ALLEN', 'AHURLEY', 'HURLEY'].includes(key)
-            ? 'SAID DONE'
+            : ['SUBX', 'ALLEN', 'AHURLEY', 'HURLEY'].includes(key)
+            ? 'SUBX'
             : cleanCallsign;
 
           return NextResponse.json({

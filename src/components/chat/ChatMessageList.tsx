@@ -120,7 +120,7 @@ export function ChatMessageList({
       shooterProfile.role === "OWNER_ADMIN" ||
       shooterProfile.role === "ADMIN" ||
       shooterProfile.role === "MODERATOR" ||
-      ["RADAR", "ROB", "LTDAN", "SAID DONE", "ALLEN", "AHURLEY", "HURLEY"].includes(shooterProfile.callsign?.toUpperCase())
+      ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"].includes(shooterProfile.callsign?.toUpperCase())
     )
   );
 
@@ -318,7 +318,7 @@ export function ChatMessageList({
         ) : (
           filteredMessages.map((msg) => {
             const isMasterOwner = msg.author.role === "MASTER_OWNER" || msg.author.role === "DEV_ADMIN" || msg.author.callsign === "ROB" || msg.author.callsign === "RADAR";
-            const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "SAID DONE" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
+            const isOwnerAdmin = msg.author.role === "OWNER_ADMIN" || msg.author.callsign === "SUBX" || msg.author.callsign === "ALLEN" || msg.author.callsign === "AHURLEY";
             const isAdmin = msg.author.role === "ADMIN";
             const isMod = msg.author.role === "MODERATOR";
             const isMD = msg.author.role === "MATCH_DIRECTOR" || msg.type === "MATCH_ALERT";

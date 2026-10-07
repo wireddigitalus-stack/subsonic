@@ -19,7 +19,7 @@ function isCallerAdmin(callsign?: string, role?: string): boolean {
   const normRole = (role || "").toUpperCase();
   const normCallsign = (callsign || "").toUpperCase();
   const adminRoles = ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR"];
-  const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SAID DONE", "ALLEN", "AHURLEY", "HURLEY"];
+  const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"];
   return adminRoles.includes(normRole) || adminCallsigns.includes(normCallsign);
 }
 

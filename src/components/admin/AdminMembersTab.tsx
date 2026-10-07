@@ -86,7 +86,7 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
     return (
       ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR", "MATCH_DIRECTOR", "OFFICIAL"].includes(m.role || "") ||
       m.member_id === "SS-2026-0001" ||
-      m.member_id === "SS-2026-0002"
+      m.member_id === "SS-PRO-SUBX"
     );
   };
 
@@ -319,7 +319,7 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
           {filteredMembers.map((m) => {
             const isBanned = m.status === "BANNED";
             const isPaused = m.status === "PAUSED";
-            const isRoot = m.member_id === "SS-2026-0001" || m.member_id === "SS-2026-0002";
+            const isRoot = m.member_id === "SS-2026-0001" || m.member_id === "SS-PRO-SUBX";
             const displayCallsign = m.callsign || (m.full_name ? m.full_name.split(" ")[0].toUpperCase() : "MARKSMAN");
 
             // Look up corresponding shooter profile if present

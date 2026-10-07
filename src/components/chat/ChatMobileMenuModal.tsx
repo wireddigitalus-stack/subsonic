@@ -73,7 +73,7 @@ export function ChatMobileMenuModal({
     shooterProfile.callsign === "ROB" ||
     shooterProfile.role === "MASTER_OWNER";
   const isOwnerAdmin =
-    shooterProfile.callsign === "SAID DONE" ||
+    shooterProfile.callsign === "SUBX" ||
     shooterProfile.callsign === "ALLEN" ||
     shooterProfile.role === "OWNER_ADMIN";
 

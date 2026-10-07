@@ -115,9 +115,9 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     notes: "Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)",
   },
   {
-    member_id: "SS-2026-0002",
+    member_id: "SS-PRO-SUBX",
     full_name: "Allen Hurley",
-    callsign: "SAID DONE",
+    callsign: "SUBX",
     email: "allen@subsonicsociety.com",
     state: "TN",
     experience_level: "Owner Admin / Executive",
@@ -126,7 +126,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     created_at: "2026-07-04T12:00:00Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
+    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SUBX)",
   },
 ];
 
@@ -458,7 +458,7 @@ export default function AdminDashboardPage() {
             const isDeletedOrExec = (id?: string, cs?: string, name?: string) => {
               const cleanCs = (cs || "").trim().toUpperCase();
               const cleanName = (name || "").trim().toUpperCase();
-              if (["RADAR", "ROB", "LTDAN", "ALLEN", "SAID DONE", "AHURLEY", "HURLEY"].includes(cleanCs)) return true;
+              if (["RADAR", "ROB", "LTDAN", "ALLEN", "SUBX", "SAID DONE", "AHURLEY", "HURLEY"].includes(cleanCs)) return true;
               if (cleanName.includes("JOHN DOE") || cleanCs === "DOE" || cleanCs === "JOHNDOE") return true;
               return (
                 (id && deletedList.includes(id.toLowerCase())) ||
@@ -1092,7 +1092,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleDeleteMember = async (memberId: string) => {
-    if (memberId === "SS-2026-0001" || memberId === "SS-2026-0002") {
+    if (memberId === "SS-2026-0001" || memberId === "SS-PRO-SUBX") {
       setMemberActionNotice("Root executive accounts (Master Owner & Owner Admin) are protected and cannot be deleted.");
       setCardDeleteConfirmId(null);
       return;
@@ -1238,17 +1238,17 @@ export default function AdminDashboardPage() {
               if (data.session.callsign === "ALLEN" || data.session.role === "OWNER_ADMIN") {
                 const allenProfile = {
                   name: "Allen Hurley",
-                  callsign: "ALLEN",
+                  callsign: "SUBX",
                   role: "OWNER_ADMIN",
                   division: "Owner Admin / Executive",
                   rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
                   badgeText: "OWNER ADMIN",
-                  member_id: "SS-2026-0002",
+                  member_id: "SS-PRO-SUBX",
                 };
                 const allenMember = {
-                  member_id: "SS-2026-0002",
+                  member_id: "SS-PRO-SUBX",
                   full_name: "Allen Hurley",
-                  callsign: "ALLEN",
+                  callsign: "SUBX",
                   state: "TN",
                   experience_level: "Owner Admin / Executive",
                   rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
@@ -1384,20 +1384,20 @@ export default function AdminDashboardPage() {
         // Immediate synchronization of client profile so Dashboard & Navbar show Allen or Rob
         if (typeof window !== "undefined") {
           try {
-            if (data.session.callsign === "ALLEN" || data.session.role === "OWNER_ADMIN") {
+            if (data.session.callsign === "ALLEN" || data.session.callsign === "SUBX" || data.session.role === "OWNER_ADMIN") {
               const allenProfile = {
                 name: "Allen Hurley",
-                callsign: "ALLEN",
+                callsign: "SUBX",
                 role: "OWNER_ADMIN",
                 division: "Owner Admin / Executive",
                 rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
                 badgeText: "OWNER ADMIN",
-                member_id: "SS-2026-0002",
+                member_id: "SS-PRO-SUBX",
               };
               const allenMember = {
-                member_id: "SS-2026-0002",
+                member_id: "SS-PRO-SUBX",
                 full_name: "Allen Hurley",
-                callsign: "ALLEN",
+                callsign: "SUBX",
                 state: "TN",
                 experience_level: "Owner Admin / Executive",
                 rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
@@ -1606,7 +1606,7 @@ export default function AdminDashboardPage() {
     return (
       ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR", "MATCH_DIRECTOR", "OFFICIAL"].includes(m.role || "") ||
       m.member_id === "SS-2026-0001" ||
-      m.member_id === "SS-2026-0002"
+      m.member_id === "SS-PRO-SUBX"
     );
   });
 
@@ -1614,7 +1614,7 @@ export default function AdminDashboardPage() {
     return (
       ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR", "MATCH_DIRECTOR", "OFFICIAL"].includes(m.role || "") ||
       m.member_id === "SS-2026-0001" ||
-      m.member_id === "SS-2026-0002"
+      m.member_id === "SS-PRO-SUBX"
     );
   };
 
@@ -3553,7 +3553,7 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Danger Zone: Delete Permanently */}
-                  {memberForm.member_id === "SS-2026-0001" || memberForm.member_id === "SS-2026-0002" ? (
+                  {memberForm.member_id === "SS-2026-0001" || memberForm.member_id === "SS-PRO-SUBX" ? (
                     <div className="px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold flex items-center justify-center gap-1.5 select-none">
                       <Lock className="w-3.5 h-3.5" />
                       <span>Root Executive Account (Protected)</span>

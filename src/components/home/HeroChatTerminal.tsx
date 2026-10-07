@@ -51,7 +51,7 @@ const STREAM_ITEMS: TerminalMessage[] = [
     id: "msg-allen",
     sender: {
       name: "Allen Hurley",
-      callsign: "SAID DONE",
+      callsign: "SUBX",
       role: "MATCH_DIRECTOR",
       roleBadge: "EXECUTIVE / MD",
       avatar: "/assets/subsonic-logo-round.png",

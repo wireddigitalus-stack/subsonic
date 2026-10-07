@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
         continue;
       }
       if (!call || shooterCallsigns.has(call)) continue;
-      const isOwner = call === "SAID DONE" || call === "ALLEN" || m.role === "OWNER_ADMIN";
+      const isOwner = call === "SUBX" || call === "ALLEN" || m.role === "OWNER_ADMIN";
       allShooters.push({
         id: `shooter_${m.member_id || call.toLowerCase()}`,
         name: m.full_name || call,

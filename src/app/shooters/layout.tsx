@@ -89,7 +89,7 @@ const shootersSchema = {
     },
     {
       "@type": "Person",
-      "@id": "https://subsonicsociety.com/shooters#allen-hurley",
+      "@id": "https://subsonicsociety.com/shooters#subx",
       "name": "Allen Hurley",
       "jobTitle": "Founder & Executive Match Host • Subsonic Society",
       "affiliation": {

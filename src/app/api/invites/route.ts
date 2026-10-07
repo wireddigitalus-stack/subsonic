@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     const recipientEmail = (body.recipientEmail || "").trim();
     const recipientPhone = (body.recipientPhone || "").trim();
     const note = (body.note || "").trim();
-    const createdBy = (body.createdBy || "SAID DONE").trim();
+    const createdBy = (body.createdBy || "SUBX").trim();
     const maxUses = typeof body.maxUses === "number" && body.maxUses > 0 ? body.maxUses : 1;
     const customCode = (body.customCode || "").trim().toUpperCase();
 

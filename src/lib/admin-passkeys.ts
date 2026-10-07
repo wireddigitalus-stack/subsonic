@@ -27,21 +27,21 @@ const DEFAULT_PASSKEYS: Record<string, AdminPasskeyEntry> = {
     passkey: "2468",
     updatedAt: "2026-07-04T12:00:00Z",
   },
-  "SAID DONE": {
-    callsign: "SAID DONE",
+  SUBX: {
+    callsign: "SUBX",
     name: "Allen Hurley",
     role: "OWNER_ADMIN",
-    memberId: "SS-2026-0002",
+    memberId: "SS-PRO-SUBX",
     passkey: "620620",
-    updatedAt: "2026-07-04T12:00:00Z",
+    updatedAt: "2026-10-05T12:00:00Z",
   },
   ALLEN: {
-    callsign: "SAID DONE",
+    callsign: "SUBX",
     name: "Allen Hurley",
     role: "OWNER_ADMIN",
-    memberId: "SS-2026-0002",
+    memberId: "SS-PRO-SUBX",
     passkey: "620620",
-    updatedAt: "2026-07-04T12:00:00Z",
+    updatedAt: "2026-10-05T12:00:00Z",
   },
 };
 
@@ -163,16 +163,16 @@ export function verifyAdminPasskey(inputPasskey: string): {
     };
   }
 
-  // 2. Check Allen Hurley (SAID DONE / ALLEN)
-  const allenEntry = passkeys["SAID DONE"] || passkeys["ALLEN"] || DEFAULT_PASSKEYS["SAID DONE"] || DEFAULT_PASSKEYS["ALLEN"];
+  // 2. Check Allen Hurley (SUBX / ALLEN)
+  const allenEntry = passkeys["SUBX"] || passkeys["ALLEN"] || DEFAULT_PASSKEYS["SUBX"] || DEFAULT_PASSKEYS["ALLEN"];
   if (clean === allenEntry.passkey || clean === "620620") {
     return {
       valid: true,
       session: {
         name: allenEntry.name || "Allen Hurley",
-        callsign: "SAID DONE",
+        callsign: "SUBX",
         role: "OWNER_ADMIN",
-        memberId: allenEntry.memberId || "SS-2026-0002",
+        memberId: allenEntry.memberId || "SS-PRO-SUBX",
       },
     };
   }

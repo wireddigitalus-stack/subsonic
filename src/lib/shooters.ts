@@ -19,19 +19,19 @@ const DB_AUTHORITATIVE = IS_SERVERLESS && isDbConfigured;
 
 export const SEED_SHOOTERS: ShooterProfile[] = [
   {
-    id: "allen-hurley",
+    id: "subx",
     name: "Allen Hurley",
-    callsign: "SAID DONE",
+    callsign: "SUBX",
     division: "Owner Admin / Executive",
     ranking: "Founder • Subsonic Society",
     homeRange: "The Hideout, Bristol, TN",
-    podiums: 12,
+    podiums: 21,
     featuredMatch: "Subsonic Society Invitational Money Match 2026",
     image: "/images/SS-RWB-LOGO.png",
     actionPhoto: "/images/SS-RWB-LOGO.png",
-    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously. Said. Done.",
+    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously.",
     signature: "Allen Hurley",
-    accolades: ["FOUNDER 👑", "MATCH HOST", "EXECUTIVE RO"],
+    accolades: ["FOUNDER 👑", "TEAM USA 🇺🇸", "NATIONAL CHAMPION 🏆", "MATCH HOST", "EXECUTIVE RO"],
     careerStats: {
       matches: 38,
       states: 9,
@@ -200,7 +200,15 @@ export function getShootersFromStorage(): ShooterProfile[] {
     // Memory last — freshest database data + this instance's writes
     for (const mem of memoryShooters) map.set(mem.id.toLowerCase(), mem);
 
-    memoryShooters = Array.from(map.values());
+    // Ensure legacy SAID DONE / allen-hurley is completely purged
+    map.delete("allen-hurley");
+    map.delete("said-done");
+    map.delete("said done");
+    map.delete("ss-2026-0002");
+
+    memoryShooters = Array.from(map.values()).filter(
+      (s) => s.id !== "allen-hurley" && s.callsign?.toUpperCase() !== "SAID DONE"
+    );
     return memoryShooters;
   } catch (err) {
     console.error("Error reading shooters:", err);
@@ -269,14 +277,13 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
 
   // Root executive protection
   if (
-    clean === "allen-hurley" ||
-    clean === "said done" ||
+    clean === "subx" ||
+    clean === "ss-pro-subx" ||
     clean === "allen" ||
     clean === "rob-neilson" ||
     clean === "radar" ||
     clean === "rob" ||
-    clean === "ss-2026-0001" ||
-    clean === "ss-2026-0002"
+    clean === "ss-2026-0001"
   ) {
     return false;
   }

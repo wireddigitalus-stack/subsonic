@@ -36,18 +36,18 @@ export const SEED_MEMBERS: SocietyMember[] = [
     notes: "Master Admin — Systems Architecture & Network Operations (Callsign: RADAR)",
   },
   {
-    member_id: "SS-2026-0002",
+    member_id: "SS-PRO-SUBX",
     full_name: "Allen Hurley",
-    callsign: "SAID DONE",
-    email: "allen@subsonicsociety.com",
+    callsign: "SUBX",
+    email: "ahurley@subsonicsociety.com",
     state: "TN",
     experience_level: "Owner Admin / Executive",
     rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
-    interests: ["Society Leadership", "Executive Comms", "Match Operations", "The Hideout Bristol"],
-    created_at: "2026-07-04T12:00:00Z",
+    interests: ["Society Leadership", "Executive Comms", "Match Operations", "Precision Rimfire"],
+    created_at: "2026-10-05T12:33:56.012Z",
     status: "ACTIVE",
     role: "OWNER_ADMIN",
-    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SAID DONE)",
+    notes: "Owner Admin & Executive — Full Management Authority (Callsign: SUBX)",
   },
 ];
 
@@ -220,19 +220,20 @@ export function getMembersFromStorage(): SocietyMember[] {
 
     const allen = Array.from(memberMap.values()).find(
       (m) =>
-        m.member_id === "SS-2026-0002" ||
-        m.callsign === "SAID DONE" ||
+        m.member_id === "SS-PRO-SUBX" ||
+        m.callsign === "SUBX" ||
         m.callsign === "ALLEN" ||
         (m.full_name.toLowerCase().includes("allen") && m.full_name.toLowerCase().includes("hurley"))
     );
     if (!allen) {
       memberMap.set(SEED_MEMBERS[1].member_id.toLowerCase(), SEED_MEMBERS[1]);
     } else {
-      allen.member_id = "SS-2026-0002";
+      allen.member_id = "SS-PRO-SUBX";
       allen.role = "OWNER_ADMIN";
-      allen.callsign = "SAID DONE";
+      allen.callsign = "SUBX";
       memberMap.set(allen.member_id.toLowerCase(), allen);
     }
+    memberMap.delete("ss-2026-0002");
 
     // Unique by member_id
     const finalMembersMap = new Map<string, SocietyMember>();
@@ -331,9 +332,9 @@ export function deleteMemberFromStorage(memberId: string): boolean {
 
   if (
     cleanId === "SS-2026-0001" ||
-    cleanId === "SS-2026-0002" ||
+    cleanId === "SS-PRO-SUBX" ||
     cleanId === "RADAR" ||
-    cleanId === "SAID DONE" ||
+    cleanId === "SUBX" ||
     cleanId === "ROB" ||
     cleanId === "ALLEN" ||
     cleanId === "LTDAN" ||
