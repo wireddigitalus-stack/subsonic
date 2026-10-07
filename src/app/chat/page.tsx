@@ -208,6 +208,17 @@ export default function ChatPage() {
 
   // Shooter Profile State
   const [shooterProfile, setShooterProfile] = useState<ShooterProfile>(DEFAULT_PROFILE);
+  const isShooterAdmin = useMemo(() => {
+    const role = (shooterProfile?.role || "").toUpperCase();
+    const cs = (shooterProfile?.callsign || "").toUpperCase();
+    return (
+      role === "MASTER_OWNER" ||
+      role === "OWNER_ADMIN" ||
+      role === "DEV_ADMIN" ||
+      role === "ADMIN" ||
+      ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"].includes(cs)
+    );
+  }, [shooterProfile]);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isFullProfileModalOpen, setIsFullProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<ShooterProfile>(DEFAULT_PROFILE);
@@ -2063,12 +2074,7 @@ export default function ChatPage() {
                       <span>Digital Member Pass</span>
                     </button>
 
-                    {(shooterProfile?.role === "MASTER_OWNER" ||
-                      shooterProfile?.role === "OWNER_ADMIN" ||
-                      shooterProfile?.role === "ADMIN" ||
-                      shooterProfile?.callsign === "RADAR" ||
-                      shooterProfile?.callsign === "SUBX" ||
-                      shooterProfile?.callsign === "ALLEN") && (
+                    {isShooterAdmin && (
                       <Link
                         href="/admin"
                         target="_blank"
@@ -2194,21 +2200,6 @@ export default function ChatPage() {
                   <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                   <span className="font-bold">SHOOTER PROFILES</span>
                 </Link>
-                {(shooterProfile?.role === "MASTER_OWNER" || 
-                  shooterProfile?.role === "OWNER_ADMIN" || 
-                  shooterProfile?.callsign === "RADAR" || 
-                  shooterProfile?.callsign === "SUBX" || 
-                  shooterProfile?.callsign === "ALLEN") && (
-                  <Link
-                    href="/admin"
-                    target="_blank"
-                    title="Open Staff Admin & Chat Moderation Dashboard"
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-[11px] text-emerald-300 transition-colors"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="font-bold">ADMIN / MODERATION</span>
-                  </Link>
-                )}
 
                 <button
                   type="button"
@@ -2316,12 +2307,7 @@ export default function ChatPage() {
                         <span>Digital Member Pass</span>
                       </button>
 
-                      {(shooterProfile?.role === "MASTER_OWNER" ||
-                        shooterProfile?.role === "OWNER_ADMIN" ||
-                        shooterProfile?.role === "ADMIN" ||
-                        shooterProfile?.callsign === "RADAR" ||
-                        shooterProfile?.callsign === "SUBX" ||
-                        shooterProfile?.callsign === "ALLEN") && (
+                      {isShooterAdmin && (
                         <Link
                           href="/admin"
                           target="_blank"
@@ -3327,11 +3313,7 @@ export default function ChatPage() {
         onOpenTour={() => setIsTourOpen(true)}
         onOpenTerms={() => setIsTermsModalOpen(true)}
         onLogout={handleLogout}
-        isAdmin={
-          shooterProfile.role === "MASTER_OWNER" ||
-          shooterProfile.role === "OWNER_ADMIN" ||
-          shooterProfile.role === "ADMIN"
-        }
+        isAdmin={isShooterAdmin}
       />
     </div>
   );
