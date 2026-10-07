@@ -136,18 +136,18 @@ export default function CompetitionDocumentsPage() {
 
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href="/shooters/intake"
+                href="/competitor-packet"
                 className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Submit Shooter Profile</span>
+                <span>2026 Competitor Packet</span>
               </Link>
               <Link
-                href="/matches"
+                href="/invitational"
                 className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-2 transition-all"
               >
                 <Target className="w-4 h-4 text-amber-400" />
-                <span>Match Schedule</span>
+                <span>The Invitational</span>
               </Link>
             </div>
           </div>
@@ -459,27 +459,27 @@ export default function CompetitionDocumentsPage() {
         )}
       </section>
 
-      {/* Cross-Link Card to Shooters Questionnaire */}
+      {/* Competitor VIP Code Invitation Card */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="ios-glass-card rounded-3xl p-6 sm:p-10 border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-black to-blue-500/10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <span className="text-xs font-mono font-bold uppercase text-amber-400 tracking-wider">
-              Automated Athlete Profiles
+              Competitor VIP Onboarding
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-white">
-              Haven&rsquo;t Submitted Your Marksman Profile?
+              Have a Competitor VIP Code?
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-              Takes under 2 minutes. Enter your rifle rig specs, competition accolades (Team USA, National Champion), sponsor tags, and photo to generate your official Subsonic Society card.
+              Invited marksmen and sponsored shooters can redeem their VIP code to unlock the profile builder, auto-generate competitor cards, and access private match comms.
             </p>
           </div>
 
           <Link
-            href="/shooters/intake"
+            href="/invite/pro"
             className="px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs tracking-wider uppercase flex items-center gap-2 shadow-tactical-glow shrink-0 active:scale-95 transition-all"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Open Profile Questionnaire</span>
+            <span>Redeem VIP Code</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>

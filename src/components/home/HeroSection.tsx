@@ -183,7 +183,7 @@ export function HeroSection() {
           </Link>
 
           <Link
-            href="/shooters/intake"
+            href="/invite"
             className="p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/30 text-white flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -192,11 +192,11 @@ export function HeroSection() {
               </div>
               <div className="min-w-0 text-left">
                 <div className="text-[11px] font-black text-white group-hover:text-amber-400 flex items-center gap-1.5">
-                  <span>Shooter Questionnaire</span>
-                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-500/20 text-amber-300">Auto-Card</span>
+                  <span>Redeem Invite Code</span>
+                  <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-500/20 text-amber-300">Member Pass</span>
                 </div>
                 <div className="text-[10px] font-mono text-slate-400 truncate">
-                  2-Min rig & profile builder
+                  VIP competitor & member keys
                 </div>
               </div>
             </div>

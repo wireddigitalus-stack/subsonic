@@ -137,12 +137,12 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/shooters/intake"
+              href="/invite/pro"
               target="_blank"
               className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Launch Intake Form</span>
+              <span>Launch VIP Intake</span>
             </Link>
 
             <Link

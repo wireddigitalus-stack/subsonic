@@ -377,10 +377,10 @@ function ShootersContent() {
                 Featured Competitors ({filteredShooters.length})
               </span>
               <Link
-                href="/shooters/intake"
+                href="/invite/pro"
                 className="text-[11px] font-mono text-amber-400 hover:underline flex items-center gap-1"
               >
-                <span>Add Profile</span>
+                <span>Claim Profile (VIP Code)</span>
                 <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
@@ -494,20 +494,20 @@ function ShootersContent() {
               )}
             </div>
 
-            {/* Nomination / Self-Submission Card */}
+            {/* VIP Code Claim Card */}
             <div className="p-5 rounded-2xl ios-glass border border-amber-500/20 bg-amber-500/5 space-y-3 mt-4 lg:mt-6">
               <span className="text-xs font-mono text-amber-400 font-bold uppercase block flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Automated Athlete Profile</span>
+                <span>Competitor VIP Onboarding</span>
               </span>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Are you shooting in the 2026 Invitational or Appalachian circuit? Complete the 2-minute questionnaire to auto-generate your competitor card.
+                Have an invitation code from match directors? Enter your VIP code to build and publish your competitor profile.
               </p>
               <Link
-                href="/shooters/intake"
+                href="/invite/pro"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
               >
-                <span>Launch Intake Form</span>
+                <span>Redeem VIP Code</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>

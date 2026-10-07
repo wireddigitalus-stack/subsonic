@@ -305,11 +305,11 @@ export function HomePreFacebookSpotlights() {
 
             <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-white/10">
               <Link
-                href="/shooters/intake"
+                href="/invite/pro"
                 className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
               >
                 <Sparkles className="w-4 h-4 fill-black" />
-                <span>Launch Intake Questionnaire</span>
+                <span>Claim Profile (VIP Code)</span>
               </Link>
 
               <Link

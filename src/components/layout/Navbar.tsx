@@ -392,24 +392,6 @@ export function Navbar() {
                       </p>
                     </div>
                   </Link>
-
-                  <Link
-                    href="/shooters/intake"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group border-t border-white/5"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-amber-400 group-hover:text-amber-300 flex items-center gap-1.5">
-                        <span>Shooter Questionnaire</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Auto-Card</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        2-min profile & rig auto-generator
-                      </p>
-                    </div>
-                  </Link>
                 </div>
               )}
             </div>
@@ -582,14 +564,6 @@ export function Navbar() {
               >
                 <Users className="w-4 h-4 text-purple-400" />
                 <span>Shooter Profiles & Rifle Builds</span>
-              </Link>
-              <Link
-                href="/shooters/intake"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-400 hover:bg-white/10 transition-colors"
-              >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Shooter Intake (Auto-Card)</span>
               </Link>
             </div>
 
