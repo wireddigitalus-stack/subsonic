@@ -15,7 +15,6 @@ import {
   Building2, 
   Radio, 
   Calendar, 
-  HelpCircle,
   Clock,
   ArrowRight,
   Key
@@ -301,28 +300,6 @@ export default function ContactPage() {
               <span>Explore Partnership Details</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
-          </div>
-
-          {/* Quick FAQ / Contacts Box */}
-          <div className="ios-glass-card rounded-3xl p-6 border border-white/10 space-y-3 text-xs">
-            <div className="flex items-center gap-2 font-bold text-white">
-              <HelpCircle className="w-4 h-4 text-amber-400" />
-              <span>Direct Match Operations</span>
-            </div>
-            <div className="space-y-2 text-slate-300">
-              <div className="flex items-center justify-between py-1 border-b border-white/5">
-                <span className="text-slate-400">General Dispatch</span>
-                <span className="font-mono text-white">info@subsonicsociety.org</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-white/5">
-                <span className="text-slate-400">Match Director</span>
-                <span className="font-mono text-white">allen@subsonicsociety.org</span>
-              </div>
-              <div className="flex items-center justify-between py-1 border-b border-white/5">
-                <span className="text-slate-400">Range Comms</span>
-                <span className="font-mono text-amber-400">Channel 4 (FRS 462.6375)</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
