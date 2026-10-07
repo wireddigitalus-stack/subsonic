@@ -52,6 +52,7 @@ export function ProfileEditModal({
   const [headshotPhoto, setHeadshotPhoto] = useState<string>("");
   const [actionPhoto, setActionPhoto] = useState<string>("");
   const [avatarColor, setAvatarColor] = useState<string>("");
+  const [existingProfileData, setExistingProfileData] = useState<any>(null);
 
   // Rifle Setup
   const [rifleAction, setRifleAction] = useState("");
@@ -128,6 +129,7 @@ export function ProfileEditModal({
   }, [isOpen, initialShooter]);
 
   const populateForm = (p: any) => {
+    setExistingProfileData(p);
     setName(p.name || "Allen Hurley");
     setCallsign((p.callsign || "SUBX").toUpperCase());
     setDivision(p.division || "Owner Admin / Executive");
@@ -219,9 +221,14 @@ export function ProfileEditModal({
       id: isAllen ? "subx" : cleanCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       name: name.trim(),
       callsign: cleanCallsign,
+      isProfileUpdate: true,
+      isIntake: false,
       division: isAllen ? "Owner Admin / Executive" : division,
       ranking: isAllen ? "Founder • Subsonic Society" : "Verified Competitor",
       homeRange: homeRange.trim() || "The Hideout, Bristol, TN",
+      email: existingProfileData?.email || initialShooter?.email || (isAllen ? "allen@modacamcustomrifles.com" : undefined),
+      phone: existingProfileData?.phone || initialShooter?.phone || (isAllen ? "423-555-0100" : undefined),
+      mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress || (isAllen ? "Bristol, TN" : undefined),
       quote: quote.trim() || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
       image: headshotPhoto || "/assets/subsonic-coin.jpg",
       actionPhoto: actionPhoto || headshotPhoto || "/assets/subsonic-coin.jpg",

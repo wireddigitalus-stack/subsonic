@@ -1701,6 +1701,8 @@ export default function ChatPage() {
           id: updated.callsign === "SUBX" ? "subx" : updated.callsign?.toLowerCase(),
           name: updated.name,
           callsign: updated.callsign,
+          isProfileUpdate: true,
+          isIntake: false,
           division: updated.division,
           image: updated.image,
           rifleSetup: { action: updated.rifleSetup },

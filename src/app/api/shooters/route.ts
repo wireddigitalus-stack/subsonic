@@ -6,6 +6,7 @@ import {
   getShooterBySlug,
   deleteShooterFromStorageAsync,
   refreshShootersFromDb,
+  SEED_SHOOTERS,
 } from "@/lib/shooters";
 import { refreshMembersFromDb, getMembersFromStorage, addOrUpdateMemberAsync } from "@/lib/members";
 
@@ -26,6 +27,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const slug = searchParams.get("slug");
+    const targetParam = searchParams.get("target");
+    const callsignParam = searchParams.get("callsign");
 
     const shooters = getShootersFromStorage();
     const members = getMembersFromStorage();
@@ -94,12 +97,12 @@ export async function GET(req: NextRequest) {
       );
     });
 
-    if (id || slug) {
-      const target = (id || slug || "").toLowerCase();
+    if (id || slug || targetParam || callsignParam) {
+      const target = (id || slug || targetParam || callsignParam || "").toLowerCase();
       const shooter = cleanShooters.find(
         (s) =>
-          s.id.toLowerCase() === target ||
-          s.callsign.toLowerCase() === target
+          (s.id && s.id.toLowerCase() === target) ||
+          (s.callsign && s.callsign.toLowerCase() === target)
       );
       if (!shooter) {
         return NextResponse.json({ error: "Shooter not found" }, { status: 404 });
@@ -123,15 +126,29 @@ export async function POST(req: NextRequest) {
     }
 
     const candidateCallsign = body.callsign.trim().toUpperCase();
-    const existingShooter = getShootersFromStorage().find(
-      (s) =>
-        (body.id && s.id.toLowerCase() === body.id.toLowerCase()) ||
-        s.callsign.toUpperCase() === candidateCallsign ||
-        (candidateCallsign === "SUBX" && s.id === "subx")
-    );
+    const isAllen =
+      candidateCallsign === "SUBX" ||
+      candidateCallsign === "ALLEN" ||
+      (body.id && body.id.toLowerCase() === "subx") ||
+      (body.name && body.name.toLowerCase().includes("hurley"));
 
-    // Require email, phone, and mailing address ONLY on brand new competitor registrations
-    if (!existingShooter) {
+    const existingShooter =
+      getShootersFromStorage().find(
+        (s) =>
+          (body.id && s.id?.toLowerCase() === body.id.toLowerCase()) ||
+          (s.callsign && s.callsign.toUpperCase() === candidateCallsign) ||
+          (isAllen && (s.id === "subx" || s.callsign?.toUpperCase() === "SUBX" || s.callsign?.toUpperCase() === "ALLEN"))
+      ) ||
+      SEED_SHOOTERS.find(
+        (s) =>
+          (body.id && s.id?.toLowerCase() === body.id.toLowerCase()) ||
+          (s.callsign && s.callsign.toUpperCase() === candidateCallsign) ||
+          (isAllen && (s.id === "subx" || s.callsign?.toUpperCase() === "SUBX"))
+      );
+
+    // Require email, phone, and mailing address ONLY on explicit brand-new competitor intake registrations
+    const isExplicitIntake = body.isIntake === true || body.source === "intake";
+    if (isExplicitIntake && !existingShooter && !isAllen) {
       if (!body.email || !String(body.email).includes("@") || !body.phone || !body.mailingAddress) {
         return NextResponse.json(
           { error: "Email address, phone number, and mailing address are required to complete shooter intake." },
@@ -140,32 +157,34 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // PIN policy: new competitor profiles must use exactly 4 digits.
+    // PIN policy: new competitor profiles on explicit intake must use exactly 4 digits.
     // (Already-hashed PINs and edits to existing profiles are left untouched.)
-    if (!existingShooter && body.pin && !isHashedPin(String(body.pin).trim())) {
+    if (isExplicitIntake && !existingShooter && !isAllen && body.pin && !isHashedPin(String(body.pin).trim())) {
       const pinError = validatePin(String(body.pin), "MEMBER");
       if (pinError) {
         return NextResponse.json({ error: pinError, code: "INVALID_PIN" }, { status: 400 });
       }
     }
 
-    // Enforce uniqueness and provide suggestions if taken
-    const callsignCheck = checkCallsignAvailability(candidateCallsign, {
-      excludeMemberId: existingShooter ? existingShooter.id : undefined,
-    });
+    // Enforce uniqueness and provide suggestions if taken (bypass for Allen or if updating own profile)
+    if (!isAllen) {
+      const callsignCheck = checkCallsignAvailability(candidateCallsign, {
+        excludeMemberId: existingShooter ? existingShooter.id : (body.id || undefined),
+      });
 
-    if (
-      !callsignCheck.isAvailable &&
-      (!existingShooter || !existingShooter.callsign || existingShooter.callsign.toUpperCase() !== candidateCallsign)
-    ) {
-      return NextResponse.json(
-        {
-          error: callsignCheck.message,
-          suggestions: callsignCheck.suggestions,
-          code: "CALLSIGN_TAKEN",
-        },
-        { status: 409 }
-      );
+      if (
+        !callsignCheck.isAvailable &&
+        (!existingShooter || !existingShooter.callsign || existingShooter.callsign.toUpperCase() !== candidateCallsign)
+      ) {
+        return NextResponse.json(
+          {
+            error: callsignCheck.message,
+            suggestions: callsignCheck.suggestions,
+            code: "CALLSIGN_TAKEN",
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Auto-generate clean slug ID from callsign or name (or keep existing ID)
@@ -176,7 +195,7 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
     
-    const id = candidateCallsign === "SUBX" 
+    const id = isAllen 
       ? "subx" 
       : existingShooter?.id || body.id || (rawSlug.length > 2 ? rawSlug : `shooter-${Date.now().toString(36)}`);
 
@@ -197,8 +216,6 @@ export async function POST(req: NextRequest) {
     if (finalName === "VIP Pro Competitor" || finalName === "Invitational Competitor VIP") {
       finalName = candidateCallsign || "TEST";
     }
-
-    const isAllen = candidateCallsign === "SUBX" || id === "subx" || finalName.toLowerCase().includes("hurley");
 
     const newShooter: ShooterProfile = {
       id,

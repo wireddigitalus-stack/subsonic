@@ -162,7 +162,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               fetch("/api/shooters", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(sanitized),
+                body: JSON.stringify({ ...sanitized, isProfileUpdate: true, isIntake: false }),
               }).catch(() => {});
               return;
             }
@@ -188,7 +188,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               fetch("/api/shooters", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(sanMatch),
+                body: JSON.stringify({ ...sanMatch, isProfileUpdate: true, isIntake: false }),
               }).catch(() => {});
               return;
             }
