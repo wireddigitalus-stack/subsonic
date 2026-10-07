@@ -353,9 +353,7 @@ export default function CompetitorPacketPage() {
           <div className="flex items-center gap-2 text-sm font-mono text-slate-300">
             <Link href="/" className="hover:text-white transition-colors">Home</Link>
             <ChevronRight className="w-4 h-4 text-slate-500" />
-            <Link href="/matches" className="hover:text-white transition-colors">Matches</Link>
-            <ChevronRight className="w-4 h-4 text-slate-500" />
-            <span className="text-amber-400 font-bold">2026 Competitor Packet</span>
+            <span className="text-amber-400 font-bold">The 2026 Invitational</span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">

@@ -329,7 +329,7 @@ export function Navbar() {
                 onClick={() => setActiveDropdown(activeDropdown === "matches" ? null : "matches")}
                 data-telemetry="nav_dropdown_matches"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
-                  pathname.startsWith("/matches") || pathname.startsWith("/shooters") || pathname.startsWith("/bristol-pro") || pathname.startsWith("/calendar") || activeDropdown === "matches"
+                  pathname.startsWith("/matches") || pathname.startsWith("/shooters") || pathname.startsWith("/bristol-pro") || pathname.startsWith("/calendar") || pathname.startsWith("/invitational") || pathname.startsWith("/competitor-packet") || activeDropdown === "matches"
                     ? "bg-white/15 text-white shadow-sm"
                     : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
@@ -341,19 +341,19 @@ export function Navbar() {
               {activeDropdown === "matches" && (
                 <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
                   <Link
-                    href="/matches"
+                    href="/invitational"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
                     <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Target className="w-4 h-4" />
+                      <Trophy className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
-                        <span>Match Schedule & Portal</span>
+                        <span>The 2026 Invitational</span>
                         <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">$7.5K Purse</span>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        The Invitational, 300X Long Gong & 200X
+                        Nov 13–15 schedule, packet, lodging & dining
                       </p>
                     </div>
                   </Link>
@@ -394,24 +394,6 @@ export function Navbar() {
                   </Link>
 
                   <Link
-                    href="/competitor-packet"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-amber-400 flex items-center gap-1.5">
-                        <span>2026 Competitor Packet</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Official PDF</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Nov 13–15 schedule, lodging, dining & guide
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
                     href="/shooters/intake"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group border-t border-white/5"
                   >
@@ -432,18 +414,18 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Direct Link: 2026 Competitor Packet */}
+            {/* Direct Link: The 2026 Invitational */}
             <Link
-              href="/competitor-packet"
+              href="/invitational"
               data-telemetry="nav_link_packet"
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                pathname === "/competitor-packet"
+                pathname === "/invitational" || pathname === "/competitor-packet"
                   ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-amber-400" />
-              <span>Competitor Packet</span>
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span>The Invitational</span>
             </Link>
 
           </div>
@@ -575,31 +557,15 @@ export function Navbar() {
                 Competitions & Athletes
               </span>
               <Link
-                href="/competitor-packet"
+                href="/invitational"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
               >
-                <FileText className="w-4 h-4 text-amber-400" />
+                <Trophy className="w-4 h-4 text-amber-400" />
                 <div className="flex items-center justify-between w-full">
-                  <span>2026 Competitor Packet</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">Official</span>
+                  <span>The 2026 Invitational</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">$7.5K Purse</span>
                 </div>
-              </Link>
-              <Link
-                href="/matches"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                <Target className="w-4 h-4 text-amber-400" />
-                <span>Matches ($7,500 Purse Invitational)</span>
-              </Link>
-              <Link
-                href="/calendar"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
-              >
-                <Calendar className="w-4 h-4 text-emerald-400" />
-                <span>Match Calendar & Dates</span>
               </Link>
               <Link
                 href="/documents"
