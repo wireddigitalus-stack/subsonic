@@ -29,8 +29,11 @@ import {
   Lock,
   LogOut,
   Key,
-  BarChart3
+  BarChart3,
+  Sliders,
+  Camera,
 } from "lucide-react";
+import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -40,6 +43,8 @@ export function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [callsign, setCallsign] = useState<string>("");
+  const [userAvatarPhoto, setUserAvatarPhoto] = useState<string | null>(null);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   // Track private chat room auth state & callsign
   useEffect(() => {
@@ -103,6 +108,11 @@ export function Navbar() {
             } catch {}
           }
           if (parsed.callsign) setCallsign(parsed.callsign);
+          if (parsed.image && parsed.image !== "/images/SS-RWB-LOGO.png") {
+            setUserAvatarPhoto(parsed.image);
+          } else {
+            setUserAvatarPhoto(null);
+          }
           const role = (parsed.role || "").toUpperCase();
           const cs = (parsed.callsign || "").toUpperCase();
           if (
@@ -121,7 +131,11 @@ export function Navbar() {
     };
     checkAuth();
     window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
+    window.addEventListener("subsonic_profile_updated", checkAuth);
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("subsonic_profile_updated", checkAuth);
+    };
   }, [pathname]);
 
   const handleLockChat = async () => {
@@ -364,10 +378,20 @@ export function Navbar() {
                     <span>Enter The Chat</span>
                   </Link>
                 )}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <button
+                  type="button"
+                  onClick={() => setIsProfileEditOpen(true)}
+                  title="Edit Profile & Photos"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 hover:border-emerald-500/50 text-[11px] font-mono text-emerald-300 transition-all cursor-pointer group shadow-sm active:scale-95"
+                >
+                  {userAvatarPhoto ? (
+                    <img src={userAvatarPhoto} alt={callsign} className="w-4 h-4 rounded-full object-cover shrink-0 ring-1 ring-emerald-400" />
+                  ) : (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  )}
                   <span className="font-bold">{callsign}</span>
-                </div>
+                  <Sliders className="w-3 h-3 text-emerald-400/80 group-hover:text-emerald-200 ml-0.5" />
+                </button>
                 <button
                   type="button"
                   onClick={handleLockChat}
@@ -506,23 +530,42 @@ export function Navbar() {
             <div className="pt-2 border-t border-white/10 space-y-2">
               {isAuthenticated ? (
                 <>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                      <span className="text-xs font-mono font-bold text-white">Signed in as {callsign}</span>
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {userAvatarPhoto ? (
+                          <img src={userAvatarPhoto} alt={callsign} className="w-5 h-5 rounded-full object-cover ring-1 ring-emerald-400" />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        )}
+                        <span className="text-xs font-mono font-bold text-white">Signed in as {callsign}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          handleLockChat();
+                        }}
+                        className="px-2 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30 text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                      >
+                        <LogOut className="w-3 h-3" />
+                        <span>Log Out</span>
+                      </button>
                     </div>
+
                     <button
                       type="button"
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        handleLockChat();
+                        setIsProfileEditOpen(true);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
+                      className="w-full py-2 px-3 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                     >
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>Log Out</span>
+                      <Camera className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Edit My Profile & Photos 📸</span>
                     </button>
                   </div>
+
                   {pathname !== "/chat" && (
                     <Link
                       href="/chat"
@@ -548,6 +591,20 @@ export function Navbar() {
           </div>
         )}
       </div>
+
+      {/* Unified Shooter Profile & Photo Editor Modal */}
+      <ProfileEditModal
+        isOpen={isProfileEditOpen}
+        onClose={() => setIsProfileEditOpen(false)}
+        onSaved={(updated) => {
+          if (updated.image && updated.image !== "/images/SS-RWB-LOGO.png") {
+            setUserAvatarPhoto(updated.image);
+          }
+          if (updated.callsign) {
+            setCallsign(updated.callsign);
+          }
+        }}
+      />
     </header>
   );
 }

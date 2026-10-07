@@ -57,8 +57,10 @@ import {
   Activity,
   Radar,
   Hash,
+  Camera,
   LogOut
 } from "lucide-react";
+import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
 import { ChatMessage, DopeCardData, DirectPartner } from "@/lib/types";
 import { evaluateChatMessage } from "@/lib/ai-moderator";
@@ -207,6 +209,7 @@ export default function ChatPage() {
   // Shooter Profile State
   const [shooterProfile, setShooterProfile] = useState<ShooterProfile>(DEFAULT_PROFILE);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isFullProfileModalOpen, setIsFullProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<ShooterProfile>(DEFAULT_PROFILE);
 
   // Direct Comms (1-on-1 Closed Net) State
@@ -1687,7 +1690,22 @@ export default function ChatPage() {
             })
           );
         }
+        window.dispatchEvent(new CustomEvent("subsonic_profile_updated", { detail: updated }));
       } catch {}
+
+      // Persist to backend database
+      fetch("/api/shooters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: updated.callsign === "SUBX" ? "subx" : updated.callsign?.toLowerCase(),
+          name: updated.name,
+          callsign: updated.callsign,
+          division: updated.division,
+          image: updated.image,
+          rifleSetup: { action: updated.rifleSetup },
+        }),
+      }).catch((e) => console.warn("Background shooter save error:", e));
     }
     // Show saved confirmation then close
     setProfileSaved(true);
@@ -2727,13 +2745,24 @@ export default function ChatPage() {
                     showDownload={true}
                   />
 
-                  <div className="text-center pt-2">
+                  <div className="text-center pt-2 space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsProfileModalOpen(false);
+                        setIsFullProfileModalOpen(true);
+                      }}
+                      className="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
+                    >
+                      <Camera className="w-4 h-4" />
+                      <span>Upload Photos & Edit Full Dossier 📸</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setProfileActiveTab("EDIT")}
-                      className="text-xs font-mono text-slate-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
+                      className="text-[11px] font-mono text-slate-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
                     >
-                      <span>{isMasterOwner ? "Need to update system credentials or tech architecture? Edit Profile →" : "Need to change your callsign or rifle build? Edit Profile →"}</span>
+                      <span>{isMasterOwner ? "Quick edit system credentials or tech architecture →" : "Quick edit callsign or rifle build →"}</span>
                     </button>
                   </div>
                 </div>
@@ -3011,6 +3040,29 @@ export default function ChatPage() {
           </div>
         );
       })()}
+
+      {/* 4.5 UNIFIED SHOOTER PROFILE & PHOTO EDITOR MODAL */}
+      <ProfileEditModal
+        isOpen={isFullProfileModalOpen}
+        onClose={() => setIsFullProfileModalOpen(false)}
+        initialShooter={shooterProfile}
+        onSaved={(updated) => {
+          const rifleString = typeof updated.rifleSetup === "object" && updated.rifleSetup
+            ? `${updated.rifleSetup.action || ""}${updated.rifleSetup.optic ? ` / ${updated.rifleSetup.optic}` : ""}`
+            : ((updated.rifleSetup as any) || "");
+
+          const merged: ShooterProfile = {
+            ...shooterProfile,
+            name: updated.name,
+            callsign: updated.callsign,
+            division: updated.division,
+            image: updated.image,
+            rifleSetup: rifleString || shooterProfile.rifleSetup,
+          };
+          setShooterProfile(merged);
+          setProfileForm(merged);
+        }}
+      />
 
       {/* 5. INTERACTIVE GUIDED CHAT TOUR */}
       <ChatTour

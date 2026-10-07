@@ -7,7 +7,7 @@ import {
   deleteShooterFromStorageAsync,
   refreshShootersFromDb,
 } from "@/lib/shooters";
-import { refreshMembersFromDb, getMembersFromStorage } from "@/lib/members";
+import { refreshMembersFromDb, getMembersFromStorage, addOrUpdateMemberAsync } from "@/lib/members";
 
 /** Never send PIN hashes to the browser. */
 function publicShooter<T extends { pin?: unknown }>(s: T): T {
@@ -124,10 +124,13 @@ export async function POST(req: NextRequest) {
 
     const candidateCallsign = body.callsign.trim().toUpperCase();
     const existingShooter = getShootersFromStorage().find(
-      (s) => s.id.toLowerCase() === (body.id || "").toLowerCase()
+      (s) =>
+        (body.id && s.id.toLowerCase() === body.id.toLowerCase()) ||
+        s.callsign.toUpperCase() === candidateCallsign ||
+        (candidateCallsign === "SUBX" && s.id === "subx")
     );
 
-    // Require email, phone, and mailing address on new competitor profiles
+    // Require email, phone, and mailing address ONLY on brand new competitor registrations
     if (!existingShooter) {
       if (!body.email || !String(body.email).includes("@") || !body.phone || !body.mailingAddress) {
         return NextResponse.json(
@@ -165,32 +168,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auto-generate clean slug ID from callsign or name
-    const rawSlug = (body.callsign || body.name)
+    // Auto-generate clean slug ID from callsign or name (or keep existing ID)
+    const rawSlug = (body.id || body.callsign || body.name)
       .toLowerCase()
       .trim()
+      .replace(/^ss-pro-/, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
     
-    const id = body.id || (rawSlug.length > 2 ? rawSlug : `shooter-${Date.now().toString(36)}`);
+    const id = candidateCallsign === "SUBX" 
+      ? "subx" 
+      : existingShooter?.id || body.id || (rawSlug.length > 2 ? rawSlug : `shooter-${Date.now().toString(36)}`);
 
     // Parse accolades & sponsors if sent as comma-separated string or array
     const accolades = Array.isArray(body.accolades)
       ? body.accolades
       : typeof body.accolades === "string"
       ? body.accolades.split(",").map((s: string) => s.trim()).filter(Boolean)
-      : [];
+      : existingShooter?.accolades || [];
 
     const sponsors = Array.isArray(body.sponsors)
       ? body.sponsors
       : typeof body.sponsors === "string"
       ? body.sponsors.split(",").map((s: string) => s.trim()).filter(Boolean)
-      : [];
+      : existingShooter?.sponsors || [];
 
     let finalName = body.name.trim();
     if (finalName === "VIP Pro Competitor" || finalName === "Invitational Competitor VIP") {
       finalName = candidateCallsign || "TEST";
     }
+
+    const isAllen = candidateCallsign === "SUBX" || id === "subx" || finalName.toLowerCase().includes("hurley");
 
     const newShooter: ShooterProfile = {
       id,
@@ -200,44 +208,73 @@ export async function POST(req: NextRequest) {
       pin: body.pin && String(body.pin).trim()
         ? (isHashedPin(String(body.pin).trim()) ? String(body.pin).trim() : await hashPin(String(body.pin).trim()))
         : existingShooter?.pin,
-      division: body.division || "Open Division Pro",
-      ranking: body.ranking || "Appalachian Rimfire Competitor",
-      homeRange: body.homeRange || "The Hideout, Bristol, TN",
-      podiums: typeof body.podiums === "number" ? body.podiums : parseInt(body.podiums, 10) || 0,
+      division: isAllen ? "Owner Admin / Executive" : (body.division || existingShooter?.division || "Open Division Pro"),
+      ranking: isAllen ? "Founder • Subsonic Society" : (body.ranking || existingShooter?.ranking || "Appalachian Rimfire Competitor"),
+      homeRange: body.homeRange || existingShooter?.homeRange || "The Hideout, Bristol, TN",
+      podiums: typeof body.podiums === "number" ? body.podiums : (existingShooter?.podiums || 0),
       email: body.email ? String(body.email).trim().toLowerCase() : existingShooter?.email,
       phone: body.phone ? String(body.phone).trim() : existingShooter?.phone,
       mailingAddress: body.mailingAddress ? String(body.mailingAddress).trim() : existingShooter?.mailingAddress,
-      featuredMatch: body.featuredMatch || "Subsonic Society Invitational 2026",
-      image: body.image || "/images/SS-RWB-LOGO.png",
-      actionPhoto: body.actionPhoto || body.image || "/images/SS-RWB-LOGO.png",
-      quote: body.quote || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
+      featuredMatch: body.featuredMatch || existingShooter?.featuredMatch || "Subsonic Society Invitational Money Match 2026",
+      image: body.image || existingShooter?.image || "/images/SS-RWB-LOGO.png",
+      actionPhoto: body.actionPhoto || existingShooter?.actionPhoto || body.image || "/images/SS-RWB-LOGO.png",
+      posterImage: body.posterImage || existingShooter?.posterImage,
+      quote: body.quote || existingShooter?.quote || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
       accolades: accolades.length > 0 ? accolades : ["COMPETITOR"],
       sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
       rifleSetup: {
-        action: body.rifleSetup?.action || body.action || "Vudoo V-22 / Rimfire Action",
-        barrel: body.rifleSetup?.barrel || body.barrel || "20\" Match Contour (1:16)",
-        trigger: body.rifleSetup?.trigger || body.trigger || "Precision Match Trigger (6 oz)",
-        chassis: body.rifleSetup?.chassis || body.chassis || "Competition Stock / Chassis",
-        optic: body.rifleSetup?.optic || body.optic || "Precision Scope with MOA/MIL Reticle",
-        mount: body.rifleSetup?.mount || body.mount || "Heavy Duty Match Rings",
-        tuner: body.rifleSetup?.tuner || body.tuner || "Precision Rimfire Tuner",
-        ammoLot: body.rifleSetup?.ammoLot || body.ammoLot || "Lapua Center-X / SK Match",
+        action: body.rifleSetup?.action || body.action || existingShooter?.rifleSetup?.action || "Vudoo V-22 / Rimfire Action",
+        barrel: body.rifleSetup?.barrel || body.barrel || existingShooter?.rifleSetup?.barrel || "20\" Match Contour (1:16)",
+        trigger: body.rifleSetup?.trigger || body.trigger || existingShooter?.rifleSetup?.trigger || "Precision Match Trigger (6 oz)",
+        chassis: body.rifleSetup?.chassis || body.chassis || existingShooter?.rifleSetup?.chassis || "Competition Stock / Chassis",
+        optic: body.rifleSetup?.optic || body.optic || existingShooter?.rifleSetup?.optic || "Precision Scope with MOA/MIL Reticle",
+        mount: body.rifleSetup?.mount || body.mount || existingShooter?.rifleSetup?.mount || "Heavy Duty Match Rings",
+        tuner: body.rifleSetup?.tuner || body.tuner || existingShooter?.rifleSetup?.tuner || "Precision Rimfire Tuner",
+        ammoLot: body.rifleSetup?.ammoLot || body.ammoLot || existingShooter?.rifleSetup?.ammoLot || "Lapua Center-X / SK Match",
       },
-      interview: Array.isArray(body.interview) ? body.interview : [
+      interview: Array.isArray(body.interview) ? body.interview : (existingShooter?.interview || [
         {
           question: "What is your advice for precision rimfire matches in mountain wind?",
           answer: "Focus on solid position building, watch mirage boil, and commit fully to your wind hold without hesitating.",
         },
-      ],
-      createdAt: new Date().toISOString(),
+      ]),
+      createdAt: existingShooter?.createdAt || new Date().toISOString(),
       status: "PUBLISHED",
     };
 
     await saveShooterToStorageAsync(newShooter);
 
+    // Cross-sync to society_members so name, rifle build, and callsign match across both datastores
+    try {
+      const members = getMembersFromStorage();
+      const existingMember = members.find(
+        (m) =>
+          (isAllen && (m.member_id === "SS-PRO-SUBX" || m.callsign === "SUBX")) ||
+          m.member_id === `SS-PRO-${candidateCallsign}` ||
+          m.callsign?.toUpperCase() === candidateCallsign
+      );
+
+      if (existingMember) {
+        const rifleSummary = newShooter.rifleSetup?.action
+          ? `${newShooter.rifleSetup.action}${newShooter.rifleSetup.optic ? ` / ${newShooter.rifleSetup.optic}` : ""}`
+          : existingMember.rifle_setup;
+
+        await addOrUpdateMemberAsync({
+          ...existingMember,
+          full_name: newShooter.name,
+          callsign: newShooter.callsign,
+          rifle_setup: rifleSummary,
+          experience_level: newShooter.division,
+          role: isAllen ? "OWNER_ADMIN" : existingMember.role,
+        });
+      }
+    } catch (syncErr) {
+      console.warn("Cross-syncing shooter to member failed:", syncErr);
+    }
+
     return NextResponse.json({
       success: true,
-      message: `Shooter profile for ${newShooter.name} (${newShooter.callsign}) created successfully.`,
+      message: `Shooter profile for ${newShooter.name} (${newShooter.callsign}) saved successfully.`,
       shooter: publicShooter(newShooter),
       url: `/shooters/${newShooter.id}`,
     });

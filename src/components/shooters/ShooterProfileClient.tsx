@@ -29,6 +29,7 @@ import {
   FileText
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
+import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 
 interface Props {
   initialShooter: ShooterProfile | null;
@@ -92,11 +93,30 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
   const [loading, setLoading] = useState(!initialShooter);
   const [showPosterModal, setShowPosterModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [loggedInCallsign, setLoggedInCallsign] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   useEffect(() => {
-    // Auto-clean any stale VIP Pro boilerplate in browser storage
+    // Auto-clean any stale VIP Pro boilerplate in browser storage & check auth
     if (typeof window !== "undefined") {
       try {
+        const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+        if (rawShooter) {
+          const parsedShooter = JSON.parse(rawShooter);
+          const cs = (parsedShooter.callsign || "").toUpperCase();
+          setLoggedInCallsign(cs);
+          const role = (parsedShooter.role || "").toUpperCase();
+          if (
+            role === "MASTER_OWNER" ||
+            role === "OWNER_ADMIN" ||
+            role === "ADMIN" ||
+            ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(cs)
+          ) {
+            setIsAdmin(true);
+          }
+        }
+
         for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
           const raw = localStorage.getItem(key);
           if (raw) {
@@ -323,6 +343,15 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
   const stats = getCareerStats(shooter);
   const posterUrl = shooter.posterImage || shooter.image || "/images/SS-RWB-LOGO.png";
 
+  const isOwnerOfProfile = Boolean(
+    shooter &&
+    (
+      (loggedInCallsign && shooter.callsign && loggedInCallsign === shooter.callsign.toUpperCase()) ||
+      (loggedInCallsign === "SUBX" && (slug.toLowerCase() === "subx" || shooter.name.toLowerCase().includes("hurley"))) ||
+      isAdmin
+    )
+  );
+
   // Schema.org Person & Athlete Structured Data
   const jsonLd = {
     "@context": "https://schema.org",
@@ -409,6 +438,18 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
           {/* Quick Actions */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+            {isOwnerOfProfile && (
+              <button
+                type="button"
+                onClick={() => setIsProfileEditOpen(true)}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center gap-1.5 shadow-sm shrink-0 active:scale-95"
+                title="Edit Profile & Upload Photos"
+              >
+                <Camera className="w-3.5 h-3.5 fill-black" />
+                <span>Edit Profile & Photos</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowPosterModal(true)}
               className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all flex items-center gap-1.5 shrink-0"
@@ -547,13 +588,26 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                     alt={`${displayName} Official Tournament Graphic`}
                     className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                   />
-                  <button
-                    onClick={() => setShowPosterModal(true)}
-                    className="absolute top-3.5 right-3.5 p-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg z-20"
-                    title="Expand Full Resolution Poster"
-                  >
-                    <Maximize2 className="w-4 h-4 text-amber-400" />
-                  </button>
+                  <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 z-20">
+                    {isOwnerOfProfile && (
+                      <button
+                        type="button"
+                        onClick={() => setIsProfileEditOpen(true)}
+                        className="px-2.5 py-1 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-amber-400/50 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1 shadow-lg transition-all hover:scale-105 active:scale-95"
+                        title="Change Photo"
+                      >
+                        <Camera className="w-3 h-3 text-amber-400" />
+                        <span>Change Photo</span>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowPosterModal(true)}
+                      className="p-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+                      title="Expand Full Resolution Poster"
+                    >
+                      <Maximize2 className="w-4 h-4 text-amber-400" />
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Outer Golden / Metallic Rim Frame for standard portraits */
@@ -569,13 +623,26 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                       <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span>INVITATIONAL PRO</span>
                     </span>
-                    <button
-                      onClick={() => setShowPosterModal(true)}
-                      className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
-                      title="Expand Full Print Poster"
-                    >
-                      <Maximize2 className="w-4 h-4 text-amber-400" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      {isOwnerOfProfile && (
+                        <button
+                          type="button"
+                          onClick={() => setIsProfileEditOpen(true)}
+                          className="px-2.5 py-1 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-amber-400/50 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1 shadow-lg transition-all hover:scale-105 active:scale-95"
+                          title="Change Photo"
+                        >
+                          <Camera className="w-3 h-3 text-amber-400" />
+                          <span>Change Photo</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowPosterModal(true)}
+                        className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+                        title="Expand Full Print Poster"
+                      >
+                        <Maximize2 className="w-4 h-4 text-amber-400" />
+                      </button>
+                    </div>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1">
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -1017,6 +1084,15 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
         </div>
       )}
 
+      {/* Profile & Photo Editor Modal */}
+      <ProfileEditModal
+        isOpen={isProfileEditOpen}
+        onClose={() => setIsProfileEditOpen(false)}
+        initialShooter={shooter}
+        onSaved={(updated) => {
+          setShooter(updated);
+        }}
+      />
     </div>
   );
 }
