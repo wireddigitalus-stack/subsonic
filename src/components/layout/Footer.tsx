@@ -15,7 +15,8 @@ import {
   Users,
   Trophy,
   Award,
-  Sparkles
+  Sparkles,
+  BarChart3
 } from "lucide-react";
 
 export function Footer() {
@@ -176,6 +177,12 @@ export function Footer() {
                   <span>Chat Room</span>
                 </Link>
               </li>
+              <li>
+                <Link href="/admin" className="hover:text-amber-400 transition-colors flex items-center gap-1">
+                  <BarChart3 className="w-3 h-3 text-amber-400" />
+                  <span>Admin Control Center</span>
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -214,6 +221,14 @@ export function Footer() {
             </Link>
             <Link href="/shooters" className="hover:text-slate-200">
               Shooter Profiles
+            </Link>
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 border border-amber-500/30 text-xs font-mono font-bold transition-all shadow-sm"
+              title="Open Admin Control Center"
+            >
+              <BarChart3 className="w-3 h-3 text-amber-400" />
+              <span>Admin</span>
             </Link>
           </div>
         </div>

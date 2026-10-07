@@ -401,16 +401,6 @@ export function Navbar() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span className="font-bold">{callsign}</span>
                 </div>
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="hidden sm:flex px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] font-mono font-bold text-amber-300 items-center gap-1 transition-all"
-                    title="Open Admin Control Center"
-                  >
-                    <BarChart3 className="w-3 h-3 text-amber-400" />
-                    <span>Admin</span>
-                  </Link>
-                )}
                 {pathname !== "/chat" && (
                   <Link
                     href="/chat"
