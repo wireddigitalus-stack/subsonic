@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, LogOut } from "lucide-react";
+import { MessageSquare, Flame, Crosshair, Lock, Shield, Sparkles, User, Info, Bot, Radar, LogOut, Camera } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
 import { getUserInitials, getAvatarColor, formatLastActive } from "@/lib/avatar-colors";
 
@@ -23,6 +23,7 @@ export interface ChatChannelSidebarProps {
     role?: string;
     badgeText?: string;
   };
+  onEditProfile?: () => void;
   onLogout?: () => void;
   onlineCallsigns?: string[];
   lastActiveMap?: Record<string, number>;
@@ -39,6 +40,7 @@ export function ChatChannelSidebar({
   unreadCounts = {},
   onOpenDossier,
   shooterProfile,
+  onEditProfile,
   onLogout,
   onlineCallsigns = [],
   lastActiveMap = {},
@@ -89,17 +91,29 @@ export function ChatChannelSidebar({
                 </div>
               </div>
             </div>
-            {onLogout && (
-              <button
-                type="button"
-                onClick={onLogout}
-                title="Log Out of Chat"
-                className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1.5 text-xs font-semibold"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>LOGOUT</span>
-              </button>
-            )}
+            <div className="flex items-center gap-1 shrink-0">
+              {onEditProfile && (
+                <button
+                  type="button"
+                  onClick={onEditProfile}
+                  title="Edit Profile & Photos"
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors"
+                >
+                  <Camera className="w-3.5 h-3.5 text-amber-400" />
+                </button>
+              )}
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  title="Log Out of Chat"
+                  className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors flex items-center gap-1 text-xs font-semibold"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="text-[11px]">LOGOUT</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
 

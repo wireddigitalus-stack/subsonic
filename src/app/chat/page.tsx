@@ -211,6 +211,23 @@ export default function ChatPage() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isFullProfileModalOpen, setIsFullProfileModalOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<ShooterProfile>(DEFAULT_PROFILE);
+  const [isChatUserMenuOpen, setIsChatUserMenuOpen] = useState(false);
+  const [isChatMobileUserMenuOpen, setIsChatMobileUserMenuOpen] = useState(false);
+  const chatUserMenuRef = useRef<HTMLDivElement>(null);
+  const chatMobileUserMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (chatUserMenuRef.current && !chatUserMenuRef.current.contains(e.target as Node)) {
+        setIsChatUserMenuOpen(false);
+      }
+      if (chatMobileUserMenuRef.current && !chatMobileUserMenuRef.current.contains(e.target as Node)) {
+        setIsChatMobileUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Direct Comms (1-on-1 Closed Net) State
   const [directPartners, setDirectPartners] = useState<DirectPartner[]>(INITIAL_DIRECT_PARTNERS);
@@ -1952,44 +1969,133 @@ export default function ChatPage() {
                 <span className="text-amber-400 font-extrabold text-xs">CHAT</span>
               </Link>
 
-              {/* Shooter Callsign & Pass Pill */}
-              <button
-                id="tour-step-pass"
-                type="button"
-                onClick={() => {
-                  setProfileForm(shooterProfile);
-                  setProfileActiveTab("PASS");
-                  setIsProfileModalOpen(true);
-                }}
-                data-telemetry="chat_mobile_view_pass"
-                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-amber-500/40 text-xs min-w-0 shrink"
-                title="View Shooter Pass"
-              >
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
-                  style={{
-                    backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
-                  }}
+              {/* Shooter Callsign & Account Options Pill */}
+              <div className="relative" ref={chatMobileUserMenuRef}>
+                <button
+                  id="tour-step-pass"
+                  type="button"
+                  onClick={() => setIsChatMobileUserMenuOpen(!isChatMobileUserMenuOpen)}
+                  data-telemetry="chat_mobile_account_menu"
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-white/15 hover:border-amber-400/40 text-xs min-w-0 shrink cursor-pointer active:scale-95 transition-all"
+                  title={`${shooterProfile.callsign} — Account & Session Options`}
+                  aria-expanded={isChatMobileUserMenuOpen}
+                  aria-haspopup="true"
                 >
-                  {shooterProfile.image ? (
-                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
-                  ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
-                    <Radar className="w-3 h-3 text-cyan-300 stroke-[2.5]" />
-                  ) : (
-                    <span className="text-white font-bold tracking-tight text-[10px]">
-                      {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
-                    </span>
-                  )}
-                </div>
-                <span className={`font-mono font-bold text-xs truncate max-w-[80px] ${
-                  shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                    ? "text-cyan-300"
-                    : "text-amber-300"
-                }`}>
-                  {shooterProfile.callsign}
-                </span>
-                <QrCode className="w-3 h-3 text-emerald-400 shrink-0" />
-              </button>
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                    style={{
+                      backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                    }}
+                  >
+                    {shooterProfile.image ? (
+                      <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                    ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                      <Radar className="w-3 h-3 text-cyan-300 stroke-[2.5]" />
+                    ) : (
+                      <span className="text-white font-bold tracking-tight text-[10px]">
+                        {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`font-mono font-bold text-xs truncate max-w-[80px] ${
+                    shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                      ? "text-cyan-300"
+                      : "text-amber-300"
+                  }`}>
+                    {shooterProfile.callsign}
+                  </span>
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${isChatMobileUserMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
+                </button>
+
+                {isChatMobileUserMenuOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-60 ios-glass rounded-2xl p-2 border border-white/15 shadow-2xl backdrop-blur-2xl animate-fadeIn z-50 space-y-1">
+                    <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                        style={{
+                          backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                        }}
+                      >
+                        {shooterProfile.image ? (
+                          <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                        ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                          <Radar className="w-3.5 h-3.5 text-cyan-300 stroke-[2.5]" />
+                        ) : (
+                          <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-mono font-bold text-xs text-white truncate flex items-center gap-1.5">
+                          <span>{shooterProfile.callsign}</span>
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-sans uppercase">Online</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                          {shooterProfile.badgeText || "SOCIETY OPERATIVE"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChatMobileUserMenuOpen(false);
+                        setProfileForm(shooterProfile);
+                        setProfileActiveTab("EDIT");
+                        setIsProfileModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                    >
+                      <Camera className="w-4 h-4 text-amber-400" />
+                      <span>Edit Profile &amp; Photos</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChatMobileUserMenuOpen(false);
+                        setProfileForm(shooterProfile);
+                        setProfileActiveTab("PASS");
+                        setIsProfileModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                    >
+                      <QrCode className="w-4 h-4 text-emerald-400" />
+                      <span>Digital Member Pass</span>
+                    </button>
+
+                    {(shooterProfile?.role === "MASTER_OWNER" ||
+                      shooterProfile?.role === "OWNER_ADMIN" ||
+                      shooterProfile?.role === "ADMIN" ||
+                      shooterProfile?.callsign === "RADAR" ||
+                      shooterProfile?.callsign === "SUBX" ||
+                      shooterProfile?.callsign === "ALLEN") && (
+                      <Link
+                        href="/admin"
+                        target="_blank"
+                        onClick={() => setIsChatMobileUserMenuOpen(false)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <span>Admin Control Center</span>
+                      </Link>
+                    )}
+
+                    <div className="border-t border-white/10 my-1" />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChatMobileUserMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 text-red-400" />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Mobile Actions: Audio Toggle + Tactical Menu */}
@@ -2117,51 +2223,132 @@ export default function ChatPage() {
                   <span>TERMS &amp; CONDUCT</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  title="Log Out of Private Chat"
-                  className="h-7 px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border-red-500/30 transition-all"
-                >
-                  <LogOut className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                  <span>Log Out</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileForm(shooterProfile);
-                    setProfileActiveTab("EDIT");
-                    setIsProfileModalOpen(true);
-                  }}
-                  data-telemetry="chat_edit_shooter_profile"
-                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] transition-all text-xs group"
-                >
-                  <div
-                    className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
-                    style={{
-                      backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
-                    }}
+                {/* Unified User Account & Session Options */}
+                <div className="relative" ref={chatUserMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsChatUserMenuOpen(!isChatUserMenuOpen)}
+                    data-telemetry="chat_shooter_account_menu"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-amber-400/40 transition-all text-xs group cursor-pointer"
+                    title={`${shooterProfile.callsign} — Account & Session Options`}
+                    aria-expanded={isChatUserMenuOpen}
+                    aria-haspopup="true"
                   >
-                    {shooterProfile.image ? (
-                      <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
-                    ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
-                      <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
-                    ) : (
-                      <span className="text-white font-bold tracking-tight text-[9px] sm:text-[10px]">
-                        {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
-                      </span>
-                    )}
-                  </div>
-                  <span className={`font-mono font-bold text-[11px] sm:text-xs ${
-                    shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
-                      ? "text-cyan-300 group-hover:text-cyan-200"
-                      : "text-amber-300 group-hover:text-amber-200"
-                  }`}>
-                    {shooterProfile.callsign}
-                  </span>
-                  <Sliders className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" />
-                </button>
+                    <div
+                      className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                      style={{
+                        backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                      }}
+                    >
+                      {shooterProfile.image ? (
+                        <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                      ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                        <Radar className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-300 stroke-[2.5]" />
+                      ) : (
+                        <span className="text-white font-bold tracking-tight text-[9px] sm:text-[10px]">
+                          {getUserInitials(shooterProfile.name, shooterProfile.callsign)}
+                        </span>
+                      )}
+                    </div>
+                    <span className={`font-mono font-bold text-[11px] sm:text-xs ${
+                      shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER"
+                        ? "text-cyan-300 group-hover:text-cyan-200"
+                        : "text-amber-300 group-hover:text-amber-200"
+                    }`}>
+                      {shooterProfile.callsign}
+                    </span>
+                    <ChevronDown className={`w-3 h-3 text-slate-400 group-hover:text-white transition-transform duration-200 ${isChatUserMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
+                  </button>
+
+                  {isChatUserMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 sm:w-64 ios-glass rounded-2xl p-2 border border-white/15 shadow-2xl backdrop-blur-2xl animate-fadeIn z-50 space-y-1">
+                      <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                          style={{
+                            backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                          }}
+                        >
+                          {shooterProfile.image ? (
+                            <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                          ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                            <Radar className="w-3.5 h-3.5 text-cyan-300 stroke-[2.5]" />
+                          ) : (
+                            <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-mono font-bold text-xs text-white truncate flex items-center gap-1.5">
+                            <span>{shooterProfile.callsign}</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-sans uppercase">Online</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                            {shooterProfile.badgeText || "SOCIETY OPERATIVE"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
+                          setProfileForm(shooterProfile);
+                          setProfileActiveTab("EDIT");
+                          setIsProfileModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <Camera className="w-4 h-4 text-amber-400" />
+                        <span>Edit Profile &amp; Photos</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
+                          setProfileForm(shooterProfile);
+                          setProfileActiveTab("PASS");
+                          setIsProfileModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <QrCode className="w-4 h-4 text-emerald-400" />
+                        <span>Digital Member Pass</span>
+                      </button>
+
+                      {(shooterProfile?.role === "MASTER_OWNER" ||
+                        shooterProfile?.role === "OWNER_ADMIN" ||
+                        shooterProfile?.role === "ADMIN" ||
+                        shooterProfile?.callsign === "RADAR" ||
+                        shooterProfile?.callsign === "SUBX" ||
+                        shooterProfile?.callsign === "ALLEN") && (
+                        <Link
+                          href="/admin"
+                          target="_blank"
+                          onClick={() => setIsChatUserMenuOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
+                        >
+                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                          <span>Admin Control Center</span>
+                        </Link>
+                      )}
+
+                      <div className="border-t border-white/10 my-1" />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 text-red-400" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -2598,6 +2785,11 @@ export default function ChatPage() {
             unreadCounts={unreadCounts}
             onOpenDossier={handleOpenDossier}
             shooterProfile={shooterProfile}
+            onEditProfile={() => {
+              setProfileForm(shooterProfile);
+              setProfileActiveTab("EDIT");
+              setIsProfileModalOpen(true);
+            }}
             onLogout={handleLogout}
             onlineCallsigns={onlineCallsigns}
             lastActiveMap={lastActiveMap}
@@ -3110,6 +3302,11 @@ export default function ChatPage() {
         onOpenPass={() => {
           setProfileForm(shooterProfile);
           setProfileActiveTab("PASS");
+          setIsProfileModalOpen(true);
+        }}
+        onEditProfile={() => {
+          setProfileForm(shooterProfile);
+          setProfileActiveTab("EDIT");
           setIsProfileModalOpen(true);
         }}
         onOpenChannels={() => {

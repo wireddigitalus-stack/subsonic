@@ -18,7 +18,8 @@ import {
   QrCode,
   Radar,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Camera
 } from "lucide-react";
 import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
 
@@ -36,6 +37,7 @@ interface ChatMobileMenuModalProps {
     avatarColor?: string;
   };
   onOpenPass: () => void;
+  onEditProfile?: () => void;
   onOpenChannels: () => void;
   onOpenDirectChats: () => void;
   unreadDmCount: number;
@@ -54,6 +56,7 @@ export function ChatMobileMenuModal({
   onClose,
   shooterProfile,
   onOpenPass,
+  onEditProfile,
   onOpenChannels,
   onOpenDirectChats,
   unreadDmCount,
@@ -154,17 +157,30 @@ export function ChatMobileMenuModal({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenPass();
-              }}
-              className="w-full py-2 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-            >
-              <QrCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>VIEW SHOOTER PASS</span>
-            </button>
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenPass();
+                }}
+                className="py-2 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
+              >
+                <QrCode className="w-3.5 h-3.5 text-amber-400" />
+                <span>MEMBER PASS</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onEditProfile?.();
+                }}
+                className="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 font-mono text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
+              >
+                <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                <span>EDIT PROFILE</span>
+              </button>
+            </div>
           </div>
 
           {/* Navigation Links */}

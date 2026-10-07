@@ -45,6 +45,19 @@ export function Navbar() {
   const [callsign, setCallsign] = useState<string>("");
   const [userAvatarPhoto, setUserAvatarPhoto] = useState<string | null>(null);
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Track private chat room auth state & callsign
   useEffect(() => {
@@ -155,6 +168,7 @@ export function Navbar() {
   // Close dropdown and mobile menu on route change
   useEffect(() => {
     setActiveDropdown(null);
+    setUserMenuOpen(false);
     setMobileMenuOpen(false);
   }, [pathname]);
 
@@ -378,29 +392,103 @@ export function Navbar() {
                     <span>Enter The Chat</span>
                   </Link>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setIsProfileEditOpen(true)}
-                  title="Edit Profile & Photos"
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 hover:border-emerald-500/50 text-[11px] font-mono text-emerald-300 transition-all cursor-pointer group shadow-sm active:scale-95"
-                >
-                  {userAvatarPhoto ? (
-                    <img src={userAvatarPhoto} alt={callsign} className="w-4 h-4 rounded-full object-cover shrink-0 ring-1 ring-emerald-400" />
-                  ) : (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {/* Unified User Account Button with Profile & Logout Options */}
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    title={`${callsign} — Account & Session Options`}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 hover:border-amber-400/40 text-[11px] sm:text-xs font-mono text-emerald-300 transition-all cursor-pointer shadow-sm active:scale-95 group"
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="true"
+                  >
+                    {userAvatarPhoto ? (
+                      <img src={userAvatarPhoto} alt={callsign} className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover shrink-0 ring-1 ring-emerald-400" />
+                    ) : (
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/30 shrink-0" />
+                    )}
+                    <span className="font-bold text-white group-hover:text-amber-300 transition-colors">{callsign}</span>
+                    <ChevronDown className={`w-3 h-3 text-slate-400 group-hover:text-white transition-transform duration-200 ${userMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 sm:w-64 ios-glass rounded-2xl p-2 border border-white/15 shadow-2xl backdrop-blur-2xl animate-fadeIn z-50 space-y-1">
+                      {/* Identity Header */}
+                      <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
+                        {userAvatarPhoto ? (
+                          <img src={userAvatarPhoto} alt={callsign} className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-400 shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-emerald-400 text-xs shrink-0">
+                            {callsign.slice(0, 2)}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-mono font-bold text-xs text-white truncate flex items-center gap-1.5">
+                            <span>{callsign}</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-sans uppercase">Online</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                            {isAdmin ? (callsign === "RADAR" ? "Master Owner • Dev Advisor" : "Owner Admin") : "Verified Competitor"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Option 1: Edit Profile & Photos */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          setIsProfileEditOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <Camera className="w-4 h-4 text-amber-400" />
+                        <span>Edit Profile &amp; Photos</span>
+                      </button>
+
+                      {/* Option 2: Enter The Chat */}
+                      {pathname !== "/chat" && (
+                        <Link
+                          href="/chat"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left"
+                        >
+                          <MessageSquare className="w-4 h-4 text-emerald-400" />
+                          <span>Enter Live Chat</span>
+                        </Link>
+                      )}
+
+                      {/* Option 3: Admin Center if admin */}
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left"
+                        >
+                          <BarChart3 className="w-4 h-4 text-cyan-400" />
+                          <span>Admin Control Center</span>
+                        </Link>
+                      )}
+
+                      {/* Divider */}
+                      <div className="border-t border-white/10 my-1" />
+
+                      {/* Option 4: Log Out */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          handleLockChat();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 text-red-400" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
                   )}
-                  <span className="font-bold">{callsign}</span>
-                  <Sliders className="w-3 h-3 text-emerald-400/80 group-hover:text-emerald-200 ml-0.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLockChat}
-                  title="Log Out & Lock Session"
-                  className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 text-[11px] font-semibold flex items-center gap-1 transition-colors"
-                >
-                  <LogOut className="w-3 h-3" />
-                  <span>Log Out</span>
-                </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -529,40 +617,50 @@ export function Navbar() {
             {/* Mobile Action: Member status & actions */}
             <div className="pt-2 border-t border-white/10 space-y-2">
               {isAuthenticated ? (
-                <>
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {userAvatarPhoto ? (
-                          <img src={userAvatarPhoto} alt={callsign} className="w-5 h-5 rounded-full object-cover ring-1 ring-emerald-400" />
-                        ) : (
-                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        )}
-                        <span className="text-xs font-mono font-bold text-white">Signed in as {callsign}</span>
+                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      {userAvatarPhoto ? (
+                        <img src={userAvatarPhoto} alt={callsign} className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-400" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-emerald-400 text-xs">
+                          {callsign.slice(0, 2)}
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                          <span>{callsign}</span>
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-sans uppercase">Online</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">
+                          {isAdmin ? (callsign === "RADAR" ? "Master Owner • Dev Advisor" : "Owner Admin") : "Verified Competitor"}
+                        </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          handleLockChat();
-                        }}
-                        className="px-2 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30 text-[11px] font-semibold flex items-center gap-1 transition-colors"
-                      >
-                        <LogOut className="w-3 h-3" />
-                        <span>Log Out</span>
-                      </button>
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5">
                     <button
                       type="button"
                       onClick={() => {
                         setMobileMenuOpen(false);
                         setIsProfileEditOpen(true);
                       }}
-                      className="w-full py-2 px-3 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      className="py-2 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Camera className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Edit My Profile & Photos 📸</span>
+                      <span>Edit Profile</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleLockChat();
+                      }}
+                      className="py-2 px-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out</span>
                     </button>
                   </div>
 
@@ -570,13 +668,13 @@ export function Navbar() {
                     <Link
                       href="/chat"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-black flex items-center justify-center gap-2 active:scale-95 transition-all"
+                      className="w-full py-2.5 rounded-xl text-xs font-bold bg-emerald-500 text-black flex items-center justify-center gap-2 active:scale-95 transition-all mt-1"
                     >
                       <MessageSquare className="w-4 h-4 fill-black" />
                       <span>Enter The Chat</span>
                     </Link>
                   )}
-                </>
+                </div>
               ) : (
                 <Link
                   href="/invite/pro"
