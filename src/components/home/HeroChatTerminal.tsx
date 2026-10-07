@@ -194,7 +194,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
 
   const handleQuickPrompt = (actionType: "DOPE" | "SQUAD" | "DOCS") => {
     if (actionType === "DOCS") {
-      window.location.href = "/documents";
+      window.location.href = "/invitational";
       return;
     }
 
@@ -517,11 +517,11 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
           </button>
 
           <Link
-            href="/documents"
+            href="/invitational"
             className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 hover:border-white/20 transition-all flex items-center gap-1.5 shrink-0"
           >
             <FileText className="w-3 h-3 text-amber-400" />
-            <span>18-Stage COF Packet</span>
+            <span>2026 Invitational Packet</span>
           </Link>
         </div>
       </div>

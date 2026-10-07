@@ -168,11 +168,11 @@ export default function MatchesPage() {
             {/* Quick Action CTAs */}
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href="/documents"
-                className="px-4 py-2.5 rounded-xl ios-glass text-cyan-300 hover:text-white text-xs font-bold border border-cyan-500/30 flex items-center gap-2 hover:bg-white/10 transition-all shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+                href="/invitational"
+                className="px-4 py-2.5 rounded-xl ios-glass text-amber-300 hover:text-white text-xs font-bold border border-amber-500/30 flex items-center gap-2 hover:bg-white/10 transition-all shadow-tactical-glow"
               >
-                <FileText className="w-4 h-4 text-cyan-400" />
-                <span>Competition Documents</span>
+                <FileText className="w-4 h-4 text-amber-400" />
+                <span>2026 Invitational Packet</span>
               </Link>
 
               <button

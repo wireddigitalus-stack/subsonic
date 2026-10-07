@@ -55,6 +55,11 @@ const nextConfig = {
         destination: "/evos1.0",
         permanent: false,
       },
+      {
+        source: "/documents",
+        destination: "/invitational",
+        permanent: false,
+      },
     ];
   },
 };

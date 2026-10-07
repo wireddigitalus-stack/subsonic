@@ -166,11 +166,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/documents" className="hover:text-cyan-300 transition-colors">
-                  Match Rules & Waivers
-                </Link>
-              </li>
-              <li>
                 <Link href="/shooters" className="hover:text-purple-300 transition-colors">
                   Shooter Profiles
                 </Link>

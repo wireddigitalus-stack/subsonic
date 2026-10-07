@@ -28,7 +28,6 @@ import {
   Mail,
   Lock,
   LogOut,
-  FileText,
   Key,
   BarChart3
 } from "lucide-react";
@@ -374,24 +373,6 @@ export function Navbar() {
                       </p>
                     </div>
                   </Link>
-
-                  <Link
-                    href="/documents"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
-                      <FileText className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-400 flex items-center gap-1.5">
-                        <span>Competition Documents</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">COF & Waivers</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Stage packets, rules, safety waivers & intel
-                      </p>
-                    </div>
-                  </Link>
                 </div>
               )}
             </div>
@@ -548,14 +529,6 @@ export function Navbar() {
                   <span>The 2026 Invitational</span>
                   <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">$7.5K Purse</span>
                 </div>
-              </Link>
-              <Link
-                href="/documents"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                <FileText className="w-4 h-4 text-cyan-400" />
-                <span>Competition Documents (COF & Waivers)</span>
               </Link>
               <Link
                 href="/shooters"

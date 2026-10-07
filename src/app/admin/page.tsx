@@ -2906,12 +2906,12 @@ export default function AdminDashboardPage() {
                 </button>
 
                 <Link
-                  href="/documents"
+                  href="/invitational"
                   target="_blank"
                   className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center gap-2 transition-all"
                 >
                   <ExternalLink className="w-4 h-4 text-cyan-400" />
-                  <span>Open Public Hub</span>
+                  <span>Open Invitational Packet</span>
                 </Link>
               </div>
             </div>
