@@ -127,6 +127,16 @@ export async function POST(req: NextRequest) {
       (s) => s.id.toLowerCase() === (body.id || "").toLowerCase()
     );
 
+    // Require email, phone, and mailing address on new competitor profiles
+    if (!existingShooter) {
+      if (!body.email || !String(body.email).includes("@") || !body.phone || !body.mailingAddress) {
+        return NextResponse.json(
+          { error: "Email address, phone number, and mailing address are required to complete shooter intake." },
+          { status: 400 }
+        );
+      }
+    }
+
     // PIN policy: new competitor profiles must use exactly 4 digits.
     // (Already-hashed PINs and edits to existing profiles are left untouched.)
     if (!existingShooter && body.pin && !isHashedPin(String(body.pin).trim())) {
@@ -194,6 +204,9 @@ export async function POST(req: NextRequest) {
       ranking: body.ranking || "Appalachian Rimfire Competitor",
       homeRange: body.homeRange || "The Hideout, Bristol, TN",
       podiums: typeof body.podiums === "number" ? body.podiums : parseInt(body.podiums, 10) || 0,
+      email: body.email ? String(body.email).trim().toLowerCase() : existingShooter?.email,
+      phone: body.phone ? String(body.phone).trim() : existingShooter?.phone,
+      mailingAddress: body.mailingAddress ? String(body.mailingAddress).trim() : existingShooter?.mailingAddress,
       featuredMatch: body.featuredMatch || "Subsonic Society Invitational 2026",
       image: body.image || "/images/SS-RWB-LOGO.png",
       actionPhoto: body.actionPhoto || body.image || "/images/SS-RWB-LOGO.png",

@@ -56,6 +56,9 @@ export default function ShooterIntakePage() {
   const [formData, setFormData] = useState({
     name: "",
     callsign: "",
+    email: "",
+    phone: "",
+    mailingAddress: "",
     division: "Open Division Pro",
     homeRange: "Holston Range, Bristol, TN",
     podiums: 0,
@@ -159,6 +162,24 @@ export default function ShooterIntakePage() {
       return;
     }
 
+    if (!formData.email.trim() || !formData.email.includes("@")) {
+      setErrorMessage("Please enter a valid Email Address. Email is required to continue shooter intake.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      setErrorMessage("Please enter your Phone Number. Phone number is required to continue shooter intake.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!formData.mailingAddress.trim()) {
+      setErrorMessage("Please enter your Mailing Address. A complete mailing address is required to continue shooter intake.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!isCallsignValid) {
       setErrorMessage("The tactical callsign you entered is taken or reserved. Please choose an available callsign or select one of the suggested alternatives.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -171,6 +192,9 @@ export default function ShooterIntakePage() {
       const payload = {
         name: formData.name,
         callsign: formData.callsign,
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        mailingAddress: formData.mailingAddress.trim(),
         division: formData.division,
         homeRange: formData.homeRange,
         podiums: Number(formData.podiums) || 0,
@@ -333,6 +357,49 @@ export default function ShooterIntakePage() {
                 <option value="Top Lady Marksman">Top Lady Marksman</option>
                 <option value="Junior Competitor (&lt;18)">Junior Competitor (&lt;18)</option>
               </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-slate-300 font-bold block">
+                EMAIL ADDRESS <span className="text-amber-400">*</span>
+              </label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="e.g. shooter@example.com"
+                className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-sm focus:border-amber-400 outline-none transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono text-slate-300 font-bold block">
+                PHONE NUMBER <span className="text-amber-400">*</span>
+              </label>
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="e.g. (423) 555-0192"
+                className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-sm focus:border-amber-400 outline-none transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-xs font-mono text-slate-300 font-bold block">
+                MAILING ADDRESS <span className="text-amber-400">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.mailingAddress}
+                onChange={(e) => setFormData({ ...formData, mailingAddress: e.target.value })}
+                placeholder="Street address, City, State, ZIP Code"
+                className="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/15 text-white text-sm focus:border-amber-400 outline-none transition-colors"
+              />
+              <p className="text-[11px] text-slate-400">Required for official competitor credentials and match registration.</p>
             </div>
 
             <div className="space-y-1.5">

@@ -67,8 +67,23 @@ export async function POST(req: NextRequest) {
     if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
       return fail("This invite code has expired.", 410, "INVITE_EXPIRED");
 
-    // ── 2. Identity ────────────────────────────────────────────────
+    // ── 2. Identity & Contact Details ─────────────────────────────
     if (!fullName || !callsign) return fail("Full name and callsign are required.", 400, "MISSING_FIELDS");
+    
+    const email = String(body.email || "").trim().toLowerCase();
+    const phone = String(body.phone || "").trim();
+    const mailingAddress = String(body.mailingAddress || "").trim();
+
+    if (!email || !email.includes("@")) {
+      return fail("Valid email address is required to complete sign up.", 400, "EMAIL_REQUIRED");
+    }
+    if (!phone) {
+      return fail("Phone number is required to complete sign up.", 400, "PHONE_REQUIRED");
+    }
+    if (!mailingAddress) {
+      return fail("Mailing address is required to complete sign up.", 400, "ADDRESS_REQUIRED");
+    }
+
     const pinError = validatePin(pin, "MEMBER");
     if (pinError) return fail(pinError, 400, "INVALID_PIN");
 
@@ -100,6 +115,9 @@ export async function POST(req: NextRequest) {
       id: shooterId,
       name: fullName,
       callsign,
+      email,
+      phone,
+      mailingAddress,
       pin: pinHash,
       division,
       ranking: String(body.ranking || "").trim() || `${division} Competitor`,
@@ -123,7 +141,7 @@ export async function POST(req: NextRequest) {
       member_id: `SS-PRO-${callsign}`,
       full_name: fullName,
       callsign,
-      email: typeof body.email === "string" && body.email.includes("@") ? body.email.trim().toLowerCase() : "",
+      email,
       state: typeof body.state === "string" && body.state ? body.state : "TN",
       experience_level: division,
       rifle_setup: "",
@@ -131,7 +149,7 @@ export async function POST(req: NextRequest) {
       created_at: now,
       status: "ACTIVE",
       role: "MEMBER",
-      notes: `Onboarded via invite ${code}. Home range: ${homeRange}. Podiums: ${shooter.podiums}. Profile: /shooters/${shooter.id}`,
+      notes: `Onboarded via invite ${code}. Phone: ${phone}. Address: ${mailingAddress}. Home range: ${homeRange}. Podiums: ${shooter.podiums}. Profile: /shooters/${shooter.id}`,
       pin: pinHash,
     };
     const savedMember = await addOrUpdateMemberAsync(member);

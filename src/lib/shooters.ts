@@ -68,6 +68,20 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
 
 // Map camelCase to snake_case for Supabase
 function mapShooterToDb(s: ShooterProfile) {
+  // Store contact info in rifle_setup JSONB so it safely persists in Supabase without needing custom columns
+  const augmentedRifleSetup = {
+    ...(s.rifleSetup || {}),
+    ...(s.email || s.phone || s.mailingAddress
+      ? {
+          contactInfo: {
+            email: s.email,
+            phone: s.phone,
+            mailingAddress: s.mailingAddress,
+          },
+        }
+      : {}),
+  };
+
   return {
     id: s.id,
     name: s.name,
@@ -82,7 +96,7 @@ function mapShooterToDb(s: ShooterProfile) {
     quote: s.quote,
     accolades: s.accolades,
     sponsors: s.sponsors,
-    rifle_setup: s.rifleSetup,
+    rifle_setup: augmentedRifleSetup,
     pin: s.pin,
     interview: s.interview,
     created_at: s.createdAt,
@@ -92,6 +106,7 @@ function mapShooterToDb(s: ShooterProfile) {
 
 // Map snake_case to camelCase from Supabase
 function mapDbToShooter(row: any): ShooterProfile {
+  const contact = row.rifle_setup?.contactInfo;
   return {
     id: row.id,
     name: row.name,
@@ -100,6 +115,9 @@ function mapDbToShooter(row: any): ShooterProfile {
     ranking: row.ranking,
     homeRange: row.home_range,
     podiums: row.podiums,
+    email: row.email || contact?.email,
+    phone: row.phone || contact?.phone,
+    mailingAddress: row.mailing_address || contact?.mailingAddress,
     featuredMatch: row.featured_match,
     image: row.image,
     actionPhoto: row.action_photo,

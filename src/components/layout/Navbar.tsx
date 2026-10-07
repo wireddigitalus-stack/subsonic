@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { 
   ChevronDown, 
-  Mountain, 
   Calendar, 
   Crosshair, 
   MessageSquare, 
@@ -265,23 +264,6 @@ export function Navbar() {
               {activeDropdown === "society" && (
                 <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
                   <Link
-                    href="/society"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-amber-400">
-                        The Story & Philosophy
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Grassroots community & marksman code
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
                     href="/chat"
                     className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
@@ -295,24 +277,6 @@ export function Navbar() {
                       </div>
                       <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
                         DOPE drops & squad chat
-                      </p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/the-hideout"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                      <Mountain className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-blue-400 flex items-center gap-1.5">
-                        <span>The Hideout</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-mono">3,420 FT</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Home facility, zero bay & 465-yd steel
                       </p>
                     </div>
                   </Link>
@@ -580,28 +544,12 @@ export function Navbar() {
                 The Society & Facility
               </span>
               <Link
-                href="/society"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>The Story & Philosophy</span>
-              </Link>
-              <Link
                 href="/chat"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-white hover:bg-white/10 transition-colors"
               >
                 <MessageSquare className="w-4 h-4 text-emerald-400" />
                 <span>Chat Room (Live)</span>
-              </Link>
-              <Link
-                href="/the-hideout"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2 rounded-xl text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
-              >
-                <Mountain className="w-4 h-4 text-blue-400" />
-                <span>The Hideout Range (3,420 FT)</span>
               </Link>
               <Link
                 href="/partners"

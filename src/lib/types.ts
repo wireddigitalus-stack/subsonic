@@ -253,6 +253,9 @@ export interface ShooterProfile {
   ranking: string;
   homeRange: string;
   podiums: number;
+  email?: string;
+  phone?: string;
+  mailingAddress?: string;
   featuredMatch?: string;
   image: string; // Headshot / profile photo
   actionPhoto?: string; // Secondary rifle rig / action photo

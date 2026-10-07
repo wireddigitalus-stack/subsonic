@@ -22,14 +22,6 @@ import {
 } from "lucide-react";
 import { recordTelemetryEvent } from "@/lib/telemetry";
 
-const INQUIRY_CATEGORIES = [
-  { id: "GENERAL", label: "General & Membership", desc: "Questions about Society passes, rules, or range procedures." },
-  { id: "SPONSORSHIP", label: "Sponsorship & Prize Table", desc: "Partner with Subsonic Society or contribute to match prize tables." },
-  { id: "MATCH_HOST", label: "Host a Regional Qualifier", desc: "Inquire about sanctioning an official qualifier at your home club." },
-  { id: "SUBSONIC_DNA", label: "Subsonic DNA Lab Submissions", desc: "Submit ammunition lots or barrel harmonic tuners for Doppler testing." },
-  { id: "MEDIA", label: "Media & Press Credentials", desc: "Request photographer, videographer, or journalist credentials for matches." },
-];
-
 export default function ContactPage() {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -152,7 +144,7 @@ export default function ContactPage() {
                   Thank you, {name}.
                 </h3>
                 <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-                  Your transmission regarding <strong>{category.replace("_", " ")}</strong> has been received by Subsonic Society match directorate. We typically respond within 24 hours to <strong>{email}</strong>.
+                  Your message has been received by the Subsonic Society match directorate. We typically respond within 24 hours to <strong>{email}</strong>.
                 </p>
                 <div className="pt-4">
                   <button
@@ -172,7 +164,7 @@ export default function ContactPage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6 text-xs">
+              <form onSubmit={handleSubmit} className="space-y-5 text-xs">
                 {errorMessage && (
                   <div className="p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs flex items-center gap-2 font-mono">
                     <span>⚠</span>
@@ -180,45 +172,11 @@ export default function ContactPage() {
                   </div>
                 )}
 
-                {/* Inquiry Category Selector */}
-                <div className="space-y-2">
-                  <label className="text-[11px] font-mono text-slate-300 uppercase tracking-wider font-bold block">
-                    1. Select Inquiry Topic
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {INQUIRY_CATEGORIES.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setCategory(cat.id)}
-                        className={`p-3 rounded-2xl border text-left transition-all ${
-                          category === cat.id
-                            ? "bg-amber-500/15 border-amber-400 text-white shadow-tactical-glow"
-                            : "bg-black/30 border-white/10 text-slate-400 hover:border-white/20 hover:text-white"
-                        }`}
-                      >
-                        <div className="font-bold text-xs text-white flex items-center justify-between">
-                          <span>{cat.label}</span>
-                          {category === cat.id && <span className="w-2 h-2 rounded-full bg-amber-400" />}
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-1 leading-snug">
-                          {cat.desc}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contact Information Fields */}
-                <div className="space-y-4 pt-2">
-                  <label className="text-[11px] font-mono text-slate-300 uppercase tracking-wider font-bold block">
-                    2. Competitor / Organization Details
-                  </label>
-
+                <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">
-                        Full Name *
+                      <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                        Your Name *
                       </label>
                       <input
                         type="text"
@@ -231,20 +189,7 @@ export default function ContactPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">
-                        Company / Club / Squad (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
-                        placeholder="e.g. Holston Mountain Precision"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">
+                      <label className="text-xs font-mono font-bold text-slate-300 uppercase">
                         Email Address *
                       </label>
                       <input
@@ -252,48 +197,35 @@ export default function ContactPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="e.g. shooter@subsonicsociety.org"
-                        className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase">
-                        Phone Number (Optional)
-                      </label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="e.g. (423) 555-0192"
+                        placeholder="e.g. shooter@example.com"
                         className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono text-slate-400 uppercase">
-                      Subject
+                    <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                      Phone Number (Optional)
                     </label>
                     <input
-                      type="text"
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="e.g. Stage Sponsorship Inquiry for Bristol Pro Match"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="e.g. (423) 555-0192"
                       className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-mono text-slate-400 uppercase">
-                      Message / Dispatch Content *
+                    <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                      Message *
                     </label>
                     <textarea
                       required
                       rows={5}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Provide details regarding your inquiry, rifle setup, proposed stage sponsorship, or range question..."
+                      placeholder="How can we assist you with match squads, sponsorships, or range questions?"
                       className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white text-base sm:text-sm placeholder-slate-500 focus:outline-none focus:border-amber-400 leading-relaxed"
                     />
                   </div>
@@ -303,14 +235,14 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-sm tracking-wide uppercase flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-[0.99] disabled:opacity-50"
+                    className="w-full py-3.5 sm:py-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-black text-sm tracking-wide uppercase flex items-center justify-center gap-2 shadow-tactical-glow transition-all active:scale-[0.99] disabled:opacity-50"
                   >
                     {isSubmitting ? (
-                      <span>Transmitting Dispatch...</span>
+                      <span>Sending Message...</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4 fill-black" />
-                        <span>Transmit Dispatch to Match Directorate</span>
+                        <span>Send Message</span>
                       </>
                     )}
                   </button>

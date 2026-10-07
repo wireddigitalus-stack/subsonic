@@ -72,6 +72,9 @@ function ProInviteContent() {
   const [fullName, setFullName] = useState("");
   const [callsign, setCallsign] = useState("");
   const [isCallsignValid, setIsCallsignValid] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [mailingAddress, setMailingAddress] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [division, setDivision] = useState("Open Division Pro");
@@ -226,6 +229,24 @@ function ProInviteContent() {
       return;
     }
 
+    if (!email.trim() || !email.includes("@")) {
+      setFormError("Please enter a valid Email Address. Email is required to complete sign up.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!phone.trim()) {
+      setFormError("Please enter your Phone Number. Phone number is required to complete sign up.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!mailingAddress.trim()) {
+      setFormError("Please enter your Mailing Address. A complete mailing address is required to complete sign up.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!isCallsignValid) {
       setFormError("The tactical callsign you entered is taken or reserved. Please choose an available callsign or select one of the suggested alternatives.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -265,6 +286,9 @@ function ProInviteContent() {
           code: inviteCode,
           fullName: fullName.trim(),
           callsign: callsign.trim().toUpperCase(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          mailingAddress: mailingAddress.trim(),
           pin: pin.trim(),
           division,
           homeRange,
@@ -573,6 +597,49 @@ function ProInviteContent() {
                 placeholder="Re-enter PIN"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-emerald-500/40 text-emerald-300 font-mono tracking-widest text-xs sm:text-sm text-center focus:border-emerald-400 focus:outline-none"
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e.g. shooter@example.com"
+                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. (423) 555-0192"
+                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                Mailing Address *
+              </label>
+              <input
+                type="text"
+                required
+                value={mailingAddress}
+                onChange={(e) => setMailingAddress(e.target.value)}
+                placeholder="Street address, City, State, ZIP Code"
+                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+              />
+              <p className="text-[11px] text-slate-400">Required for official competitor credentials and match registration.</p>
             </div>
 
             <div className="space-y-1.5">
