@@ -99,11 +99,42 @@ export async function GET(req: NextRequest) {
 
     if (id || slug || targetParam || callsignParam) {
       const target = (id || slug || targetParam || callsignParam || "").toLowerCase();
-      const shooter = cleanShooters.find(
+      let shooter = cleanShooters.find(
         (s) =>
           (s.id && s.id.toLowerCase() === target) ||
           (s.callsign && s.callsign.toLowerCase() === target)
       );
+
+      // If targeted lookup is for site executive Rob / RADAR, retrieve profile
+      if (!shooter && (target === "radar" || target === "rob" || target === "ltdan" || target === "rob-neilson")) {
+        const robMember = members.find(
+          (m) => m.member_id === "SS-2026-0001" || m.callsign?.toUpperCase() === "RADAR" || m.callsign?.toUpperCase() === "ROB"
+        );
+        const existingRadarShooter = shooters.find(
+          (s) => s.id?.toLowerCase() === "radar" || s.callsign?.toUpperCase() === "RADAR"
+        );
+        shooter = existingRadarShooter || {
+          id: "radar",
+          name: robMember?.full_name || "Rob Neilson",
+          callsign: "RADAR",
+          division: "Lead Developer & Tech Advisor",
+          ranking: "Owner • Lead Systems Developer",
+          homeRange: "The Hideout, Bristol, TN",
+          podiums: 0,
+          image: "/images/SS-RWB-LOGO.png",
+          actionPhoto: "/images/SS-RWB-LOGO.png",
+          quote: "Architecture, precision optics, and sub-MOA reliability on the digital ridge.",
+          accolades: ["DEV ADVISOR", "MASTER OWNER", "SYSTEM ARCHITECT"],
+          sponsors: ["Subsonic Society"],
+          rifleSetup: {
+            action: robMember?.rifle_setup || "Smart Systems Integrations",
+            optic: "Zero Compromise Optic",
+          },
+          createdAt: robMember?.created_at || "2026-07-04T12:00:00Z",
+          status: "PUBLISHED",
+        };
+      }
+
       if (!shooter) {
         return NextResponse.json({ error: "Shooter not found" }, { status: 404 });
       }
@@ -126,29 +157,41 @@ export async function POST(req: NextRequest) {
     }
 
     const candidateCallsign = body.callsign.trim().toUpperCase();
+    const isRob =
+      candidateCallsign === "RADAR" ||
+      candidateCallsign === "ROB" ||
+      candidateCallsign === "LTDAN" ||
+      (body.id && (body.id.toLowerCase() === "radar" || body.id.toLowerCase() === "rob-neilson" || body.id.toLowerCase() === "ss-2026-0001")) ||
+      (body.name && body.name.toLowerCase().includes("neilson"));
+
     const isAllen =
       candidateCallsign === "SUBX" ||
       candidateCallsign === "ALLEN" ||
-      (body.id && body.id.toLowerCase() === "subx") ||
+      candidateCallsign === "HURLEY" ||
+      (body.id && (body.id.toLowerCase() === "subx" || body.id.toLowerCase() === "allen" || body.id.toLowerCase() === "ss-2026-0002")) ||
       (body.name && body.name.toLowerCase().includes("hurley"));
+
+    const isExec = isRob || isAllen;
 
     const existingShooter =
       getShootersFromStorage().find(
         (s) =>
           (body.id && s.id?.toLowerCase() === body.id.toLowerCase()) ||
           (s.callsign && s.callsign.toUpperCase() === candidateCallsign) ||
+          (isRob && (s.id === "radar" || s.callsign?.toUpperCase() === "RADAR" || s.callsign?.toUpperCase() === "ROB")) ||
           (isAllen && (s.id === "subx" || s.callsign?.toUpperCase() === "SUBX" || s.callsign?.toUpperCase() === "ALLEN"))
       ) ||
       SEED_SHOOTERS.find(
         (s) =>
           (body.id && s.id?.toLowerCase() === body.id.toLowerCase()) ||
           (s.callsign && s.callsign.toUpperCase() === candidateCallsign) ||
+          (isRob && (s.id === "radar" || s.callsign?.toUpperCase() === "RADAR")) ||
           (isAllen && (s.id === "subx" || s.callsign?.toUpperCase() === "SUBX"))
       );
 
     // Require email, phone, and mailing address ONLY on explicit brand-new competitor intake registrations
     const isExplicitIntake = body.isIntake === true || body.source === "intake";
-    if (isExplicitIntake && !existingShooter && !isAllen) {
+    if (isExplicitIntake && !existingShooter && !isExec) {
       if (!body.email || !String(body.email).includes("@") || !body.phone || !body.mailingAddress) {
         return NextResponse.json(
           { error: "Email address, phone number, and mailing address are required to complete shooter intake." },
@@ -159,17 +202,17 @@ export async function POST(req: NextRequest) {
 
     // PIN policy: new competitor profiles on explicit intake must use exactly 4 digits.
     // (Already-hashed PINs and edits to existing profiles are left untouched.)
-    if (isExplicitIntake && !existingShooter && !isAllen && body.pin && !isHashedPin(String(body.pin).trim())) {
+    if (isExplicitIntake && !existingShooter && !isExec && body.pin && !isHashedPin(String(body.pin).trim())) {
       const pinError = validatePin(String(body.pin), "MEMBER");
       if (pinError) {
         return NextResponse.json({ error: pinError, code: "INVALID_PIN" }, { status: 400 });
       }
     }
 
-    // Enforce uniqueness and provide suggestions if taken (bypass for Allen or if updating own profile)
-    if (!isAllen) {
+    // Enforce uniqueness and provide suggestions if taken (bypass for site executives or if updating own profile)
+    if (!isExec) {
       const callsignCheck = checkCallsignAvailability(candidateCallsign, {
-        excludeMemberId: existingShooter ? existingShooter.id : (body.id || undefined),
+        excludeMemberId: existingShooter ? existingShooter.id : (body.id || candidateCallsign),
       });
 
       if (
@@ -195,7 +238,9 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
     
-    const id = isAllen 
+    const id = isRob
+      ? "radar"
+      : isAllen 
       ? "subx" 
       : existingShooter?.id || body.id || (rawSlug.length > 2 ? rawSlug : `shooter-${Date.now().toString(36)}`);
 
@@ -225,8 +270,16 @@ export async function POST(req: NextRequest) {
       pin: body.pin && String(body.pin).trim()
         ? (isHashedPin(String(body.pin).trim()) ? String(body.pin).trim() : await hashPin(String(body.pin).trim()))
         : existingShooter?.pin,
-      division: isAllen ? "Owner Admin / Executive" : (body.division || existingShooter?.division || "Open Division Pro"),
-      ranking: isAllen ? "Founder • Subsonic Society" : (body.ranking || existingShooter?.ranking || "Appalachian Rimfire Competitor"),
+      division: isRob
+        ? "Lead Developer & Tech Advisor"
+        : isAllen
+        ? "Owner Admin / Executive"
+        : (body.division || existingShooter?.division || "Open Division Pro"),
+      ranking: isRob
+        ? "Owner • Lead Systems Developer"
+        : isAllen
+        ? "Founder • Subsonic Society"
+        : (body.ranking || existingShooter?.ranking || "Appalachian Rimfire Competitor"),
       homeRange: body.homeRange || existingShooter?.homeRange || "The Hideout, Bristol, TN",
       podiums: typeof body.podiums === "number" ? body.podiums : (existingShooter?.podiums || 0),
       email: body.email ? String(body.email).trim().toLowerCase() : existingShooter?.email,
@@ -266,7 +319,8 @@ export async function POST(req: NextRequest) {
       const members = getMembersFromStorage();
       const existingMember = members.find(
         (m) =>
-          (isAllen && (m.member_id === "SS-PRO-SUBX" || m.callsign === "SUBX")) ||
+          (isRob && (m.member_id === "SS-2026-0001" || m.callsign === "RADAR" || m.callsign === "ROB" || m.callsign === "LTDAN")) ||
+          (isAllen && (m.member_id === "SS-2026-0002" || m.callsign === "SUBX" || m.callsign === "ALLEN")) ||
           m.member_id === `SS-PRO-${candidateCallsign}` ||
           m.callsign?.toUpperCase() === candidateCallsign
       );
@@ -282,7 +336,7 @@ export async function POST(req: NextRequest) {
           callsign: newShooter.callsign,
           rifle_setup: rifleSummary,
           experience_level: newShooter.division,
-          role: isAllen ? "OWNER_ADMIN" : existingMember.role,
+          role: isRob ? "MASTER_OWNER" : isAllen ? "OWNER_ADMIN" : existingMember.role,
         });
       }
     } catch (syncErr) {

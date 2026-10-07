@@ -41,6 +41,7 @@ export interface CallsignCheckResult {
  */
 export function getAllTakenCallsigns(excludeMemberId?: string): Set<string> {
   const taken = new Set<string>();
+  const excludeUpper = excludeMemberId ? excludeMemberId.toUpperCase().trim() : null;
 
   // 1. Reserved callsigns
   for (const r of RESERVED_CALLSIGNS) {
@@ -51,7 +52,13 @@ export function getAllTakenCallsigns(excludeMemberId?: string): Set<string> {
   try {
     const members = getMembersFromStorage();
     for (const m of members) {
-      if (excludeMemberId && m.member_id === excludeMemberId) continue;
+      if (
+        excludeUpper &&
+        (m.member_id?.toUpperCase() === excludeUpper ||
+          m.callsign?.toUpperCase() === excludeUpper)
+      ) {
+        continue;
+      }
       if (m.callsign) {
         taken.add(m.callsign.toUpperCase().trim());
       }
@@ -64,6 +71,13 @@ export function getAllTakenCallsigns(excludeMemberId?: string): Set<string> {
   try {
     const shooters = getShootersFromStorage();
     for (const s of shooters) {
+      if (
+        excludeUpper &&
+        (s.id?.toUpperCase() === excludeUpper ||
+          s.callsign?.toUpperCase() === excludeUpper)
+      ) {
+        continue;
+      }
       if (s.callsign) {
         taken.add(s.callsign.toUpperCase().trim());
       }
@@ -165,6 +179,22 @@ export function checkCallsignAvailability(
       isAvailable: false,
       normalized,
       message: "Callsign cannot exceed 16 characters.",
+      suggestions: [],
+    };
+  }
+
+  // If the user already owns this callsign or is updating their existing handle
+  if (
+    options?.excludeMemberId &&
+    (options.excludeMemberId.toUpperCase().trim() === normalized ||
+      (normalized === "RADAR" && (options.excludeMemberId.toUpperCase().includes("RADAR") || options.excludeMemberId.toUpperCase().includes("ROB") || options.excludeMemberId === "SS-2026-0001")) ||
+      (normalized === "SUBX" && (options.excludeMemberId.toUpperCase().includes("SUBX") || options.excludeMemberId.toUpperCase().includes("ALLEN") || options.excludeMemberId === "SS-2026-0002")))
+  ) {
+    return {
+      isValidFormat: true,
+      isAvailable: true,
+      normalized,
+      message: `Callsign "${normalized}" is confirmed!`,
       suggestions: [],
     };
   }

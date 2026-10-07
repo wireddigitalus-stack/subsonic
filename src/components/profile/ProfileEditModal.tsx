@@ -130,11 +130,19 @@ export function ProfileEditModal({
 
   const populateForm = (p: any) => {
     setExistingProfileData(p);
-    setName(p.name || "Allen Hurley");
-    setCallsign((p.callsign || "SUBX").toUpperCase());
-    setDivision(p.division || "Owner Admin / Executive");
+    const call = (p.callsign || "").toUpperCase();
+    const isRobUser = call === "RADAR" || call === "ROB" || call === "LTDAN" || (p.name && p.name.toLowerCase().includes("neilson"));
+
+    setName(p.name || (isRobUser ? "Rob Neilson" : "Allen Hurley"));
+    setCallsign(call || (isRobUser ? "RADAR" : "SUBX"));
+    setDivision(p.division || (isRobUser ? "Lead Developer & Tech Advisor" : "Owner Admin / Executive"));
     setHomeRange(p.homeRange || "The Hideout, Bristol, TN");
-    setQuote(p.quote || "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Said. Done.");
+    setQuote(
+      p.quote ||
+      (isRobUser
+        ? "Architecture, precision optics, and sub-MOA reliability on the digital ridge."
+        : "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Said. Done.")
+    );
     setHeadshotPhoto(p.image && p.image !== "/images/SS-RWB-LOGO.png" ? p.image : "");
     setActionPhoto(p.actionPhoto && p.actionPhoto !== "/images/SS-RWB-LOGO.png" ? p.actionPhoto : "");
     setAvatarColor(p.avatarColor || "");
@@ -215,27 +223,28 @@ export function ProfileEditModal({
     const accolades = accoladesText.split(",").map((s) => s.trim()).filter(Boolean);
     const sponsors = sponsorsText.split(",").map((s) => s.trim()).filter(Boolean);
 
+    const isRob = cleanCallsign === "RADAR" || cleanCallsign === "ROB" || cleanCallsign === "LTDAN" || name.toLowerCase().includes("neilson");
     const isAllen = cleanCallsign === "SUBX" || cleanCallsign === "ALLEN" || name.toLowerCase().includes("hurley");
 
     const payload = {
-      id: isAllen ? "subx" : cleanCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      id: isRob ? "radar" : isAllen ? "subx" : cleanCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       name: name.trim(),
       callsign: cleanCallsign,
       isProfileUpdate: true,
       isIntake: false,
-      division: isAllen ? "Owner Admin / Executive" : division,
-      ranking: isAllen ? "Founder • Subsonic Society" : "Verified Competitor",
+      division: isRob ? "Lead Developer & Tech Advisor" : isAllen ? "Owner Admin / Executive" : division,
+      ranking: isRob ? "Owner • Lead Systems Developer" : isAllen ? "Founder • Subsonic Society" : "Verified Competitor",
       homeRange: homeRange.trim() || "The Hideout, Bristol, TN",
-      email: existingProfileData?.email || initialShooter?.email || (isAllen ? "allen@modacamcustomrifles.com" : undefined),
+      email: existingProfileData?.email || initialShooter?.email || (isRob ? "rob@wired-digital.com" : isAllen ? "allen@modacamcustomrifles.com" : undefined),
       phone: existingProfileData?.phone || initialShooter?.phone || (isAllen ? "423-555-0100" : undefined),
-      mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress || (isAllen ? "Bristol, TN" : undefined),
-      quote: quote.trim() || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
+      mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress || (isAllen ? "Bristol, TN" : "Bristol, TN"),
+      quote: quote.trim() || (isRob ? "Architecture, precision optics, and sub-MOA reliability on the digital ridge." : "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind."),
       image: headshotPhoto || "/assets/subsonic-coin.jpg",
       actionPhoto: actionPhoto || headshotPhoto || "/assets/subsonic-coin.jpg",
-      accolades: accolades.length > 0 ? accolades : ["COMPETITOR"],
+      accolades: accolades.length > 0 ? accolades : (isRob ? ["DEV ADVISOR", "MASTER OWNER"] : ["COMPETITOR"]),
       sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
       rifleSetup: {
-        action: rifleAction.trim() || "Precision Rimfire Action",
+        action: rifleAction.trim() || (isRob ? "Smart Systems Integrations" : "Precision Rimfire Action"),
         barrel: barrel.trim() || "Match Contour",
         trigger: trigger.trim() || "Match Trigger",
         chassis: chassis.trim() || "Chassis",
@@ -276,8 +285,8 @@ export function ProfileEditModal({
             actionPhoto: payload.actionPhoto,
             avatarColor: avatarColor || currentShooter.avatarColor,
             rifleSetup: `${payload.rifleSetup.action}${payload.rifleSetup.optic ? ` / ${payload.rifleSetup.optic}` : ""}`,
-            badgeText: isAllen ? "OWNER ADMIN" : (currentShooter.badgeText || "PRO SHOOTER"),
-            role: isAllen ? "OWNER_ADMIN" : (currentShooter.role || "PRO_COMPETITOR"),
+            badgeText: isRob ? "DEV ADVISOR" : isAllen ? "OWNER ADMIN" : (currentShooter.badgeText || "PRO SHOOTER"),
+            role: isRob ? "MASTER_OWNER" : isAllen ? "OWNER_ADMIN" : (currentShooter.role || "PRO_COMPETITOR"),
           };
 
           localStorage.setItem("subsonic_shooter_profile", JSON.stringify(merged));
@@ -290,12 +299,12 @@ export function ProfileEditModal({
             "subsonic_member_profile",
             JSON.stringify({
               ...mem,
-              member_id: isAllen ? "SS-PRO-SUBX" : (mem.member_id || `SS-PRO-${payload.callsign}`),
+              member_id: isRob ? "SS-2026-0001" : isAllen ? "SS-PRO-SUBX" : (mem.member_id || `SS-PRO-${payload.callsign}`),
               full_name: payload.name,
               callsign: payload.callsign,
               experience_level: payload.division,
               rifle_setup: `${payload.rifleSetup.action} / ${payload.rifleSetup.optic}`,
-              role: isAllen ? "OWNER_ADMIN" : (mem.role || "PRO_COMPETITOR"),
+              role: isRob ? "MASTER_OWNER" : isAllen ? "OWNER_ADMIN" : (mem.role || "PRO_COMPETITOR"),
             })
           );
 
