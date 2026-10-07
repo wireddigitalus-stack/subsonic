@@ -183,7 +183,7 @@ export function HeroInviteCard() {
                 ) : (
                   <>
                     <Key className="w-4 h-4 fill-black" />
-                    <span>START REGISTRATION</span>
+                    <span>REDEEM CODE</span>
                     <ArrowRight className="w-4 h-4 stroke-[3]" />
                   </>
                 )}
