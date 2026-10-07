@@ -350,10 +350,6 @@ export function Navbar() {
           <div className="flex items-center gap-2 sm:gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span className="font-bold">{callsign}</span>
-                </div>
                 {pathname !== "/chat" && (
                   <Link
                     href="/chat"
@@ -366,6 +362,10 @@ export function Navbar() {
                     <span>Enter The Chat</span>
                   </Link>
                 )}
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="font-bold">{callsign}</span>
+                </div>
                 <button
                   type="button"
                   onClick={handleLockChat}
