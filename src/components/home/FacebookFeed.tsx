@@ -41,15 +41,32 @@ function FeedMediaItem({
   post: FacebookPostItem;
   onLightbox: () => void;
 }) {
-  const defaultFallback = post.fallbackImageUrl || "/assets/subsonic-facebook-cover.jpg";
-  const [imgSrc, setImgSrc] = useState<string>(post.imageUrl || defaultFallback);
   const [hasError, setHasError] = useState(false);
   const isReel = Boolean(post.externalUrl && post.externalUrl.includes("/reel/"));
 
   useEffect(() => {
-    setImgSrc(post.imageUrl || defaultFallback);
     setHasError(false);
-  }, [post.imageUrl, defaultFallback]);
+  }, [post.imageUrl]);
+
+  // If there is no image URL, or if loading failed (e.g. expired Facebook CDN URL),
+  // do NOT render a broken image or force an unrelated package photo. Just render null (or reel CTA if it's a reel).
+  if (!post.imageUrl || hasError) {
+    if (isReel && post.externalUrl) {
+      return (
+        <a
+          href={post.externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 text-xs font-mono font-bold transition-all mt-2 select-none"
+        >
+          <Play className="w-3.5 h-3.5 fill-blue-300" />
+          <span>Watch Reel on Facebook</span>
+          <ExternalLink className="w-3 h-3 ml-auto opacity-70" />
+        </a>
+      );
+    }
+    return null;
+  }
 
   return (
     <div
@@ -57,14 +74,11 @@ function FeedMediaItem({
       className="relative w-full h-56 sm:h-72 rounded-xl overflow-hidden border border-white/10 bg-black/60 cursor-pointer group/media mt-2 select-none"
     >
       <Image
-        src={hasError ? defaultFallback : imgSrc}
+        src={post.imageUrl}
         alt="Subsonic Society Media"
         fill
         unoptimized
-        onError={() => {
-          setHasError(true);
-          setImgSrc(defaultFallback);
-        }}
+        onError={() => setHasError(true)}
         className="object-cover group-hover/media:scale-105 transition-transform duration-500"
       />
       <div className="absolute inset-0 bg-black/20 group-hover/media:bg-transparent transition-colors" />
@@ -823,7 +837,7 @@ export function FacebookFeed() {
         {/* ========================================================================= */}
         {/* INTERACTIVE MEDIA LIGHTBOX MODAL                                          */}
         {/* ========================================================================= */}
-        {activeLightboxPost && (
+        {activeLightboxPost && activeLightboxPost.imageUrl && (
           <div 
             className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl animate-fade-in"
             onClick={() => setActiveLightboxPost(null)}
@@ -851,11 +865,7 @@ export function FacebookFeed() {
               {/* Modal Image */}
               <div className="relative w-full h-80 sm:h-[420px] bg-black">
                 <Image
-                  src={
-                    activeLightboxPost.imageUrl ||
-                    activeLightboxPost.fallbackImageUrl ||
-                    "/assets/subsonic-facebook-cover.jpg"
-                  }
+                  src={activeLightboxPost.imageUrl}
                   alt="Subsonic Media Lightbox"
                   fill
                   unoptimized

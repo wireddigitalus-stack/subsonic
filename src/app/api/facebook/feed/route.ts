@@ -23,28 +23,6 @@ function cleanHtml(html: string): string {
     .trim();
 }
 
-function getContextualFallback(content: string, category: string): string {
-  const lower = content.toLowerCase();
-  if (lower.includes("shirt") || lower.includes("apparel") || lower.includes("merch") || lower.includes("out the door")) {
-    return "/assets/fb-event-shirts.jpg";
-  }
-  if (lower.includes("7,500") || lower.includes("cash purse")) {
-    return "/assets/fb-invitational-purse.jpg";
-  }
-  if (lower.includes("invitational") || lower.includes("inaugural") || lower.includes("history")) {
-    return "/assets/fb-invitational-inaugural.jpg";
-  }
-  if (lower.includes("red line") || lower.includes("yellow line")) {
-    return "/assets/fb-red-line.jpg";
-  }
-  if (lower.includes("abra") || lower.includes("nationals") || lower.includes("benchrest") || lower.includes("commence")) {
-    return "/assets/fb-abra-nationals.jpg";
-  }
-  if (lower.includes("big news") || lower.includes("custom") || lower.includes("rifle")) {
-    return "/assets/fb-big-news-rifles.jpg";
-  }
-  return "/assets/subsonic-facebook-cover.jpg";
-}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -130,17 +108,11 @@ export async function GET(req: NextRequest) {
         category = "MEDIA";
       }
 
-      const fallbackImage = getContextualFallback(content, category);
-
-      // Prioritize our pristine local photos so images never fail with 403 or broken tokens
-      const resolvedImage = fallbackImage || imageUrl;
-
       const postItem: FacebookPostItem = {
         id,
         content,
         publishedAt,
-        imageUrl: resolvedImage || undefined,
-        fallbackImageUrl: fallbackImage,
+        imageUrl: imageUrl || undefined,
         externalUrl,
         likesCount: 30 + Math.floor(Math.random() * 20),
         commentsCount: 4 + Math.floor(Math.random() * 6),
@@ -213,8 +185,6 @@ async function getFallbackPosts() {
 
       if (!error && data && data.length > 0) {
         const mapped: FacebookPostItem[] = data.map((d: any) => {
-          const fallback = getContextualFallback(d.content || "", d.category || "ALL");
-          const img = (d.image_url && !d.image_url.includes("fbcdn.net")) ? d.image_url : fallback;
           return {
             id: d.id,
             content: d.content,
@@ -223,8 +193,7 @@ async function getFallbackPosts() {
               day: "numeric",
               year: "numeric",
             }),
-            imageUrl: img,
-            fallbackImageUrl: fallback,
+            imageUrl: d.image_url || undefined,
             externalUrl: d.external_url || FB_PAGE_URL,
             likesCount: d.likes_count || 32,
             commentsCount: d.comments_count || 4,
