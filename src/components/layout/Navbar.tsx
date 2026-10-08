@@ -32,6 +32,7 @@ import {
   BarChart3,
   Sliders,
   Camera,
+  Smartphone,
 } from "lucide-react";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 
@@ -471,6 +472,21 @@ export function Navbar() {
                         </Link>
                       )}
 
+                      {/* Option: Install Mobile App */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          if (typeof window !== "undefined") {
+                            window.dispatchEvent(new CustomEvent("open-pwa-install"));
+                          }
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <Smartphone className="w-4 h-4 text-emerald-400" />
+                        <span>Install Mobile App</span>
+                      </button>
+
                       {/* Divider */}
                       <div className="border-t border-white/10 my-1" />
 
@@ -569,6 +585,26 @@ export function Navbar() {
                 <Mail className="w-4 h-4 text-cyan-400" />
                 <span>Contact & Inquiries</span>
               </Link>
+            </div>
+
+            {/* Quick Install Mobile App */}
+            <div className="pt-2 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("open-pwa-install"));
+                  }
+                }}
+                className="w-full flex items-center justify-between p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/25 text-amber-300 text-xs font-bold transition-all text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Smartphone className="w-4 h-4 text-amber-400" />
+                  <span>Install Subsonic Mobile App</span>
+                </div>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono uppercase font-black">PWA</span>
+              </button>
             </div>
 
             {/* Group 2: Competitions & Athletes */}
