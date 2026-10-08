@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="flex-1 safe-bottom-padding pt-20 sm:pt-24">
+      <main className="flex-1 safe-bottom-padding pt-[calc(5rem+env(safe-area-inset-top,0px))] sm:pt-[calc(6rem+env(safe-area-inset-top,0px))]">
         {children}
       </main>
       <Footer />

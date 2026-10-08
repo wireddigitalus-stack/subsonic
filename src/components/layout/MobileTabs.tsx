@@ -5,11 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
-  CalendarDays, 
   MessageSquare, 
   Trophy,
-  Radio,
-  BarChart3
+  Radio
 } from "lucide-react";
 import { 
   getCommsStatus, 
@@ -27,7 +25,6 @@ interface TabItem {
 
 export function MobileTabs() {
   const pathname = usePathname();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [commsStatus, setCommsStatusState] = useState<CommsStatusState>(getCommsStatus());
 
   useEffect(() => {
@@ -43,19 +40,8 @@ export function MobileTabs() {
       const rawShooter = localStorage.getItem("subsonic_shooter_profile");
       const rawMember = localStorage.getItem("subsonic_member_profile");
       const p = rawShooter ? JSON.parse(rawShooter) : rawMember ? JSON.parse(rawMember) : null;
-      if (p) {
-        if (p.callsign) userCallsign = p.callsign;
-        const role = (p.role || "").toUpperCase();
-        const callsign = (p.callsign || "").toUpperCase();
-        if (
-          role === "MASTER_OWNER" ||
-          role === "OWNER_ADMIN" ||
-          role === "DEV_ADMIN" ||
-          role === "ADMIN" ||
-          ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"].includes(callsign)
-        ) {
-          setIsAdmin(true);
-        }
+      if (p && p.callsign) {
+        userCallsign = p.callsign;
       }
     } catch {
       // ignore
@@ -95,11 +81,9 @@ export function MobileTabs() {
 
   const tabs: TabItem[] = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Calendar", href: "/calendar", icon: CalendarDays },
     { name: "Chat", href: "/chat", icon: MessageSquare },
     { name: "Shooters", href: "/shooters", icon: Trophy },
     { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
-    ...(isAdmin ? [{ name: "Admin", href: "/admin", icon: BarChart3 }] : []),
   ];
 
   // Visual configuration for color-coded pulsing beacon

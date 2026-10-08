@@ -130,6 +130,10 @@ body {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 1rem));
 }
 
+.safe-top-padding {
+  padding-top: calc(5rem + env(safe-area-inset-top, 0px));
+}
+
 /* ─── CHAT PAGE VIEWPORT LOCK ─────────────────────────────────────────────
    body.chat-active: prevents outer page scroll. Chat manages its own scroll.
    ─────────────────────────────────────────────────────────────────────────── */

@@ -1963,7 +1963,7 @@ export default function ChatPage() {
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
-        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.5rem,env(safe-area-inset-top,0px))] sm:pt-3">
+        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.75rem,calc(env(safe-area-inset-top,0px)+0.35rem))] sm:pt-3">
         <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-white/10">
           {/* Mobile Top Bar: Tactical Breadcrumbs + Quick Hub Switcher + Callsign + Actions */}
           <div className="flex sm:hidden items-center justify-between gap-1.5">
