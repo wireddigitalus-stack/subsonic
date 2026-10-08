@@ -134,6 +134,16 @@ body {
   padding-top: calc(5rem + env(safe-area-inset-top, 0px));
 }
 
+/* iOS Home Screen PWA Standalone Mode adjustments */
+@media all and (display-mode: standalone) {
+  header.site-header {
+    padding-top: max(3.75rem, calc(0.75rem + env(safe-area-inset-top, 47px))) !important;
+  }
+  main.site-main {
+    padding-top: max(8rem, calc(5.5rem + env(safe-area-inset-top, 47px))) !important;
+  }
+}
+
 /* ─── CHAT PAGE VIEWPORT LOCK ─────────────────────────────────────────────
    body.chat-active: prevents outer page scroll. Chat manages its own scroll.
    ─────────────────────────────────────────────────────────────────────────── */

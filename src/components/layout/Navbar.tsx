@@ -217,7 +217,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] pb-2 transition-all duration-300 pointer-events-none">
+    <header className="site-header fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 pt-[max(0.75rem,calc(env(safe-area-inset-top,0px)+0.75rem))] pb-2 transition-all duration-300 pointer-events-none">
       <div className="max-w-7xl mx-auto pointer-events-auto">
         <nav className="ios-glass rounded-2xl px-4 sm:px-6 py-2.5 flex items-center justify-between border border-white/10 shadow-ios-glass">
           {/* Brand Logo with Challenge Coin & Wordmark */}
