@@ -848,10 +848,10 @@ export function ChatMessageList({
               </button>
               <button
                 type="button"
-                onClick={() => quickBroadcast("Impact confirmed! Center hold.")}
+                onClick={() => quickBroadcast("Chamber flag inserted. Rifle safe.")}
                 className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition-all shrink-0"
               >
-                🎯 &ldquo;Impact!&rdquo;
+                🚩 &ldquo;Chamber Flag In&rdquo;
               </button>
               <button
                 type="button"
@@ -862,10 +862,10 @@ export function ChatMessageList({
               </button>
               <button
                 type="button"
-                onClick={() => quickBroadcast("Wind switch: Gusting 12mph 3 o'clock.")}
+                onClick={() => quickBroadcast("Heading to staging area.")}
                 className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-200 border border-white/10 transition-all shrink-0"
               >
-                💨 &ldquo;Wind switch 12mph&rdquo;
+                📍 &ldquo;At Staging&rdquo;
               </button>
             </>
           )}

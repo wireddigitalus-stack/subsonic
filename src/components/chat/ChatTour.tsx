@@ -54,8 +54,8 @@ const TOUR_STEPS: TourStep[] = [
     badge: "04 / AI RANGE OFFICER",
     title: "RO BOT — 24/7 Autonomous AI Agent",
     description:
-      "Meet RO BOT 🤖, your official 24/7 Autonomous AI Assistant and Range Officer for The Hideout Invitational. RO BOT knows all details from the Competitor Packet: match schedules, side matches, Bristol hotels, dining, and local entertainment. Say 'hey ro' or ask '@ro help' anytime.",
-    proTip: "Ask RO BOT naturally about Bristol hotels, BBQ, stage timing, or fly fishing.",
+      "Meet RO BOT 🤖, your official 24/7 Autonomous AI Assistant and Range Officer for The Hideout. RO BOT is dialed into Bristol hotels, campgrounds, dining, facility amenities, and cold range safety SOPs. Say 'hey ro' or ask '@ro help' anytime.",
+    proTip: "Ask RO BOT naturally about Bristol hotels, campgrounds, 620 State steaks & sushi, or range safety.",
     icon: <Bot className="w-5 h-5 text-amber-400" />,
   },
   {

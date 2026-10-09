@@ -317,7 +317,7 @@ const MESSAGE_POOLS: MessagePool = {
       "The Bergara B-14R is the best value in production rimfire right now. Sub-MOA out of the box for under $1K.",
       "Is it worth upgrading my trigger? The stock Bergara trigger is decent but I've heard the Timney is a game changer.",
       "Bushnell XRS3 at 6-36x is insane value. Tracks perfectly and the glass is 90% as good as the big names.",
-      "hey ro, what ammo should I use for my first match? Budget-friendly options?",
+      "hey ro, what are the best hotels near the range with secure parking?",
     ],
   },
 

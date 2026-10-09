@@ -137,7 +137,7 @@ const RO_GREETING_RESPONSES = [
   (c: string) =>
     `Welcome to the frequency, ${c}! ⛰️ I'm RO BOT, your 24/7 AI Range Officer. I have Bristol intel locked in — hotels, campgrounds, BBQ, steaks & sushi at 620 State, and local entertainment. How can I help you?`,
   (c: string) =>
-    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, range safety rules, or great steaks and sushi at 620 State St, I've got your DOPE.`,
+    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, range safety rules, or great steaks and sushi at 620 State St, I've got you covered.`,
 ];
 
 const RO_THANKS_RESPONSES = [
@@ -381,24 +381,29 @@ export function getFaqResponse(content: string): string {
       `• **Host:** Allen Hurley — Subsonic Society Founder ("Said. Done.")`;
   }
 
-  // 7. AMMO, BALLISTICS & GEAR
+  // 7. BALLISTICS, DOPE & AMMO — OFFICIAL RANGE OFFICER POLICY
   if (
+    lower.includes("dope") ||
+    lower.includes("ballistic") ||
+    lower.includes("elevation") ||
+    lower.includes("wind") ||
+    lower.includes("hold") ||
+    lower.includes("mils") ||
+    lower.includes("moa") ||
     lower.includes("ammo") ||
     lower.includes("bullet") ||
     lower.includes("velocity") ||
-    lower.includes("subsonic") ||
-    lower.includes("gear") ||
-    lower.includes("spec") ||
+    lower.includes("fps") ||
+    lower.includes("tuner") ||
+    lower.includes("zero") ||
     lower.includes("lapua") ||
     lower.includes("eley") ||
     lower.includes("sk")
   ) {
-    return `🎯 **Ammunition & Gear Specifications:**\n\n` +
-      `• **Authorized Ammunition:** Standard-velocity or subsonic .22 LR with muzzle velocity under 1,120 FPS at sea level equivalent.\n` +
-      `• **Prohibited:** Any hyper-velocity or magnum rimfire (.22 WMR, .17 HMR).\n` +
-      `• **Chrono Station:** Random squad chronograph checks conducted during Friday practice & Saturday staging.\n` +
-      `• **Top Match Lots:** Lapua Center-X, SK Long Range Match, Eley Tenex, and RWS R50.\n` +
-      `• **Elevation DOPE:** Range elevation sits at 3,420 FT. Account for thermal ridge drafts and lower air density. Check the Competitor Packet (/competitor-packet) for range elevation and match ballistics.`;
+    return `🛑 **Range Officer Notice — Ballistics & Shooting Data Policy:**\n\n` +
+      `Per Subsonic Society match regulations and range policy, Range Officers and RO BOT do **not** provide ballistic DOPE, wind calls, target holds, velocity data, or ammunition recommendations.\n\n` +
+      `All competitors are strictly responsible for confirming their own rifle zeros, ballistic calculations, and ammunition performance on the practice line.\n\n` +
+      `I am always on frequency to assist with **Bristol lodging, dining, campgrounds, facility amenities, and cold range safety rules**!`;
   }
 
   // 8. RULES & SAFETY
@@ -426,7 +431,6 @@ export function getFaqResponse(content: string): string {
       `• **@ro food** — Top Bristol restaurants, BBQ, steaks & sushi at 620 State, Blackbird Bakery\n` +
       `• **@ro entertainment** — Fly fishing, Hard Rock Casino, Speedway & attractions\n` +
       `• **@ro hideout** — 220-acre facility amenities, ranges & address\n` +
-      `• **@ro ammo** — Authorized ammo specs & subsonic speed limits\n` +
       `• **@ro rules** — Safety SOPs and cold range rules\n\n` +
       `Or just ask any question about Bristol lodging, dining, campgrounds, or range safety — I'm monitoring this frequency 24/7!`;
   }
@@ -573,6 +577,14 @@ export function analyzeMsgForPlink(
     lower.includes("sushi") ||
     lower.includes("suhi") ||
     lower.includes("620")
+  ) {
+    return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
+  }
+
+  // Intercept any ballistic DOPE, shooting hold, or ammo inquiries directed to RO or chat
+  if (
+    (lower.includes("dope") || lower.includes("ammo") || lower.includes("bullet") || lower.includes("elevation") || lower.includes("wind hold") || lower.includes("velocity") || lower.includes("tuner") || lower.includes("zero") || lower.includes("ballistic")) &&
+    (lower.includes("ro") || lower.includes("range officer") || lower.includes("?") || lower.includes("what") || lower.includes("recommend") || lower.includes("give me"))
   ) {
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
