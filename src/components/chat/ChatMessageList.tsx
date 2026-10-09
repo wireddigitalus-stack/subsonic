@@ -165,11 +165,11 @@ export function ChatMessageList({
       name: isRO ? "RO BOT" : author.name,
       role: author.role,
       badgeText: isRO ? "AI Range Officer" : (author.badgeText || author.role),
-      division: isRO ? "Autonomous AI Match Assistant" : author.division,
-      rifleSetup: isRO ? "Autonomous AI Agent • Match Ops & Safety" : author.rifleSetup,
+      division: isRO ? "Autonomous AI Range Officer" : author.division,
+      rifleSetup: isRO ? "Autonomous AI Agent • Range Safety & Bristol Intel" : author.rifleSetup,
       status: isRO ? "online" : "online",
       bio: isRO 
-        ? "Official Autonomous AI Range Officer & Match Assistant for The Hideout. 24/7 intel on match schedules, Bristol lodging, dining, and range safety." 
+        ? "Official Autonomous AI Range Officer for The Hideout. 24/7 intel on Bristol lodging, campgrounds, dining, and range safety." 
         : `Verified Subsonic Society competitor in ${author.division || "Open Division"}.`,
     };
     onSelectShooter(partner);
@@ -290,8 +290,8 @@ export function ChatMessageList({
                     {[
                       "Where should I stay in Bristol?",
                       "What are the best dinner spots?",
-                      "Tell me about the $2,500 cash side matches",
-                      "What is the schedule for Saturday?"
+                      "What are reputable RV campgrounds?",
+                      "Tell me about South Holston fly fishing"
                     ].map((promptText, i) => (
                       <button
                         key={i}
@@ -813,13 +813,6 @@ export function ChatMessageList({
                   className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-950/25 hover:bg-cyan-900/40 text-slate-200 hover:text-cyan-100 border border-white/10 hover:border-cyan-500/30 transition-all shrink-0"
                 >
                   🍖 &ldquo;Bristol Food&rdquo;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("How do the $2,500 cash side matches work?")}
-                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/35 transition-all shrink-0"
-                >
-                  💵 &ldquo;Cash Matches&rdquo;
                 </button>
               </>
             ) : (

@@ -207,10 +207,10 @@ export function ShooterDossierModal({
           <div className="p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-500/30 space-y-2 shadow-[0_0_15px_rgba(6,182,212,0.08)]">
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-cyan-300">
               <Bot className="w-4 h-4 text-cyan-400" />
-              <span>Autonomous AI Match Assistant · 24/7 Intel</span>
+              <span>Autonomous AI Range Officer · 24/7 Intel</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-normal">
-              RO BOT is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 in the private Chat Room to answer competitor inquiries regarding match check-in, the $2,500 cash side matches, Bristol hotels, top restaurants, or match rules.
+              RO BOT is Subsonic Society&apos;s official autonomous AI Range Officer. Available 24/7 in the private Chat Room to answer inquiries regarding Bristol hotels, campgrounds, top restaurants like 620 State, local entertainment, and range safety.
             </p>
           </div>
         )}

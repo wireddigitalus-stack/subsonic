@@ -118,10 +118,10 @@ const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
     name: "RO BOT",
     role: "OFFICIAL",
     badgeText: "AI Range Officer",
-    division: "Autonomous AI Match Assistant",
+    division: "Autonomous AI Range Officer",
     status: "online",
-    bio: "Official Autonomous AI Assistant & Range Officer for The Hideout Invitational. Available 24/7 with expert intel on Bristol lodging, dining, match schedule, and cash side matches.",
-    rifleSetup: "Autonomous AI Agent • Neural Match & Safety Telemetry",
+    bio: "Official Autonomous AI Assistant & Range Officer for The Hideout. Available 24/7 with expert intel on Bristol lodging, campgrounds, dining, local entertainment, and range safety.",
+    rifleSetup: "Autonomous AI Agent • Range Safety & Bristol Intel",
     isBot: true,
   },
   {

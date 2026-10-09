@@ -17,7 +17,7 @@ export const RO_AUTHOR = {
   role: "OFFICIAL" as const,
   badgeText: "AI Range Officer",
   division: "Autonomous AI Range Officer • The Hideout",
-  rifleSetup: "Autonomous AI Assistant • 24/7 Match Ops",
+  rifleSetup: "Autonomous AI Assistant • Range Safety & Bristol Intel",
 };
 
 // Export PLINK_AUTHOR alias for backwards compatibility
@@ -131,46 +131,46 @@ const RO_MENTIONED = /\b(ro|range\s*officer)\b/i;
 
 const RO_GREETING_RESPONSES = [
   (c: string) =>
-    `Hey ${c}! 🤖 RO BOT here — your autonomous AI Range Officer and match assistant on deck for The Hideout Invitational. Ready to talk match stages, Bristol lodging, food spots, or local entertainment. What do you need?`,
+    `Hey ${c}! 🤖 RO BOT here — your autonomous AI Range Officer on deck for The Hideout. Ready to help with Bristol lodging, food spots, local entertainment, and range safety. What do you need?`,
   (c: string) =>
-    `${c}, RO BOT on net! 📻 Standing 24/7 post for the 2026 Subsonic Society Invitational. Need info on the match schedule, hotels in Bristol, or where to grab dinner tonight? Ask away.`,
+    `${c}, RO BOT on net! 📻 Standing 24/7 post for The Hideout in Bristol. Need info on hotels in Bristol, campgrounds, or where to grab dinner tonight? Ask away.`,
   (c: string) =>
-    `Welcome to the Invitational frequency, ${c}! ⛰️ I'm RO BOT, your 24/7 AI Range Officer. I have the entire 2026 Competitor Packet locked in — stages, side matches, hotels, BBQ, and Bristol entertainment. How can I help you prep?`,
+    `Welcome to the frequency, ${c}! ⛰️ I'm RO BOT, your 24/7 AI Range Officer. I have Bristol intel locked in — hotels, campgrounds, BBQ, steaks & sushi at 620 State, and local entertainment. How can I help you?`,
   (c: string) =>
-    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, stage rotation times, or great steaks and sushi at 620 State St, I've got your DOPE.`,
+    `RO BOT here, ${c}. Frequencies open. As your AI Range Officer, whether you need hotel recommendations, range safety rules, or great steaks and sushi at 620 State St, I've got your DOPE.`,
 ];
 
 const RO_THANKS_RESPONSES = [
   (c: string) => `Roger that, ${c}. RO BOT out. 🤖 Keep your chamber flagged and stay dialed in.`,
   (c: string) => `Anytime, ${c}. See you on the firing line at The Hideout. ⛰️`,
-  (c: string) => `Copy that, ${c}. RO BOT standing by on the Invitational frequency.`,
-  (c: string) => `Glad to help, ${c}. Let's make this the best money match in the country. Said. Done. 🏆`,
+  (c: string) => `Copy that, ${c}. RO BOT standing by on frequency.`,
+  (c: string) => `Glad to help, ${c}. Stay safe on the line. Said. Done. 🎯`,
 ];
 
 const RO_IDENTITY_RESPONSES = [
   (c: string) =>
-    `I'm RO BOT — your official autonomous AI Range Officer for the Subsonic Society Invitational Money Match at The Hideout (Bristol, TN). 🤖 I'm dialed into everything in our 2026 Competitor Packet: 3-day match schedule, $2,500 cash side matches, 12 Bristol hotels, 12 top restaurants, and all local entertainment like South Holston fly fishing and the Bristol Casino. Review the full guide here: https://subsonic-omega.vercel.app/competitor-packet`,
+    `I'm RO BOT — your official autonomous AI Range Officer for The Hideout in Bristol, TN. 🤖 I'm dialed into Bristol hospitality & facility info: 12 Bristol hotels, campgrounds & RV parks, top restaurants like 620 State, and local entertainment like South Holston fly fishing and the Bristol Casino.`,
   (c: string) =>
-    `I am the autonomous AI Range Officer (RO BOT) for Subsonic Society, ${c}. Think of me as your 24/7 digital match briefing assistant and Bristol town concierge. Read our full match packet at https://subsonic-omega.vercel.app/competitor-packet or ask me any question!`,
+    `I am the autonomous AI Range Officer (RO BOT) for Subsonic Society, ${c}. Think of me as your 24/7 digital range safety assistant and Bristol town concierge. Ask me any question!`,
 ];
 
 const RO_REAL_RESPONSES = [
   (c: string) =>
-    `I'm your autonomous AI Range Officer, ${c} (RO BOT) — running official 24/7 Subsonic Society match intelligence. 🤖 I'm always on duty across The Hideout network to keep chat safe, answer match questions, and guide competitors visiting Bristol.`,
+    `I'm your autonomous AI Range Officer, ${c} (RO BOT) — running 24/7 Subsonic Society intelligence. 🤖 I'm always on duty across The Hideout network to keep chat safe, answer local questions, and guide visitors in Bristol.`,
 ];
 
 const RO_HOW_RESPONSES = [
   (c: string) =>
-    `Range is in prime condition, ${c}! 🟢 220 acres prepped, steel freshly painted, elevation 3,420 FT, and Bristol is ready for all competitors. How's your gear prep going?`,
+    `Range is in prime condition, ${c}! 🟢 220 acres prepped, steel freshly painted, elevation 3,420 FT, and Bristol is ready for all marksmen. How's your gear prep going?`,
   (c: string) =>
-    `All systems nominal on the Invitational frequency, ${c}. Weather telemetry is monitoring Holston Mountain drafts, and hotel blocks are filling up fast. What questions can I answer for you?`,
+    `All systems nominal on the frequency, ${c}. Weather telemetry is monitoring Holston Mountain drafts, and hotel blocks are filling up fast. What questions can I answer for you?`,
 ];
 
 const RO_GENERAL_RESPONSES = [
   (c: string) =>
-    `${c} — you called for the Range Officer. What do you need? Ask about match dates, stage details, hotels, restaurants, or entertainment in Bristol. 🎯`,
+    `${c} — you called for the Range Officer. What do you need? Ask about hotels, restaurants, campgrounds, or entertainment in Bristol. 🎯`,
   (c: string) =>
-    `RO standing by, ${c}. Need intel on The Hideout, the $1,500 Cold Bore Challenge, or where to eat in Bristol? Fire away.`,
+    `RO standing by, ${c}. Need intel on The Hideout, hotels, or where to eat in Bristol? Fire away.`,
 ];
 
 // ─── WARNING MESSAGES ─────────────────────────────────────────────────────────
@@ -222,7 +222,7 @@ export function getFaqResponse(content: string): string {
     lower.includes("trailer") ||
     (lower.includes("camp") && !lower.includes("hotel") && !lower.includes("motel"))
   ) {
-    return `🚐 **RV Hookups & Camping Policy for The Hideout Invitational:**\n\n` +
+    return `🚐 **RV Hookups & Camping Policy for The Hideout:**\n\n` +
       `**Official Range Policy:**\n` +
       `❌ **Negative on on-site RV hookups.** We do **NOT** have RV electric, water, or sewer hookups available at the clubhouse or range facility at this time.\n\n` +
       `⛺ **Reputable RV Parks & Campgrounds in the Area:**\n` +
@@ -232,7 +232,7 @@ export function getFaqResponse(content: string): string {
       `• **Lake Retreat RV Park & Campground** (Bristol, TN) — Full hookups located directly on scenic South Holston Lake with boat ramps and mountain views.\n` +
       `• **Sugar Hollow Park Campground** (Bristol, VA) — 75 sites with water/electric hookups in a quiet 400-acre city park with clean bathhouses.\n` +
       `• **Hicks White Top & Farmer Bob's Campgrounds** (Bristol, TN) — Established regional campgrounds catering to large rigs.\n\n` +
-      `💡 *Shooter Advisory:* If you are traveling in an RV or towing a camper for match weekend (Nov 13–15), we strongly recommend reserving your site in advance at Hilltop or Lakeview RV Resort as regional sites fill quickly during major Appalachian sporting weekends!`;
+      `💡 *Shooter Advisory:* If you are traveling in an RV or towing a camper, we strongly recommend reserving your site in advance at Hilltop or Lakeview RV Resort as regional sites fill quickly during major Appalachian sporting weekends!`;
   }
 
   // 2. HOTELS & LODGING IN BRISTOL
@@ -244,15 +244,14 @@ export function getFaqResponse(content: string): string {
     lower.includes("cabin") ||
     lower.includes("motel")
   ) {
-    return `🏨 **Bristol Lodging Guide (From 2026 Competitor Packet):**\n\n` +
+    return `🏨 **Bristol Lodging Guide:**\n\n` +
       `• **The Bristol Hotel (Historic Downtown)** — 12 mi / 18 min. Boutique luxury, Lumac Rooftop Bar & Vivian's Table. Highly recommended for couples & squads.\n` +
       `• **Hard Rock Hotel & Casino Bristol** — 13 mi / 20 min. 24/7 resort gaming, upscale dining, Caesars sportsbook.\n` +
       `• **Courtyard & Fairfield Inn by Marriott** — 9 mi / 14 min off I-81 Exit 74 near The Pinnacle shopping center.\n` +
       `• **Hilton Garden Inn & Hampton Inn** — 10–11 mi / 15 min. Clean, dependable, with hot breakfast.\n` +
       `• **Extended Stay America** — 10 mi / 15 min. Kitchenettes ideal for traveling shooters carrying pelican cases.\n` +
       `• **Quality Inn / Days Inn / Red Roof** — 10–11 mi. Solid budget-friendly options.\n` +
-      `• **RVs & Campers:** Note that the clubhouse has no on-site RV hookups at this time. Recommended reputable options: Hilltop Campground in Bristol and Lakeview RV Resort just 10–12 min away.\n\n` +
-      `💡 Check the full 12-hotel directory with direct phone numbers & online booking links in the Competitor Packet: https://subsonic-omega.vercel.app/competitor-packet#hotels`;
+      `• **RVs & Campers:** Note that the clubhouse has no on-site RV hookups at this time. Recommended reputable options: Hilltop Campground in Bristol and Lakeview RV Resort just 10–12 min away.`;
   }
 
   // 2. STEAKS, SUSHI & 620 STATE STREET (TOP SPOTLIGHT)
@@ -303,8 +302,7 @@ export function getFaqResponse(content: string): string {
       `• **Lost State Distilling** (295 4th St) — Award-winning Tennessee whiskey, bourbon & gin tastings.\n` +
       `• **Bloom Café & Listening Room** — Craft espresso, scratch breakfast & live acoustic music.\n` +
       `• **The Angry Italian** (714 State St) — Chicago-style deep-dish pizza & Italian beef sandwiches for hungry squads.\n` +
-      `• **Cootie Brown's** (118 Volunteer Pkwy) — Jamaican jerk chicken, tamales & signature Key Lime pie.\n\n` +
-      `🍗 *Note: All match meals at The Hideout are included with registration (Friday Welcome BBQ, Sat breakfast & lunch, Sunday breakfast & awards banquet).*`;
+      `• **Cootie Brown's** (118 Volunteer Pkwy) — Jamaican jerk chicken, tamales & signature Key Lime pie.`;
   }
 
   // 3. ENTERTAINMENT, ATTRACTIONS & FLY FISHING
@@ -337,50 +335,28 @@ export function getFaqResponse(content: string): string {
       `• **Historic Abingdon & Barter Theatre** 🎭 — 15 min north in VA; historic brick town with the State Theatre of Virginia & 34-mile Creeper Bike Trail.`;
   }
 
-  // 4. MATCH DATES, SCHEDULE & TIMES
+  // 4. MATCH OPERATIONS & EVENT INQUIRIES (OFFICIAL DIRECTORY NOTICE)
   if (
+    lower.includes("match") ||
     lower.includes("schedule") ||
     lower.includes("time") ||
     lower.includes("date") ||
     lower.includes("when") ||
+    lower.includes("timeline") ||
     lower.includes("friday") ||
     lower.includes("saturday") ||
     lower.includes("sunday") ||
-    lower.includes("timeline")
-  ) {
-    return `📅 **2026 Invitational Match Schedule (Nov 13–15, 2026):**\n\n` +
-      `• **Friday, Nov 13 — Staging & Check-In:**\n` +
-      `  - 10:00 AM – 5:00 PM: Competitor Check-In, Zero Range Open, Practice Barricades & Chrono\n` +
-      `  - 5:30 PM: Welcome Address by Allen Hurley & Smoked BBQ Dinner (Included)\n\n` +
-      `• **Saturday, Nov 14 — Match Day 1:**\n` +
-      `  - 6:30 AM: Competitor Breakfast (Clubhouse)\n` +
-      `  - 7:30 AM: Mandatory Safety Briefing\n` +
-      `  - 8:00 AM: Match Day 1 Begins (Stages 1–10)\n` +
-      `  - 12:00 PM: Catered Lunch on the Line\n` +
-      `  - 4:30 PM: **$1,000 Rimfire Speed Duel Side Match** ⚡\n\n` +
-      `• **Sunday, Nov 15 — Match Day 2 & Awards:**\n` +
-      `  - 7:00 AM: Competitor Breakfast\n` +
-      `  - 8:00 AM: Match Day 2 Begins (Stages 11–20)\n` +
-      `  - 1:30 PM: **$1,500 1,000-Yard Cold Bore Challenge** 🎯\n` +
-      `  - 3:00 PM: Awards & Trophy Presentation ($28,500+ Prize Table)`;
-  }
-
-  // 5. SIDE MATCHES & CASH PURSES
-  if (
+    lower.includes("purse") ||
+    lower.includes("prize") ||
+    lower.includes("cash") ||
     lower.includes("side match") ||
     lower.includes("cold bore") ||
     lower.includes("speed duel") ||
-    lower.includes("cash") ||
-    lower.includes("purse") ||
-    lower.includes("prize") ||
     lower.includes("money match")
   ) {
-    return `💰 **Cash Side Matches & Prize Table ($2,500 Cash Purse):**\n\n` +
-      `1️⃣ **$1,000 Rimfire Speed Duel** (Saturday 4:30 PM):\n` +
-      `   Head-to-head bracket elimination on dual reactive steel knockdowns. Speed, recoil recovery, and clean splits win the cash.\n\n` +
-      `2️⃣ **$1,500 1,000-Yard Cold Bore Challenge** (Sunday 1:30 PM):\n` +
-      `   Held across the deep Appalachian draws on The Hideout's centerfire range. One cold bore shot at 1,000 yards on steel. Closest to center plate takes the cash pot.\n\n` +
-      `🏆 Main Match: Over $28,500 in custom rifles, glass, chassis systems, and cash awarded at Sunday's ceremony. Presented by Modacam Custom Rifles.`;
+    return `🎯 **Range Officer Notice — Event & Match Operations:**\n\n` +
+      `All official match schedules, registration, stage briefings, and event prize details are managed directly by Match Director Allen Hurley.\n\n` +
+      `For Bristol lodging, campgrounds, top restaurants (like steaks & sushi at 620 State), local attractions, and range safety rules, I'm here 24/7!`;
   }
 
   // 6. THE HIDEOUT FACILITY & ADDRESS
@@ -444,26 +420,24 @@ export function getFaqResponse(content: string): string {
 
   // 9. GENERAL HELP & COMMANDS
   if (lower.includes("help") || lower.includes("command") || lower.includes("what can you")) {
-    return `🎯 **I'm RO — Official Range Officer for The Hideout Invitational. Here's what I know:**\n\n` +
-      `• **@ro schedule** — Full 3-day match schedule (Nov 13–15)\n` +
-      `• **@ro hotels** — 12 recommended Bristol hotels, rates & distances\n` +
+    return `🎯 **I'm RO — Official Range Officer for The Hideout. Here's what I know:**\n\n` +
+      `• **@ro hotels** — Recommended Bristol hotels, rates & distances\n` +
       `• **@ro rv** — RV hookup policy & reputable Bristol campgrounds (Hilltop, Lakeview, KOA)\n` +
-      `• **@ro food** — Top 12 Bristol restaurants, BBQ, steaks & Blackbird Bakery\n` +
+      `• **@ro food** — Top Bristol restaurants, BBQ, steaks & sushi at 620 State, Blackbird Bakery\n` +
       `• **@ro entertainment** — Fly fishing, Hard Rock Casino, Speedway & attractions\n` +
-      `• **@ro side matches** — $1,000 Speed Duel & $1,500 Cold Bore Challenge\n` +
       `• **@ro hideout** — 220-acre facility amenities, ranges & address\n` +
       `• **@ro ammo** — Authorized ammo specs & subsonic speed limits\n` +
       `• **@ro rules** — Safety SOPs and cold range rules\n\n` +
-      `Or just ask any natural question about the match or Bristol — I'm monitoring this frequency 24/7!`;
+      `Or just ask any question about Bristol lodging, dining, campgrounds, or range safety — I'm monitoring this frequency 24/7!`;
   }
 
-  return `🎯 Range Officer on net! I'm tracking all details for the 2026 Subsonic Society Invitational. Ask me about the match schedule, $2,500 cash side matches, Bristol hotels, restaurants, or local entertainment like South Holston fly fishing and the Hard Rock Casino. Type @ro help for commands!`;
+  return `🎯 Range Officer on net! Ask me about Bristol hotels, campgrounds, restaurants (head to 620 State for steaks & sushi!), or local entertainment like South Holston fly fishing and the Hard Rock Casino. Type @ro help for commands!`;
 }
 
 export function getRoDirectAnswer(content: string, callsign: string): string {
   const lower = content.toLowerCase();
   if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey")) {
-    return `Copy that, [${callsign}]. Range Officer standing by on your private point-to-point net. What match ops, Bristol lodging, dining, or side match details can I verify for your squad?`;
+    return `Copy that, [${callsign}]. Range Officer standing by on your private point-to-point net. What Bristol lodging, dining, campground, or range safety details can I verify for your squad?`;
   }
   return getFaqResponse(content);
 }
@@ -472,10 +446,9 @@ export function getRoDirectAnswer(content: string, callsign: string): string {
 
 export function getChannelWelcome(channelId: string, callsign: string): string {
   return `🎯 Range Officer on net! Welcome to #${channelId}, ${callsign}.\n\n` +
-    `This is the official 2026 Subsonic Society Invitational frequency for The Hideout in Bristol, TN (Nov 13–15). ` +
-    `Use this channel for match operations, stage DOPE, Bristol hotel coordination, food runs, and local entertainment.\n\n` +
-    `📖 Review the complete 2026 Competitor Packet & Bristol Guide:\nhttps://subsonic-omega.vercel.app/competitor-packet\n\n` +
-    `Say "hey ro" or ask me anything about the match schedule, $2,500 cash side matches, Bristol dining (head to 620 State for steaks & sushi!), lodging, or fly fishing on the South Holston!`;
+    `This is the official Subsonic Society frequency for The Hideout in Bristol, TN. ` +
+    `Use this channel for squad comms, Bristol hotel coordination, food runs, and local entertainment.\n\n` +
+    `Say "hey ro" or ask me anything about Bristol dining (head to 620 State for steaks & sushi!), lodging, campgrounds, or fly fishing on the South Holston!`;
 }
 
 // ─── RANDOM PICKER ───────────────────────────────────────────────────────────
@@ -604,9 +577,9 @@ export function analyzeMsgForPlink(
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
   }
 
-  // Direct question keywords about Bristol or match details
+  // Direct question keywords about Bristol hospitality & amenities
   if (
-    (lower.includes("where to stay") || lower.includes("hotel") || lower.includes("lodging") || lower.includes("where to eat") || lower.includes("restaurant") || lower.includes("blackbird") || lower.includes("bbq") || lower.includes("fly fishing") || lower.includes("south holston") || lower.includes("casino") || lower.includes("side match") || lower.includes("cold bore") || lower.includes("schedule")) &&
+    (lower.includes("where to stay") || lower.includes("hotel") || lower.includes("lodging") || lower.includes("where to eat") || lower.includes("restaurant") || lower.includes("blackbird") || lower.includes("bbq") || lower.includes("fly fishing") || lower.includes("south holston") || lower.includes("casino") || lower.includes("campground") || lower.includes("rv") || lower.includes("camper")) &&
     (lower.includes("?") || lower.includes("recommend") || lower.includes("best") || lower.includes("ro") || lower.includes("anyone") || lower.includes("dinner") || lower.includes("food"))
   ) {
     return { content: getFaqResponse(content), warningTier: 0, violationType: null, shouldEscalate: false, targetCallsign: callsign };
