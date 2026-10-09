@@ -7,13 +7,16 @@ interface WeatherReport {
   tempMin?: number;
   tempMax?: number;
   feelsLike?: number;
+  dewPoint?: number;
   humidity: number;
   pressureHpa: number;
+  pressureInHg: number;
   windSpeed: number;
   windGusts: number;
   windDirection: string;
   windDegrees: number;
   densityAltitude: number;
+  mach1Fps: number;
   condition: string;
   location: string;
   elevationFt: number;
@@ -47,16 +50,27 @@ function wmoCodeToCondition(code: number): string {
   return "Partly Cloudy";
 }
 
-function calculateDensityAltitude(tempF: number, pressureHpa: number, elevationFt: number): number {
+/**
+ * Standard atmospheric Density Altitude calculated from station surface pressure & temperature
+ * Uses the standard US Standard Atmosphere barometric equation:
+ * Pressure Alt = (1 - (P_station / 1013.25)^0.190284) * 145366.45
+ * Density Alt = PA + 118.8 * (OAT_Celsius - ISA_Temp_at_PA)
+ */
+function calculateDensityAltitude(tempF: number, pressureHpa: number): number {
   const tempC = ((tempF - 32) * 5) / 9;
-  const inHg = pressureHpa * 0.02953;
-  // Pressure Altitude
-  const pressureAlt = (29.92 - inHg) * 1000 + elevationFt;
-  // Standard ISA temperature at this pressure altitude
+  const pressureAlt = (1 - Math.pow(pressureHpa / 1013.25, 0.190284)) * 145366.45;
   const isaTemp = 15 - pressureAlt * 0.0019812;
-  // Density Altitude
   const da = Math.round(pressureAlt + 118.8 * (tempC - isaTemp));
   return da;
+}
+
+/**
+ * Speed of sound in feet per second (Mach 1) based on ambient temperature
+ * v = 49.02 * sqrt(Rankine)
+ */
+function calculateMach1Fps(tempF: number): number {
+  const rankine = tempF + 459.67;
+  return Math.round(49.02 * Math.sqrt(rankine));
 }
 
 export async function GET() {
@@ -66,13 +80,15 @@ export async function GET() {
   }
 
   // Holston Mountain / The Hideout range coordinates in Bristol TN area:
-  // Lat: 36.52, Lon: -82.10, Elevation ~3,420 ft
+  // Lat: 36.52, Lon: -82.10, Elevation: 3,420 ft (1,042.4 meters)
   const latitude = 36.52;
   const longitude = -82.10;
+  const elevationMeters = 1042;
   const elevationFt = 3420;
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+    // Request Open-Meteo with exact mountain elevation (1,042m) to receive true ridge-top telemetry
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&elevation=${elevationMeters}&current=temperature_2m,relative_humidity_2m,dew_point_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`;
 
     const res = await fetch(url, {
       next: { revalidate: 180 },
@@ -87,24 +103,30 @@ export async function GET() {
     const current = data.current;
 
     const tempF = Math.round(current.temperature_2m);
+    const dewPoint = current.dew_point_2m !== undefined ? Math.round(current.dew_point_2m) : undefined;
     const humidity = Math.round(current.relative_humidity_2m);
-    const pressureHpa = current.surface_pressure || 962;
+    const pressureHpa = Math.round((current.surface_pressure || 905) * 10) / 10;
+    const pressureInHg = Math.round(pressureHpa * 0.02953 * 100) / 100;
     const windSpeed = Math.round(current.wind_speed_10m);
     const windGusts = Math.round(current.wind_gusts_10m || current.wind_speed_10m * 1.3);
     const windDeg = current.wind_direction_10m || 0;
     const windDirection = degreesToCompass(windDeg);
     const condition = wmoCodeToCondition(current.weather_code || 0);
-    const densityAltitude = calculateDensityAltitude(tempF, pressureHpa, elevationFt);
+    const densityAltitude = calculateDensityAltitude(tempF, pressureHpa);
+    const mach1Fps = calculateMach1Fps(tempF);
 
     const report: WeatherReport = {
       temp: tempF,
+      dewPoint,
       humidity,
-      pressureHpa: Math.round(pressureHpa * 10) / 10,
+      pressureHpa,
+      pressureInHg,
       windSpeed,
       windGusts,
       windDirection,
       windDegrees: windDeg,
       densityAltitude,
+      mach1Fps,
       condition,
       location: "Holston Ridge",
       elevationFt,
@@ -120,16 +142,19 @@ export async function GET() {
   } catch (err: any) {
     console.warn("Weather fetch failed, using mountain station fallback:", err.message);
 
-    // Realistic fallback for Bristol TN mountain range
+    // Realistic fallback for Bristol TN mountain range at 3,420 FT
     const fallbackReport: WeatherReport = cachedWeather || {
-      temp: 66,
-      humidity: 78,
-      pressureHpa: 963.2,
-      windSpeed: 6,
-      windGusts: 11,
+      temp: 64,
+      dewPoint: 42,
+      humidity: 48,
+      pressureHpa: 905.2,
+      pressureInHg: 26.73,
+      windSpeed: 5,
+      windGusts: 9,
       windDirection: "WNW",
       windDegrees: 290,
-      densityAltitude: 2150,
+      densityAltitude: 3820,
+      mach1Fps: 1122,
       condition: "Clear",
       location: "Holston Ridge",
       elevationFt: 3420,

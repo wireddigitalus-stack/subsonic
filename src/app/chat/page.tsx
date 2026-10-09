@@ -438,13 +438,16 @@ export default function ChatPage() {
   // Live Mountain Weather Telemetry state
   const [liveWeather, setLiveWeather] = useState<{
     temp: number;
+    dewPoint?: number;
     humidity: number;
     pressureHpa: number;
+    pressureInHg?: number;
     windSpeed: number;
     windGusts: number;
     windDirection: string;
     windDegrees: number;
     densityAltitude: number;
+    mach1Fps?: number;
     condition: string;
     location: string;
     elevationFt: number;
@@ -2342,7 +2345,7 @@ export default function ChatPage() {
             <div className="flex items-center justify-between gap-3">
               {/* Left: Compact Range Status Chip */}
               <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-400">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04]" title={liveWeather ? `Updated at ${liveWeather.updatedAt} • ${liveWeather.stationName} • Humidity: ${liveWeather.humidity}% • Baro: ${liveWeather.pressureHpa} hPa` : "Live Mountain Telemetry"}>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04]" title={liveWeather ? `Holston Ridge • Elev: ${liveWeather.elevationFt?.toLocaleString()} ft • Wind: ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • Temp: ${liveWeather.temp}°F${liveWeather.dewPoint !== undefined ? ` (Dew: ${liveWeather.dewPoint}°F)` : ""} • Humidity: ${liveWeather.humidity}% • Baro: ${liveWeather.pressureInHg || (Math.round(liveWeather.pressureHpa * 0.02953 * 100) / 100)} inHg (${liveWeather.pressureHpa} hPa) • Density Alt: ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude?.toLocaleString()} ft${liveWeather.mach1Fps ? ` • Mach 1: ${liveWeather.mach1Fps} FPS` : ""} • Updated: ${liveWeather.updatedAt}` : "Live Mountain Telemetry"}>
                   <span className={`w-1.5 h-1.5 rounded-full ${liveWeather?.isLive ? "bg-emerald-400" : "bg-amber-400"}`} />
                   <span className="text-slate-300 font-medium">{liveWeather?.location || "Holston Ridge"}</span>
                   <span className="text-white/20">·</span>
@@ -2482,7 +2485,7 @@ export default function ChatPage() {
           {/* Right: Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Desktop-only: Weather, Staff Moderated */}
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 border border-white/10 text-slate-200 text-xs font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude} ft` : "Live Wind Telemetry"}>
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 border border-white/10 text-slate-200 text-xs font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude?.toLocaleString()} ft • Baro ${liveWeather.pressureInHg || (Math.round(liveWeather.pressureHpa * 0.02953 * 100) / 100)} inHg` : "Live Wind Telemetry"}>
               <Wind className="w-3.5 h-3.5 text-cyan-400" />
               <span>{liveWeather ? `${liveWeather.windSpeed}-${liveWeather.windGusts} MPH ${liveWeather.windDirection}` : "4-6 MPH SE"}</span>
             </div>
