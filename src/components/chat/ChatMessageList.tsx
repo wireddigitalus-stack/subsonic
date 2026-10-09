@@ -120,7 +120,13 @@ export function ChatMessageList({
       shooterProfile.role === "OWNER_ADMIN" ||
       shooterProfile.role === "ADMIN" ||
       shooterProfile.role === "MODERATOR" ||
-      ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"].includes(shooterProfile.callsign?.toUpperCase())
+      ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY", "SAID DONE"].includes(shooterProfile.callsign?.toUpperCase()) ||
+      (typeof shooterProfile.badgeText === "string" && (
+        shooterProfile.badgeText.toUpperCase().includes("ADMIN") ||
+        shooterProfile.badgeText.toUpperCase().includes("OWNER") ||
+        shooterProfile.badgeText.toUpperCase().includes("DEV")
+      )) ||
+      (typeof window !== "undefined" && Boolean(localStorage.getItem("subsonic_admin_session")))
     )
   );
 
@@ -528,7 +534,13 @@ export function ChatMessageList({
                   <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-300 shrink-0 font-medium">
                     {/* Action buttons (Edit & Delete) */}
                     {(canEdit || canDelete) && (
-                      <div className="flex items-center gap-1 opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <div
+                        className={`flex items-center gap-1 transition-opacity ${
+                          isRO && isCurrentUserAdmin
+                            ? "opacity-90 hover:opacity-100"
+                            : "opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
+                        }`}
+                      >
                         {canEdit && editingMessageId !== msg.id && (
                           <button
                             type="button"
@@ -543,8 +555,12 @@ export function ChatMessageList({
                           <button
                             type="button"
                             onClick={() => setDeletingMessageId(msg.id)}
-                            title="Delete transmission"
-                            className="p-1 rounded-md text-slate-300 hover:text-red-400 hover:bg-white/10 transition-colors"
+                            title={isRO ? "Delete RO BOT transmission (Master Admin)" : "Delete transmission"}
+                            className={`p-1 rounded-md transition-colors ${
+                              isRO
+                                ? "text-red-400 hover:text-red-300 hover:bg-red-500/20 ring-1 ring-red-500/30"
+                                : "text-slate-300 hover:text-red-400 hover:bg-white/10"
+                            }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -582,7 +598,7 @@ export function ChatMessageList({
                   <div className="p-2.5 sm:p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-xs sm:text-sm text-red-200 flex items-center justify-between gap-2 animate-fadeIn">
                     <div className="flex items-center gap-2 font-medium">
                       <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-                      <span>Delete transmission permanently?</span>
+                      <span>{isRO ? "Delete RO BOT transmission permanently?" : "Delete transmission permanently?"}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
@@ -597,7 +613,7 @@ export function ChatMessageList({
                         onClick={() => confirmDelete(msg.id)}
                         className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-colors"
                       >
-                        Delete
+                        {isRO ? "Delete RO Post" : "Delete"}
                       </button>
                     </div>
                   </div>

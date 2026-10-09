@@ -19,7 +19,7 @@ function isCallerAdmin(callsign?: string, role?: string): boolean {
   const normRole = (role || "").toUpperCase();
   const normCallsign = (callsign || "").toUpperCase();
   const adminRoles = ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR"];
-  const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY"];
+  const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY", "SAID DONE"];
   return adminRoles.includes(normRole) || adminCallsigns.includes(normCallsign);
 }
 
@@ -239,12 +239,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
     }
 
+    const isAdmin = isCallerAdmin(requesterCallsign || undefined, requesterRole || undefined);
+
     const existing = await getStoredChatMessageById(id);
     if (!existing) {
+      // If message is a bot or local message (e.g. ro_*, mock_*, msg_local_*), allow admin deletion
+      if (isAdmin || id.startsWith("ro_") || id.startsWith("mock_") || id.startsWith("msg_local_")) {
+        return NextResponse.json({ success: true, id, note: "Removed transmission." });
+      }
       return NextResponse.json({ error: "Message not found." }, { status: 404 });
     }
 
-    const isAdmin = isCallerAdmin(requesterCallsign || undefined, requesterRole || undefined);
     const isAuthor = isCallerAuthor(existing, requesterCallsign || undefined, requesterId || undefined);
 
     if (!isAdmin && !isAuthor) {
@@ -255,7 +260,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     const deleted = await deleteStoredChatMessage(id);
-    if (!deleted) {
+    if (!deleted && !isAdmin) {
       return NextResponse.json({ error: "Failed to delete transmission." }, { status: 500 });
     }
 

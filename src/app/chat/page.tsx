@@ -814,14 +814,22 @@ export default function ChatPage() {
 
         // 1. Process messages for active channel
         if (Array.isArray(data.messages)) {
+          let locallyDeleted = new Set<string>();
+          if (typeof window !== "undefined") {
+            try {
+              locallyDeleted = new Set(JSON.parse(localStorage.getItem("subsonic_deleted_chat_ids") || "[]"));
+            } catch {}
+          }
+          const validMessages = data.messages.filter((m: ChatMessage) => !locallyDeleted.has(m.id));
+
           setMessages((prev) => {
             const incomingMap = new Map<string, ChatMessage>(
-              data.messages.map((m: ChatMessage) => [m.id, m])
+              validMessages.map((m: ChatMessage) => [m.id, m])
             );
             const prevIds = new Set(prev.map((m) => m.id));
 
             // Check if any new external messages arrived for the comms chirp
-            const newIncoming = data.messages.filter((m: ChatMessage) => !prevIds.has(m.id));
+            const newIncoming = validMessages.filter((m: ChatMessage) => !prevIds.has(m.id));
             if (newIncoming.length > 0) {
               const hasExternalMsg = newIncoming.some(
                 (m: ChatMessage) => m.author.callsign?.toUpperCase() !== myCallsign.toUpperCase()
@@ -836,7 +844,7 @@ export default function ChatPage() {
             }
 
             // Update existing messages with edited content, reactions, or status
-            let updated = prev.map((m) => {
+            let updated = prev.filter((m) => !locallyDeleted.has(m.id)).map((m) => {
               const serverMsg = incomingMap.get(m.id);
               if (serverMsg) {
                 if (
@@ -1598,8 +1606,19 @@ export default function ChatPage() {
   };
 
   const handleDeleteMessage = async (messageId: string) => {
-    // Optimistic update
+    // 1. Optimistic update
     setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+    // 2. Persist deleted message ID in localStorage so client-side sync never restores it
+    if (typeof window !== "undefined") {
+      try {
+        const stored: string[] = JSON.parse(localStorage.getItem("subsonic_deleted_chat_ids") || "[]");
+        if (!stored.includes(messageId)) {
+          stored.push(messageId);
+          localStorage.setItem("subsonic_deleted_chat_ids", JSON.stringify(stored.slice(-500)));
+        }
+      } catch {}
+    }
 
     try {
       const res = await fetch("/api/chat/messages", {
@@ -1614,7 +1633,7 @@ export default function ChatPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        console.error("Delete message failed:", errData.error);
+        console.warn("Delete message server status:", errData.error || errData);
       } else {
         playTacticalChirp(700);
       }
