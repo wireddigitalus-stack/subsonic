@@ -214,8 +214,7 @@ export function ChatChannelSidebar({
                   const pLastSeen = (lastActiveMap && lastActiveMap[pCallsign]) || 0;
                   const isOnline =
                     isRO ||
-                    (onlineCallsigns && onlineCallsigns.some((c) => c.toUpperCase() === pCallsign)) ||
-                    partner.status === "online" ||
+                    Boolean(onlineCallsigns && onlineCallsigns.some((c) => c.toUpperCase() === pCallsign)) ||
                     (pLastSeen > 0 && Date.now() - pLastSeen < 30_000);
                   const pColor = getAvatarColor(partner.avatarColor, pCallsign || partner.name);
                   const pInitials = getUserInitials(partner.name, partner.callsign);

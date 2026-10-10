@@ -19,13 +19,15 @@ import {
   ExternalLink
 } from "lucide-react";
 import { DirectPartner } from "@/lib/types";
-import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
+import { getUserInitials, getAvatarColor, formatLastActive } from "@/lib/avatar-colors";
 
 export interface ShooterDossierModalProps {
   isOpen: boolean;
   onClose: () => void;
   shooter: DirectPartner | null;
   onStartDirectComms: (shooter: DirectPartner) => void;
+  onlineCallsigns?: string[];
+  lastActiveMap?: Record<string, number>;
 }
 
 export function ShooterDossierModal({
@@ -33,12 +35,21 @@ export function ShooterDossierModal({
   onClose,
   shooter,
   onStartDirectComms,
+  onlineCallsigns = [],
+  lastActiveMap = {},
 }: ShooterDossierModalProps) {
   if (!isOpen || !shooter) return null;
 
   const isRO = shooter.callsign === "RO" || shooter.callsign === "RO BOT" || shooter.name === "RO" || shooter.name === "RO BOT" || shooter.id === "dm_ro";
   const isMasterOwner = shooter.role === "MASTER_OWNER" || shooter.callsign === "ROB" || shooter.callsign === "RADAR";
   const isOwnerAdmin = shooter.role === "OWNER_ADMIN" || shooter.callsign === "SUBX" || shooter.callsign === "ALLEN";
+  const sCallsign = (shooter.callsign || "").toUpperCase();
+  const sLastSeen = (lastActiveMap && lastActiveMap[sCallsign]) || 0;
+  const isOnline =
+    isRO ||
+    Boolean(onlineCallsigns && onlineCallsigns.some((c) => c.toUpperCase() === sCallsign)) ||
+    (sLastSeen > 0 && Date.now() - sLastSeen < 30_000);
+  const lastActiveText = formatLastActive(sLastSeen, isOnline);
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
@@ -132,10 +143,22 @@ export function ShooterDossierModal({
                 )}
               </span>
 
-              <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                {shooter.status === "on_range" ? "ON RANGE" : "ONLINE 24/7"}
-              </span>
+              {isRO ? (
+                <span className="text-[10px] font-mono text-cyan-400 flex items-center gap-1 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />
+                  ONLINE 24/7
+                </span>
+              ) : isOnline ? (
+                <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                  ONLINE
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-600 inline-block" />
+                  {lastActiveText}
+                </span>
+              )}
             </div>
           </div>
         </div>

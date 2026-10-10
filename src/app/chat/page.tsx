@@ -264,7 +264,7 @@ export default function ChatPage() {
         name: other,
         role: "PRO_COMPETITOR" as const,
         badgeText: "COMPETITOR",
-        status: "online" as const,
+        status: "offline" as const,
         bio: "Verified competitor on direct encrypted frequency.",
       };
     }
@@ -276,7 +276,7 @@ export default function ChatPage() {
       name: clean,
       role: "PRO_COMPETITOR" as const,
       badgeText: "COMPETITOR",
-      status: "online" as const,
+      status: "offline" as const,
       bio: "Verified competitor on direct encrypted frequency.",
     };
   }, [currentChannel, directPartners, isDirectMode, shooterProfile.callsign]);
@@ -921,7 +921,7 @@ export default function ChatPage() {
                   role: conv.partnerRole || "PRO_COMPETITOR",
                   badgeText: conv.partnerRole === "MASTER_OWNER" ? "DEV ADVISOR" : conv.partnerRole === "OWNER_ADMIN" ? "OWNER ADMIN" : "PRO SHOOTER",
                   division: conv.partnerDivision || "Pro Division",
-                  status: "online",
+                  status: "offline",
                   bio: "Verified competitor on direct encrypted frequency.",
                 });
                 changed = true;
@@ -3285,6 +3285,8 @@ export default function ChatPage() {
         onPlayChirp={playTacticalChirp}
         directPartners={directPartners}
         initialTab={channelModalInitialTab}
+        onlineCallsigns={onlineCallsigns}
+        lastActiveMap={lastActiveMap}
       />
 
       {/* 7. SHOOTER DOSSIER MODAL */}
@@ -3293,6 +3295,8 @@ export default function ChatPage() {
         onClose={() => setIsDossierModalOpen(false)}
         shooter={selectedDossierShooter}
         onStartDirectComms={handleStartDirectComms}
+        onlineCallsigns={onlineCallsigns}
+        lastActiveMap={lastActiveMap}
       />
 
       {/* 8. TERMS OF USE & CODE OF CONDUCT MODAL */}

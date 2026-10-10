@@ -39,6 +39,8 @@ interface ChannelPickerModalProps {
   onPlayChirp?: (freq?: number) => void;
   directPartners?: DirectPartner[];
   initialTab?: "ALL" | "MATCH" | "DIRECT";
+  onlineCallsigns?: string[];
+  lastActiveMap?: Record<string, number>;
 }
 
 export function ChannelPickerModal({
@@ -52,6 +54,8 @@ export function ChannelPickerModal({
   onPlayChirp,
   directPartners = [],
   initialTab = "ALL",
+  onlineCallsigns = [],
+  lastActiveMap = {},
 }: ChannelPickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState<"ALL" | "MATCH" | "DIRECT">(initialTab);
@@ -390,7 +394,12 @@ export function ChannelPickerModal({
                 const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                 const isOwnerAdmin = partner.role === "OWNER_ADMIN" || partner.callsign === "SUBX" || partner.callsign === "ALLEN";
                 const isMasterOwner = partner.role === "MASTER_OWNER" || partner.callsign === "ROB" || partner.callsign === "RADAR";
-                const isOnline = isRO || partner.status === "online";
+                const pCallsign = (partner.callsign || "").toUpperCase();
+                const pLastSeen = (lastActiveMap && lastActiveMap[pCallsign]) || 0;
+                const isOnline =
+                  isRO ||
+                  Boolean(onlineCallsigns && onlineCallsigns.some((c) => c.toUpperCase() === pCallsign)) ||
+                  (pLastSeen > 0 && Date.now() - pLastSeen < 30_000);
 
                 return (
                   <button

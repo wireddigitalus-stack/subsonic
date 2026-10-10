@@ -100,7 +100,7 @@ export function getAvatarColor(customColor?: string, seedString?: string): Tacti
  */
 export function formatLastActive(lastActiveEpochMs?: number, isOnline?: boolean): string {
   if (isOnline) return "Active now";
-  if (!lastActiveEpochMs || lastActiveEpochMs <= 0) return "Active today";
+  if (!lastActiveEpochMs || lastActiveEpochMs <= 0) return "Offline";
 
   const diffMs = Math.max(0, Date.now() - lastActiveEpochMs);
   if (diffMs < 45_000) return "Active now";
@@ -114,6 +114,7 @@ export function formatLastActive(lastActiveEpochMs?: number, isOnline?: boolean)
   const days = Math.floor(hours / 24);
   if (days === 1) return "Active yesterday";
   if (days < 7) return `Active ${days}d ago`;
+  if (days < 30) return `Active ${Math.floor(days / 7)}w ago`;
 
-  return "Active recently";
+  return "Offline";
 }
