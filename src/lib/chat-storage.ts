@@ -55,6 +55,7 @@ function mapToDb(m: StoredChatMessage) {
     dope_card: m.dopeCard ?? null,
     author: {
       ...m.author,
+      ...(m.imageUrl ? { imageUrl: m.imageUrl } : {}),
       ...(m.isEdited ? { isEdited: true, editedAt: m.editedAt } : {}),
     },
     content: m.content ?? "",
@@ -69,11 +70,13 @@ function mapFromDb(row: any): StoredChatMessage {
   const createdAtMs = new Date(row.created_at).getTime();
   const isEdited = Boolean(row.is_edited || row.author?.isEdited || row.author?.is_edited);
   const editedAt = row.edited_at || row.author?.editedAt || row.author?.edited_at || undefined;
+  const imageUrl = row.image_url || row.author?.imageUrl || row.author?.image_url || undefined;
   return {
     id: row.id,
     channelId: row.channel_id,
     type: row.type || "STANDARD",
     dopeCard: row.dope_card || undefined,
+    imageUrl,
     author: row.author || { id: "unknown", name: "Verified Marksman", role: "MEMBER" },
     content: row.content || "",
     timestamp: formatDisplayTime(createdAtMs),

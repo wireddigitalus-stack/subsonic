@@ -1,7 +1,7 @@
 "use client";
 
 import React, { RefObject } from "react";
-import { Mic, Crosshair, Send } from "lucide-react";
+import { Mic, Crosshair, Send, Camera, X } from "lucide-react";
 
 
 export interface ChatInputBarProps {
@@ -16,6 +16,8 @@ export interface ChatInputBarProps {
   isAiScanning: boolean;
   shooterProfile: any;
   scrollContainerToBottom?: (smooth?: boolean) => void;
+  pendingImage?: string | null;
+  setPendingImage?: (val: string | null) => void;
 }
 
 export function ChatInputBar({
@@ -30,11 +32,83 @@ export function ChatInputBar({
   isAiScanning,
   shooterProfile,
   scrollContainerToBottom,
+  pendingImage = null,
+  setPendingImage,
 }: ChatInputBarProps) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !setPendingImage) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDim = 1200;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.78);
+          setPendingImage(compressed);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
   return (
     <>
       {/* TRANSMITTER INPUT BAR */}
       <form id="tour-step-ptt" onSubmit={handleSendMessage} className="p-2 md:p-4 bg-black/85 shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:pb-[max(0.6rem,env(safe-area-inset-bottom))]">
+        {/* Hidden photo file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+
+        {/* Pending Image Attachment Preview */}
+        {pendingImage && (
+          <div className="mb-2 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 animate-fadeIn">
+            <img
+              src={pendingImage}
+              alt="Photo preview"
+              className="w-9 h-9 object-cover rounded-lg border border-amber-400/40 shrink-0"
+            />
+            <div className="text-left">
+              <span className="text-xs font-mono font-bold text-amber-300 block">Photo Attached</span>
+              <span className="text-[10px] text-slate-400 font-mono">Ready to transmit</span>
+            </div>
+            {setPendingImage && (
+              <button
+                type="button"
+                onClick={() => setPendingImage(null)}
+                className="p-1 rounded-full hover:bg-black/40 text-slate-400 hover:text-white transition-colors ml-1"
+                title="Remove photo"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center gap-1.5 md:gap-2">
           {/* Main text input */}
           <input
@@ -42,6 +116,8 @@ export function ChatInputBar({
             placeholder={
               isListening
                 ? "Listening…"
+                : pendingImage
+                ? "Add an optional caption..."
                 : currentChannelData.name.startsWith("dm:")
                 ? `Direct message to ${currentChannelData.name.replace("dm: ", "").toUpperCase()}...`
                 : typeof window !== "undefined" && window.innerWidth < 768
@@ -74,6 +150,20 @@ export function ChatInputBar({
             className="flex-1 min-w-0 px-3 py-2.5 md:px-4 md:py-3 rounded-full md:rounded-2xl bg-white/[0.06] border border-white/10 text-white text-sm md:text-base focus:border-amber-400 focus:outline-none placeholder:text-slate-400 placeholder:text-sm"
           />
 
+          {/* Photo upload camera button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-2.5 md:p-3 rounded-full md:rounded-2xl border transition-all flex items-center justify-center shrink-0 ${
+              pendingImage
+                ? "bg-amber-500/20 border-amber-500/50 text-amber-300"
+                : "bg-white/10 hover:bg-white/20 border-white/10 text-slate-300 hover:text-white"
+            }`}
+            title="Attach target group, barricade, or rig photo"
+          >
+            <Camera className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+
           {/* Push-to-Talk mic button */}
           <button
             type="button"
@@ -87,18 +177,6 @@ export function ChatInputBar({
           >
             <Mic className={`w-4 h-4 md:w-5 md:h-5 ${isListening ? "text-white" : "text-slate-300"}`} />
           </button>
-
-          {/* DOPE card button — hidden for initial onboarding, re-enable when ready */}
-          {/* <button
-            id="tour-step-dope"
-            type="button"
-            onClick={() => setIsDopeModalOpen(true)}
-            className="hidden md:flex p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-cyan-300 hover:text-cyan-200 transition-all items-center gap-1 text-sm font-mono shrink-0"
-            title="Drop DOPE Card"
-          >
-            <Crosshair className="w-4 h-4" />
-            <span>DOPE</span>
-          </button> */}
 
           {/* Send */}
           <button

@@ -111,6 +111,7 @@ export function ChatMessageList({
   const [editContent, setEditContent] = React.useState("");
   const [deletingMessageId, setDeletingMessageId] = React.useState<string | null>(null);
   const [isSubmittingEdit, setIsSubmittingEdit] = React.useState(false);
+  const [viewingImageUrl, setViewingImageUrl] = React.useState<string | null>(null);
 
   const isCurrentUserAdmin = Boolean(
     shooterProfile &&
@@ -713,6 +714,29 @@ export function ChatMessageList({
                   )
                 )}
 
+                {/* Photo Attachment Card */}
+                {msg.imageUrl && (
+                  <div className="pt-1 max-w-sm sm:max-w-md">
+                    <div
+                      onClick={() => setViewingImageUrl(msg.imageUrl || null)}
+                      className="relative group rounded-xl overflow-hidden border border-white/15 bg-black/60 cursor-pointer shadow-lg hover:border-amber-400/60 transition-all"
+                    >
+                      <img
+                        src={msg.imageUrl}
+                        alt="Transmitted image"
+                        className="w-full max-h-72 object-cover object-center group-hover:scale-[1.02] transition-transform duration-200"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2.5 justify-between">
+                        <span className="text-[11px] font-mono text-amber-300 font-semibold flex items-center gap-1">
+                          <Maximize2 className="w-3.5 h-3.5" />
+                          Click to inspect
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* DOPE CARD — hidden for initial onboarding */}
 
                 {/* Staff Moderation Flag Notice */}
@@ -900,6 +924,31 @@ export function ChatMessageList({
           </span>
         </button>
       </div>
+
+      {/* Fullscreen Lightbox Modal */}
+      {viewingImageUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 animate-fadeIn"
+          onClick={() => setViewingImageUrl(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full flex flex-col items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setViewingImageUrl(null)}
+              className="absolute -top-11 right-0 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              title="Close image inspection"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img
+              src={viewingImageUrl}
+              alt="High-resolution inspection"
+              className="max-h-[82vh] max-w-full object-contain rounded-xl border border-white/20 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

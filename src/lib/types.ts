@@ -109,6 +109,7 @@ export interface ChatMessage {
   channelId: string;
   type?: "STANDARD" | "DOPE_DROP" | "MATCH_ALERT" | "RADIO_CHECK";
   dopeCard?: DopeCardData;
+  imageUrl?: string;
   author: {
     id: string;
     name: string;

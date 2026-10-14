@@ -8,6 +8,7 @@ import { ChatMessageList } from "@/components/chat/ChatMessageList";
 import { ShooterDossierModal } from "@/components/chat/ShooterDossierModal";
 import { ChatTermsModal } from "@/components/chat/ChatTermsModal";
 import { ChatMobileMenuModal } from "@/components/chat/ChatMobileMenuModal";
+import { ActiveMarksmenModal } from "@/components/chat/ActiveMarksmenModal";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
@@ -244,6 +245,8 @@ export default function ChatPage() {
   const [directPartners, setDirectPartners] = useState<DirectPartner[]>(INITIAL_DIRECT_PARTNERS);
   const [selectedDossierShooter, setSelectedDossierShooter] = useState<DirectPartner | null>(null);
   const [isDossierModalOpen, setIsDossierModalOpen] = useState(false);
+  const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
 
   const isDirectMode = currentChannel.startsWith("dm_");
   const activeDirectPartner = useMemo(() => {
@@ -981,11 +984,36 @@ export default function ChatPage() {
     // Immediate initial sync on channel switch
     syncMessages();
 
-    // Fast polling loop for near-instant cross-device comms
-    const pollInterval = setInterval(syncMessages, 2500);
+    // Adaptive polling loop: 2.5s when active tab, 12s when backgrounded
+    let pollInterval: ReturnType<typeof setInterval>;
+    const setupPolling = (delay: number) => {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(syncMessages, delay);
+    };
+
+    const isHidden = typeof document !== "undefined" && document.hidden;
+    setupPolling(isHidden ? 12000 : 2500);
+
+    const handleVisibilityChange = () => {
+      if (!isMounted) return;
+      if (document.hidden) {
+        setupPolling(12000);
+      } else {
+        syncMessages();
+        setupPolling(2500);
+      }
+    };
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+    }
+
     return () => {
       isMounted = false;
-      clearInterval(pollInterval);
+      if (pollInterval) clearInterval(pollInterval);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+      }
     };
   }, [currentChannel, isAuthenticated, shooterProfile.callsign]);
 
@@ -1372,37 +1400,48 @@ export default function ChatPage() {
   // (/api/chat/messages, polled every 2.5s). The browser no longer talks to the
   // database directly, so database access rules can stay locked down.
 
-  // Handle Transmitting Message (Standard or DOPE Card)
-  const handleTransmit = async (content: string, type: "STANDARD" | "DOPE_DROP" = "STANDARD", dopeCard?: DopeCardData) => {
-    if (!content.trim() && !dopeCard) return;
+  // Handle Transmitting Message (Standard or DOPE Card or Photo)
+  const handleTransmit = async (
+    content: string,
+    type: "STANDARD" | "DOPE_DROP" = "STANDARD",
+    dopeCard?: DopeCardData,
+    imageUrl?: string
+  ) => {
+    if (!content.trim() && !dopeCard && !imageUrl) return;
 
     setIsAiScanning(true);
 
     let evaluation: any = null;
     let aiEngine = "Google Gemini 2.5 Flash";
 
-    // 1. Try server-side Gemini 2.5 Flash route
-    try {
-      const res = await fetch("/api/moderate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: content + (dopeCard ? ` [DOPE Card: ${dopeCard.targetDistance} ${dopeCard.notes || ""}]` : ""),
-          authorRole: shooterProfile.role,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        evaluation = data.report;
-        aiEngine = data.engine === "gemini-2.5-flash" ? "Google Gemini 2.5 Flash" : "Subsonic Neural Guard";
-      }
-    } catch {
-      // Fallback to local rule engine
-    }
+    const textToScan = content.trim() || (imageUrl ? "Transmitted photo attachment" : "");
 
-    if (!evaluation) {
-      evaluation = evaluateChatMessage(content, shooterProfile.role);
-      aiEngine = "Subsonic Local Sentinel";
+    // 1. Try server-side Gemini 2.5 Flash route
+    if (textToScan) {
+      try {
+        const res = await fetch("/api/moderate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: textToScan + (dopeCard ? ` [DOPE Card: ${dopeCard.targetDistance} ${dopeCard.notes || ""}]` : ""),
+            authorRole: shooterProfile.role,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          evaluation = data.report;
+          aiEngine = data.engine === "gemini-2.5-flash" ? "Google Gemini 2.5 Flash" : "Subsonic Neural Guard";
+        }
+      } catch {
+        // Fallback to local rule engine
+      }
+
+      if (!evaluation) {
+        evaluation = evaluateChatMessage(textToScan, shooterProfile.role);
+        aiEngine = "Subsonic Local Sentinel";
+      }
+    } else {
+      evaluation = { status: "APPROVED", toxicityScore: 0, threatScore: 0, policyScore: 0, sentiment: "neutral" };
     }
 
     setIsAiScanning(false);
@@ -1463,6 +1502,7 @@ export default function ChatPage() {
       channelId: currentChannel,
       type: type,
       dopeCard: dopeCard,
+      imageUrl: imageUrl || undefined,
       author: {
         id: "usr_" + shooterProfile.callsign.toLowerCase(),
         name: shooterProfile.name,
@@ -1490,6 +1530,7 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, newMsg]);
     setInputText("");
+    setPendingImage(null);
 
     // Smoothly scroll only within the container for user's own sent message
     setTimeout(() => scrollContainerToBottom(true), 50);
@@ -1552,10 +1593,10 @@ export default function ChatPage() {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() && !pendingImage) return;
     setIsTyping(false);
     if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-    handleTransmit(inputText, "STANDARD");
+    handleTransmit(inputText.trim(), "STANDARD", undefined, pendingImage || undefined);
   };
 
   const handleSendDopeCard = (e: React.FormEvent) => {
@@ -2319,7 +2360,6 @@ export default function ChatPage() {
                         type="button"
                         onClick={() => {
                           setIsChatUserMenuOpen(false);
-                          setProfileForm(shooterProfile);
                           setProfileActiveTab("PASS");
                           setIsProfileModalOpen(true);
                         }}
@@ -2327,6 +2367,22 @@ export default function ChatPage() {
                       >
                         <QrCode className="w-4 h-4 text-emerald-400" />
                         <span>Digital Member Pass</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
+                          setIsRosterModalOpen(true);
+                          playTacticalChirp(1050);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <Users className="w-4 h-4 text-emerald-400" />
+                        <span className="flex-1">Active Marksmen</span>
+                        <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                          {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
+                        </span>
                       </button>
 
                       {isShooterAdmin && (
@@ -2389,8 +2445,21 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              {/* Right: Tactical Utilities (Tour Guide, Fullscreen, Audio, Pass) */}
+              {/* Right: Tactical Utilities (Roster, Tour Guide, Fullscreen, Audio, Pass) */}
               <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRosterModalOpen(true);
+                    playTacticalChirp(1050);
+                  }}
+                  className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all cursor-pointer"
+                  title="View Active Marksmen Online Roster"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -2525,6 +2594,20 @@ export default function ChatPage() {
             >
               <Scale className="w-3 h-3 text-amber-400" />
               <span>TERMS</span>
+            </button>
+
+            {/* Active Marksmen Online Roster Pill */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsRosterModalOpen(true);
+                playTacticalChirp(1050);
+              }}
+              className="h-7 px-2 sm:px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all cursor-pointer"
+              title="View Active Marksmen Online Roster"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="hidden xs:inline">{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
             </button>
 
             {/* Audio Toggle */}
@@ -2856,6 +2939,8 @@ export default function ChatPage() {
             isAiScanning={isAiScanning}
             shooterProfile={shooterProfile}
             scrollContainerToBottom={scrollContainerToBottom}
+            pendingImage={pendingImage}
+            setPendingImage={setPendingImage}
           />
         </div>
       </div>
@@ -3297,6 +3382,17 @@ export default function ChatPage() {
         onStartDirectComms={handleStartDirectComms}
         onlineCallsigns={onlineCallsigns}
         lastActiveMap={lastActiveMap}
+      />
+
+      {/* 7.5 ACTIVE MARKSMEN ONLINE ROSTER MODAL */}
+      <ActiveMarksmenModal
+        isOpen={isRosterModalOpen}
+        onClose={() => setIsRosterModalOpen(false)}
+        onlineCallsigns={onlineCallsigns}
+        lastActiveMap={lastActiveMap}
+        directPartners={directPartners}
+        onStartDirectComms={handleStartDirectComms}
+        onPlayChirp={playTacticalChirp}
       />
 
       {/* 8. TERMS OF USE & CODE OF CONDUCT MODAL */}
