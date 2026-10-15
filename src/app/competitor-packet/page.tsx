@@ -350,14 +350,6 @@ export default function CompetitorPacketPage() {
               <Share2 className="w-4 h-4" />
               <span>{copiedLink ? "Link Copied!" : "Share Guide"}</span>
             </button>
-            <a
-              href={PDF_URL}
-              download="2026-Subsonic-Society-Invitational-Competitor-Packet.pdf"
-              className="px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center gap-2 shadow-tactical-glow"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Official PDF (246 KB)</span>
-            </a>
           </div>
         </div>
       </div>
@@ -390,10 +382,10 @@ export default function CompetitorPacketPage() {
               </span>
             </h1>
             <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
-              Everything you need for the championship weekend: Founder Allen Hurley’s welcome address, 
-              full 3-day schedule, <strong className="text-amber-400 font-bold">$7,500 total cash prizes ($5,000 main match + $2,500 cash side matches)</strong>, 
-              <strong className="text-emerald-400 font-bold">Saturday lunch &amp; dinner included</strong>, 
-              The Hideout match details, 12 recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
+              Founder Allen Hurley’s welcome address, weekend schedule,{" "}
+              <strong className="text-amber-400 font-bold">$7,500 total cash prizes ($5,000 main match + $2,500 side matches)</strong>,{" "}
+              <strong className="text-emerald-400 font-bold">Saturday lunch &amp; dinner provided</strong>,{" "}
+              recommended hotels, Bristol dining, and South Holston fly-fishing guide.
             </p>
           </div>
 
@@ -423,54 +415,16 @@ export default function CompetitorPacketPage() {
                 Hospitality
               </div>
               <div className="text-lg sm:text-xl font-black text-emerald-400 mt-1">Saturday Lunch &amp; Dinner</div>
-              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Included With Registration</div>
+              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Provided Saturday</div>
             </div>
 
             <div className="p-4 rounded-xl bg-white/[0.03] border border-amber-500/20 backdrop-blur-sm shadow-[0_0_15px_rgba(245,158,11,0.08)]">
               <div className="text-xs sm:text-sm font-mono text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Target className="w-4 h-4 text-amber-400" />
-                Cash Prizes &amp; Purses
+                Cash Prizes
               </div>
               <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">$7,500 Total Cash Prizes</div>
               <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">$5,000 Main Match • $2,500 Side Matches</div>
-            </div>
-          </div>
-
-          {/* Quick PDF Action Hero Card */}
-          <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                <FileText className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 flex-wrap">
-                  <span>Official Printable Competitor Packet (PDF)</span>
-                  <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">4 Pages • 246 KB</span>
-                </h4>
-                <p className="text-sm sm:text-base text-slate-300 mt-1">
-                  Full original document as distributed by Allen Hurley & Modacam Custom Rifles.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
-              <a
-                href={PDF_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/15 border border-white/15 text-white transition-all flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Open in Tab</span>
-              </a>
-              <a
-                href={PDF_URL}
-                download="2026-Subsonic-Society-Invitational-Competitor-Packet.pdf"
-                className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-black bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black shadow-tactical-glow transition-all flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download PDF</span>
-              </a>
             </div>
           </div>
         </div>
@@ -481,62 +435,50 @@ export default function CompetitorPacketPage() {
         <div className="max-w-7xl mx-auto space-y-2.5">
           <div className="flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">
             <Compass className="w-4 h-4 text-amber-400" />
-            <span>Match Packet Sections & Jump Navigation</span>
+            <span>Match Packet Sections</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1.5 sm:gap-2 text-xs sm:text-sm font-mono">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2 text-xs sm:text-sm font-mono">
             <a
               href="#welcome"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Allen&apos;s Welcome
-            </a>
-            <a
-              href="#facility"
-              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
-            >
-              The Hideout
+              Welcome
             </a>
             <a
               href="#schedule"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Weekend Schedule
-            </a>
-            <a
-              href="#hospitality"
-              className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
-            >
-              Food & Hospitality
+              Schedule
             </a>
             <a
               href="#hotels"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Lodging (12)
+              Lodging
             </a>
             <a
               href="#dining"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Bristol Dining (10)
+              Bristol Dining
             </a>
             <a
               href="#attractions"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Attractions (10)
+              Attractions
             </a>
             <a
               href="#fishing"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Trout Fly Fishing
+              Fly Fishing
             </a>
             <a
               href="#rules"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold col-span-2 sm:col-span-1"
             >
-              Terms &amp; Waiver
+              Info &amp; Contact
             </a>
           </div>
         </div>
@@ -591,221 +533,61 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 2: The Hideout — Your Invitational Home */}
-        <section id="facility" className="scroll-mt-24 space-y-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-blue-400 font-bold">
-              <Navigation className="w-4 h-4" />
-              <span>Private Property &amp; Match Setting</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              The Hideout — Your Invitational Home
-            </h2>
-            <p className="text-base text-slate-300 max-w-3xl leading-relaxed">
-              The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — but have no fear, it is in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-blue-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                <Target className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">Dedicated 300-Yard Rimfire Range</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Dedicated 300-yard rimfire range and PRS-style positional rifle range set up for the Invitational stages.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-amber-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Target className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">1,000-Yard Long-Range Rifle Range</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                1,000-yard long-range rifle range with 50-yard, 100-yard, and 200-yard zero available during scheduled sight-in windows.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-cyan-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                <Coffee className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">24&apos; x 40&apos; Covered Pavilion</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                24&apos; x 40&apos; covered pavilion with two restrooms and showers at the shooting range.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-purple-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                <Flame className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">20&apos; x 20&apos; Fire Pit</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                20&apos; x 20&apos; fire pit ready for relaxing in the evenings after the match stages.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 3: Master Weekend Schedule */}
+        {/* SECTION 2: Schedule */}
         <section id="schedule" className="scroll-mt-24 space-y-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">
               <Calendar className="w-4 h-4" />
-              <span>Official 3-Day Itinerary</span>
+              <span>Schedule</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              Match Weekend Schedule — November 13–15, 2026
+              Weekend Schedule — November 13–15, 2026
             </h2>
-            <p className="text-base text-slate-300 max-w-3xl">
-              Strict timelines ensure maximum trigger time, professional squad rotations, and evening hospitality.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Friday */}
             <div className="rounded-2xl bg-white/[0.02] border border-white/10 p-5 sm:p-6 space-y-4">
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 1 • Arrival</div>
-                  <h3 className="text-lg font-black text-white">Friday, Nov 13</h3>
-                </div>
-                <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-400 text-xs font-mono font-bold">Registration &amp; Sight-In</span>
+                <h3 className="text-lg font-black text-white">Friday</h3>
               </div>
 
-              <div className="space-y-3.5 font-sans">
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">12:00 – 5:00 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">Range Open:</span> Competitor registration and sight-in only (50-yard, 100-yard, and 200-yard zero available).
-                  </div>
-                </div>
-              </div>
+              <ul className="space-y-2.5 text-sm sm:text-base text-slate-200 font-sans">
+                <li>Range open 12–5</li>
+                <li>Registration and sight in only</li>
+              </ul>
             </div>
 
             {/* Saturday */}
-            <div className="rounded-2xl bg-white/[0.02] border border-amber-500/30 p-5 sm:p-6 space-y-4 shadow-lg shadow-amber-500/5">
+            <div className="rounded-2xl bg-white/[0.02] border border-amber-500/30 p-5 sm:p-6 space-y-4">
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 2 • 8 Stages</div>
-                  <h3 className="text-lg font-black text-white">Saturday, Nov 14</h3>
-                </div>
+                <h3 className="text-lg font-black text-white">Saturday</h3>
                 <span className="px-2.5 py-1 rounded bg-amber-500 text-black text-xs font-black uppercase font-mono">$5,000 Main Match</span>
               </div>
 
-              <div className="space-y-3.5 font-sans">
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">Range Open:</span> Gates open for Saturday arrival.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 – 8:30 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Registration &amp; Sight-In:</span> Competitor check-in and 50/100/200-yard sight-in open until 8:30 AM.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">8:30 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Shooter Briefing:</span> Mandatory safety and match briefing at the Pavilion.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">9:00 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">First Shot — 8 Stages:</span> Main match stages commence.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">Hospitality</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Lunch &amp; Dinner Provided:</span> On-site lunch and dinner provided for competitors.
-                  </div>
-                </div>
-              </div>
+              <ul className="space-y-2.5 text-sm sm:text-base text-slate-200 font-sans">
+                <li>Open 7am</li>
+                <li>Registration and sight in until 8:30</li>
+                <li>Shooter brief 8:30</li>
+                <li>First shot 9am</li>
+                <li className="font-bold text-amber-400">8 stages — lunch and dinner provided</li>
+              </ul>
             </div>
 
             {/* Sunday */}
             <div className="rounded-2xl bg-white/[0.02] border border-white/10 p-5 sm:p-6 space-y-4">
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">Day 3 • 4 Stages + 2 Side Stages</div>
-                  <h3 className="text-lg font-black text-white">Sunday, Nov 15</h3>
-                </div>
+                <h3 className="text-lg font-black text-white">Sunday</h3>
                 <span className="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold">$2,500 Side Matches</span>
               </div>
 
-              <div className="space-y-3.5 font-sans">
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">Range Open:</span> Gates open for Sunday competition.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 – 8:30 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Sight-In:</span> 50-yard, 100-yard, and 200-yard sight-in open until 8:30 AM.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">8:30 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Shooter Briefing:</span> Morning safety and finals briefing.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">9:00 AM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">First Shot — 4 Stages:</span> Final 4 main match championship stages.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
-                  <div className="font-mono text-emerald-400 shrink-0 w-24 sm:w-28 font-bold">2 Stages</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-emerald-400">2 Cash Side Match Stages ($2,500 Purse):</span> Special cash side stages following the 4 main stages, followed by Awards &amp; Payouts.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 4: Food & Hospitality */}
-        <section id="hospitality" className="scroll-mt-24 space-y-6">
-          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-500/15 via-black to-zinc-900 border border-amber-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">
-                <Utensils className="w-4 h-4" />
-                <span>Competitor Hospitality Included</span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white">
-                Saturday Lunch &amp; Dinner Covered With Competitor Registration
-              </h3>
-              <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-                Saturday lunch and Saturday dinner are provided on-site for registered competitors.
-              </p>
-            </div>
-
-            <div className="shrink-0 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs sm:text-sm font-mono">
-              <div className="text-slate-300 font-bold tracking-wider">HOSPITALITY PASS</div>
-              <div className="text-lg font-black text-emerald-400">SATURDAY MEALS INCLUDED</div>
-              <div className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                • Saturday Lunch Provided<br />
-                • Saturday Dinner Provided
-              </div>
+              <ul className="space-y-2.5 text-sm sm:text-base text-slate-200 font-sans">
+                <li>Open 7am</li>
+                <li>7–8:30 sight in</li>
+                <li>Shooter brief 8:30</li>
+                <li>First shot 9am</li>
+                <li className="font-bold text-emerald-400">4 stages • 2 stages</li>
+              </ul>
             </div>
           </div>
         </section>
@@ -1113,39 +895,33 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 9: Platform Restriction & Event Waiver */}
+        {/* SECTION 7: Event Info, Waiver & Contact */}
         <section id="rules" className="scroll-mt-24 space-y-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-red-400 font-bold">
-              <ShieldAlert className="w-4 h-4" />
-              <span>Terms &amp; Event Waiver</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              Firearm Sales Restriction &amp; Event Waiver
-            </h2>
-            <p className="text-base text-slate-300 max-w-3xl">
-              The only platform restriction is the prohibition on firearm and ammunition sales. All other requirements and rules will be done with a waiver at the event.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 sm:p-6 rounded-2xl bg-red-950/30 border border-red-500/30 space-y-2.5">
-              <h4 className="text-base sm:text-lg font-bold text-red-400 flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 shrink-0" />
-                Restriction on Firearm &amp; Ammunition Sales
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+              <h4 className="text-base sm:text-lg font-bold text-amber-400">
+                Zero Range
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                Under no circumstances may this platform, chat system, or direct channels be used to <strong className="text-white">buy, sell, trade, broker, or solicit the transfer of firearms, ammunition, serialized receivers, or regulated components</strong>.
+                50 yard, 100 yard, and 200 yard zero available.
               </p>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
-              <h4 className="text-base sm:text-lg font-bold text-amber-400 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 shrink-0" />
-                All Else Handled by Event Waiver
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+              <h4 className="text-base sm:text-lg font-bold text-amber-400">
+                Eye &amp; Ear Protection
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                All other rules, safety protocols, and liability requirements will be done with a waiver in person at the event during check-in at The Hideout.
+                Eye and ear protection is recommended at all times.
+              </p>
+            </div>
+
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+              <h4 className="text-base sm:text-lg font-bold text-amber-400">
+                Terms &amp; Event Waiver
+              </h4>
+              <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
+                Restriction on firearm sales on this platform. Everything else including waiver will be done day of event.
               </p>
             </div>
           </div>
@@ -1160,12 +936,10 @@ export default function CompetitorPacketPage() {
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <a
-                href={PDF_URL}
-                download="2026-Subsonic-Society-Invitational-Competitor-Packet.pdf"
+                href="mailto:ahurley@subsonicsociety.com"
                 className="w-full sm:w-auto px-5 py-3 rounded-xl text-sm font-black bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center justify-center gap-2 shadow-tactical-glow"
               >
-                <Download className="w-4 h-4" />
-                <span>Download Official 4-Page PDF (246 KB)</span>
+                <span>Contact Subsonic</span>
               </a>
             </div>
           </div>

@@ -56,12 +56,8 @@ export function Footer() {
               <span className="text-purple-400 font-semibold">Community</span>
             </div>
 
-            {/* Mountain Specs Pill */}
+            {/* Location Pill */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
-                <Mountain className="w-3.5 h-3.5 text-amber-400" />
-                <span>3,420 FT ELEVATION</span>
-              </div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
                 <MapPin className="w-3.5 h-3.5 text-blue-400" />
                 <span>Bristol, Tennessee</span>
@@ -121,7 +117,7 @@ export function Footer() {
               <li>
                 <Link href="/competitor-packet" className="hover:text-amber-400 transition-colors flex items-center gap-1">
                   <Award className="w-3 h-3 text-amber-400" />
-                  <span>Competitor Packet & Guide (PDF)</span>
+                  <span>Competitor Packet &amp; Guide</span>
                 </Link>
               </li>
             </ul>

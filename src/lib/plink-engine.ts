@@ -359,7 +359,7 @@ export function getFaqResponse(content: string): string {
       `For Bristol lodging, campgrounds, top restaurants (like steaks & sushi at 620 State), local attractions, and range safety rules, I'm here 24/7!`;
   }
 
-  // 6. THE HIDEOUT — YOUR INVITATIONAL HOME
+  // 6. LOCATION & ADDRESS
   if (
     lower.includes("hideout") ||
     lower.includes("facility") ||
@@ -369,16 +369,10 @@ export function getFaqResponse(content: string): string {
     lower.includes("directions") ||
     lower.includes("acres")
   ) {
-    return `📍 **The Hideout — Your Invitational Home:**\n\n` +
-      `• **Address:** 111 Hwy 44, Bristol, TN 37620\n` +
-      `• **Property:** The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.\n` +
-      `• **Match Features:**\n` +
-      `  - Dedicated 300-Yard Rimfire Range & PRS-Style Positional Rifle Range\n` +
-      `  - 1,000-Yard Long-Range Rifle Range\n` +
-      `  - 50, 100 & 200-Yard Sight-In Available\n` +
-      `  - 24' x 40' Covered Pavilion & 20' x 20' Fire Pit\n` +
-      `  - Two Restrooms and Showers at the Shooting Range\n` +
-      `• **Host:** Allen Hurley — Subsonic Society Founder & Event Director ("Said. Done.")`;
+    return `📍 **Match Location:**\n\n` +
+      `• **Property:** The Hideout — 111 Hwy 44, Bristol, TN 37620\n` +
+      `• **Sight-In:** 50 yard, 100 yard, and 200 yard zero available.\n` +
+      `• **Event Director:** Allen Hurley • Subsonic Society`;
   }
 
   // 7. BALLISTICS, DOPE & AMMO — OFFICIAL RANGE OFFICER POLICY

@@ -66,7 +66,7 @@ export function FullHomePage() {
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-300 max-w-md font-medium leading-relaxed">
-                  Precision Rimfire Rifles Used by the Best Shooters in the World. Hand-crafted in America by master gunsmith Jonathan Elrod. Title sponsor of the $7,500 Invitational Purse.
+                  Precision Rimfire Rifles used by the Best Shooters in the World.
                 </p>
 
                 <div className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 font-bold group-hover:text-amber-300 pt-1">

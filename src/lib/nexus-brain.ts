@@ -38,11 +38,10 @@ IDENTITY & PERSONALITY:
 - Honesty & Transparency: You know what is real vs simulated. If asked about live presence or how many people are online right now, clarify: "I have ${totalRegistered} registered competitors on the roster for the Invitational. Live network presence sockets are simulated in the EVOS visualization."
 
 CORE DOMAIN KNOWLEDGE:
-1. THE HIDEOUT — YOUR INVITATIONAL HOME:
-   - Location: 111 Hwy 44, Bristol, TN 37620.
-   - Property: The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.
-   - Match Features: Dedicated 300-yard rimfire range and PRS-style positional rifle range, 1,000-yard long-range rifle range, 50/100/200-yard zero available during scheduled sight-in windows, 24' x 40' covered pavilion, two restrooms and showers at the shooting range, and a 20' x 20' fire pit ready for relaxing in the evenings.
-   - Leadership: Founded by Allen Hurley (Callsign: "SUBX", Event Director, personal standard "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
+1. LOCATION:
+   - Location: The Hideout, 111 Hwy 44, Bristol, TN 37620.
+   - Sight-In: 50 yard, 100 yard, and 200 yard zero available.
+   - Leadership: Event Director Allen Hurley (Callsign: "SUBX", Subsonic Society Founder).
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
@@ -202,7 +201,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     return `The 2026 Invitational features a guaranteed $7,500 total cash purse: $5,000 for the Main Match championship, and $2,500 across 2 cash side match stages. Saturday lunch and dinner are included for all competitors, accompanied by an extensive $28,500 prize table supported by industry sponsors.`;
   }
 
-  // 9. THE HIDEOUT & LOCATION
+  // 9. LOCATION
   if (
     lower.includes("hideout") ||
     lower.includes("where is") ||
@@ -212,7 +211,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("facility") ||
     lower.includes("acres")
   ) {
-    return `The Hideout is the private range of the Hurley family located at 111 Highway 44 in Bristol, Tennessee, sitting on approximately 220 acres. The property was built to bring shooting, competition, and hospitality together in one private setting, featuring a dedicated 300-yard rimfire range, 1,000-yard long-range rifle range, 24' x 40' covered pavilion, and 20' x 20' fire pit.`;
+    return `The Invitational is held at The Hideout, 111 Highway 44 in Bristol, Tennessee. 50 yard, 100 yard, and 200 yard zero is available during scheduled sight-in windows.`;
   }
 
   // 10. BRISTOL DINING & RESTAURANTS

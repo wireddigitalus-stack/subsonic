@@ -556,10 +556,10 @@ export function Navbar() {
             className="lg:hidden mt-2 ios-glass rounded-2xl p-4 sm:p-5 border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.85)] space-y-4 animate-fadeIn max-h-[calc(100dvh-6rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] overflow-y-auto overscroll-contain ios-scrollbar touch-pan-y pointer-events-auto"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {/* Group 1: The Society & Facility */}
+            {/* Group 1: The Society */}
             <div className="space-y-1">
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold px-2">
-                The Society & Facility
+                The Society
               </span>
               <Link
                 href="/chat"
