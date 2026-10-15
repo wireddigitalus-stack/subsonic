@@ -231,11 +231,11 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 homeRange: "The Hideout, Bristol, TN",
                 podiums: 1,
                 featuredMatch: "Subsonic Society Invitational 2026",
-                image: parsed.image || "/images/SS-RWB-LOGO.png",
-                actionPhoto: parsed.image || "/images/SS-RWB-LOGO.png",
+                image: isRealShooterPhoto(parsed.image) ? parsed.image : "",
+                actionPhoto: isRealShooterPhoto(parsed.actionPhoto) ? parsed.actionPhoto : "",
                 quote: "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
                 accolades: ["VERIFIED COMPETITOR"],
-                sponsors: ["Modacam Custom Rifles", "Subsonic Society"],
+                sponsors: ["Modacam Custom Rifles"],
                 rifleSetup: {
                   action: parsed.rifleSetup || "Custom Precision Rimfire Rig",
                   barrel: "Match Contour Barrel",
@@ -407,18 +407,6 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
       },
     },
   };
-
-  // Official tournament sponsor logos list
-  const defaultSponsors = [
-    { name: "MasterPiece Arms", subtitle: "BA Chassis Systems", badge: "MPA" },
-    { name: "Modacam Custom Rifles", subtitle: "Presenting Partner", badge: "MODACAM" },
-    { name: "Vortex Optics", subtitle: "Razor HD Gen III", badge: "VORTEX" },
-    { name: "Zermatt Arms", subtitle: "RimX Precision Actions", badge: "ZERMATT" },
-    { name: "Clenzoil", subtitle: "Field & Range CLP", badge: "CLENZOIL" },
-    { name: "Leofoto", subtitle: "Carbon Precision Tripods", badge: "LEOFOTO" },
-    { name: "Hoz & Shield", subtitle: "Tactical Gear & Support", badge: "HOZ & SHIELD" },
-    { name: "Arrow Products USA", subtitle: "Precision Ballistics", badge: "ARROW" },
-  ];
 
   return (
     <div className="min-h-screen text-slate-100 pb-32">
@@ -909,23 +897,27 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
           </div>
 
           {/* ─── BOTTOM TOURNAMENT RIBBON & PRESENTING SPONSOR (PRINT-EXACT) ─── */}
-          <div className="relative z-10 border-t-2 border-amber-500/40 bg-black/90 px-6 py-6 space-y-6">
-            
+          <div className="relative z-10 border-t-2 border-amber-500/40 bg-black/90 px-6 py-6">
             {/* Top Bar: $7,500 Money Match • Presented by Modacam Custom Rifles */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/10 pb-4 text-center md:text-left">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
               <div>
-                <div className="text-xs sm:text-sm font-mono font-black text-amber-400 uppercase tracking-[0.25em]">
-                  $7,500 MONEY MATCH • MAKING RIMFIRE HISTORY
+                <div className="text-xs sm:text-sm font-mono font-black text-amber-400 uppercase tracking-[0.2em]">
+                  $7,500 TOTAL CASH PRIZES ($5,000 MAIN MATCH • $2,500 SIDE MATCHES)
                 </div>
                 <div className="text-slate-400 text-xs font-mono uppercase tracking-wider pt-0.5">
-                  18 Natural Terrain Stages • The Hideout • Bristol, TN
+                  18 Natural Terrain Stages • Sat &amp; Sun Meals Included • The Hideout • Bristol, TN
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 bg-white/[0.04] border border-amber-500/30 px-5 py-2.5 rounded-2xl">
+              <a
+                href="https://mcr-rifles.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 bg-white/[0.04] hover:bg-white/[0.08] border border-amber-500/30 hover:border-amber-400/60 px-5 py-2.5 rounded-2xl transition-all"
+              >
                 <div className="text-right">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block">
-                    PRESENTED BY
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold block">
+                    OFFICIAL TITLE SPONSOR
                   </span>
                   <span className="text-xs sm:text-sm font-mono font-black text-white uppercase tracking-wider">
                     MODACAM CUSTOM RIFLES
@@ -938,42 +930,18 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                     className="w-full h-full object-contain filter invert"
                   />
                 </div>
-              </div>
+              </a>
             </div>
-
-            {/* Official Sponsor Logo Ribbon */}
-            <div className="space-y-2">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block text-center md:text-left">
-                Official Invitational Partner Alliances
-              </span>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
-                {defaultSponsors.map((sp, idx) => (
-                  <div
-                    key={idx}
-                    className="p-2.5 rounded-xl bg-white/[0.02] border border-white/10 hover:border-amber-400/50 hover:bg-white/[0.05] transition-all text-center space-y-0.5 group"
-                  >
-                    <div className="text-[11px] font-mono font-bold text-slate-300 group-hover:text-amber-400 transition-colors uppercase truncate">
-                      {sp.badge}
-                    </div>
-                    <div className="text-[9px] font-mono text-slate-500 truncate">
-                      {sp.subtitle}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
           </div>
 
         </div>
 
 
 
-        {/* ─── SECTION 3: ACTION PHOTO & TECHNICAL INTERVIEW ─────────────── */}
+        {/* ─── SECTION 3: RIFLE BUILD, ACTION PHOTO & TECHNICAL INTERVIEW ─── */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Action Photo Showcase */}
-          {shooter.actionPhoto && (
+          {/* Action Photo Showcase (Only rendered when shooter has a real action photo, never the Subsonic logo) */}
+          {isRealShooterPhoto(shooter.actionPhoto) && (
             <div className="rounded-3xl bg-white/[0.02] border border-white/10 p-6 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold flex items-center gap-1.5">
@@ -989,6 +957,58 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                   alt={`${displayName} in competition`}
                   className="w-full h-full object-cover object-center"
                 />
+              </div>
+            </div>
+          )}
+
+          {/* Rifle Build & Equipment Specs */}
+          {shooter.rifleSetup && (
+            <div className="rounded-3xl bg-white/[0.02] border border-white/10 p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
+                  <Crosshair className="w-4 h-4" />
+                  <span>Competition Rifle Build &amp; Optics</span>
+                </span>
+                <span className="text-[11px] font-mono text-slate-500">{shooter.division}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                {shooter.rifleSetup.action && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Action</span>
+                    <span className="font-bold text-white">{shooter.rifleSetup.action}</span>
+                  </div>
+                )}
+                {shooter.rifleSetup.barrel && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Barrel</span>
+                    <span className="font-bold text-white">{shooter.rifleSetup.barrel}</span>
+                  </div>
+                )}
+                {shooter.rifleSetup.chassis && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Chassis / Stock</span>
+                    <span className="font-bold text-white">{shooter.rifleSetup.chassis}</span>
+                  </div>
+                )}
+                {shooter.rifleSetup.optic && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Optic</span>
+                    <span className="font-bold text-amber-300">{shooter.rifleSetup.optic}</span>
+                  </div>
+                )}
+                {shooter.rifleSetup.trigger && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Trigger</span>
+                    <span className="font-bold text-white">{shooter.rifleSetup.trigger}</span>
+                  </div>
+                )}
+                {shooter.rifleSetup.ammoLot && (
+                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Ammunition</span>
+                    <span className="font-bold text-emerald-400">{shooter.rifleSetup.ammoLot}</span>
+                  </div>
+                )}
               </div>
             </div>
           )}

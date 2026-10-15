@@ -82,7 +82,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/partners" className="hover:text-amber-400 transition-colors">
-                  Modacam & Sponsors
+                  Title Sponsor: Modacam
                 </Link>
               </li>
               <li>
@@ -170,7 +170,7 @@ export function Footer() {
           <div className="flex flex-wrap items-center gap-4 text-slate-400">
             <span className="flex items-center gap-1 font-mono text-[10px]">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              TELEMETRY & RSS SYNC ACTIVE
+              ENCRYPTED TELEMETRY ACTIVE
             </span>
             <Link href="/terms" className="hover:text-slate-200">
               Terms of Use

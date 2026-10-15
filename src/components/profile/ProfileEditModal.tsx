@@ -239,10 +239,10 @@ export function ProfileEditModal({
       phone: existingProfileData?.phone || initialShooter?.phone || (isAllen ? "423-555-0100" : undefined),
       mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress || (isAllen ? "Bristol, TN" : "Bristol, TN"),
       quote: quote.trim() || (isRob ? "Architecture, precision optics, and sub-MOA reliability on the digital ridge." : "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind."),
-      image: headshotPhoto || "/assets/subsonic-coin.jpg",
-      actionPhoto: actionPhoto || headshotPhoto || "/assets/subsonic-coin.jpg",
+      image: headshotPhoto || "",
+      actionPhoto: actionPhoto || "",
       accolades: accolades.length > 0 ? accolades : (isRob ? ["DEV ADVISOR", "MASTER OWNER"] : ["COMPETITOR"]),
-      sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
+      sponsors: sponsors.length > 0 ? sponsors : ["Modacam Custom Rifles"],
       rifleSetup: {
         action: rifleAction.trim() || (isRob ? "Smart Systems Integrations" : "Precision Rimfire Action"),
         barrel: barrel.trim() || "Match Contour",

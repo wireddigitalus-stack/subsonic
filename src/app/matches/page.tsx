@@ -44,10 +44,10 @@ const MATCHES_DATA: MatchCard[] = [
   {
     id: "subsonic-invitational-2026",
     title: "Subsonic Society Invitational",
-    subtitle: "The Premier $7,500 Cash Purse Championship Presented by Modacam Custom Rifles",
+    subtitle: "The Premier $7,500 Cash Purse Championship ($5,000 Main Match • $2,500 Side Matches) Presented by Modacam Custom Rifles",
     date: "November 13–15, 2026",
     location: "The Hideout Ridge Complex, Bristol, TN",
-    purse: "$7,500 Guaranteed Cash Purse",
+    purse: "$7,500 Total Cash Prizes",
     stages: 18,
     maxDistance: "465 Yards",
     entryFee: 275,
@@ -56,95 +56,13 @@ const MATCHES_DATA: MatchCard[] = [
     presentingPartner: "Modacam Custom Rifles",
     status: "FILLING",
     tier: "INVITATIONAL",
-    description: "The crown jewel of Subsonic Society calendar. 18 stages across steep Appalachian terrain with extreme long-range subsonic engagements out to 465 yards. Solid cash purse payouts for Top 5 Open, Top Production, and Senior Divisions.",
+    description: "The crown jewel of the Subsonic Society calendar. 18 natural-terrain stages across steep Appalachian ridgelines with extreme long-range subsonic engagements out to 465 yards. $5,000 Main Match cash payouts + $2,500 Cash Side Matches. Sat & Sun Meals Included.",
     featured: true,
-  },
-  {
-    id: "300x-long-gong",
-    title: "300X Long Gong Challenge",
-    subtitle: "Extreme Distance Rimfire Precision & Cold Bore Barricade Shootout",
-    date: "August 22, 2026",
-    location: "The Hideout Valley Steel Bay, Bristol, TN",
-    purse: "$3,500 Gear & Ammo Table",
-    stages: 10,
-    maxDistance: "300–385 Yards",
-    entryFee: 140,
-    totalSlots: 60,
-    takenSlots: 51,
-    presentingPartner: "Lapua Rimfire",
-    status: "FILLING",
-    tier: "LONG_GONG",
-    description: "A dedicated 300-yard plus precision match where every stage is positioned at extreme subsonic distances. Tests pure wind-reading capability, aerodynamic drag consistency, and rifle harmonic tuning.",
-  },
-  {
-    id: "200x-mountain-match",
-    title: "200X Mountain Match",
-    subtitle: "Technical High-Angle Ridge Barricade Championship",
-    date: "July 11, 2026",
-    location: "The Hideout Ridge Barricade Line, Bristol, TN",
-    purse: "$2,800 Cash & Trophies",
-    stages: 12,
-    maxDistance: "200 Yards",
-    entryFee: 110,
-    totalSlots: 75,
-    takenSlots: 68,
-    presentingPartner: "Vortex Optics",
-    status: "FILLING",
-    tier: "CHAMPIONSHIP",
-    description: "Fast, positional precision on tank traps, spool pyramids, wire fences, and rocking platforms. Pure barricade agility and rapid target acquisition inside 200 yards.",
-  },
-  {
-    id: "x-factor-head-to-head",
-    title: "The X-Factor Shootout",
-    subtitle: "Double-Elimination Bracket Duel on Reactive Steel Targets",
-    date: "September 12, 2026",
-    location: "Pavilion Speedway Arena, The Hideout, TN",
-    purse: "$4,000 Winner-Take-All",
-    stages: 8,
-    maxDistance: "100–175 Yards",
-    entryFee: 95,
-    totalSlots: 32,
-    takenSlots: 32,
-    presentingPartner: "Modacam Custom Rifles",
-    status: "WAITLIST",
-    tier: "INVITATIONAL",
-    description: "Head-to-head electronic timer duels. Shooters start standing, take position upon the buzzer, and race through matching steel racks to trigger the center stop-plate.",
-  },
-  {
-    id: "spring-opener-2026",
-    title: "Appalachian Spring Kickoff",
-    subtitle: "Season Opening Regional Points Qualifier",
-    date: "April 25, 2026",
-    location: "The Hideout Range, Bristol, TN",
-    purse: "$2,000 Prize Table",
-    stages: 10,
-    maxDistance: "250 Yards",
-    entryFee: 90,
-    totalSlots: 60,
-    takenSlots: 60,
-    status: "COMPLETED",
-    tier: "REGIONAL",
-    description: "The 2026 season inaugural match featuring cold morning density altitude shifts and 10 dynamic stages.",
   }
 ];
 
 export default function MatchesPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [tierFilter, setTierFilter] = useState<string>("ALL");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [showRulebookModal, setShowRulebookModal] = useState(false);
-
-  const filteredMatches = MATCHES_DATA.filter((m) => {
-    const matchesSearch = 
-      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.presentingPartner && m.presentingPartner.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesTier = tierFilter === "ALL" || m.tier === tierFilter;
-    const matchesStatus = statusFilter === "ALL" || m.status === statusFilter;
-
-    return matchesSearch && matchesTier && matchesStatus;
-  });
 
   return (
     <div className="space-y-12 pb-20">
@@ -158,21 +76,21 @@ export default function MatchesPage() {
                 <span>OFFICIAL MATCH PORTAL</span>
               </div>
               <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-                COMPETITION SCHEDULE & RESULTS
+                2026 INVITATIONAL CHAMPIONSHIP
               </h1>
               <p className="text-sm sm:text-base text-slate-300">
-                Searchable, dedicated match records, course of fires, and squad registration. No lost posts or buried leaderboards.
+                Official course of fire, stage standards, and competitor guide for the Subsonic Society Invitational at The Hideout in Bristol, TN.
               </p>
             </div>
 
             {/* Quick Action CTAs */}
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                href="/invitational"
+                href="/competitor-packet"
                 className="px-4 py-2.5 rounded-xl ios-glass text-amber-300 hover:text-white text-xs font-bold border border-amber-500/30 flex items-center gap-2 hover:bg-white/10 transition-all shadow-tactical-glow"
               >
                 <FileText className="w-4 h-4 text-amber-400" />
-                <span>2026 Invitational Packet</span>
+                <span>2026 Competitor Packet</span>
               </Link>
 
               <button
@@ -184,11 +102,11 @@ export default function MatchesPage() {
               </button>
 
               <Link
-                href="/register?match=subsonic-invitational-2026"
+                href="/invitational"
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-extrabold flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
               >
                 <Flame className="w-4 h-4 fill-black" />
-                <span>Enter Match Squad</span>
+                <span>Explore The Invitational</span>
               </Link>
             </div>
           </div>
@@ -221,13 +139,18 @@ export default function MatchesPage() {
                   SUBSONIC SOCIETY INVITATIONAL
                 </h2>
 
-                <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-amber-400" />
-                  <span>$7,500 GUARANTEED CASH PURSE</span>
+                <div className="space-y-1">
+                  <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono flex items-center gap-2">
+                    <Trophy className="w-6 h-6 text-amber-400" />
+                    <span>$7,500 TOTAL CASH PRIZES</span>
+                  </div>
+                  <div className="text-xs font-mono text-amber-300 font-bold">
+                    $5,000 Main Match Purse • $2,500 Cash Side Matches • Sat &amp; Sun Meals Included
+                  </div>
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                  18 grueling stages in the high-elevation Appalachian wind. Over 465 yards of steel with cold-bore long gong bonus targets. Reserved slots for national qualifier podium finishers and open lottery entries.
+                  18 grueling stages in the high-elevation Appalachian wind at The Hideout in Bristol, TN. Over 465 yards of steel with cold-bore long gong targets and $2,500 in dedicated Friday cash side matches.
                 </p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
@@ -244,17 +167,17 @@ export default function MatchesPage() {
                     <span className="text-xs sm:text-sm font-bold text-amber-400">18 Stages / 220 Rnds</span>
                   </div>
                   <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 block">SQUAD SLOTS</span>
-                    <span className="text-xs sm:text-sm font-bold text-emerald-400">26 Spots Remaining</span>
+                    <span className="text-[10px] font-mono text-slate-400 block">HOSPITALITY</span>
+                    <span className="text-xs sm:text-sm font-bold text-emerald-400">Sat &amp; Sun Meals Included</span>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 pt-3">
                   <Link
-                    href="/register?match=subsonic-invitational-2026"
+                    href="/invitational"
                     className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black text-xs font-extrabold flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
                   >
-                    <span>Register For The Invitational</span>
+                    <span>View Full Invitational Details</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
 
@@ -263,7 +186,7 @@ export default function MatchesPage() {
                     className="px-5 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
-                    <span>2026 Competitor Packet & Guide</span>
+                    <span>2026 Competitor Packet &amp; Guide</span>
                   </Link>
 
                   <a
@@ -290,167 +213,92 @@ export default function MatchesPage() {
         </div>
       </section>
 
-      {/* Filter and Search Controls */}
+      {/* Match Card Detail */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="ios-glass rounded-2xl p-4 border border-white/10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by match name, location, or sponsor..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-black/40 border border-white/10 text-white placeholder:text-slate-500 text-xs sm:text-sm focus:outline-none focus:border-amber-500/60 transition-colors"
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-6">
+          {MATCHES_DATA.map((m) => (
+            <div
+              key={m.id}
+              className="ios-glass rounded-3xl p-6 sm:p-7 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between space-y-5 group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold">
+                    OFFICIAL 2026 CHAMPIONSHIP
+                  </span>
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 text-xs">
-              <Filter className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-slate-400">Tier:</span>
-              <select
-                value={tierFilter}
-                onChange={(e) => setTierFilter(e.target.value)}
-                className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="ALL" className="bg-[#0e131d]">All Events</option>
-                <option value="INVITATIONAL" className="bg-[#0e131d]">Invitational</option>
-                <option value="CHAMPIONSHIP" className="bg-[#0e131d]">Championship</option>
-                <option value="LONG_GONG" className="bg-[#0e131d]">Long Gong</option>
-                <option value="REGIONAL" className="bg-[#0e131d]">Regional</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 text-xs">
-              <span className="text-slate-400">Status:</span>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="ALL" className="bg-[#0e131d]">All Statuses</option>
-                <option value="FILLING" className="bg-[#0e131d]">Registration Open</option>
-                <option value="WAITLIST" className="bg-[#0e131d]">Sold Out / Waitlist</option>
-                <option value="COMPLETED" className="bg-[#0e131d]">Past Results</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Match Cards Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredMatches.map((m) => {
-            const isSoldOut = m.status === "WAITLIST";
-            const isCompleted = m.status === "COMPLETED";
-
-            return (
-              <div
-                key={m.id}
-                className="ios-glass rounded-3xl p-6 sm:p-7 border border-white/10 hover:border-amber-500/40 transition-all flex flex-col justify-between space-y-5 group"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300">
-                      {m.tier.replace("_", " ")}
-                    </span>
-
-                    <span
-                      className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
-                        isCompleted
-                          ? "bg-slate-500/20 text-slate-400 border border-slate-500/30"
-                          : isSoldOut
-                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                          : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                      }`}
-                    >
-                      {isCompleted ? "Scores Final" : isSoldOut ? "Waitlist Only" : `${m.totalSlots - m.takenSlots} Slots Left`}
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-amber-400 transition-colors">
-                    {m.title}
-                  </h3>
-
-                  <p className="text-xs text-amber-400/90 font-mono">
-                    {m.subtitle}
-                  </p>
-
-                  <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                    {m.description}
-                  </p>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Sat &amp; Sun Meals Included
+                  </span>
                 </div>
 
-                {/* Match Specs Row */}
-                <div className="space-y-4 pt-2 border-t border-white/5">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                    <div className="p-2 rounded-lg bg-black/30">
-                      <span className="text-[10px] font-mono text-slate-500 block">DATE</span>
-                      <span className="font-semibold text-slate-200">{m.date}</span>
-                    </div>
-                    <div className="p-2 rounded-lg bg-black/30">
-                      <span className="text-[10px] font-mono text-slate-500 block">PRIZE / PURSE</span>
-                      <span className="font-bold text-amber-400">{m.purse}</span>
-                    </div>
-                    <div className="p-2 rounded-lg bg-black/30 col-span-2 sm:col-span-1">
-                      <span className="text-[10px] font-mono text-slate-500 block">DISTANCE</span>
-                      <span className="font-semibold text-slate-200">{m.maxDistance}</span>
-                    </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-amber-400 transition-colors">
+                  {m.title}
+                </h3>
+
+                <p className="text-xs text-amber-400/90 font-mono">
+                  {m.subtitle}
+                </p>
+
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {m.description}
+                </p>
+              </div>
+
+              {/* Match Specs Row */}
+              <div className="space-y-4 pt-2 border-t border-white/5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                  <div className="p-2 rounded-lg bg-black/30">
+                    <span className="text-[10px] font-mono text-slate-500 block">DATE</span>
+                    <span className="font-semibold text-slate-200">{m.date}</span>
                   </div>
-
-                  {m.presentingPartner && (
-                    <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                      <span>Presented by:</span>
-                      <strong className="text-white">{m.presentingPartner}</strong>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-3 pt-1">
-                    {isCompleted ? (
-                      <Link
-                        href={`/matches?id=${m.id}`}
-                        className="flex-1 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
-                      >
-                        <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                        <span>View Match Leaderboard</span>
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/register?match=${m.id}`}
-                        className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
-                      >
-                        <Flame className="w-3.5 h-3.5 fill-black" />
-                        <span>{isSoldOut ? "Join Waitlist" : "Register Squad"}</span>
-                      </Link>
-                    )}
-
-                    {m.id === "subsonic-invitational-2026" && (
-                      <Link
-                        href="/competitor-packet"
-                        className="px-3.5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all flex items-center gap-1.5"
-                        title="View Official Competitor Packet & Bristol Guide"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>Packet</span>
-                      </Link>
-                    )}
-
-                    <Link
-                      href="/chat"
-                      className="px-3.5 py-2.5 rounded-xl ios-glass text-slate-300 hover:text-white text-xs font-semibold border border-white/10 hover:bg-white/10 transition-all"
-                      title="Match Comms"
-                    >
-                      <Users className="w-4 h-4" />
-                    </Link>
+                  <div className="p-2 rounded-lg bg-black/30">
+                    <span className="text-[10px] font-mono text-slate-500 block">PRIZE / PURSE</span>
+                    <span className="font-bold text-amber-400">{m.purse}</span>
                   </div>
+                  <div className="p-2 rounded-lg bg-black/30 col-span-2 sm:col-span-1">
+                    <span className="text-[10px] font-mono text-slate-500 block">DISTANCE</span>
+                    <span className="font-semibold text-slate-200">{m.maxDistance}</span>
+                  </div>
+                </div>
+
+                {m.presentingPartner && (
+                  <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                    <span>Presented by:</span>
+                    <strong className="text-white">{m.presentingPartner}</strong>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <Link
+                    href="/invitational"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
+                  >
+                    <Flame className="w-3.5 h-3.5 fill-black" />
+                    <span>Explore Invitational Overview</span>
+                  </Link>
+
+                  <Link
+                    href="/competitor-packet"
+                    className="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold transition-all flex items-center gap-1.5"
+                    title="View Official Competitor Packet & Bristol Guide"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Competitor Packet</span>
+                  </Link>
+
+                  <Link
+                    href="/chat"
+                    className="px-3.5 py-2.5 rounded-xl ios-glass text-slate-300 hover:text-white text-xs font-semibold border border-white/10 hover:bg-white/10 transition-all"
+                    title="Match Comms"
+                  >
+                    <Users className="w-4 h-4" />
+                  </Link>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </section>
 

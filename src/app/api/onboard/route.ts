@@ -103,15 +103,48 @@ export async function POST(req: NextRequest) {
 
     const pinHash = await hashPin(pin);
     const now = new Date().toISOString();
-    const division = String(body.division || "Open Division Pro");
-    const homeRange = String(body.homeRange || "").trim() || "The Hideout, Bristol, TN";
+    const division = String(body.division || "Open Division Pro").trim();
+    const homeRange = String(body.homeRange || "").trim();
+    const ranking = String(body.ranking || "").trim();
+    const quote = String(body.quote || "").trim();
+    if (!homeRange || !ranking || !quote) {
+      return fail("All profile fields (Home Range, Ranking/Title, and Bio Quote) are required.", 400, "MISSING_PROFILE_FIELDS");
+    }
+
+    const rawRig = typeof body.rifleSetup === "object" && body.rifleSetup ? body.rifleSetup : {};
+    const rifleSetup = {
+      action: String(rawRig.action || "").trim(),
+      barrel: String(rawRig.barrel || "").trim(),
+      trigger: String(rawRig.trigger || "").trim(),
+      chassis: String(rawRig.chassis || "").trim(),
+      optic: String(rawRig.optic || "").trim(),
+      ammoLot: String(rawRig.ammoLot || "").trim(),
+    };
+    if (
+      !rifleSetup.action ||
+      !rifleSetup.barrel ||
+      !rifleSetup.trigger ||
+      !rifleSetup.chassis ||
+      !rifleSetup.optic ||
+      !rifleSetup.ammoLot
+    ) {
+      return fail("All Competition Rifle Build & Ammunition fields are required.", 400, "MISSING_RIFLE_SPECS");
+    }
+
     const accolades: string[] = Array.isArray(body.accolades) && body.accolades.length ? body.accolades : ["VIP COMPETITOR"];
-    const sponsors: string[] = Array.isArray(body.sponsors) && body.sponsors.length ? body.sponsors : ["Subsonic Society"];
+    const sponsors: string[] = Array.isArray(body.sponsors) && body.sponsors.length ? body.sponsors : ["Modacam Custom Rifles"];
     const image = typeof body.image === "string" ? body.image.trim() : "";
     if (!image || image.includes("SS-RWB-LOGO") || image.includes("subsonic-logo") || image.includes("subsonic-coin")) {
       return fail("A real profile photo / headshot is required to publish a competitor profile.", 400, "PHOTO_REQUIRED");
     }
-    const actionPhoto = typeof body.actionPhoto === "string" && body.actionPhoto ? body.actionPhoto : image;
+    const rawActionPhoto = typeof body.actionPhoto === "string" ? body.actionPhoto.trim() : "";
+    const actionPhoto =
+      rawActionPhoto &&
+      !rawActionPhoto.includes("SS-RWB-LOGO") &&
+      !rawActionPhoto.includes("subsonic-logo") &&
+      !rawActionPhoto.includes("subsonic-coin")
+        ? rawActionPhoto
+        : "";
 
     // ── 3. Shooter profile ─────────────────────────────────────────
     const shooter: ShooterProfile = {
@@ -123,13 +156,14 @@ export async function POST(req: NextRequest) {
       mailingAddress,
       pin: pinHash,
       division,
-      ranking: String(body.ranking || "").trim() || `${division} Competitor`,
+      ranking,
       homeRange,
       podiums: Number(body.podiums) || 0,
       featuredMatch: "Subsonic Society Invitational 2026",
       image,
       actionPhoto,
-      quote: "",
+      quote,
+      rifleSetup,
       accolades,
       sponsors,
       interview: [],
@@ -147,7 +181,7 @@ export async function POST(req: NextRequest) {
       email,
       state: typeof body.state === "string" && body.state ? body.state : "TN",
       experience_level: division,
-      rifle_setup: "",
+      rifle_setup: `${rifleSetup.action} / ${rifleSetup.optic}`,
       interests: ["Competition", "PRS Rimfire"],
       created_at: now,
       status: "ACTIVE",

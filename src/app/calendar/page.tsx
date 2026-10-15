@@ -103,29 +103,8 @@ export default function CalendarPage() {
             PRECISION RIMFIRE <span className="amber-gradient-text">EVENT CALENDAR</span>
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            Register for the premier Subsonic Society Invitational held on the mountain ranges of Bristol, TN.
+            Official schedule and stage briefing for the Subsonic Society Invitational ($7,500 Total Cash Prizes • Sat &amp; Sun Meals Included) at The Hideout in Bristol, TN.
           </p>
-        </div>
-
-        {/* Filter Tier Tabs */}
-        <div className="bg-black/60 p-1.5 rounded-2xl border border-white/10 flex flex-wrap gap-1">
-          {[
-            { id: "ALL", label: "All Events" },
-            { id: "PRO_SERIES", label: "Invitational" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setFilterTier(tab.id)}
-              data-telemetry={`calendar_filter_${tab.id.toLowerCase()}`}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                filterTier === tab.id
-                  ? "bg-amber-500 text-black shadow-tactical-glow font-bold"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -230,12 +209,12 @@ export default function CalendarPage() {
                 </button>
 
                 <Link
-                  href={`/register?match=${match.id}`}
-                  data-telemetry={`match_register_button_${match.id}`}
+                  href="/invitational"
+                  data-telemetry={`match_invitational_button_${match.id}`}
                   className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all"
                 >
                   <Flame className="w-3.5 h-3.5 fill-black" />
-                  <span>Enter (${match.entryFee})</span>
+                  <span>Explore Invitational</span>
                 </Link>
               </div>
             </div>
@@ -298,7 +277,7 @@ export default function CalendarPage() {
                   <div className="text-xs">
                     <span className="text-slate-400">Prize Table: </span>
                     <strong className="text-emerald-400">{selectedMatch.prizePool}</strong>
-                    <div className="text-[11px] text-slate-500">Cash Payouts & Sponsor Awards</div>
+                    <div className="text-[11px] text-slate-500">$5,000 Main Match • $2,500 Side Matches • Sat &amp; Sun Meals Included</div>
                   </div>
                 </div>
               </div>
@@ -357,12 +336,12 @@ export default function CalendarPage() {
               </button>
 
               <Link
-                href={`/register?match=${selectedMatch.id}`}
-                data-telemetry={`open_registration_modal_${selectedMatch.id}`}
+                href="/competitor-packet"
+                data-telemetry={`open_packet_modal_${selectedMatch.id}`}
                 className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-black flex items-center justify-center gap-1.5 shadow-tactical-glow transition-all"
               >
                 <Flame className="w-4 h-4 fill-black" />
-                <span>Proceed to Squad Registration (${selectedMatch.entryFee})</span>
+                <span>View 2026 Competitor Packet &amp; Guide</span>
               </Link>
             </div>
           </div>

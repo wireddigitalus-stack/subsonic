@@ -90,61 +90,25 @@ export function ChatTermsModal({
         </div>
 
         {/* Zero Tolerance Warning Callout */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-red-950/50 border border-red-500/40 space-y-2">
-          <div className="flex items-center gap-2 text-red-400 font-medium text-xs uppercase tracking-wider">
+        <div className="p-4 rounded-2xl bg-red-950/50 border-2 border-red-500/50 space-y-2.5">
+          <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-wider">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>ZERO-TOLERANCE: COMMERCE PROHIBITION</span>
+            <span>STRICT PROHIBITION: NO FIREARM OR AMMUNITION SALES</span>
           </div>
-          <p className="text-[11px] sm:text-xs text-red-200/90 leading-relaxed font-sans">
-            Under no circumstances may this chat system or direct channels be used to buy, sell, trade, or transfer firearms, ammunition, or regulated items. Violations result in immediate permanent expulsion and credential revocation.
+          <p className="text-xs text-red-100/90 leading-relaxed font-sans">
+            Subsonic Society is strictly a sporting, competition, and educational community. Under no circumstances may this platform, chat system, or direct channels be used to <strong>buy, sell, trade, auction, or transfer firearms, ammunition, receivers, or regulated components</strong>. Any violation results in immediate permanent removal.
           </p>
         </div>
 
-        {/* Policy Highlights Grid */}
-        <div className="space-y-2.5 pt-1">
-          {/* Item 1: Decorum & Sportsmanship */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-amber-400 font-medium text-xs uppercase">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>1. Competitor Sportsmanship &amp; Decorum</span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Maintain professional marksman etiquette. Harassment, abusive language, discrimination, or unsportsmanlike conduct across official match channels will not be tolerated.
-            </p>
+        {/* Day-of-Event In-Person Waiver Notice */}
+        <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-2">
+          <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>RANGE WAIVERS &amp; SAFETY BRIEFING (IN-PERSON DAY OF EVENT)</span>
           </div>
-
-          {/* Item 2: AI Sentinel & Active Moderation */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-emerald-400 font-medium text-xs uppercase">
-              <Radio className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>2. Real-Time Safety &amp; AI Moderation</span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Public squad comms and tactical rooms are scanned in real time by automated security sentinels and human Range Officers to preserve a safe, focused competition environment.
-            </p>
-          </div>
-
-          {/* Item 3: Data & DOPE Card Integrity */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-cyan-400 font-medium text-xs uppercase">
-              <Target className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-              <span>3. DOPE Cards &amp; Ballistic Data Integrity</span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Shared DOPE drops, elevation tables, and wind calls are provided for match intelligence and education. Always verify your own chambering, bore height, and rifle safety parameters.
-            </p>
-          </div>
-
-          {/* Item 4: Invitation Credentials */}
-          <div className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-1">
-            <div className="flex items-center gap-2 text-indigo-400 font-medium text-xs uppercase">
-              <Lock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span>4. Invitation Pass &amp; Credential Security</span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Access is granted strictly by invitation pass. You are responsible for all transmissions originating from your registered tactical callsign and PIN key.
-            </p>
-          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            All range liability waivers, safety briefings, and cold-range acknowledgments are completed <strong>in person at the range on the morning of the event</strong> during competitor check-in.
+          </p>
         </div>
 
         {/* Action Buttons */}

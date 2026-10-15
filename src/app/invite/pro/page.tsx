@@ -30,21 +30,6 @@ import { CallsignInput } from "@/components/common/CallsignInput";
 
 const POPULAR_SPONSORS = [
   "Modacam Custom Rifles",
-  "Vudoo Gun Works",
-  "Lapua Rimfire",
-  "Zero Compromise Optic (ZCO)",
-  "MDT ACC Elite",
-  "RimX Precision",
-  "Proof Research",
-  "Tangent Theta",
-  "Bix'n Andy",
-  "Foundation Stocks",
-  "SK Ammunition",
-  "Vortex Optics",
-  "Hawkins Precision",
-  "Harrell Precision",
-  "Leupold",
-  "Spuhr",
 ];
 
 const PRESET_ACCOLADES = [
@@ -81,6 +66,16 @@ function ProInviteContent() {
   const [homeRange, setHomeRange] = useState("The Hideout, Bristol, TN");
   const [ranking, setRanking] = useState("");
   const [podiums, setPodiums] = useState<number>(0);
+  const [quote, setQuote] = useState("");
+
+  // Rifle Build Specs (Required)
+  const [rifleAction, setRifleAction] = useState("");
+  const [barrel, setBarrel] = useState("");
+  const [trigger, setTrigger] = useState("");
+  const [chassis, setChassis] = useState("");
+  const [optic, setOptic] = useState("");
+  const [ammoLot, setAmmoLot] = useState("");
+
   const [accolades, setAccolades] = useState<string[]>([]);
   const [customAccolade, setCustomAccolade] = useState("");
   const [sponsors, setSponsors] = useState<string[]>([]);
@@ -277,6 +272,25 @@ function ProInviteContent() {
       return;
     }
 
+    if (!quote.trim()) {
+      setFormError("Please enter a short Competitor Bio or Quote. All profile fields are required.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (
+      !rifleAction.trim() ||
+      !barrel.trim() ||
+      !trigger.trim() ||
+      !chassis.trim() ||
+      !optic.trim() ||
+      !ammoLot.trim()
+    ) {
+      setFormError("Please complete all Competition Rifle Build & Ammunition fields. All profile fields are required.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!headshotResult?.dataUrl) {
       setFormError("A profile headshot photo is required. Please upload a clear photo of yourself to publish your competitor profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -292,8 +306,8 @@ function ProInviteContent() {
     setIsSubmitting(true);
 
     try {
-      const primaryImage = headshotResult?.dataUrl || "/images/SS-RWB-LOGO.png";
-      const secondaryImage = actionPhotoResult?.dataUrl || primaryImage;
+      const primaryImage = headshotResult.dataUrl;
+      const secondaryImage = actionPhotoResult?.dataUrl || "";
 
       // One server call does everything (invite check → profile → member → claim),
       // and only succeeds once the database has confirmed every step.
@@ -309,9 +323,18 @@ function ProInviteContent() {
           mailingAddress: mailingAddress.trim(),
           pin: pin.trim(),
           division,
-          homeRange,
+          homeRange: homeRange.trim(),
           podiums: Number(podiums) || 0,
           ranking: ranking.trim(),
+          quote: quote.trim(),
+          rifleSetup: {
+            action: rifleAction.trim(),
+            barrel: barrel.trim(),
+            trigger: trigger.trim(),
+            chassis: chassis.trim(),
+            optic: optic.trim(),
+            ammoLot: ammoLot.trim(),
+          },
           accolades,
           sponsors,
           image: primaryImage,
@@ -662,9 +685,10 @@ function ProInviteContent() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Competition Division
+                Competition Division *
               </label>
               <select
+                required
                 value={division}
                 onChange={(e) => setDivision(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
@@ -680,42 +704,162 @@ function ProInviteContent() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Home Club / Home Range
+                Home Club / Home Range *
               </label>
               <input
                 type="text"
+                required
                 value={homeRange}
                 onChange={(e) => setHomeRange(e.target.value)}
-                placeholder="e.g. Holston Mountain Range, TN"
+                placeholder="e.g. The Hideout, Bristol, TN"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Regional or National Ranking
+                Regional or National Ranking / Title *
               </label>
               <input
                 type="text"
+                required
                 value={ranking}
                 onChange={(e) => setRanking(e.target.value)}
-                placeholder="e.g. Southeast Champion • Rank #4"
+                placeholder="e.g. Southeast Champion • PRS Rimfire Competitor"
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-amber-400 uppercase">
-                Career Podium Finishes
+                Career Podium Finishes *
               </label>
               <input
                 type="number"
+                required
                 min={0}
                 max={999}
                 value={podiums}
                 onChange={(e) => setPodiums(parseInt(e.target.value) || 0)}
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-amber-400 font-mono font-bold text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                Competitor Bio / Personal Quote *
+              </label>
+              <textarea
+                rows={2}
+                required
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+                placeholder="Share a brief competitor bio, shooting philosophy, or wind-reading quote for your spotlight card..."
+                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Competition Rifle Build & Ammunition Specs (All Required) */}
+          <div className="pt-4 border-t border-white/10 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block">
+                  Required Equipment Dossier
+                </span>
+                <h3 className="text-sm sm:text-base font-black text-white uppercase">
+                  Competition Rifle Build &amp; Ammunition *
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
+                All Fields Required
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Rifle Action / Model *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={rifleAction}
+                  onChange={(e) => setRifleAction(e.target.value)}
+                  placeholder="e.g. RimX / Vudoo V-22 / CZ 457"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Barrel Specs *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={barrel}
+                  onChange={(e) => setBarrel(e.target.value)}
+                  placeholder="e.g. 22&quot; Bartlein / Modacam Custom"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Trigger *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={trigger}
+                  onChange={(e) => setTrigger(e.target.value)}
+                  placeholder="e.g. TriggerTech Diamond / Bix'n Andy"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Chassis / Stock *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={chassis}
+                  onChange={(e) => setChassis(e.target.value)}
+                  placeholder="e.g. MDT ACC Elite / Foundation"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Optic / Scope *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={optic}
+                  onChange={(e) => setOptic(e.target.value)}
+                  placeholder="e.g. ZCO 527 / Nightforce ATACR"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-300 uppercase">
+                  Match Ammunition *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={ammoLot}
+                  onChange={(e) => setAmmoLot(e.target.value)}
+                  placeholder="e.g. Lapua Center-X / Eley Tenex"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
             </div>
           </div>
         </section>
