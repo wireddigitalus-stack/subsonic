@@ -45,6 +45,20 @@ const sanitizeShooter = (s: ShooterProfile | null): ShooterProfile | null => {
   return copy;
 };
 
+const isRealShooterPhoto = (img?: string | null): boolean => {
+  if (!img) return false;
+  if (
+    img.includes("SS-RWB-LOGO") ||
+    img.includes("subsonic-logo") ||
+    img.includes("subsonic-coin") ||
+    img.includes("subsoniccoin") ||
+    img.includes("logo")
+  ) {
+    return false;
+  }
+  return img.startsWith("data:") || img.startsWith("http") || img.startsWith("/");
+};
+
 const getShooterDisplayName = (s?: { name?: string; callsign?: string } | null): string => {
   if (!s) return "";
   if (!s.name || s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
@@ -341,7 +355,8 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
   const displayName = getShooterDisplayName(shooter);
   const { firstName, lastName } = splitName(displayName);
   const stats = getCareerStats(shooter);
-  const posterUrl = shooter.posterImage || shooter.image || "/images/SS-RWB-LOGO.png";
+  const hasRealArtwork = Boolean(shooter.posterImage || isRealShooterPhoto(shooter.image));
+  const posterUrl = shooter.posterImage || (isRealShooterPhoto(shooter.image) ? shooter.image : undefined);
 
   const isOwnerOfProfile = Boolean(
     shooter &&
@@ -612,11 +627,38 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               ) : (
                 /* Outer Golden / Metallic Rim Frame for standard portraits */
                 <div className="relative w-full max-w-sm sm:max-w-md aspect-[3/4] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.35)] bg-gradient-to-b from-zinc-900 to-black group">
-                  <img
-                    src={shooter.image || "/images/SS-RWB-LOGO.png"}
-                    alt={displayName}
-                    className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  />
+                  {isRealShooterPhoto(shooter.image) ? (
+                    <img
+                      src={shooter.image!}
+                      alt={displayName}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-zinc-900/90 via-black to-zinc-950 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none" />
+                      <div className="w-28 h-28 rounded-full border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/20 via-black to-zinc-900 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.25)] mb-4">
+                        <span className="text-3xl font-mono font-black text-amber-400 tracking-wider">
+                          {shooter.callsign ? shooter.callsign.slice(0, 3) : shooter.name ? shooter.name.split(" ").map((w) => w[0]).join("").slice(0, 2) : "SS"}
+                        </span>
+                      </div>
+                      <div className="text-xs font-mono text-amber-400/90 uppercase tracking-widest font-bold mb-1">
+                        TACTICAL CALLSIGN • {shooter.callsign || "INVITATIONAL PRO"}
+                      </div>
+                      <h3 className="text-lg font-black text-white tracking-wide mb-3">
+                        {displayName}
+                      </h3>
+                      {isOwnerOfProfile && (
+                        <button
+                          type="button"
+                          onClick={() => setIsProfileEditOpen(true)}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg transition-transform hover:scale-105 active:scale-95"
+                        >
+                          <Camera className="w-4 h-4" />
+                          <span>Upload Competitor Headshot</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent pointer-events-none" />
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-20">
                     <span className="px-3 py-1 rounded-full bg-black/75 backdrop-blur-md border border-amber-400/50 text-amber-400 text-[10px] font-mono font-bold tracking-wider flex items-center gap-1.5 shadow-lg">
@@ -635,13 +677,15 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                           <span>Change Photo</span>
                         </button>
                       )}
-                      <button
-                        onClick={() => setShowPosterModal(true)}
-                        className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
-                        title="Expand Full Print Poster"
-                      >
-                        <Maximize2 className="w-4 h-4 text-amber-400" />
-                      </button>
+                      {hasRealArtwork && (
+                        <button
+                          onClick={() => setShowPosterModal(true)}
+                          className="p-2 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white transition-all hover:scale-110 shadow-lg"
+                          title="Expand Full Print Poster"
+                        >
+                          <Maximize2 className="w-4 h-4 text-amber-400" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1">
@@ -663,13 +707,23 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
               {/* Quick Action under image */}
               <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-                <button
-                  onClick={() => setShowPosterModal(true)}
-                  className="px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                >
-                  <Maximize2 className="w-3 h-3 text-amber-400" />
-                  <span>View Full Poster Graphic</span>
-                </button>
+                {hasRealArtwork ? (
+                  <button
+                    onClick={() => setShowPosterModal(true)}
+                    className="px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                  >
+                    <Maximize2 className="w-3 h-3 text-amber-400" />
+                    <span>View Full Poster Graphic</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setIsProfileEditOpen(true)}
+                    className="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                  >
+                    <Camera className="w-3 h-3 text-amber-400" />
+                    <span>Upload Headshot</span>
+                  </button>
+                )}
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
                   PRECISION IS IN OUR DNA
                 </span>

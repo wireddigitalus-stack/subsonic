@@ -107,7 +107,10 @@ export async function POST(req: NextRequest) {
     const homeRange = String(body.homeRange || "").trim() || "The Hideout, Bristol, TN";
     const accolades: string[] = Array.isArray(body.accolades) && body.accolades.length ? body.accolades : ["VIP COMPETITOR"];
     const sponsors: string[] = Array.isArray(body.sponsors) && body.sponsors.length ? body.sponsors : ["Subsonic Society"];
-    const image = typeof body.image === "string" && body.image ? body.image : "/images/SS-RWB-LOGO.png";
+    const image = typeof body.image === "string" ? body.image.trim() : "";
+    if (!image || image.includes("SS-RWB-LOGO") || image.includes("subsonic-logo") || image.includes("subsonic-coin")) {
+      return fail("A real profile photo / headshot is required to publish a competitor profile.", 400, "PHOTO_REQUIRED");
+    }
     const actionPhoto = typeof body.actionPhoto === "string" && body.actionPhoto ? body.actionPhoto : image;
 
     // ── 3. Shooter profile ─────────────────────────────────────────

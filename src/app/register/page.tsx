@@ -147,9 +147,9 @@ function RegisterContent() {
   const [squaddingPartner, setSquaddingPartner] = useState("");
   const [shirtSize, setShirtSize] = useState("L");
 
-  // Agreements
-  const [waiverAgreed, setWaiverAgreed] = useState(false);
-  const [coldRangeAgreed, setColdRangeAgreed] = useState(false);
+  // Agreements (Handled day-of-event at range check-in)
+  const [waiverAgreed, setWaiverAgreed] = useState(true);
+  const [coldRangeAgreed, setColdRangeAgreed] = useState(true);
 
   // Submitting / Confirmation State
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -214,11 +214,6 @@ function RegisterContent() {
   };
 
   const handleCompleteRegistration = async (paymentMethod = "APPLE_PAY") => {
-    if (!waiverAgreed || !coldRangeAgreed) {
-      alert("Please accept the Range Safety & Cold Range liability waivers to confirm registration.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     const ticketNumber = `SS-2026-${selectedMatch.location.slice(0, 4).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1051,42 +1046,24 @@ function RegisterContent() {
                   </div>
                 </div>
 
-                {/* Safety & Liability Waivers */}
-                <div className="space-y-3 p-5 rounded-2xl bg-white/[0.02] border border-white/10">
-                  <span className="text-xs font-mono uppercase text-slate-300 font-bold block">
-                    Mandatory Range Safety Protocols
-                  </span>
-
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={coldRangeAgreed}
-                      onChange={(e) => setColdRangeAgreed(e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded border-white/20 text-amber-500 focus:ring-0 bg-black/60"
-                    />
-                    <span className="text-xs text-slate-300 leading-relaxed">
-                      <strong>Cold Range & Chamber Flag Rule:</strong> I agree that all rifles must have an illuminated chamber flag inserted at all times until instructed by the Range Officer on the firing line.
-                    </span>
-                  </label>
-
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={waiverAgreed}
-                      onChange={(e) => setWaiverAgreed(e.target.checked)}
-                      className="mt-1 w-4 h-4 rounded border-white/20 text-amber-500 focus:ring-0 bg-black/60"
-                    />
-                    <span className="text-xs text-slate-300 leading-relaxed">
-                      <strong>Liability & Media Waiver:</strong> I release Subsonic Society, match officials, and venue landowners from all liability and grant permission for competitive score broadcasting and event media recording.
-                    </span>
-                  </label>
+                {/* Day of Event Range Safety & Waiver Notice */}
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                      Range Safety &amp; Match Waiver
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      All physical waivers, cold range safety protocols, and competitor check-ins will be completed in person on the day of the event at The Hideout.
+                    </p>
+                  </div>
                 </div>
 
                 {/* One-Click Instant Checkout Buttons */}
                 <div className="space-y-3 pt-2">
                   <button
                     type="button"
-                    disabled={isSubmitting || !waiverAgreed || !coldRangeAgreed}
+                    disabled={isSubmitting}
                     onClick={() => handleCompleteRegistration("APPLE_PAY")}
                     className="w-full py-4 rounded-2xl bg-white hover:bg-slate-100 text-black font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -1102,7 +1079,7 @@ function RegisterContent() {
 
                   <button
                     type="button"
-                    disabled={isSubmitting || !waiverAgreed || !coldRangeAgreed}
+                    disabled={isSubmitting}
                     onClick={() => handleCompleteRegistration("CREDIT_CARD")}
                     className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-black font-extrabold text-sm flex items-center justify-center gap-2 transition-all shadow-tactical-glow disabled:opacity-50 disabled:cursor-not-allowed"
                   >

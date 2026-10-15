@@ -6,7 +6,6 @@ import Image from "next/image";
 import { 
   Mail, 
   Phone, 
-  MapPin, 
   Send, 
   CheckCircle2, 
   Sparkles, 
@@ -250,27 +249,8 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Right Column: Key Contacts & Facility Details */}
+        {/* Right Column: Title Sponsor Spotlight */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Facility Location Card */}
-          <div className="ios-glass-card rounded-3xl p-6 border border-white/10 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">The Hideout Range</h4>
-                <p className="text-[11px] font-mono text-amber-400">Bristol, Tennessee</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Perched at 3,420 FT elevation on Holston Mountain. 50-meter zero bay, 18-stage barricade proving grounds, and 465-yard extreme subsonic glide canyon.
-            </p>
-            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1 text-[11px] font-mono">
-              <div className="text-slate-400">GPS COORDINATES:</div>
-              <div className="text-white font-bold">36.5951° N, 82.1887° W</div>
-            </div>
-          </div>
 
           {/* Presenting Sponsor Spotlight Badge */}
           <div className="ios-glass rounded-3xl p-6 border border-amber-500/30 space-y-3 relative overflow-hidden group">

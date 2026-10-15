@@ -93,6 +93,20 @@ const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string })
   );
 };
 
+const isRealShooterPhoto = (img?: string | null): boolean => {
+  if (!img) return false;
+  if (
+    img.includes("SS-RWB-LOGO") ||
+    img.includes("subsonic-logo") ||
+    img.includes("subsonic-coin") ||
+    img.includes("subsoniccoin") ||
+    img.includes("logo")
+  ) {
+    return false;
+  }
+  return img.startsWith("data:") || img.startsWith("http") || img.startsWith("/");
+};
+
 function ShootersContent() {
   const searchParams = useSearchParams();
   const requestedId = searchParams.get("id");
@@ -429,15 +443,15 @@ function ShootersContent() {
                         <div className="flex items-center gap-3 min-w-0">
                           {/* Competitor Avatar */}
                           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400/60 shadow-md relative shrink-0 bg-black">
-                            {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") ? (
+                            {isRealShooterPhoto(shooter.image) ? (
                               <img
-                                src={shooter.image}
+                                src={shooter.image!}
                                 alt={getShooterDisplayName(shooter)}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-amber-400 font-black text-sm">
-                                {shooter.callsign?.slice(0, 2) || "SS"}
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-500/25 via-black to-zinc-900 text-amber-300 font-mono font-black text-xs uppercase tracking-wider">
+                                <span>{shooter.callsign ? shooter.callsign.slice(0, 3) : shooter.name ? shooter.name.split(" ").map((w) => w[0]).join("").slice(0, 2) : "SS"}</span>
                               </div>
                             )}
                           </div>

@@ -265,6 +265,24 @@ function ProInviteContent() {
       return;
     }
 
+    if (!homeRange.trim()) {
+      setFormError("Please enter your Home Range facility. All profile fields are required.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!ranking.trim()) {
+      setFormError("Please enter your Experience Level or Match Title (e.g. PRS Competitor, Club Marksman). All profile fields are required.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    if (!headshotResult?.dataUrl) {
+      setFormError("A profile headshot photo is required. Please upload a clear photo of yourself to publish your competitor profile.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!agreeTerms) {
       setFormError("You must read and agree to the Terms of Use and platform conduct rules to publish your Pro Profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -724,9 +742,14 @@ function ProInviteContent() {
             {/* Photo 1: Headshot Portrait */}
             <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-amber-400 uppercase">
-                  1. Marksman Portrait (1:1 Square)
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-amber-400 uppercase">
+                    1. Marksman Headshot Portrait
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold border border-red-500/30">
+                    REQUIRED *
+                  </span>
+                </div>
                 {headshotResult && (
                   <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" />
@@ -736,7 +759,9 @@ function ProInviteContent() {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-amber-500/40 bg-zinc-950 shrink-0 relative flex items-center justify-center">
+                <div className={`w-24 h-24 rounded-2xl overflow-hidden border-2 bg-zinc-950 shrink-0 relative flex items-center justify-center ${
+                  headshotResult ? "border-emerald-500/60" : "border-amber-500/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                }`}>
                   {headshotResult ? (
                     <img
                       src={headshotResult.dataUrl}
@@ -744,7 +769,7 @@ function ProInviteContent() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Camera className="w-8 h-8 text-slate-600" />
+                    <Camera className="w-8 h-8 text-amber-400 animate-pulse" />
                   )}
                   {compressingHeadshot && (
                     <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
@@ -754,9 +779,9 @@ function ProInviteContent() {
                 </div>
 
                 <div className="space-y-2 flex-1">
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold transition-all shadow-tactical-glow">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{headshotResult ? "Replace Headshot" : "Upload Headshot"}</span>
+                    <span>{headshotResult ? "Replace Headshot Photo" : "Upload Headshot Photo *"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -771,8 +796,8 @@ function ProInviteContent() {
                       <div>Resolution: {headshotResult.width}x{headshotResult.height}px WebP</div>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-slate-400 leading-snug">
-                      Smartphone photos will be automatically auto-cropped and compressed to 1:1 portrait.
+                    <p className="text-[11px] text-amber-200/90 leading-snug">
+                      <strong>Required for official athlete profile:</strong> Upload a clear photo of yourself. Smartphone selfies will be auto-cropped and compressed to 1:1 portrait.
                     </p>
                   )}
                 </div>

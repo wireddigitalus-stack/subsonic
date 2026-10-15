@@ -1,17 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { 
-  ShieldCheck, 
   AlertTriangle, 
-  FileText, 
   Scale, 
-  Lock, 
-  Radio, 
   CheckCircle2, 
   ArrowLeft,
-  Mail,
-  Flame,
-  Target
+  Mail
 } from "lucide-react";
 
 export const metadata = {
@@ -65,107 +59,16 @@ export default function TermsPage() {
         </p>
       </section>
 
-      {/* Terms Sections */}
-      <div className="space-y-6">
-        {/* 1. Acceptance & Invitation-Only Access */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <Lock className="w-4 h-4 text-amber-400" />
-            <span>1. Eligibility &amp; Invitation-Only Status</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Controlled Membership Network</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Access to Subsonic Society digital infrastructure is granted strictly by invitation pass. Members are issued a unique tactical callsign and personal security PIN. You agree to maintain the confidentiality of your PIN and are solely responsible for all dispatches, messages, and DOPE logs transmitted under your callsign. Sharing or transferring credentials without written authorization from Society Executive Command is strictly prohibited.
-          </p>
+      {/* Day of Event Notice */}
+      <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
+        <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-xs uppercase tracking-wider">
+          <CheckCircle2 className="w-4 h-4 text-amber-400" />
+          <span>Match Waivers &amp; Range Safety Protocols</span>
         </div>
-
-        {/* 2. Platform Usage & AI Moderation */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <Radio className="w-4 h-4 text-emerald-400" />
-            <span>2. Private Comms &amp; Automated Safety Moderation</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Sportsmanship, Decorum &amp; AI Sentinel</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            All private comms rooms, DOPE card drops, and match telemetry feeds are monitored in real time by automated security sentinels (powered by Gemini AI and heuristic pattern matching) to evaluate compliance with community standards. You agree to interact with fellow marksmen professionally and respectfully. The following activities will trigger automated disarming and instant suspension:
-          </p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono pt-2 text-slate-300">
-            <li className="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-              <span>Harassment, bullying, or defamation</span>
-            </li>
-            <li className="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-              <span>Hate speech or personal attacks</span>
-            </li>
-            <li className="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-              <span>Commercial solicitation or spamming</span>
-            </li>
-            <li className="flex items-center gap-2 p-2 rounded-xl bg-black/40 border border-white/5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" />
-              <span>Impersonating match directors or R.O.s</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* 3. Range Safety & Cold Range Rule */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-cyan-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <Target className="w-4 h-4 text-cyan-400" />
-            <span>3. Range Safety, Cold Range &amp; Chamber Flags</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Absolute Precision Firearm Safety Rules</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            All registered competitors and attendees of Subsonic Society physical events (including matches hosted at The Hideout in Bristol, TN and regional partner venues) must strictly obey the Cold Range rule:
-          </p>
-          <div className="p-4 rounded-xl bg-black/50 border border-cyan-500/30 space-y-2 text-xs">
-            <div className="flex items-start gap-2 text-cyan-300 font-bold">
-              <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-              <span>Illuminated Chamber Flags (Empty Chamber Indicator / ECI) must be inserted into all rimfire actions at all times, with magazines removed, until the Range Officer commands &ldquo;Make Ready&rdquo;.</span>
-            </div>
-            <div className="flex items-start gap-2 text-cyan-300 font-bold">
-              <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-              <span>Muzzle discipline is absolute. Any 180-degree rule violation or accidental discharge will trigger immediate match disqualification (DQ) without refund.</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Ballistics Telemetry & User Content */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-purple-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <FileText className="w-4 h-4 text-purple-400" />
-            <span>4. Ballistics Data, DOPE Drops &amp; Intellectual Property</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Community Knowledge Sharing</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            By sharing ballistic tables, DOPE card drops, chronograph data, rifle build specs, and match tips, you grant Subsonic Society a perpetual, non-exclusive license to index, display, and aggregate this data for community education and platform analytics. Ballistic data shared by users is for informational purposes only; each marksman is solely responsible for verifying their own elevation, windage, and firearm capabilities.
-          </p>
-        </div>
-
-        {/* 5. Limitation of Liability */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-amber-400" />
-            <span>5. Assumption of Risk &amp; Limitation of Liability</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Sporting Participation &amp; Release</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Shooting sports and extreme long-range rimfire competition inherently involve risks. To the fullest extent permitted by applicable law, Subsonic Society, its founders, match directors, volunteers, and facility partners (including The Hideout Bristol) shall not be liable for any indirect, incidental, or consequential damages resulting from your use of the platform, participation in matches, or reliance upon user-submitted ballistic data.
-          </p>
-        </div>
-
-        {/* 6. Account Revocation & Modifications */}
-        <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
-          <div className="flex items-center gap-2 text-slate-400 font-mono font-bold text-xs uppercase tracking-wider">
-            <Flame className="w-4 h-4 text-slate-400" />
-            <span>6. Termination &amp; Right to Revoke</span>
-          </div>
-          <h2 className="text-lg font-bold text-white">Discretionary Credential Authority</h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Subsonic Society reserves the right to modify these Terms of Use at any time. Continued access to the platform following notice of changes constitutes acceptance. We reserve the absolute right to revoke any member invitation, terminate credentials, or disqualify any competitor who violates range safety, sportsmanship standards, or platform rules.
-          </p>
-        </div>
+        <h2 className="text-lg font-bold text-white">Day of Event In-Person Check-In</h2>
+        <p className="text-sm text-slate-300 leading-relaxed">
+          All competitor liability waivers, cold range safety protocols, and venue guidelines will be executed in person on the day of the event during morning check-in at The Hideout.
+        </p>
       </div>
 
       {/* Legal & Inquiries Footer */}
