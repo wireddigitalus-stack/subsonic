@@ -56,7 +56,7 @@ const MATCHES_DATA: MatchCard[] = [
     presentingPartner: "Modacam Custom Rifles",
     status: "FILLING",
     tier: "INVITATIONAL",
-    description: "The crown jewel of the Subsonic Society calendar. 18 natural-terrain stages across steep Appalachian ridgelines with extreme long-range subsonic engagements out to 465 yards. $5,000 Main Match cash payouts + $2,500 Cash Side Matches. Sat & Sun Meals Included.",
+    description: "The crown jewel of the Subsonic Society calendar. 18 natural-terrain stages across steep Appalachian ridgelines with extreme long-range subsonic engagements out to 465 yards. $5,000 Main Match cash payouts + $2,500 Cash Side Matches. Saturday Lunch & Dinner Included.",
     featured: true,
   }
 ];
@@ -145,12 +145,12 @@ export default function MatchesPage() {
                     <span>$7,500 TOTAL CASH PRIZES</span>
                   </div>
                   <div className="text-xs font-mono text-amber-300 font-bold">
-                    $5,000 Main Match Purse • $2,500 Cash Side Matches • Sat &amp; Sun Meals Included
+                    $5,000 Main Match Purse • $2,500 Cash Side Matches • Saturday Lunch &amp; Dinner Included
                   </div>
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                  18 grueling stages in the high-elevation Appalachian wind at The Hideout in Bristol, TN. Over 465 yards of steel with cold-bore long gong targets and $2,500 in dedicated Friday cash side matches.
+                  18 grueling stages in the high-elevation Appalachian wind at The Hideout in Bristol, TN. Over 465 yards of steel with cold-bore long gong targets and $2,500 in dedicated cash side matches.
                 </p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
@@ -168,7 +168,7 @@ export default function MatchesPage() {
                   </div>
                   <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                     <span className="text-[10px] font-mono text-slate-400 block">HOSPITALITY</span>
-                    <span className="text-xs sm:text-sm font-bold text-emerald-400">Sat &amp; Sun Meals Included</span>
+                    <span className="text-xs sm:text-sm font-bold text-emerald-400">Sat Lunch &amp; Dinner</span>
                   </div>
                 </div>
 
@@ -228,7 +228,7 @@ export default function MatchesPage() {
                   </span>
 
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    Sat &amp; Sun Meals Included
+                    Saturday Lunch &amp; Dinner Included
                   </span>
                 </div>
 

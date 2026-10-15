@@ -230,7 +230,7 @@ export default function TheHideoutPage() {
               <span>Competitor Lodging &amp; Dining</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Competitors stay at official Bristol hotels or rent lakeside cabins around South Holston Lake. Saturday &amp; Sunday range meals are included for all registered Invitational competitors.
+              Competitors stay at official Bristol hotels or rent lakeside cabins around South Holston Lake. Saturday lunch and dinner are included for all registered Invitational competitors.
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2">
               <Link

@@ -529,7 +529,7 @@ function RegisterContent() {
                       </span>
                       <span className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
                         <Check className="w-3.5 h-3.5" />
-                        Sat &amp; Sun Meals Included
+                        Saturday Lunch &amp; Dinner Included
                       </span>
                     </div>
                     <span className="text-lg font-extrabold text-white font-mono">

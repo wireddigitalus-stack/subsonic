@@ -905,7 +905,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                   $7,500 TOTAL CASH PRIZES ($5,000 MAIN MATCH • $2,500 SIDE MATCHES)
                 </div>
                 <div className="text-slate-400 text-xs font-mono uppercase tracking-wider pt-0.5">
-                  18 Natural Terrain Stages • Sat &amp; Sun Meals Included • The Hideout • Bristol, TN
+                  18 Natural Terrain Stages • Sat Lunch &amp; Dinner Included • The Hideout • Bristol, TN
                 </div>
               </div>
 

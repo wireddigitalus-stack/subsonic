@@ -235,7 +235,7 @@ export function ProfileEditModal({
       division: isRob ? "Lead Developer & Tech Advisor" : isAllen ? "Owner Admin / Executive" : division,
       ranking: isRob ? "Owner • Lead Systems Developer" : isAllen ? "Founder • Subsonic Society" : "Verified Competitor",
       homeRange: homeRange.trim() || "The Hideout, Bristol, TN",
-      email: existingProfileData?.email || initialShooter?.email || (isRob ? "rob@wired-digital.com" : isAllen ? "allen@modacamcustomrifles.com" : undefined),
+      email: existingProfileData?.email || initialShooter?.email || (isRob ? "rob@wired-digital.com" : isAllen ? "ahurley@subsonicsociety.com" : undefined),
       phone: existingProfileData?.phone || initialShooter?.phone || (isAllen ? "423-555-0100" : undefined),
       mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress || (isAllen ? "Bristol, TN" : "Bristol, TN"),
       quote: quote.trim() || (isRob ? "Architecture, precision optics, and sub-MOA reliability on the digital ridge." : "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind."),

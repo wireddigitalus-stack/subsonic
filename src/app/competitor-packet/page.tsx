@@ -392,7 +392,7 @@ export default function CompetitorPacketPage() {
             <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
               Everything you need for the championship weekend: Founder Allen Hurley’s welcome address, 
               full 3-day schedule, <strong className="text-amber-400 font-bold">$7,500 total cash prizes ($5,000 main match + $2,500 cash side matches)</strong>, 
-              <strong className="text-emerald-400 font-bold">Saturday &amp; Sunday meals included</strong>, 
+              <strong className="text-emerald-400 font-bold">Saturday lunch &amp; dinner included</strong>, 
               220-acre facility amenities, 12 recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
             </p>
           </div>
@@ -422,8 +422,8 @@ export default function CompetitorPacketPage() {
                 <Trophy className="w-4 h-4 text-emerald-400" />
                 Hospitality
               </div>
-              <div className="text-lg sm:text-xl font-black text-emerald-400 mt-1">Sat &amp; Sun Meals Included</div>
-              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Breakfasts, Lunch &amp; Smoked BBQ</div>
+              <div className="text-lg sm:text-xl font-black text-emerald-400 mt-1">Saturday Lunch &amp; Dinner</div>
+              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Included With Registration</div>
             </div>
 
             <div className="p-4 rounded-xl bg-white/[0.03] border border-amber-500/20 backdrop-blur-sm shadow-[0_0_15px_rgba(245,158,11,0.08)]">
@@ -654,19 +654,9 @@ export default function CompetitorPacketPage() {
               <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                 <Coffee className="w-5 h-5" />
               </div>
-              <h4 className="text-lg font-bold text-white">60&apos; x 40&apos; Covered Pavilion & Kitchen</h4>
+              <h4 className="text-lg font-bold text-white">24&apos; x 40&apos; Covered Pavilion</h4>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Full commercial on-site kitchen, covered dining seating for the entire roster, and real-time electronic match scoring displays.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-amber-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Car className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">Dirt Track, Staging & RV Lodging</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                1/4-mile dirt flat track & supercross rhythm section with ample squad staging. Note: The clubhouse does not have on-site RV hookups at this time; reputable regional RV parks (Hilltop Campground, Lakeview RV Resort) are located 10–12 minutes away.
+                Covered pavilion gathering area for competitor check-in, shooter briefings, and Saturday meals.
               </p>
             </div>
           </div>
@@ -815,26 +805,19 @@ export default function CompetitorPacketPage() {
                 <span>Competitor Hospitality Included</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-white">
-                Saturday &amp; Sunday Meals Covered With Competitor Registration
+                Saturday Lunch &amp; Dinner Covered With Competitor Registration
               </h3>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-                Enjoy hot breakfasts each morning, full catered lunches between stage rotations, 
-                and Saturday night&apos;s slow-smoked mountain BBQ feast at the 20x20 stone fire pit.
+                Saturday lunch and Saturday dinner are provided on-site for registered competitors.
               </p>
-              <div className="text-xs sm:text-sm font-mono text-slate-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Family & Spectators: $15/day meal band available at Pavilion check-in.</span>
-              </div>
             </div>
 
             <div className="shrink-0 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs sm:text-sm font-mono">
               <div className="text-slate-300 font-bold tracking-wider">HOSPITALITY PASS</div>
-              <div className="text-lg font-black text-emerald-400">SAT &amp; SUN MEALS INCLUDED</div>
+              <div className="text-lg font-black text-emerald-400">SATURDAY MEALS INCLUDED</div>
               <div className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                • Friday Evening Social<br />
-                • Sat & Sun Breakfasts<br />
-                • Saturday Catered Lunch<br />
-                • Smoked BBQ Pit Dinner
+                • Saturday Lunch Provided<br />
+                • Saturday Dinner Provided
               </div>
             </div>
           </div>

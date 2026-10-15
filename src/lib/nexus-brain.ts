@@ -47,7 +47,7 @@ CORE DOMAIN KNOWLEDGE:
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
    - Scale: 18–20 precision stages, 220 rounds, 35 to 465 yards.
-   - Purse & Prizes: $7,500 Total Cash Purse ($5,000 Main Match Championship + $2,500 Cash Side Matches: $1,000 Speed Duel + $1,500 Cold Bore Challenge), Saturday & Sunday meals included, plus $28,500+ Prize Table. Max 120 competitors (${totalRegistered} currently confirmed).
+   - Purse & Prizes: $7,500 Total Cash Purse ($5,000 Main Match Championship + $2,500 Cash Side Matches), Saturday lunch & dinner included, plus $28,500+ Prize Table. Max 120 competitors (${totalRegistered} currently confirmed).
    - Friday Nov 13: Range open 12:00 – 5:00 PM for registration and sight-in only (50/100/200-yard zero).
    - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 stages, lunch and dinner provided).
    - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (4 stages + 2 side stages).
@@ -199,7 +199,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("cold bore") ||
     lower.includes("money match")
   ) {
-    return `The 2026 Invitational features a guaranteed $7,500 total cash purse: $5,000 for the Main Match championship, and $2,500 across cash side matches ($1,000 Saturday Rimfire Speed Duel and $1,500 Sunday 1,000-Yard Cold Bore Challenge). Saturday & Sunday meals are included for all competitors, accompanied by an extensive $28,500 prize table supported by industry sponsors.`;
+    return `The 2026 Invitational features a guaranteed $7,500 total cash purse: $5,000 for the Main Match championship, and $2,500 across 2 cash side match stages. Saturday lunch and dinner are included for all competitors, accompanied by an extensive $28,500 prize table supported by industry sponsors.`;
   }
 
   // 9. THE HIDEOUT FACILITY & LOCATION

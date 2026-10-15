@@ -103,7 +103,7 @@ export default function CalendarPage() {
             PRECISION RIMFIRE <span className="amber-gradient-text">EVENT CALENDAR</span>
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            Official schedule and stage briefing for the Subsonic Society Invitational ($7,500 Total Cash Prizes • Sat &amp; Sun Meals Included) at The Hideout in Bristol, TN.
+            Official schedule and stage briefing for the Subsonic Society Invitational ($7,500 Total Cash Prizes • Saturday Lunch &amp; Dinner Included) at The Hideout in Bristol, TN.
           </p>
         </div>
       </div>
@@ -266,7 +266,7 @@ export default function CalendarPage() {
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5 flex items-center gap-3">
                   <User className="w-4 h-4 text-blue-400" />
                   <div className="text-xs">
-                    <span className="text-slate-400">Match Director: </span>
+                    <span className="text-slate-400">Event Director: </span>
                     <strong className="text-white">{selectedMatch.matchDirector.name}</strong>
                     <div className="text-[11px] text-slate-500 font-mono">{selectedMatch.matchDirector.email}</div>
                   </div>
@@ -277,7 +277,7 @@ export default function CalendarPage() {
                   <div className="text-xs">
                     <span className="text-slate-400">Prize Table: </span>
                     <strong className="text-emerald-400">{selectedMatch.prizePool}</strong>
-                    <div className="text-[11px] text-slate-500">$5,000 Main Match • $2,500 Side Matches • Sat &amp; Sun Meals Included</div>
+                    <div className="text-[11px] text-slate-500">$5,000 Main Match • $2,500 Side Matches • Sat Lunch &amp; Dinner Included</div>
                   </div>
                 </div>
               </div>

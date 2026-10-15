@@ -28,7 +28,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
       phone: "(423) 555-0198",
     },
     description:
-      "Perched high on the ridgeline overlooking the East Tennessee mountains at The Hideout, the Subsonic Society Invitational tests competitors against drastic elevation changes, variable mountain thermals, and reactive steel targets stretched out to 465 yards. Guaranteed $7,500 total purse ($5,000 Main Match • $2,500 Cash Side Matches). All Saturday & Sunday meals included with registration.",
+      "Perched high on the ridgeline overlooking the East Tennessee mountains at The Hideout, the Subsonic Society Invitational tests competitors against drastic elevation changes, variable mountain thermals, and reactive steel targets stretched out to 465 yards. Guaranteed $7,500 total purse ($5,000 Main Match • $2,500 Cash Side Matches). Saturday lunch & dinner included with registration.",
     stageBriefs: [
       {
         stageNumber: 1,

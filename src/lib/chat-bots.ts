@@ -178,11 +178,10 @@ interface MessagePool {
 const MESSAGE_POOLS: MessagePool = {
   "invitational": {
     "bot-garrett": [
-      "All competitors: Zero confirmation range opens Friday Nov 13 at 10:00 AM sharp at The Hideout. Chrono station at Pavilion 1.",
-      "Reminder: Mandatory safety brief is 07:30 AM Saturday morning under the main pavilion. Check your chamber flags.",
-      "The $1,000 Rimfire Speed Duel brackets will be drawn Saturday at 4:00 PM right before the head-to-head showdown.",
-      "Sunday afternoon: $1,500 1,000-Yard Cold Bore Challenge on the centerfire range. One shot, cold bore, 1,000 yards on steel.",
-      "Full hospitality update: Smoked BBQ dinner Friday at 5:30 PM, hot breakfasts Sat/Sun, and catered lunch Saturday are all included.",
+      "All competitors: Range is open Friday Nov 13 from 12:00 to 5:00 PM for registration and sight-in only (50, 100, and 200-yard zero).",
+      "Reminder: Range opens at 7:00 AM Saturday and Sunday with sight-in until 8:30 AM. Shooter brief is at 8:30 AM and first shot is at 9:00 AM.",
+      "Saturday features 8 main match stages with lunch and dinner provided on-site for all competitors.",
+      "Sunday features 4 main match stages followed by 2 cash side match stages ($2,500 purse).",
     ],
     "bot-wyatt": [
       "The Bristol Hotel on State Street is where our squad is staging. Lumac Rooftop Bar has killer sunset views over the mountains.",

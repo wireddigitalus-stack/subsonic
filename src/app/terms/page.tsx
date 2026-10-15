@@ -75,14 +75,13 @@ export default function TermsPage() {
       <div className="p-6 rounded-3xl ios-glass border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         <div className="space-y-1 text-center sm:text-left">
           <div className="font-bold text-white">Questions regarding our rules or governance?</div>
-          <p className="text-slate-400">Direct all compliance and legal inquiries to Executive Command.</p>
         </div>
         <a 
-          href="mailto:allen@subsonicsociety.com"
+          href="mailto:ahurley@subsonicsociety.com"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-mono font-bold tracking-wider transition-all"
         >
           <Mail className="w-4 h-4" />
-          <span>CONTACT EXECUTIVE COMMAND</span>
+          <span>CONTACT SUBSONIC</span>
         </a>
       </div>
     </div>

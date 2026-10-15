@@ -118,7 +118,7 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
     member_id: "SS-PRO-SUBX",
     full_name: "Allen Hurley",
     callsign: "SUBX",
-    email: "allen@subsonicsociety.com",
+    email: "ahurley@subsonicsociety.com",
     state: "TN",
     experience_level: "Owner Admin / Executive",
     rifle_setup: "Modacam Custom Precision V-22 / ZCO 527",
