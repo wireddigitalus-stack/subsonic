@@ -193,7 +193,7 @@ const FORMAL_SALE_WARNINGS = [
 ];
 
 const HARASSMENT_WARNINGS = [
-  (c: string) => `🚫 [${c}] — Unsportsmanlike conduct and targeted harassment will not be tolerated. This incident has been logged by the Range Officer and escalated to Match Director Allen Hurley.`,
+  (c: string) => `🚫 [${c}] — Unsportsmanlike conduct and targeted harassment will not be tolerated. This incident has been logged by the Range Officer and escalated to Event Director Allen Hurley.`,
 ];
 
 const UNSPORTSMANLIKE_WARNINGS = [
@@ -355,7 +355,7 @@ export function getFaqResponse(content: string): string {
     lower.includes("money match")
   ) {
     return `🎯 **Range Officer Notice — Event & Match Operations:**\n\n` +
-      `All official match schedules, registration, stage briefings, and event prize details are managed directly by Match Director Allen Hurley.\n\n` +
+      `All official match schedules, registration, stage briefings, and event prize details are managed directly by Event Director Allen Hurley.\n\n` +
       `For Bristol lodging, campgrounds, top restaurants (like steaks & sushi at 620 State), local attractions, and range safety rules, I'm here 24/7!`;
   }
 
@@ -378,7 +378,7 @@ export function getFaqResponse(content: string): string {
       `  - Sporting Clays & Skeet Field\n` +
       `• **Clubhouse:** Air-conditioned pro shop, lounge, conference rooms & staging pavilions\n` +
       `• **Camping / RVs:** No on-site RV hookups at the clubhouse at this time. Recommended nearby Bristol RV parks: Hilltop Campground and Lakeview RV Resort (10–12 min away).\n` +
-      `• **Host:** Allen Hurley — Subsonic Society Founder ("Said. Done.")`;
+      `• **Host:** Allen Hurley — Subsonic Society Founder & Event Director ("Said. Done.")`;
   }
 
   // 7. BALLISTICS, DOPE & AMMO — OFFICIAL RANGE OFFICER POLICY
@@ -418,8 +418,8 @@ export function getFaqResponse(content: string): string {
     return `📋 **Range Safety & Match Regulations:**\n\n` +
       `1️⃣ **Cold Range Standard:** Rifles remain completely unloaded with chamber flags inserted until the RO gives the command to load and make ready.\n` +
       `2️⃣ **Muzzle Discipline:** 120-degree muzzle rule enforced on all transition stages and barricades.\n` +
-      `3️⃣ **Eye & Ear Protection:** Mandatory for all competitors, squad leads, ROs, and spectators.\n` +
-      `4️⃣ **Score Protests:** Inquiries must be filed with the Chief RO or Match Director within 30 minutes of stage completion.\n` +
+      `3️⃣ **Eye & Ear Protection:** Recommended at all times for all competitors, squad leads, ROs, and spectators.\n` +
+      `4️⃣ **Score Protests:** Inquiries must be filed with the Chief RO or Event Director within 30 minutes of stage completion.\n` +
       `5️⃣ **Community Comms:** No gear sales, harassment, or commercial spam on the frequency. Respect all marksmen.`;
   }
 

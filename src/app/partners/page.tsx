@@ -34,13 +34,13 @@ const PARTNERS_DATA: Partner[] = [
     name: "Modacam Custom Rifles",
     role: "Title Sponsor — Subsonic Society Invitational ($7,500 Total Purse)",
     badge: "Official Presenting Sponsor",
-    description: "Modacam Custom Rifles represents the absolute zenith of precision rimfire gunsmithing. Hand-crafted in America by master gunsmith Jonathan Elrod with blueprinted actions, single-point cut-rifled match barrels, and meticulous chamber leades, Modacam rifles are engineered to dominate high-stakes PRS and NRL22 podiums.",
+    description: "Modacam Custom Rifles represents the absolute zenith of precision rimfire gunsmithing. Hand-crafted in America by master gunsmith Jonathan Elrod with match-grade barrels and meticulous chambering, Modacam rifles are engineered to dominate high-stakes PRS and NRL22 podiums.",
     tier: "PRESENTING",
     website: "https://mcr-rifles.com",
     highlights: [
       "Sole Presenting Partner for the $7,500 Cash Purse Invitational",
       "Custom Match Rifle Build on Display at The Hideout",
-      "Precision Match Chambering & Blueprinting for Subsonic Society Competitors",
+      "Custom Match-Grade Precision Rimfire Builds for Subsonic Society Competitors",
     ],
   },
 ];
@@ -125,7 +125,7 @@ export default function PartnersPage() {
               </p>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                Founded and operated by master gunsmith Jonathan Elrod, Modacam Custom Rifles is dedicated to redefining what a precision rimfire rifle can achieve. Every rifle is hand-crafted with blueprinted actions, single-point cut-rifled match barrels, meticulous chamber leades, and dialed harmonic balance to deliver unrivaled cold-bore consistency and podium finishes.
+                Founded and operated by master gunsmith Jonathan Elrod, Modacam Custom Rifles is dedicated to redefining what a precision rimfire rifle can achieve. Every rifle is hand-crafted with match-grade barrels, meticulous chambering, and dialed harmonic balance to deliver unrivaled cold-bore consistency and podium finishes.
               </p>
 
               <div className="space-y-2 pt-2">
@@ -147,7 +147,7 @@ export default function PartnersPage() {
                   </div>
                   <div className="flex items-center gap-2 p-2.5 rounded-xl bg-black/40 border border-white/5">
                     <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Precision Match Chambering &amp; Blueprinting</span>
+                    <span>Custom Match-Grade Precision Rimfire Rifles</span>
                   </div>
                 </div>
               </div>

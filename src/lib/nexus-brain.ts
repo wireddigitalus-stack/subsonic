@@ -60,7 +60,7 @@ CORE DOMAIN KNOWLEDGE:
 
 4. SAFETY SOPs (COLD RANGE):
    - Strict Cold Range: Rifles must remain unloaded with yellow/orange chamber flags inserted at all times until on the firing line and given the command to load and make ready.
-   - 120-degree muzzle rule on all positional transitions. Mandatory eye and ear protection.
+   - 120-degree muzzle rule on all positional transitions. Eye and ear protection is recommended at all times.
 
 5. TOP SHOOTERS & PROFILES:
 ${topShooters}
@@ -119,10 +119,11 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("allen") ||
     lower.includes("hurley") ||
     lower.includes("match director") ||
+    lower.includes("event director") ||
     lower.includes("subx") ||
     lower.includes("said done")
   ) {
-    return `Allen Hurley, callsign SUBX, is the founder and Match Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the 20-stage championship course.`;
+    return `Allen Hurley, callsign SUBX, is the founder and Event Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the 20-stage championship course.`;
   }
 
   if (

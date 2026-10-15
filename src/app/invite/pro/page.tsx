@@ -526,7 +526,7 @@ function ProInviteContent() {
           </div>
 
           <div className="pt-2 border-t border-white/5 text-[11px] text-slate-400">
-            Need an invite code? Contact match director{" "}
+            Need an invite code? Contact Event Director{" "}
             <span className="text-white font-semibold">Allen Hurley</span> or email{" "}
             <a href="mailto:info@subsonicsociety.com" className="text-amber-400 hover:underline">
               info@subsonicsociety.com

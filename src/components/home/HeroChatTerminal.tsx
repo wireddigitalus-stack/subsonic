@@ -153,7 +153,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
 
     // Sequence: Stream Allen Hurley's welcome message, reveal the Claim Invitation card, and stop on that card
     const sequence = [
-      { delay: 100, typingDelay: 600, msg: STREAM_ITEMS[0], typingWho: "Match Director Allen Hurley" },
+      { delay: 100, typingDelay: 600, msg: STREAM_ITEMS[0], typingWho: "Event Director Allen Hurley" },
     ];
 
     sequence.forEach(({ delay, typingDelay, msg, typingWho }) => {
@@ -231,7 +231,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
       }, 700);
     } else if (actionType === "SQUAD") {
       setIsTyping(true);
-      setTypingName("Match Director Allen");
+      setTypingName("Event Director Allen");
       setTimeout(() => {
         setIsTyping(false);
         setTypingName(null);
@@ -239,9 +239,9 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
           id: `custom-squad-${Date.now()}`,
           sender: {
             name: "Allen Hurley",
-            callsign: "DIRECTOR",
+            callsign: "SUBX",
             role: "MATCH_DIRECTOR",
-            roleBadge: "EXECUTIVE / MD",
+            roleBadge: "EVENT DIRECTOR",
             avatar: "/assets/subsonic-logo-round.png",
             color: "border-emerald-400 text-emerald-300 bg-emerald-500/15",
           },

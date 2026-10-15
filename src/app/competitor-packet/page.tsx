@@ -1193,7 +1193,7 @@ export default function CompetitorPacketPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
               <h4 className="text-base sm:text-lg font-bold text-red-400 flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
@@ -1220,30 +1220,19 @@ export default function CompetitorPacketPage() {
             <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
               <h4 className="text-base sm:text-lg font-bold text-amber-400 flex items-center gap-2">
                 <Clock className="w-5 h-5 shrink-0" />
-                Eye & Ear Protection
+                Eye &amp; Ear Protection
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                Eye and hearing protection are mandatory at all times forward of the Pavilion parking perimeter whenever any range is active. 
+                Eye and ear protection is recommended at all times forward of the Pavilion parking perimeter whenever any range is active. 
                 This applies to all competitors, match staff, ROs, and spectators.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
-              <h4 className="text-base sm:text-lg font-bold text-cyan-400 flex items-center gap-2">
-                <Navigation className="w-5 h-5 shrink-0" />
-                November Weather & Gear Recommendations
-              </h4>
-              <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                Mid-November in Bristol typically experiences morning lows in the 30s–40s°F and daytime highs in the 50s–60s°F. 
-                Ridge winds along the mountain draws can shift quickly. Competitors are strongly advised to dress in layers and carry windproof outer garments.
               </p>
             </div>
           </div>
 
-          {/* Match Director Signoff Footer Card */}
+          {/* Event Director Signoff Footer Card */}
           <div className="p-6 sm:p-7 rounded-2xl bg-zinc-950 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div>
-              <div className="text-xs sm:text-sm font-mono text-slate-300 uppercase tracking-wider font-semibold">Match Director Contact</div>
+              <div className="text-xs sm:text-sm font-mono text-slate-300 uppercase tracking-wider font-semibold">Event Director Contact</div>
               <div className="text-lg sm:text-xl font-bold text-white mt-0.5">Allen Hurley • Subsonic Society</div>
               <div className="text-sm sm:text-base text-slate-300">The Hideout • 111 Hwy 44, Bristol, TN 37620</div>
             </div>
