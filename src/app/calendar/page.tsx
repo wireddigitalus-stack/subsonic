@@ -103,7 +103,7 @@ export default function CalendarPage() {
             PRECISION RIMFIRE <span className="amber-gradient-text">EVENT CALENDAR</span>
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl">
-            Register for sanctioned pro matches, regional qualifiers, and ballistics clinics held on the mountain ranges of Bristol, TN.
+            Register for the premier Subsonic Society Invitational held on the mountain ranges of Bristol, TN.
           </p>
         </div>
 
@@ -111,9 +111,7 @@ export default function CalendarPage() {
         <div className="bg-black/60 p-1.5 rounded-2xl border border-white/10 flex flex-wrap gap-1">
           {[
             { id: "ALL", label: "All Events" },
-            { id: "PRO_SERIES", label: "Pro Series" },
-            { id: "REGIONAL_QUALIFIER", label: "Regional" },
-            { id: "CLINIC", label: "Clinics" },
+            { id: "PRO_SERIES", label: "Invitational" },
           ].map((tab) => (
             <button
               key={tab.id}

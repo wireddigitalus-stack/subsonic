@@ -404,9 +404,9 @@ export default function CompetitorPacketPage() {
               </span>
             </h1>
             <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
-              Everything you need for the championship weekend: Founder Allen Hurley’s welcome address, 
-              full 3-day schedule, $2,500 cash side matches, 220-acre facility amenities, 12 recommended hotels, 
-              and the complete Bristol dining & South Holston fly-fishing guide.
+              Everything you need for championship weekend: Founder Allen Hurley’s welcome address, 
+              full 3-day schedule, $5,000 main match purse &amp; $2,500 cash side matches, Saturday &amp; Sunday meals included, 
+              220-acre facility amenities, recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
             </p>
           </div>
 
@@ -435,17 +435,17 @@ export default function CompetitorPacketPage() {
                 <Trophy className="w-4 h-4 text-emerald-400" />
                 Hospitality
               </div>
-              <div className="text-lg sm:text-xl font-black text-emerald-400 mt-1">All Meals Included</div>
-              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Breakfasts, Lunch & Smoked BBQ</div>
+              <div className="text-lg sm:text-xl font-black text-emerald-400 mt-1">Sat &amp; Sun Meals Included</div>
+              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Breakfasts, Lunch &amp; Smoked BBQ</div>
             </div>
 
             <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
               <div className="text-xs sm:text-sm font-mono text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Target className="w-4 h-4 text-purple-400" />
-                Cash Side Matches
+                Match Purses
               </div>
-              <div className="text-lg sm:text-xl font-black text-purple-300 mt-1">$2,500 Purse</div>
-              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">1,000Y Cold Bore & Speed Duel</div>
+              <div className="text-lg sm:text-xl font-black text-purple-300 mt-1">$7,500 Total Purse</div>
+              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">$5,000 Main • $2,500 Side Matches</div>
             </div>
           </div>
 
@@ -860,7 +860,7 @@ export default function CompetitorPacketPage() {
                 <span>Competitor Hospitality Included</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-white">
-                All Weekend Meals Covered With Competitor Registration
+                Saturday &amp; Sunday Meals Covered With Competitor Registration
               </h3>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
                 Enjoy hot breakfasts each morning, full catered lunches between stage rotations, 

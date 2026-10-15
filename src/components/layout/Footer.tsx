@@ -4,11 +4,9 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
-  Radio, 
   MapPin, 
   Mountain, 
   Target, 
-  ExternalLink, 
   Shield, 
   Cpu,
   Microscope,
@@ -126,11 +124,6 @@ export function Footer() {
                   <span>Competitor Packet & Guide (PDF)</span>
                 </Link>
               </li>
-              <li>
-                <Link href="/register?match=subsonic-invitational-2026" className="text-emerald-400 font-semibold hover:underline">
-                  Squad Slot Registration
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -162,20 +155,8 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Social Feed Quick Bar */}
+        {/* Community Notice Bar */}
         <div className="mt-10 pt-6 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
-          <a
-            href="https://www.facebook.com/p/Subsonic-Society-61578052196057/"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-telemetry="footer_link_facebook"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 hover:text-white text-xs font-semibold transition-all"
-          >
-            <Radio className="w-3.5 h-3.5 text-blue-400" />
-            <span>Official Facebook Media Feed</span>
-            <ExternalLink className="w-3 h-3 text-blue-400" />
-          </a>
-
           <div className="text-[11px] text-slate-500">
             Strictly non-transactional sporting community adhering to all federal and state regulations.
           </div>

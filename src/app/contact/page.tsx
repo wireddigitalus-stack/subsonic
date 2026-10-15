@@ -16,7 +16,6 @@ import {
   Radio, 
   Calendar, 
   Clock,
-  ArrowRight,
   Key
 } from "lucide-react";
 import { recordTelemetryEvent } from "@/lib/telemetry";
@@ -293,13 +292,6 @@ export default function ContactPage() {
             <p className="text-xs text-slate-300 leading-relaxed">
               Modacam Custom Rifles is the presenting partner for the $7,500 Cash Purse Subsonic Society Invitational.
             </p>
-            <Link
-              href="/partners"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-400 font-bold hover:text-amber-300"
-            >
-              <span>Explore Partnership Details</span>
-              <ArrowRight className="w-3 h-3" />
-            </Link>
           </div>
         </div>
       </div>

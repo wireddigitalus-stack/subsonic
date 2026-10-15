@@ -164,7 +164,7 @@ export function HeroSection() {
         </div>
 
         {/* Live Countdown Banner for The Invitational */}
-        <CountdownBanner targetDate="2026-10-17T08:00:00" />
+        <CountdownBanner targetDate="2026-11-13T08:00:00" />
       </div>
     </section>
   );

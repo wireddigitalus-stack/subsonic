@@ -7,7 +7,7 @@ import {
   Home, 
   MessageSquare, 
   Trophy,
-  Radio
+  FileText
 } from "lucide-react";
 import { 
   getCommsStatus, 
@@ -83,7 +83,7 @@ export function MobileTabs() {
     { name: "Home", href: "/", icon: Home },
     { name: "Chat", href: "/chat", icon: MessageSquare },
     { name: "Shooters", href: "/shooters", icon: Trophy },
-    { name: "FB Feed", href: "/#facebook-feed", icon: Radio },
+    { name: "Packet", href: "/competitor-packet", icon: FileText },
   ];
 
   // Visual configuration for color-coded pulsing beacon

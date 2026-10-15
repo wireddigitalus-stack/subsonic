@@ -2,13 +2,13 @@ import { MatchEvent, FacebookPostItem, AthleteProfile, ChatMessage } from "./typ
 
 export const INITIAL_MATCHES: MatchEvent[] = [
   {
-    id: "bristol-pro-invitational-2026",
-    title: "Appalachian Mountain Rimfire Pro Invitational",
-    subtitle: "The Premier Precision Rimfire Shootout in the Bristol TN High Country",
-    date: "October 17-18, 2026",
+    id: "subsonic-invitational-2026",
+    title: "Subsonic Society Invitational",
+    subtitle: "The Premier $7,500 Cash Purse Championship Presented by Modacam Custom Rifles",
+    date: "November 13–15, 2026",
     time: "07:00 AM EST Check-in",
-    location: "Bristol Mountain Precision Facility, Bristol, TN",
-    locationDetails: "Ridge Line Sector 4, Holston Mountain Valley, Bristol, TN 37620",
+    location: "The Hideout Ridge Complex, Bristol, TN",
+    locationDetails: "111 Hwy 44, Bristol, TN 37620",
     coordinates: {
       lat: 36.5951,
       lng: -82.1887,
@@ -20,7 +20,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
     maxCompetitors: 120,
     registeredCount: 94,
     entryFee: 275,
-    prizePool: "$28,500 Cash & Gear Table",
+    prizePool: "$7,500 Total Purse ($5,000 Main Match • $2,500 Cash Side Matches)",
     matchDirector: {
       name: "Garrett 'Vapor' Vance",
       callsign: "MD-01",
@@ -28,7 +28,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
       phone: "(423) 555-0198",
     },
     description:
-      "Perched high on the ridgeline overlooking the East Tennessee mountains, the Appalachian Mountain Pro Invitational tests competitors against drastic elevation changes, variable thermal mountain drafts, and steel targets stretched out to a staggering 465 yards. Pro shooters and top regional marksmen will battle across two grueling days for the coveted Subsonic Society Championship Cup and cash purse.",
+      "Perched high on the ridgeline overlooking the East Tennessee mountains at The Hideout, the Subsonic Society Invitational tests competitors against drastic elevation changes, variable mountain thermals, and reactive steel targets stretched out to 465 yards. Guaranteed $7,500 total purse ($5,000 Main Match • $2,500 Cash Side Matches). All Saturday & Sunday meals included with registration.",
     stageBriefs: [
       {
         stageNumber: 1,
@@ -69,90 +69,6 @@ export const INITIAL_MATCHES: MatchEvent[] = [
     ],
     status: "SPOTS_FILLING",
     featured: true,
-  },
-  {
-    id: "bristol-regional-qualifier",
-    title: "East Tennessee Rimfire PRS Regional",
-    subtitle: "Official Points Match for Mid-Atlantic & Southeast Precision Circuits",
-    date: "November 14, 2026",
-    time: "08:00 AM EST",
-    location: "Bristol Mountain Complex, Range 2, Bristol, TN",
-    locationDetails: "Hwy 421 Mountain Access, Bristol, TN",
-    coordinates: {
-      lat: 36.581,
-      lng: -82.164,
-    },
-    tier: "REGIONAL_QUALIFIER",
-    stages: 10,
-    roundCount: 115,
-    distanceRange: "40 – 310 Yards",
-    maxCompetitors: 75,
-    registeredCount: 42,
-    entryFee: 110,
-    prizePool: "$6,500 Prize Table",
-    matchDirector: {
-      name: "Caleb Sterling",
-      callsign: "RO-CHIEF",
-      email: "caleb@subsonicsociety.com",
-      phone: "(423) 555-0144",
-    },
-    description:
-      "A fast-paced regional qualifier featuring balanced barricades, tank traps, spool transitions, and positional rimfire challenges designed for regional rank points.",
-    stageBriefs: [
-      {
-        stageNumber: 1,
-        name: "Tank Trap Shuffle",
-        distance: "95 yds",
-        targetType: "Reactive Steel T-Post",
-        roundCount: 10,
-        timeLimit: "90 seconds",
-        description: "Shoot 2 rounds each from 5 distinct pipe tips on the tank trap.",
-      },
-    ],
-    status: "REGISTRATION_OPEN",
-    featured: false,
-  },
-  {
-    id: "subsonic-youth-academy",
-    title: "Subsonic Society Precision Rimfire Clinic",
-    subtitle: "Hands-on Masterclass: Wind Reading, Ballistic Solvers & Positional Stability",
-    date: "December 5, 2026",
-    time: "09:00 AM - 04:00 PM EST",
-    location: "Subsonic Mountain Training Pavilion, Bristol, TN",
-    locationDetails: "Clubhouse & Zero Bay, Bristol, TN",
-    coordinates: {
-      lat: 36.592,
-      lng: -82.179,
-    },
-    tier: "CLINIC",
-    stages: 5,
-    roundCount: 150,
-    distanceRange: "50 – 200 Yards",
-    maxCompetitors: 30,
-    registeredCount: 28,
-    entryFee: 85,
-    prizePool: "Certificates, Match Ammo & Sponsor Gear",
-    matchDirector: {
-      name: "Marcus Vance",
-      callsign: "COACH-01",
-      email: "academy@subsonicsociety.com",
-      phone: "(423) 555-0122",
-    },
-    description:
-      "Full day clinic taught by top PRS rimfire competitors. Learn DOPE card validation, cold bore zeroing, reading mountain mirage, and rapid target acquisition.",
-    stageBriefs: [
-      {
-        stageNumber: 1,
-        name: "Fundamentals of DOPE & Chronograph",
-        distance: "50 yds & 100 yds",
-        targetType: "Paper Grid & Chrono Screen",
-        roundCount: 30,
-        timeLimit: "Self-paced",
-        description: "Truing muzzle velocity SD and BC validation through Kestrel 5700 solvers.",
-      },
-    ],
-    status: "SPOTS_FILLING",
-    featured: false,
   },
 ];
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Timer, Mountain } from "lucide-react";
 
-export function CountdownBanner({ targetDate = "2026-10-17T08:00:00" }: { targetDate?: string }) {
+export function CountdownBanner({ targetDate = "2026-11-13T08:00:00" }: { targetDate?: string }) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -47,7 +47,7 @@ export function CountdownBanner({ targetDate = "2026-10-17T08:00:00" }: { target
               </span>
             </div>
             <p className="text-sm font-semibold text-white">
-              Appalachian Mountain Rimfire Pro Invitational
+              Subsonic Society Invitational
             </p>
           </div>
         </div>

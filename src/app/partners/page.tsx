@@ -32,68 +32,15 @@ const PARTNERS_DATA: Partner[] = [
   {
     id: "modacam-custom-rifles",
     name: "Modacam Custom Rifles",
-    role: "Presenting Partner — Subsonic Society Invitational ($7,500 Cash Purse)",
+    role: "Title Sponsor — Subsonic Society Invitational ($7,500 Total Purse)",
     badge: "Official Presenting Sponsor",
-    description: "Modacam Custom Rifles represents the absolute zenith of precision rimfire gunsmithing. Hand-crafted in America with blueprinted actions, single-point cut-rifled match barrels, and meticulous chamber leades, Modacam rifles are engineered to dominate high-stakes PRS and NRL22 podiums.",
+    description: "Modacam Custom Rifles represents the absolute zenith of precision rimfire gunsmithing. Hand-crafted in America by master gunsmith Jonathan Elrod with blueprinted actions, single-point cut-rifled match barrels, and meticulous chamber leades, Modacam rifles are engineered to dominate high-stakes PRS and NRL22 podiums.",
     tier: "PRESENTING",
-    website: "https://modacamcustomrifles.com",
+    website: "https://mcr-rifles.com",
     highlights: [
       "Sole Presenting Partner for the $7,500 Cash Purse Invitational",
       "Custom Match Rifle Build on Display at The Hideout",
-      "Factory Headspace & Chamber Blueprinting for Subsonic Society Members",
-    ],
-  },
-  {
-    id: "lapua-rimfire",
-    name: "Lapua Ammunition",
-    role: "Official Match Ammunition & Ballistics Partner",
-    badge: "Ammunition Benchmark",
-    description: "Renowned worldwide for Olympic gold medals and national rimfire records. Center-X, Midas+, and X-ACT provide the chronograph standard against which all Subsonic DNA testing is calibrated.",
-    tier: "INDUSTRY_LEADER",
-    website: "https://www.lapua.com",
-    highlights: [
-      "Official Chrono Testing Provider for Subsonic DNA",
-      "Prize Table Contributor for 300X Long Gong Challenge",
-      "Factory Lot Benchmarking at The Hideout",
-    ],
-  },
-  {
-    id: "vortex-optics",
-    name: "Vortex Optics",
-    role: "Official Precision Glass & Elevation Partner",
-    badge: "Optics Sponsor",
-    description: "Provider of high-magnification Razor HD Gen III and Venom precision riflescopes engineered with generous elevation travel for 400+ yard subsonic bullet arcs.",
-    tier: "INDUSTRY_LEADER",
-    website: "https://vortexoptics.com",
-    highlights: [
-      "Razor HD Gen III Spotting Stations on Stage 4 and Stage 18",
-      "Competitor Warranty Protection & Onsite Support",
-    ],
-  },
-  {
-    id: "vudoo-gun-works",
-    name: "Vudoo Gun Works",
-    role: "Official Rimfire Action & Platform Partner",
-    badge: "Action Sponsor",
-    description: "Pioneers of the Remington 700 footprint rimfire action. The V-22 repeater allows competitors to train with identical ergos and trigger feel to their centerfire match rigs.",
-    tier: "TECHNICAL_COLLABORATOR",
-    website: "https://vudoogunworks.com",
-    highlights: [
-      "Factory Action Giveaway for Top Amateur Division",
-      "Direct Support for Subsonic Society Comms & Technical Forums",
-    ],
-  },
-  {
-    id: "mdt-chassis",
-    name: "MDT Sporting Goods",
-    role: "Chassis & Barricade Stability Partner",
-    badge: "Stability Sponsor",
-    description: "MDT ACC Elite and XRS chassis systems provide modular internal and external weighting systems tailored to neutralize barricade vibration in the Appalachian mountains.",
-    tier: "TECHNICAL_COLLABORATOR",
-    website: "https://mdttac.com",
-    highlights: [
-      "Custom Subsonic Society ACC Elite Forend Weight Kit",
-      "Barricade Props Design Consultation for The Hideout",
+      "Precision Match Chambering & Blueprinting for Subsonic Society Competitors",
     ],
   },
 ];
@@ -133,16 +80,16 @@ export default function PartnersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
             <Award className="w-3.5 h-3.5" />
-            <span>INDUSTRY PARTNERS & PRESENTING SPONSORS</span>
+            <span>TITLE SPONSOR &amp; INDUSTRY PARTNER</span>
           </div>
 
           <div className="space-y-2 max-w-3xl">
             <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-              PRECISION POWERED BY INDUSTRY LEADERS. <br />
-              <span className="amber-gradient-text">MODACAM CUSTOM RIFLES & SPONSORS.</span>
+              PRECISION RIMFIRE <span className="amber-gradient-text">REDEFINED.</span> <br />
+              MODACAM CUSTOM RIFLES.
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              We collaborate with premier gunsmiths, barrel makers, optic manufacturers, and ammunition houses dedicated to elevating the sport of precision rimfire.
+              Precision rimfire rifles hand-crafted by master gunsmith Jonathan Elrod and used by the best shooters in the world. Official presenting partner of the Subsonic Society Invitational.
             </p>
           </div>
         </div>
@@ -155,7 +102,7 @@ export default function PartnersPage() {
             <div className="lg:col-span-8 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500 text-black text-xs font-black font-mono uppercase tracking-wider shadow-md">
                 <Sparkles className="w-3.5 h-3.5 fill-black" />
-                <span>Premier Presenting Partner</span>
+                <span>Official Title Sponsor</span>
               </div>
 
               <div className="pt-2 pb-1">
@@ -174,11 +121,11 @@ export default function PartnersPage() {
               </h2>
 
               <p className="text-sm font-mono text-amber-400 font-bold">
-                Presenting Sponsor of Subsonic Society Invitational $7,500 Cash Purse
+                Precision Rimfire Rifles Used by the Best Shooters in the World
               </p>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                When matches come down to a fraction of a millimeter at 300 yards, the firearm cannot be an afterthought. Modacam Custom Rifles blueprints every action, cuts chambers to exact ammunition lot dimensions, and tunes harmonic resonance to deliver unrivaled cold-bore consistency.
+                Founded and operated by master gunsmith Jonathan Elrod, Modacam Custom Rifles is dedicated to redefining what a precision rimfire rifle can achieve. Every rifle is hand-crafted with blueprinted actions, single-point cut-rifled match barrels, meticulous chamber leades, and dialed harmonic balance to deliver unrivaled cold-bore consistency and podium finishes.
               </p>
 
               <div className="space-y-2 pt-2">
@@ -196,11 +143,11 @@ export default function PartnersPage() {
                   </div>
                   <div className="flex items-center gap-2 p-2.5 rounded-xl bg-black/40 border border-white/5">
                     <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Onsite Gunsmithing Support at The Hideout</span>
+                    <span>Custom Match Rifle Build on Display at The Hideout</span>
                   </div>
                   <div className="flex items-center gap-2 p-2.5 rounded-xl bg-black/40 border border-white/5">
                     <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                    <span>Priority Build Queues for Society Members</span>
+                    <span>Precision Match Chambering &amp; Blueprinting</span>
                   </div>
                 </div>
               </div>
@@ -211,16 +158,16 @@ export default function PartnersPage() {
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
                 >
                   <Trophy className="w-4 h-4 fill-black" />
-                  <span>Explore The Modacam Invitational</span>
+                  <span>Explore The Invitational</span>
                 </Link>
 
                 <a
-                  href="https://modacamcustomrifles.com"
+                  href="https://mcr-rifles.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-3 rounded-xl ios-glass text-white font-bold text-xs flex items-center gap-1.5 border border-white/10 hover:bg-white/10 transition-all"
                 >
-                  <span>Visit Modacam Custom Rifles</span>
+                  <span>Visit Modacam Custom Rifles (mcr-rifles.com)</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
               </div>
@@ -243,88 +190,23 @@ export default function PartnersPage() {
 
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-mono text-amber-400 font-bold tracking-widest uppercase block">
-                    MASTER RIFLE BUILDER
+                    MASTER GUNSMITH
                   </span>
                   <h3 className="text-lg font-black text-white">
-                    CUSTOM MATCH BUILDS
+                    JONATHAN ELROD
                   </h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Hand-crafted rimfire platforms engineered specifically for the extreme high-angle winds and cold mountain air of Appalachian matches.
+                    Custom match-grade rimfire and centerfire platforms engineered specifically for extreme distance, high-angle winds, and precision consistency.
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <span>CHAMBER: <strong className="text-amber-400">MATCH .22LR</strong></span>
-                  <span>TESTED: <strong className="text-white">BRISTOL, TN</strong></span>
+                  <span>CRAFT: <strong className="text-amber-400">MATCH .22LR</strong></span>
+                  <span>DOMAIN: <strong className="text-white">MCR-RIFLES.COM</strong></span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Industry Partners Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="space-y-2">
-          <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-            Equipment & Technical Collaborators
-          </span>
-          <h3 className="text-2xl sm:text-3xl font-black text-white">
-            OFFICIAL MATCH PROVIDERS
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {PARTNERS_DATA.slice(1).map((partner) => (
-            <div
-              key={partner.id}
-              className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-amber-500/30 transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300">
-                    {partner.badge}
-                  </span>
-                  <span className="text-xs font-mono text-amber-400 font-bold">
-                    {partner.tier.replace(/_/g, " ")}
-                  </span>
-                </div>
-
-                <h4 className="text-xl font-bold text-white">
-                  {partner.name}
-                </h4>
-
-                <p className="text-xs font-mono text-slate-400">
-                  {partner.role}
-                </p>
-
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  {partner.description}
-                </p>
-
-                <ul className="space-y-1 text-xs text-slate-400 font-mono pt-2">
-                  {partner.highlights.map((h, i) => (
-                    <li key={i} className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-4 border-t border-white/5">
-                <a
-                  href={partner.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-white transition-colors"
-                >
-                  <span>Visit {partner.name}</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 

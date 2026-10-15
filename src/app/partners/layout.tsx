@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Official Industry Partners & Sponsors | Subsonic Society",
+  title: "Title Sponsor: Modacam Custom Rifles | Subsonic Society",
   description:
-    "Meet the industry partners powering Subsonic Society. Featuring Title Sponsor Modacam Custom Rifles, alongside Lapua, Vortex Optics, Vudoo Gun Works, and MDT.",
+    "Modacam Custom Rifles is the premier title sponsor of the Subsonic Society Invitational $7,500 Cash Purse. Hand-crafted precision rimfire rifles built by master gunsmith Jonathan Elrod.",
   keywords: [
     "Modacam Custom Rifles",
-    "Subsonic Society sponsors",
-    "Precision rimfire partners",
-    "Lapua rimfire sponsor",
-    "Vortex Optics rimfire",
-    "Vudoo Gun Works",
-    "MDT chassis rimfire",
+    "Jonathan Elrod gunsmith",
+    "Subsonic Society title sponsor",
+    "Precision rimfire rifles",
+    "MCR Rifles",
+    "Bristol TN precision rimfire",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/partners",
   },
   openGraph: {
-    title: "Official Industry Partners & Sponsors | Subsonic Society",
+    title: "Title Sponsor: Modacam Custom Rifles | Subsonic Society",
     description:
-      "Engineered excellence. Discover the brands partnering with Subsonic Society to advance precision rimfire competition.",
+      "Precision Rimfire Redefined. Modacam Custom Rifles is the presenting partner for the Subsonic Society Invitational $7,500 Cash Purse.",
     url: "https://subsonicsociety.com/partners",
     siteName: "Subsonic Society",
     images: [
@@ -27,7 +26,7 @@ export const metadata: Metadata = {
         url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
-        alt: "Subsonic Society Industry Partners",
+        alt: "Modacam Custom Rifles - Subsonic Society Title Sponsor",
       },
     ],
     locale: "en_US",
@@ -35,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Industry Partners | Subsonic Society",
+    title: "Title Sponsor: Modacam Custom Rifles | Subsonic Society",
     description:
-      "Featuring Title Sponsor Modacam Custom Rifles, Lapua, Vortex Optics, Vudoo Gun Works, and MDT.",
+      "Precision Rimfire Redefined. Featuring Title Sponsor Modacam Custom Rifles.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
@@ -68,14 +67,7 @@ const partnersSchema = {
       "@id": "https://subsonicsociety.com/partners#modacam",
       "name": "Modacam Custom Rifles",
       "description": "Title Sponsor of Subsonic Society Invitational and master builder of custom match-grade precision rimfire and centerfire rifles.",
-      "url": "https://modacamrifles.com"
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://subsonicsociety.com/partners#lapua",
-      "name": "Lapua",
-      "description": "World-championship rimfire ammunition manufacturer, producing Center-X, Midas+, and Super X-Act .22LR cartridges.",
-      "url": "https://www.lapua.com"
+      "url": "https://mcr-rifles.com"
     }
   ]
 };
