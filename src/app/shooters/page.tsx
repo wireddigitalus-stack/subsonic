@@ -39,19 +39,9 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     featuredMatch: "Subsonic Society Invitational Money Match 2026",
     image: "/images/SS-RWB-LOGO.png",
     actionPhoto: "/images/SS-RWB-LOGO.png",
-    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously.",
+    quote: "This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation.",
     signature: "Allen Hurley",
-    accolades: ["FOUNDER 👑", "TEAM USA 🇺🇸", "NATIONAL CHAMPION 🏆", "MATCH HOST", "EXECUTIVE RO"],
-    careerStats: {
-      matches: 38,
-      states: 9,
-      countries: 1,
-      wins: 12,
-      top3: 20,
-      top5: 28,
-      top10: 35,
-      nationalPlacements: ["Host & Director — Subsonic Society Invitational", "1st Place — Bristol Ridge Shootout"],
-    },
+    accolades: ["FOUNDER 👑", "TEAM USA 🇺🇸", "NATIONAL CHAMPION 🏆", "MATCH HOST", "EVENT DIRECTOR"],
     sponsors: ["Modacam Custom Rifles", "Subsonic Society"],
     rifleSetup: {
       action: "Modacam Custom Precision V-22 Rimfire",
@@ -65,8 +55,8 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
     },
     interview: [
       {
-        question: "What was the vision behind The Hideout complex in Bristol?",
-        answer: "To bring together the best shooters in the country onto terrain that tests real wind reading and elevation, while providing hospitality, live scoring, and community that the sport has been missing.",
+        question: "What was the vision behind the Subsonic Society Invitational at The Hideout?",
+        answer: "We have worked hard to make the Invitational different — challenging stages, a meaningful cash purse, dedicated staff and spotters, hospitality, and an atmosphere where the competitors are the focus.",
       }
     ],
     createdAt: "2026-07-01T12:00:00Z",

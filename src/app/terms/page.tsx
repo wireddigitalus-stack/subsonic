@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Terms of Use & Code of Conduct | Subsonic Society",
-  description: "Official terms of service, platform rules, and competitor code of conduct for Subsonic Society precision rimfire network.",
+  title: "Terms of Use | Subsonic Society",
+  description: "Official platform restriction on firearm sales and event waiver notice for Subsonic Society.",
 };
 
 export default function TermsPage() {
@@ -26,7 +26,7 @@ export default function TermsPage() {
           <span>RETURN TO HOME</span>
         </Link>
         <span className="text-[11px] font-mono text-slate-500">
-          REVISION: 2026.1 • BRISTOL, TN
+          BRISTOL, TN
         </span>
       </div>
 
@@ -34,47 +34,45 @@ export default function TermsPage() {
       <header className="ios-glass-card rounded-3xl p-6 sm:p-10 border border-amber-500/30 space-y-4 relative overflow-hidden">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-bold tracking-wider">
           <Scale className="w-3.5 h-3.5" />
-          <span>PLATFORM GOVERNANCE &amp; LEGAL CODE</span>
+          <span>PLATFORM TERMS</span>
         </div>
 
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white uppercase tracking-tight">
-          TERMS OF USE &amp; <br />
-          <span className="amber-gradient-text">CODE OF CONDUCT</span>
+          TERMS OF <span className="amber-gradient-text">USE</span>
         </h1>
 
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-          By redeeming an invitation pass, activating a tactical callsign, accessing the private comms network, or participating in Subsonic Society matches, you expressly accept and agree to these Terms of Use and Range Safety Policies.
+          The only platform restriction on this site is the strict prohibition on firearm and ammunition sales. All other requirements, rules, and liability agreements are handled by a waiver in person at the event.
         </p>
       </header>
 
-      {/* Critical Zero Tolerance Notice */}
+      {/* Restriction on Firearm Sales */}
       <section className="p-6 rounded-3xl bg-red-950/40 border border-red-500/40 space-y-3">
         <div className="flex items-center gap-2 text-red-400 font-mono font-black text-xs sm:text-sm uppercase tracking-wider">
           <AlertTriangle className="w-5 h-5 shrink-0" />
-          <span>STRICT PROHIBITION ON FIREARM &amp; AMMUNITION COMMERCE</span>
+          <span>RESTRICTION ON FIREARM &amp; AMMUNITION SALES</span>
         </div>
         <p className="text-xs sm:text-sm text-red-200/90 leading-relaxed">
-          Subsonic Society is an educational, athletic, and ballistic research community. 
-          <strong className="text-white font-bold"> Under no circumstances may this platform, its private chat channels, or its direct messaging be used to buy, sell, trade, broker, or solicit the transfer of firearms, ammunition, serialized firearm receivers, or restricted components.</strong> Any attempt to conduct commercial transactions for regulated items will result in immediate permanent account termination, forfeiture of invitation credentials, and notification of the appropriate authorities.
+          <strong className="text-white font-bold">Under no circumstances may this website, its private chat channels, or its direct messaging be used to buy, sell, trade, broker, or solicit the transfer of firearms, ammunition, serialized firearm receivers, or restricted components.</strong> Any attempt to conduct firearm or ammunition sales on this platform will result in immediate account removal.
         </p>
       </section>
 
-      {/* Day of Event Notice */}
+      {/* All Else Handled by Waiver */}
       <div className="ios-glass-card rounded-2xl p-6 sm:p-8 border border-white/10 space-y-3">
         <div className="flex items-center gap-2 text-amber-400 font-mono font-bold text-xs uppercase tracking-wider">
           <CheckCircle2 className="w-4 h-4 text-amber-400" />
-          <span>Match Waivers &amp; Range Safety Protocols</span>
+          <span>Event Waiver</span>
         </div>
-        <h2 className="text-lg font-bold text-white">Day of Event In-Person Check-In</h2>
+        <h2 className="text-lg font-bold text-white">All Other Requirements Handled by Waiver</h2>
         <p className="text-sm text-slate-300 leading-relaxed">
-          All competitor liability waivers, cold range safety protocols, and venue guidelines will be executed in person on the day of the event during morning check-in at The Hideout.
+          All other rules, safety protocols, and liability requirements will be done with a waiver in person at the event during check-in.
         </p>
       </div>
 
-      {/* Legal & Inquiries Footer */}
+      {/* Contact Footer */}
       <div className="p-6 rounded-3xl ios-glass border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
         <div className="space-y-1 text-center sm:text-left">
-          <div className="font-bold text-white">Questions regarding our rules or governance?</div>
+          <div className="font-bold text-white">Questions?</div>
         </div>
         <a 
           href="mailto:ahurley@subsonicsociety.com"

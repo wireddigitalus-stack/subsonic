@@ -18,7 +18,6 @@ import {
   FileText,
   Key
 } from "lucide-react";
-import { CountdownBanner } from "./CountdownBanner";
 import { HeroChatTerminal } from "./HeroChatTerminal";
 import { HeroVideoBanner } from "./HeroVideoBanner";
 import { HeroCrosshairLoader } from "./HeroCrosshairLoader";
@@ -162,9 +161,6 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
         </div>
-
-        {/* Live Countdown Banner for The Invitational */}
-        <CountdownBanner targetDate="2026-11-13T08:00:00" />
       </div>
     </section>
   );

@@ -101,7 +101,7 @@ export default function ContactPage() {
               <span className="amber-gradient-text">SUBSONIC SOCIETY.</span>
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Have an inquiry regarding match squad slots, hosting an Appalachian qualifier, contributing to the prize table, or submitting ammunition for Subsonic DNA chronograph testing? Transmit your dispatch below.
+              Have a question regarding the Subsonic Society Invitational, sponsorship, or competitor invitations? Send a message below.
             </p>
           </div>
 
@@ -112,13 +112,6 @@ export default function ContactPage() {
             >
               <Key className="w-4 h-4 fill-black" />
               <span>Claim Invitation Pass</span>
-            </Link>
-            <Link
-              href="/matches"
-              className="px-5 py-2.5 rounded-xl ios-glass text-white font-bold text-xs flex items-center gap-2 border border-white/10 hover:bg-white/10 transition-all"
-            >
-              <Calendar className="w-4 h-4 text-amber-400" />
-              <span>View Match Schedule</span>
             </Link>
           </div>
         </div>

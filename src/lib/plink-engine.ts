@@ -406,21 +406,18 @@ export function getFaqResponse(content: string): string {
       `I am always on frequency to assist with **Bristol lodging, dining, campgrounds, The Hideout details, and cold range safety rules**!`;
   }
 
-  // 8. RULES & SAFETY
+  // 8. RULES & WAIVER
   if (
     lower.includes("rule") ||
+    lower.includes("waiver") ||
+    lower.includes("restriction") ||
     lower.includes("safety") ||
     lower.includes("flag") ||
-    lower.includes("chamber") ||
-    lower.includes("ro") ||
-    lower.includes("range officer")
+    lower.includes("chamber")
   ) {
-    return `📋 **Range Safety & Match Regulations:**\n\n` +
-      `1️⃣ **Cold Range Standard:** Rifles remain completely unloaded with chamber flags inserted until the RO gives the command to load and make ready.\n` +
-      `2️⃣ **Muzzle Discipline:** 120-degree muzzle rule enforced on all transition stages and barricades.\n` +
-      `3️⃣ **Eye & Ear Protection:** Recommended at all times for all competitors, squad leads, ROs, and spectators.\n` +
-      `4️⃣ **Score Protests:** Inquiries must be filed with the Chief RO or Event Director within 30 minutes of stage completion.\n` +
-      `5️⃣ **Community Comms:** No gear sales, harassment, or commercial spam on the frequency. Respect all marksmen.`;
+    return `📋 **Platform Terms & Event Waiver:**\n\n` +
+      `• **Firearm & Ammunition Sales Restriction:** Under no circumstances may this platform or chat channels be used to buy, sell, trade, or transfer firearms, ammunition, or regulated components.\n` +
+      `• **Event Waiver:** All other rules, safety protocols, and liability requirements will be done with a waiver in person at the event during check-in at The Hideout.`;
   }
 
   // 9. GENERAL HELP & COMMANDS

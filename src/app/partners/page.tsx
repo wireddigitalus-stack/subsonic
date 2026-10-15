@@ -154,7 +154,7 @@ export default function PartnersPage() {
 
               <div className="flex flex-wrap items-center gap-3 pt-3">
                 <Link
-                  href="/matches"
+                  href="/invitational"
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all"
                 >
                   <Trophy className="w-4 h-4 fill-black" />

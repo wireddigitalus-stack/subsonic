@@ -536,7 +536,7 @@ export default function CompetitorPacketPage() {
               href="#rules"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold col-span-2 sm:col-span-1"
             >
-              Range SOP
+              Terms &amp; Waiver
             </a>
           </div>
         </div>
@@ -1113,53 +1113,39 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 9: Competitor Quick Notes & Safety Protocols */}
+        {/* SECTION 9: Platform Restriction & Event Waiver */}
         <section id="rules" className="scroll-mt-24 space-y-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-red-400 font-bold">
               <ShieldAlert className="w-4 h-4" />
-              <span>Competitor Quick Notes</span>
+              <span>Terms &amp; Event Waiver</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              Competitor Quick Notes &amp; Safety Protocols
+              Firearm Sales Restriction &amp; Event Waiver
             </h2>
             <p className="text-base text-slate-300 max-w-3xl">
-              Strict cold-range guidelines are enforced at all times at The Hideout.
+              The only platform restriction is the prohibition on firearm and ammunition sales. All other requirements and rules will be done with a waiver at the event.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-5 sm:p-6 rounded-2xl bg-red-950/30 border border-red-500/30 space-y-2.5">
               <h4 className="text-base sm:text-lg font-bold text-red-400 flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
-                Strict Cold Range Policy
+                Restriction on Firearm &amp; Ammunition Sales
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                The Hideout operates strictly as a cold range at all times. All firearms must remain completely unloaded, 
-                magazines removed, and cased or secured in an approved carrier with an <strong className="text-white">open bolt and chamber flag inserted</strong>. 
-                Handling of firearms is only permitted on the firing line under direct Range Officer commands or inside designated Safe Areas (no ammunition permitted in safe areas).
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
-              <h4 className="text-base sm:text-lg font-bold text-blue-400 flex items-center gap-2">
-                <Target className="w-5 h-5 shrink-0" />
-                Zero Range Protocols
-              </h4>
-              <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                50-yard, 100-yard, and 200-yard zero will be available on Friday from 12:00 PM to 5:00 PM (registration and sight-in only), 
-                and on Saturday and Sunday mornings from 7:00 AM to 8:30 AM prior to the 8:30 AM shooter briefing.
+                Under no circumstances may this platform, chat system, or direct channels be used to <strong className="text-white">buy, sell, trade, broker, or solicit the transfer of firearms, ammunition, serialized receivers, or regulated components</strong>.
               </p>
             </div>
 
             <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2.5">
               <h4 className="text-base sm:text-lg font-bold text-amber-400 flex items-center gap-2">
-                <Clock className="w-5 h-5 shrink-0" />
-                Eye &amp; Ear Protection
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                All Else Handled by Event Waiver
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                Eye and ear protection is recommended at all times forward of the Pavilion parking perimeter whenever any range is active. 
-                This applies to all competitors, match staff, ROs, and spectators.
+                All other rules, safety protocols, and liability requirements will be done with a waiver in person at the event during check-in at The Hideout.
               </p>
             </div>
           </div>

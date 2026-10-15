@@ -32,16 +32,6 @@ export const SEED_SHOOTERS: ShooterProfile[] = [
     quote: "This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation.",
     signature: "Allen Hurley",
     accolades: ["FOUNDER 👑", "TEAM USA 🇺🇸", "NATIONAL CHAMPION 🏆", "MATCH HOST", "EVENT DIRECTOR"],
-    careerStats: {
-      matches: 38,
-      states: 9,
-      countries: 1,
-      wins: 12,
-      top3: 20,
-      top5: 28,
-      top10: 35,
-      nationalPlacements: ["Founder & Event Director — Subsonic Society Invitational", "1st Place — Bristol Ridge Shootout"],
-    },
     sponsors: ["Modacam Custom Rifles", "Subsonic Society"],
     rifleSetup: {
       action: "Modacam Custom Precision V-22 Rimfire",

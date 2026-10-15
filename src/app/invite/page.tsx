@@ -266,10 +266,10 @@ function StandardInviteContent() {
             </Link>
 
             <Link
-              href="/matches"
+              href="/invitational"
               className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs border border-white/10 transition-all text-center"
             >
-              <span>View Match Schedule</span>
+              <span>View Competitor Packet</span>
             </Link>
           </div>
         </div>
