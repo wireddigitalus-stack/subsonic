@@ -384,9 +384,9 @@ export default function CompetitorPacketPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-6">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono font-bold tracking-wider uppercase bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4" />
-              Official Match Packet
+            <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono font-black tracking-wider uppercase bg-amber-500 text-black flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+              <Sparkles className="w-4 h-4 fill-black" />
+              $7,500 Total Cash Prizes
             </span>
             <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200">
               Presented by Modacam Custom Rifles
@@ -404,9 +404,10 @@ export default function CompetitorPacketPage() {
               </span>
             </h1>
             <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
-              Everything you need for championship weekend: Founder Allen Hurley’s welcome address, 
-              full 3-day schedule, $5,000 main match purse &amp; $2,500 cash side matches, Saturday &amp; Sunday meals included, 
-              220-acre facility amenities, recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
+              Everything you need for the championship weekend: Founder Allen Hurley’s welcome address, 
+              full 3-day schedule, <strong className="text-amber-400 font-bold">$7,500 total cash prizes ($5,000 main match + $2,500 cash side matches)</strong>, 
+              <strong className="text-emerald-400 font-bold">Saturday &amp; Sunday meals included</strong>, 
+              220-acre facility amenities, 12 recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
             </p>
           </div>
 
@@ -430,8 +431,8 @@ export default function CompetitorPacketPage() {
               <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">111 Hwy 44, Bristol, TN 37620</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
-              <div className="text-xs sm:text-sm font-mono text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-emerald-500/20 backdrop-blur-sm shadow-[0_0_15px_rgba(16,185,129,0.08)]">
+              <div className="text-xs sm:text-sm font-mono text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Trophy className="w-4 h-4 text-emerald-400" />
                 Hospitality
               </div>
@@ -439,13 +440,13 @@ export default function CompetitorPacketPage() {
               <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">Breakfasts, Lunch &amp; Smoked BBQ</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
-              <div className="text-xs sm:text-sm font-mono text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-purple-400" />
-                Match Purses
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-amber-500/20 backdrop-blur-sm shadow-[0_0_15px_rgba(245,158,11,0.08)]">
+              <div className="text-xs sm:text-sm font-mono text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Target className="w-4 h-4 text-amber-400" />
+                Cash Prizes &amp; Purses
               </div>
-              <div className="text-lg sm:text-xl font-black text-purple-300 mt-1">$7,500 Total Purse</div>
-              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">$5,000 Main • $2,500 Side Matches</div>
+              <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">$7,500 Total Cash Prizes</div>
+              <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">$5,000 Main Match • $2,500 Side Matches</div>
             </div>
           </div>
 
@@ -749,7 +750,7 @@ export default function CompetitorPacketPage() {
                   <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 2 • 14 Stages</div>
                   <h3 className="text-lg font-black text-white">Saturday, Nov 14</h3>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-amber-500 text-black text-xs font-black uppercase font-mono">Main Match</span>
+                <span className="px-2.5 py-1 rounded bg-amber-500 text-black text-xs font-black uppercase font-mono">$5,000 Main Match</span>
               </div>
 
               <div className="space-y-3.5 font-sans">
@@ -804,7 +805,7 @@ export default function CompetitorPacketPage() {
                   <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">Day 3 • Finals & Cash</div>
                   <h3 className="text-lg font-black text-white">Sunday, Nov 15</h3>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold">$2.5K Side Cash</span>
+                <span className="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold">$2,500 Side Matches</span>
               </div>
 
               <div className="space-y-3.5 font-sans">
@@ -836,7 +837,7 @@ export default function CompetitorPacketPage() {
                 <div className="flex items-start gap-3 text-sm sm:text-base">
                   <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">1:30 PM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Awards Ceremony:</span> Trophy presentations, prize table & cash purse checks.
+                    <span className="font-bold text-amber-400">Awards Ceremony:</span> $5,000 Main Match &amp; $2,500 Side Match cash payouts, trophy presentations &amp; prize table checks.
                   </div>
                 </div>
 
@@ -874,7 +875,7 @@ export default function CompetitorPacketPage() {
 
             <div className="shrink-0 p-5 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs sm:text-sm font-mono">
               <div className="text-slate-300 font-bold tracking-wider">HOSPITALITY PASS</div>
-              <div className="text-lg font-black text-emerald-400">FULL INCLUSION</div>
+              <div className="text-lg font-black text-emerald-400">SAT &amp; SUN MEALS INCLUDED</div>
               <div className="text-slate-300 text-xs sm:text-sm leading-relaxed">
                 • Friday Evening Social<br />
                 • Sat & Sun Breakfasts<br />

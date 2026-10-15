@@ -15,7 +15,7 @@ const SEED_DOCUMENTS: CompetitionDocument[] = [
     category: "RANGE_INTEL",
     matchId: "subsonic-invitational-2026",
     matchTitle: "Subsonic Society Invitational 2026",
-    description: "Official 4-page competitor packet presented by Modacam Custom Rifles. Includes Allen Hurley welcome letter, weekend schedule (Nov 13-15), 220-acre range amenities, $2,500 cash side matches, hotel directory, and Bristol dining & attractions guide.",
+    description: "Official 4-page competitor packet presented by Modacam Custom Rifles. Includes Allen Hurley welcome letter, weekend schedule (Nov 13-15), 220-acre range amenities, $7,500 total cash prizes ($5,000 main match • $2,500 cash side matches), Saturday & Sunday meals included, hotel directory, and Bristol dining & attractions guide.",
     fileName: "2026-Subsonic-Society-Invitational-Competitor-Packet.pdf",
     fileSize: "246 KB",
     fileUrl: "/documents/2026-Subsonic-Society-Invitational-Competitor-Packet.pdf",
