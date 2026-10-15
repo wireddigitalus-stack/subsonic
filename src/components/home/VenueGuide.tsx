@@ -53,7 +53,7 @@ export function VenueGuide() {
               Pro Range Facilities
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Equipped with a 24-bench covered zero bay, LabRadar Doppler chronograph stations, squad staging pavilions, water hydration stations, and digital target flashers.
+              Equipped with a 50-yard, 100-yard, and 200-yard zero range, Doppler chronograph stations, squad staging pavilions, water hydration stations, and digital target flashers.
             </p>
             <div className="text-[11px] font-mono text-blue-300 bg-blue-500/10 p-2.5 rounded-xl border border-blue-500/20">
               Full 465-yard laser-verified firing line with electronic hit indicators

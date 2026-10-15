@@ -212,7 +212,7 @@ export function BallisticsCalculator() {
       <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
         <span>
-          Note: Extreme range .22LR past 350 yards experiences pronounced aerodynamic drag and Magnus effect. Verify DOPE on the zero bay prior to match start.
+          Note: Extreme range .22LR past 350 yards experiences pronounced aerodynamic drag and Magnus effect. Verify DOPE on the 50/100/200-yard zero range prior to match start.
         </span>
       </div>
     </div>

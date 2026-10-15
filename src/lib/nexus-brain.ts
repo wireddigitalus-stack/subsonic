@@ -67,7 +67,7 @@ ${topShooters}
 
 6. BRISTOL, TN LODGING & DINING:
    - Lodging: The Bristol Hotel (boutique with Lumac Rooftop), Hard Rock Hotel & Casino Bristol, Courtyard by Marriott Bristol, on-site RV camping at The Hideout.
-   - Dining: Blackbird Bakery on Piedmont Ave (famous doughnuts & espresso, open 24 hours Mon–Sat), 620 State (steaks & sushi), Delta Blues BBQ, The Angry Italian.
+   - Dining: Blackbird Bakery on Piedmont Ave (famous doughnuts & espresso, open 24 hours Mon–Sat), 620 State (steaks & sushi), Delta Blues BBQ, Public House Bristol (629 State St).
    - Attractions: South Holston River (world-class wild brown trout fly fishing), Bristol Motor Speedway, State Street twin-state line (stand in TN and VA simultaneously).
 
 DOMAIN BOUNDARY:

@@ -204,13 +204,6 @@ const DINING_DATA: DiningItem[] = [
     type: "craft"
   },
   {
-    name: "Michael Waltrip Brewing Co.",
-    address: "221 Moore St, Bristol, VA",
-    tag: "NASCAR Heritage & Taproom",
-    description: "NASCAR-inspired craft brewery with huge beer selections, hearty food menu, and outdoor patio.",
-    type: "craft"
-  },
-  {
     name: "Lost State Distilling",
     address: "295 4th St, Bristol, TN",
     tag: "Small-Batch Spirits",
@@ -225,13 +218,6 @@ const DINING_DATA: DiningItem[] = [
     type: "bakery"
   },
   {
-    name: "The Angry Italian",
-    address: "714 State St, Bristol, TN",
-    tag: "Chicago Deep Dish",
-    description: "Authentic Chicago-style deep-dish pizza, Italian beef sandwiches, and hearty pasta portions for hungry squads.",
-    type: "comfort"
-  },
-  {
     name: "Cootie Brown's",
     address: "118 Volunteer Pkwy, Bristol, TN",
     tag: "Eclectic Southern",
@@ -239,10 +225,10 @@ const DINING_DATA: DiningItem[] = [
     type: "comfort"
   },
   {
-    name: "Quaker Steak & Lube",
-    address: "629 Linden Dr, Bristol, VA",
-    tag: "Wings & Squad Tables",
-    description: "Motor-sports-themed wing joint with jumbo wings, burgers, and draft beer. Perfect for large squads and families.",
+    name: "Public House Bristol",
+    address: "629 State St, Bristol, VA",
+    tag: "Chef-Driven American Tavern",
+    description: "Elevated tavern burgers, steaks, seafood, smoked pastrami & hot honey chicken sandwiches, craft cocktails, and local draft beers right on historic State Street.",
     type: "comfort"
   }
 ];
@@ -532,7 +518,7 @@ export default function CompetitorPacketPage() {
               href="#dining"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              Bristol Dining (12)
+              Bristol Dining (10)
             </a>
             <a
               href="#attractions"
@@ -723,7 +709,7 @@ export default function CompetitorPacketPage() {
                 <div className="flex items-start gap-3 text-sm sm:text-base">
                   <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">1:00 – 4:30 PM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Zero Ranges Open:</span> Rimfire & centerfire bays available for verification and chrono check.
+                    <span className="font-bold text-amber-400">Zero Range Open:</span> 50-yard, 100-yard, and 200-yard zero available for verification and chrono check.
                   </div>
                 </div>
 
@@ -1006,7 +992,7 @@ export default function CompetitorPacketPage() {
                 <span>Culinary Intel</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-                Where to Eat in Bristol — 12 Local Landmarks
+                Where to Eat in Bristol — 10 Local Landmarks
               </h2>
               <p className="text-base text-slate-300 max-w-2xl">
                 From the 24-hour legendary Blackbird Bakery to rooftop bourbon lounges and Memphis-style smoked ribs.
@@ -1021,7 +1007,7 @@ export default function CompetitorPacketPage() {
                   diningFilter === "ALL" ? "bg-amber-500 text-black font-bold" : "text-slate-300 hover:text-white"
                 }`}
               >
-                All Spots (12)
+                All Spots (10)
               </button>
               <button
                 onClick={() => setDiningFilter("bakery")}
@@ -1226,7 +1212,7 @@ export default function CompetitorPacketPage() {
                 Zero Range Protocols
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                50-yard, 100-yard, and 200-yard zero bays will be hot on Friday from 1:00 PM to 4:30 PM. 
+                50-yard, 100-yard, and 200-yard zero will be available on Friday from 1:00 PM to 4:30 PM. 
                 Limited zero access will be available Saturday morning from 6:30 AM to 7:30 AM before the mandatory safety briefing.
               </p>
             </div>

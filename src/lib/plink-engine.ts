@@ -298,10 +298,10 @@ export function getFaqResponse(content: string): string {
       `• **Lumac Rooftop Bar** (510 State St, Bristol VA) — Craft cocktails & small plates with panoramic sunset views over the Appalachians.\n` +
       `• **Vivian's Table** (Bristol Hotel) — Refined Southern dining, prime ribeyes & top-tier bourbon list.\n` +
       `• **Delta Blues BBQ** (724 State St) — Slow-smoked Memphis-style ribs, brisket, pulled pork & weekend live blues.\n` +
-      `• **State Street Brewing & Michael Waltrip Brewing** — Downtown small-batch craft beer & NASCAR heritage taprooms.\n` +
+      `• **State Street Brewing** (595 State St, Bristol VA) — Downtown small-batch craft beer taproom right on State Street.\n` +
       `• **Lost State Distilling** (295 4th St) — Award-winning Tennessee whiskey, bourbon & gin tastings.\n` +
       `• **Bloom Café & Listening Room** — Craft espresso, scratch breakfast & live acoustic music.\n` +
-      `• **The Angry Italian** (714 State St) — Chicago-style deep-dish pizza & Italian beef sandwiches for hungry squads.\n` +
+      `• **Public House Bristol** (629 State St, Bristol VA) — Chef-driven American tavern with elevated burgers, steaks, seafood, smoked pastrami sandwiches & craft cocktails.\n` +
       `• **Cootie Brown's** (118 Volunteer Pkwy) — Jamaican jerk chicken, tamales & signature Key Lime pie.`;
   }
 

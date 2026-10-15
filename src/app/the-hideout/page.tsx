@@ -99,16 +99,16 @@ export default function TheHideoutPage() {
           {/* Sector 1 */}
           <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-amber-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-amber-400 font-bold">SECTOR 1 • ZERO BAY</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">50 METERS</span>
+              <span className="text-xs font-mono text-amber-400 font-bold">SECTOR 1 • ZERO RANGE</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">50 / 100 / 200 YDS</span>
             </div>
-            <h3 className="text-xl font-bold text-white">Olympic Paper & Chrono Pavilion</h3>
+            <h3 className="text-xl font-bold text-white">50, 100 &amp; 200-Yard Zero &amp; Chrono Range</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              24 covered shooting bays equipped with heavy poured-concrete benches, integrated target cameras, and dedicated Garmin Xero / LabRadar mount stations. The perfect wind-baffled zeroing environment for precision lot tests and cold-bore truing.
+              Dedicated 50-yard, 100-yard, and 200-yard zero range equipped for precision zero verification, lot testing, and cold-bore truing prior to match kickoff.
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
-              <li>• Wind Baffles: Side acoustic retaining berms</li>
-              <li>• Targets: Electronic target monitors + 1/4&quot; precision paper grids</li>
+              <li>• Zero Distances: 50-yard, 100-yard, and 200-yard targets</li>
+              <li>• Schedule: Open Friday 1:00 PM – 4:30 PM &amp; Saturday 6:30 AM – 7:30 AM</li>
             </ul>
           </div>
 

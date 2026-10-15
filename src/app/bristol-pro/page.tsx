@@ -424,7 +424,7 @@ export default function BristolProPortalPage() {
 
             <div className="space-y-3 text-xs">
               {[
-                { time: "FRIDAY 01:00 PM", title: "Registration & Zero Bay Open", desc: "Doppler chronograph station verification and 50-yard paper zero checks." },
+                { time: "FRIDAY 01:00 PM", title: "Registration & Zero Range Open", desc: "50-yard, 100-yard, and 200-yard zero available for verification and chrono check." },
                 { time: "SATURDAY 07:00 AM", title: "Shooter Safety Briefing", desc: "Mandatory safety meeting at the main pavilion. Squad assignments finalized." },
                 { time: "SATURDAY 08:00 AM", title: "Stages 1 through 10 Firing", desc: "High-angle mountain canyon stages commence. Lunch provided on the ridge." },
                 { time: "SUNDAY 08:00 AM", title: "Stages 11 through 18 Firing", desc: "Final 8 stages and the 465-yard Subsonic Society Cup finale." },

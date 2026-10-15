@@ -212,7 +212,7 @@ const MESSAGE_POOLS: MessagePool = {
       "Hard Rock Hotel & Casino Bristol is where my crew is staying! 20 minutes from The Hideout and the gaming resort is buzzing.",
       "Don't miss walking down State Street — you can literally stand with one foot in Tennessee and one foot in Virginia!",
       "Does the clubhouse have RV hookups available for weekend campers? Looking to bring my rig for match weekend — are there good campgrounds nearby?",
-      "Grabbing pizza at The Angry Italian after check-in. Authentic Chicago deep dish in the Appalachian mountains!",
+      "Heading to Public House on State Street after check-in — chef-driven tavern burgers and local draft beer right on the state line!",
     ],
   },
   "bristol-pro-shootout": {
