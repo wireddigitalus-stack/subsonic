@@ -18,6 +18,7 @@ import {
   Trophy,
   Car,
   Share2,
+  Download,
 } from "lucide-react";
 
 interface HotelItem {
@@ -281,6 +282,14 @@ export default function CompetitorPacketPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <a
+              href="/documents/invitational-competitor-packet.pdf"
+              download="Subsonic-Society-2026-Competitor-Packet.pdf"
+              className="px-3.5 py-2 rounded-lg text-sm font-black bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center gap-2 shadow-sm"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download PDF Packet</span>
+            </a>
             <button
               onClick={handleShare}
               className="px-3.5 py-2 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition-all flex items-center gap-2"
@@ -302,9 +311,6 @@ export default function CompetitorPacketPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono font-black tracking-wider uppercase bg-amber-500 text-black flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.4)]">
               <Sparkles className="w-4 h-4 fill-black" />
-              $7,500 Total Cash Prizes
-            </span>
-            <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono tracking-wider uppercase bg-white/5 border border-white/10 text-slate-200">
               Presented by Modacam Custom Rifles
             </span>
             <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-mono tracking-wider uppercase bg-blue-500/15 border border-blue-500/30 text-blue-300">
@@ -312,16 +318,27 @@ export default function CompetitorPacketPage() {
             </span>
           </div>
 
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white font-heading">
-              Subsonic Society Invitational <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">
-                Money Match — 2026 Competitor Packet
-              </span>
-            </h1>
-            <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
-              Presented by Modacam Custom Rifles • November 13–15, 2026 | The Hideout | Bristol, Tennessee
-            </p>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div className="space-y-3">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white font-heading">
+                Subsonic Society Invitational <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">
+                  Money Match — 2026 Competitor Packet
+                </span>
+              </h1>
+              <p className="max-w-3xl text-base sm:text-lg text-slate-200 leading-relaxed font-sans">
+                Presented by Modacam Custom Rifles • November 13–15, 2026 | The Hideout | Bristol, Tennessee
+              </p>
+            </div>
+
+            <a
+              href="/documents/invitational-competitor-packet.pdf"
+              download="Subsonic-Society-2026-Competitor-Packet.pdf"
+              className="px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download PDF Packet</span>
+            </a>
           </div>
 
           {/* Info Bar */}
@@ -346,22 +363,22 @@ export default function CompetitorPacketPage() {
             <div className="p-4 rounded-xl bg-white/[0.03] border border-emerald-500/20 backdrop-blur-sm">
               <div className="text-xs sm:text-sm font-mono text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Trophy className="w-4 h-4 text-emerald-400" />
-                Host &amp; Hospitality
+                Host
               </div>
               <div className="text-lg sm:text-xl font-black text-white mt-1">Subsonic Society</div>
               <div className="text-xs sm:text-sm text-emerald-400 font-medium mt-0.5">
-                Founder: Allen Hurley • Sat Lunch &amp; Dinner
+                Founder: Allen Hurley
               </div>
             </div>
 
             <div className="p-4 rounded-xl bg-white/[0.03] border border-amber-500/20 backdrop-blur-sm">
               <div className="text-xs sm:text-sm font-mono text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Target className="w-4 h-4 text-amber-400" />
-                Total Cash Prizes
+                Match Format
               </div>
-              <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">$7,500 Total Cash Prizes</div>
+              <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">12 Main Event Stages</div>
               <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">
-                $5,000 Main Match • $2,500 Side Matches
+                Followed by 2 Side Matches
               </div>
             </div>
           </div>
@@ -473,7 +490,7 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 3: Competitor Hospitality & Invitational Weekend Schedule (Verbatim from Allen's Schedule & Hospitality Revisions) */}
+        {/* SECTION 3: Invitational Weekend Schedule */}
         <section id="schedule" className="scroll-mt-24 space-y-6">
           <div className="space-y-3">
             <h2 className="text-2xl sm:text-3xl font-black text-white font-heading">
@@ -501,7 +518,7 @@ export default function CompetitorPacketPage() {
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
                 <h3 className="text-lg font-black text-white">Saturday — Nov. 14</h3>
                 <span className="px-2.5 py-1 rounded bg-amber-500 text-black text-xs font-black uppercase font-mono">
-                  $5,000 Main Match
+                  Main Event
                 </span>
               </div>
               <ul className="space-y-2.5 text-sm sm:text-base text-slate-200">
@@ -509,7 +526,7 @@ export default function CompetitorPacketPage() {
                 <li>Registration and sight in until 8:30</li>
                 <li>Shooter brief 8:30</li>
                 <li>First shot 9am</li>
-                <li className="font-bold text-amber-400">8 stages — lunch and dinner provided</li>
+                <li className="font-bold text-amber-400">8 stages (Main Event) — lunch and dinner provided</li>
               </ul>
             </div>
 
@@ -518,7 +535,7 @@ export default function CompetitorPacketPage() {
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
                 <h3 className="text-lg font-black text-white">Sunday — Nov. 15</h3>
                 <span className="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold">
-                  $2,500 Side Matches
+                  Main Event + Side Matches
                 </span>
               </div>
               <ul className="space-y-2.5 text-sm sm:text-base text-slate-200">
@@ -526,7 +543,8 @@ export default function CompetitorPacketPage() {
                 <li>7–8:30 sight in</li>
                 <li>Shooter brief 8:30</li>
                 <li>First shot 9am</li>
-                <li className="font-bold text-emerald-400">4 stages • 2 stages</li>
+                <li className="font-bold text-amber-400">4 stages (Main Event)</li>
+                <li className="font-bold text-emerald-400">2 side matches following the main event</li>
               </ul>
             </div>
           </div>

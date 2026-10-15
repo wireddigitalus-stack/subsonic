@@ -14,7 +14,7 @@ export function BallisticsCalculator() {
 
   // Precision rimfire trajectory model for .22LR subsonic (G1 BC ~0.130 to 0.145)
   const dopeTable = useMemo(() => {
-    const distances = [50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375, 400, 425, 450, 465];
+    const distances = [50, 75, 100, 125, 150, 175, 200];
     const bc = 0.138; // Lapua Center-X / SK Long Range standard
     const densityFactor = 1 - (elevation / 1000) * 0.03 + (temperature - 59) * 0.0018;
 
@@ -72,7 +72,7 @@ export function BallisticsCalculator() {
             SUBSONIC .22LR DOPE & ELEVATION MATRIX
           </h3>
           <p className="text-xs text-slate-300 mt-1">
-            Calibrated for Holston Mountain atmospheric density (3,420 FT ELEV). Solve drops out to 465 yards.
+            Calibrated for Bristol atmospheric density. Solve drops from 50 to 200 yards.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export function BallisticsCalculator() {
           />
           <div className="text-[10px] text-slate-500 font-mono flex justify-between">
             <span>1,000 FT</span>
-            <span>Bristol Peak 3,420 FT</span>
+            <span>Bristol 3,420 FT</span>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export function BallisticsCalculator() {
           />
           <div className="text-[10px] text-slate-500 font-mono flex justify-between">
             <span>2 MPH Light</span>
-            <span>25 MPH Ridge Gale</span>
+            <span>25 MPH Gust</span>
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export function BallisticsCalculator() {
             {dopeTable.map((row) => (
               <tr key={row.distance} className="hover:bg-white/[0.03] transition-colors">
                 <td className="p-3 font-bold text-white">
-                  {row.distance} YDS {row.distance === 465 && <span className="text-[10px] text-amber-400 font-normal">(Bristol Max)</span>}
+                  {row.distance} YDS
                 </td>
                 <td className="p-3 text-amber-400 font-black text-sm">
                   {row.elevationMil} MIL
@@ -212,7 +212,7 @@ export function BallisticsCalculator() {
       <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
         <span>
-          Note: Extreme range .22LR past 350 yards experiences pronounced aerodynamic drag and Magnus effect. Verify DOPE on the 50/100/200-yard zero range prior to match start.
+          Note: 50 yard, 100 yard, and 200 yard zero available prior to match start.
         </span>
       </div>
     </div>

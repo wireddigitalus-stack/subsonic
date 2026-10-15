@@ -98,7 +98,7 @@ export default function SocietyPage() {
               1. Competition Without Gatekeeping
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              We design courses of fire that reward mechanical discipline, wind reading, and barricade stability rather than an endless checkbook. From our flagship $7,500 Invitational to local 300X Long Gong challenges, every shooter lines up with an equal chance at glory.
+              We design courses of fire that reward mechanical discipline, wind reading, and barricade stability rather than an endless checkbook. In the Subsonic Society Invitational, every invited competitor lines up with an equal chance on the firing line.
             </p>
             <div className="text-xs font-mono text-amber-400/80 pt-2 flex items-center gap-1">
               <span>EXPLORE SCHEDULE</span>

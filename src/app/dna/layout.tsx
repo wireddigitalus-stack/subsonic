@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Rimfire ballistics lab",
     "Subsonic Society DNA",
     "Extreme spread rimfire ammo",
-    "300 yard 22LR DOPE table",
+    "200 yard 22LR DOPE table",
     "Harrell tuner 22LR test",
   ],
   alternates: {

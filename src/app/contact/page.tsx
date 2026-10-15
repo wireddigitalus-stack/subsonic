@@ -263,7 +263,7 @@ export default function ContactPage() {
               />
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Modacam Custom Rifles is the presenting partner for the $7,500 Cash Purse Subsonic Society Invitational.
+              Modacam Custom Rifles is the presenting partner for the Subsonic Society Invitational Money Match.
             </p>
           </div>
         </div>

@@ -291,7 +291,7 @@ export function HeroCrosshairLoader({
             <span>{getStatusText()}</span>
           </div>
           <div className="text-[8px] sm:text-[11px] font-mono text-slate-400 truncate max-w-xs sm:max-w-none">
-            TARGET RANGE: 340 YDS • ELEV: +4.6 MIL • WIND: 0.7 MIL L
+            TARGET RANGE: 150 YDS • ELEV: +4.6 MIL • WIND: 0.7 MIL L
           </div>
         </div>
       </div>

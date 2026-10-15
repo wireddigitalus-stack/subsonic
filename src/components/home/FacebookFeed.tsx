@@ -502,16 +502,16 @@ export function FacebookFeed() {
                 {/* Channel Metrics */}
                 <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center font-mono">
                   <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="text-xs font-black text-amber-400">465 YDS</div>
-                    <div className="text-[9px] text-slate-400 uppercase">Max Target</div>
+                    <div className="text-xs font-black text-amber-400">200 YDS</div>
+                    <div className="text-[9px] text-slate-400 uppercase">Zero Range</div>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="text-xs font-black text-blue-400">18 STAGES</div>
-                    <div className="text-[9px] text-slate-400 uppercase">Pro Match</div>
+                    <div className="text-xs font-black text-blue-400">12 STAGES</div>
+                    <div className="text-[9px] text-slate-400 uppercase">Main Event</div>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="text-xs font-black text-emerald-400">$28.5K</div>
-                    <div className="text-[9px] text-slate-400 uppercase">Prize Table</div>
+                    <div className="text-xs font-black text-emerald-400">2 SIDE</div>
+                    <div className="text-[9px] text-slate-400 uppercase">Matches</div>
                   </div>
                 </div>
 

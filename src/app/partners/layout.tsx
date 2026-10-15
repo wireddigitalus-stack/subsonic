@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Title Sponsor: Modacam Custom Rifles | Subsonic Society",
   description:
-    "Modacam Custom Rifles is the premier title sponsor of the Subsonic Society Invitational $7,500 Cash Purse. Hand-crafted precision rimfire rifles built by master gunsmith Jonathan Elrod.",
+    "Modacam Custom Rifles is the premier title sponsor of the Subsonic Society Invitational Money Match. Hand-crafted precision rimfire rifles built by master gunsmith Jonathan Elrod.",
   keywords: [
     "Modacam Custom Rifles",
     "Jonathan Elrod gunsmith",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Title Sponsor: Modacam Custom Rifles | Subsonic Society",
     description:
-      "Precision Rimfire Redefined. Modacam Custom Rifles is the presenting partner for the Subsonic Society Invitational $7,500 Cash Purse.",
+      "Precision Rimfire Redefined. Modacam Custom Rifles is the presenting partner for the Subsonic Society Invitational Money Match.",
     url: "https://subsonicsociety.com/partners",
     siteName: "Subsonic Society",
     images: [

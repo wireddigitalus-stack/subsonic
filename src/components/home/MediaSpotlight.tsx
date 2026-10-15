@@ -182,7 +182,7 @@ export function MediaSpotlight() {
             <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 font-mono">
               <span className="flex items-center gap-1.5 text-amber-300">
                 <Target className="w-4 h-4 text-amber-400" />
-                Zeroed at 50 Yds • Dialed to 465 Yds (34.2 Mils Elevation)
+                50, 100 &amp; 200 Yard Precision Rimfire
               </span>
               <span>Subsonic Society Official Athlete Profile</span>
             </div>

@@ -57,7 +57,7 @@ const STREAM_ITEMS: TerminalMessage[] = [
       avatar: "/assets/subsonic-logo-round.png",
       color: "border-amber-400 text-amber-400 bg-amber-500/15",
     },
-    text: "Welcome marksmen. Squad registration for the 2026 Subsonic Invitational at The Hideout is live ($7,500 Cash Purse). If you received an invitation or squad pass, claim your credentials below to unlock private comms and stage DOPE.",
+    text: "Welcome marksmen. Squad registration for the 2026 Subsonic Invitational at The Hideout is live. If you received an invitation or squad pass, claim your credentials below to unlock private comms and stage DOPE.",
     timestamp: "10:41 AM",
   },
   {
@@ -446,7 +446,7 @@ export function HeroChatTerminal({ isActive = true, onReplayVideo, onReplayLock 
                       CLAIM YOUR INVITATION &amp; ACTIVATE CALLSIGN
                     </h4>
                     <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed max-w-xl">
-                      Squad slots for the 2026 Subsonic Invitational ($7,500 Cash Purse) are strictly limited. Claim your code below to unlock private comms and competitor clearance.
+                      Squad slots for the 2026 Subsonic Invitational are strictly limited. Claim your code below to unlock private comms and competitor clearance.
                     </p>
                   </div>
 

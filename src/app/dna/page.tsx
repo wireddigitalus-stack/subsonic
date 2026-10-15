@@ -152,7 +152,7 @@ export default function SubsonicDnaPage() {
             "@context": "https://schema.org",
             "@type": "TechArticle",
             "headline": "Subsonic DNA: Precision .22LR Ammunition Lot Testing & Rimfire Ballistics",
-            "description": "Comprehensive chronograph, velocity SD/ES, and 50 to 300 yard dispersion testing across Lapua, Eley, RWS, and harmonic tuners.",
+            "description": "Comprehensive chronograph, velocity SD/ES, and 50 to 200 yard dispersion testing across Lapua, Eley, RWS, and harmonic tuners.",
             "author": {
               "@type": "Organization",
               "name": "Subsonic Society Ballistics Lab"
@@ -179,7 +179,7 @@ export default function SubsonicDnaPage() {
               <span className="amber-gradient-text">THE SUBSONIC TESTING LAB.</span>
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              We don&apos;t guess. We verify. Explore empirical chronograph data, lot variance, barrel harmonic tuning matrices, and extreme 300-yard rimfire bullet behavior under high-altitude Appalachian atmospheric conditions.
+              We don&apos;t guess. We verify. Explore empirical chronograph data, lot variance, barrel harmonic tuning matrices, and precision rimfire bullet behavior under Appalachian atmospheric conditions.
             </p>
           </div>
 
@@ -493,11 +493,6 @@ export default function SubsonicDnaPage() {
                     { dist: "100 Yds", mil: "1.9 MIL", moa: "6.5 MOA", time: "0.30 s", rem: "945 fps", w5: "0.5 MIL", w10: "1.0 MIL" },
                     { dist: "150 Yds", mil: "4.2 MIL", moa: "14.4 MOA", time: "0.48 s", rem: "888 fps", w5: "0.8 MIL", w10: "1.6 MIL" },
                     { dist: "200 Yds", mil: "7.1 MIL", moa: "24.4 MOA", time: "0.68 s", rem: "838 fps", w5: "1.2 MIL", w10: "2.3 MIL" },
-                    { dist: "250 Yds", mil: "10.6 MIL", moa: "36.4 MOA", time: "0.91 s", rem: "792 fps", w5: "1.5 MIL", w10: "3.1 MIL" },
-                    { dist: "300 Yds", mil: "14.8 MIL", moa: "50.9 MOA", time: "1.16 s", rem: "750 fps", w5: "1.9 MIL", w10: "3.9 MIL" },
-                    { dist: "350 Yds", mil: "19.8 MIL", moa: "68.1 MOA", time: "1.44 s", rem: "712 fps", w5: "2.4 MIL", w10: "4.8 MIL" },
-                    { dist: "400 Yds", mil: "25.6 MIL", moa: "88.0 MOA", time: "1.74 s", rem: "677 fps", w5: "2.9 MIL", w10: "5.8 MIL" },
-                    { dist: "465 Yds", mil: "34.2 MIL", moa: "117.5 MOA", time: "2.18 s", rem: "634 fps", w5: "3.6 MIL", w10: "7.2 MIL" },
                   ].map((row, i) => (
                     <tr key={i} className="hover:bg-white/5 transition-colors">
                       <td className="py-3 px-4 font-bold text-white">{row.dist}</td>
@@ -520,10 +515,10 @@ export default function SubsonicDnaPage() {
             <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4">
               <h3 className="text-xl font-bold text-white">Twist Rate Comparison: 1:16 vs 1:14</h3>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Standard rimfire barrels utilize a 1:16 twist, optimized for 40gr lead round-nose ammo inside 100 yards. However, in long-range rimfire competitions stretching to 300+ yards, faster 1:14 or 1:14.5 twist barrels (such as MullerWorks 8-groove) provide higher gyroscopic stability (Sg &gt; 1.8) that prevents bullet yaw as the projectile drops through the transonic speed barrier.
+                Standard rimfire barrels utilize a 1:16 twist, optimized for 40gr lead round-nose ammo. In precision rimfire competition out to 200 yards, 1:16 and 1:14.5 twist barrels provide consistent gyroscopic stability and minimal vertical dispersion.
               </p>
               <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs font-mono text-amber-400">
-                RECOMMENDATION: For matches featuring steel beyond 250 yards, 1:14.5 twist consistently delivers tighter vertical groups.
+                RECOMMENDATION: Match your barrel tuner setting to your specific ammunition lot at 50 and 100 yards.
               </div>
             </div>
 

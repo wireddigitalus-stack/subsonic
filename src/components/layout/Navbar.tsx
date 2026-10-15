@@ -620,7 +620,7 @@ export function Navbar() {
                 <Trophy className="w-4 h-4 text-amber-400" />
                 <div className="flex items-center justify-between w-full">
                   <span>The 2026 Invitational</span>
-                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">$7.5K Purse</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-mono font-bold uppercase">Packet</span>
                 </div>
               </Link>
               <Link

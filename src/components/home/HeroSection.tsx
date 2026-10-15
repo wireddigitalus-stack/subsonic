@@ -106,7 +106,7 @@ export function HeroSection() {
 
         {/* Hero Creed & Mission Statement */}
         <p className="text-sm sm:text-lg text-slate-300 font-normal leading-relaxed max-w-3xl">
-          A grassroots precision-rimfire community built around real-world ballistic knowledge, extreme 300-yard competition, and figuring out what <strong className="text-white">actually works</strong>.
+          A grassroots precision-rimfire community built around real-world ballistic knowledge, precision rimfire competition, and figuring out what <strong className="text-white">actually works</strong>.
         </p>
 
         {/* PRIMARY ACTION BUTTONS: INVITATIONAL PACKET • REDEEM CODE • CHAT ROOM */}

@@ -54,17 +54,17 @@ export function HomePreFacebookSpotlights() {
 
               <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-amber-400" />
-                <span>$7,500 GUARANTEED CASH PURSE</span>
+                <span>INVITATIONAL MONEY MATCH</span>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                The premier precision rimfire shootout in the East Tennessee high country. 18 stages across rugged ridge terrain with steel stretched out to 465 yards. Open to top regional competitors and open lottery squads.
+                The premier precision rimfire shootout in East Tennessee. 12 main event stages plus 2 side matches at The Hideout in Bristol, Tennessee.
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-[10px] font-mono text-slate-400 block">DATES</span>
-                  <span className="text-xs sm:text-sm font-bold text-white">Oct 17–18, 2026</span>
+                  <span className="text-xs sm:text-sm font-bold text-white">Nov 13–15, 2026</span>
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-[10px] font-mono text-slate-400 block">LOCATION</span>
@@ -72,11 +72,11 @@ export function HomePreFacebookSpotlights() {
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-[10px] font-mono text-slate-400 block">COURSE OF FIRE</span>
-                  <span className="text-xs sm:text-sm font-bold text-amber-400">18 Stages / 465 Yds</span>
+                  <span className="text-xs sm:text-sm font-bold text-amber-400">12 Stages + 2 Side</span>
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-[10px] font-mono text-slate-400 block">AVAILABILITY</span>
-                  <span className="text-xs sm:text-sm font-bold text-emerald-400">26 Squad Spots Left</span>
+                  <span className="text-[10px] font-mono text-slate-400 block">FORMAT</span>
+                  <span className="text-xs sm:text-sm font-bold text-emerald-400">Invitation Only</span>
                 </div>
               </div>
 
@@ -111,9 +111,9 @@ export function HomePreFacebookSpotlights() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">THE INVITATIONAL CUP</h3>
+                  <h3 className="text-lg font-bold text-white">THE INVITATIONAL</h3>
                   <p className="text-xs text-slate-300 mt-1">
-                    Guaranteed $7,500 cash purse payouts across Open, Production, and Senior divisions, presented by Modacam Custom Rifles.
+                    Subsonic Society Invitational Money Match, presented by Modacam Custom Rifles.
                   </p>
                 </div>
                 <div className="pt-3 border-t border-white/10 flex flex-col items-center gap-1.5">
@@ -162,12 +162,12 @@ export function HomePreFacebookSpotlights() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-amber-400 font-bold uppercase tracking-wider">SCHEDULE & PURSES</span>
-                <span className="text-emerald-400 font-mono font-bold">$2,500 CASH</span>
+                <span className="text-amber-400 font-bold uppercase tracking-wider">WEEKEND SCHEDULE</span>
+                <span className="text-emerald-400 font-mono font-bold">NOV 13–15</span>
               </div>
               <h4 className="text-base font-bold text-white">Full 3-Day Championship Timeline</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Nov 13–15 at The Hideout. Friday zero & BBQ, Saturday 10 stages & $1,000 Speed Duel, Sunday 10 stages & $1,500 1,000Y Cold Bore.
+                Nov 13–15 at The Hideout. Friday registration & sight-in, Saturday 8 main event stages (lunch & dinner provided), Sunday 4 main event stages followed by 2 side matches.
               </p>
             </div>
 

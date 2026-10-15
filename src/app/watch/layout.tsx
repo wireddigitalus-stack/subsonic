@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Watch 4K Bullet Trace & Phantom High-Speed Video | Subsonic Society",
   description:
-    "Stream 4K ultra-slow-motion bullet trace at 1,000 FPS captured with Phantom high-speed cameras. Witness subsonic .22LR aerodynamics, vortex wakes, and steel impacts at 300+ yards.",
+    "Stream 4K ultra-slow-motion bullet trace at 1,000 FPS captured with Phantom high-speed cameras. Witness subsonic .22LR aerodynamics, vortex wakes, and downrange steel impacts.",
   keywords: [
     "22LR bullet trace video",
     "Phantom high speed camera rimfire",

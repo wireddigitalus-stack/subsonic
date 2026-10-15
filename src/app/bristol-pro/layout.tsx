@@ -1,25 +1,24 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Subsonic Society Invitational | $7,500 Cash Purse Presented by Modacam",
+  title: "Subsonic Society Invitational Money Match | Presented by Modacam",
   description:
-    "The marquee high-country precision rimfire championship. 18 stages out to 465 yards, $7,500 guaranteed cash purse presented by Modacam Custom Rifles at The Hideout (Bristol, TN • 3,420 FT).",
+    "The premier precision rimfire championship. 12 Main Event stages (8 Saturday, 4 Sunday) followed by 2 side matches, presented by Modacam Custom Rifles in Bristol, TN.",
   keywords: [
     "Subsonic Society Invitational",
     "Bristol TN rimfire championship",
     "Modacam Custom Rifles invitational",
-    "Precision rimfire cash purse",
+    "Precision rimfire money match",
     "The Hideout Bristol shooting match",
     "Appalachian rimfire championship",
-    "7500 dollar rimfire purse",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/bristol-pro",
   },
   openGraph: {
-    title: "Subsonic Society Invitational | $7,500 Guaranteed Cash Purse",
+    title: "Subsonic Society Invitational Money Match | Presented by Modacam",
     description:
-      "18 stages in the Appalachian mountain winds. The marquee precision rimfire competition presented by Modacam Custom Rifles.",
+      "12 Main Event stages followed by 2 side matches in the Appalachian mountain winds. Presented by Modacam Custom Rifles.",
     url: "https://subsonicsociety.com/bristol-pro",
     siteName: "Subsonic Society",
     images: [
@@ -35,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Subsonic Society Invitational | $7,500 Cash Purse",
+    title: "Subsonic Society Invitational Money Match",
     description:
-      "October 17–18, 2026 at The Hideout (Bristol, TN • 3,420 FT). Presented by Modacam Custom Rifles.",
+      "November 13–15, 2026 in Bristol, TN. Presented by Modacam Custom Rifles.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };

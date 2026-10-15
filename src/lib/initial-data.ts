@@ -18,14 +18,14 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-02",
     content:
-      "🏆 Official 2026 Subsonic Society Invitational awards are finalized! Competitors at The Hideout in Bristol, TN will battle for a guaranteed $7,500 cash purse presented by Modacam Custom Rifles.",
+      "🏆 Official 2026 Subsonic Society Invitational Money Match presented by Modacam Custom Rifles! November 13–15, 2026 in Bristol, TN.",
     publishedAt: "3 days ago",
     likesCount: 312,
     commentsCount: 56,
     sharesCount: 41,
     imageUrl: "/images/SS-RWB-LOGO.png",
     externalUrl: "https://www.facebook.com/p/Subsonic-Society-61578052196057/",
-    tags: ["#SubsonicSociety", "#ModacamCustomRifles", "#PrecisionRimfire", "#CashPurse"],
+    tags: ["#SubsonicSociety", "#ModacamCustomRifles", "#PrecisionRimfire"],
   },
   {
     id: "fb-post-03",

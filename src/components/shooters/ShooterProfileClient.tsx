@@ -390,7 +390,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
     })),
     knowsAbout: [
       "Precision Rimfire Shooting",
-      "Extreme Long Range Subsonic Ballistics",
+      "Subsonic Ballistics",
       shooter.division,
       shooter.rifleSetup?.action,
       shooter.rifleSetup?.optic,
@@ -797,14 +797,14 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
           {/* ─── BOTTOM TOURNAMENT RIBBON & PRESENTING SPONSOR (PRINT-EXACT) ─── */}
           <div className="relative z-10 border-t-2 border-amber-500/40 bg-black/90 px-6 py-6">
-            {/* Top Bar: $7,500 Money Match • Presented by Modacam Custom Rifles */}
+            {/* Top Bar: Money Match • Presented by Modacam Custom Rifles */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
               <div>
                 <div className="text-xs sm:text-sm font-mono font-black text-amber-400 uppercase tracking-[0.2em]">
-                  $7,500 TOTAL CASH PRIZES ($5,000 MAIN MATCH • $2,500 SIDE MATCHES)
+                  SUBSONIC SOCIETY INVITATIONAL MONEY MATCH
                 </div>
                 <div className="text-slate-400 text-xs font-mono uppercase tracking-wider pt-0.5">
-                  18 Natural Terrain Stages • Sat Lunch &amp; Dinner Included • The Hideout • Bristol, TN
+                  12 Main Event Stages + 2 Side Matches • Sat Lunch &amp; Dinner Provided • The Hideout • Bristol, TN
                 </div>
               </div>
 

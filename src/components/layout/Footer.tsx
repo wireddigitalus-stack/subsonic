@@ -111,7 +111,7 @@ export function Footer() {
                   className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold text-amber-400/90"
                 >
                   <Trophy className="w-3 h-3 text-amber-400" />
-                  <span>The Invitational ($7.5K)</span>
+                  <span>The Invitational</span>
                 </Link>
               </li>
               <li>

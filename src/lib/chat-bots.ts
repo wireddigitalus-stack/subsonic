@@ -156,7 +156,7 @@ export const BOT_VIOLATIONS: BotViolationItem[] = [
   },
   {
     category: "STRONG_LANGUAGE",
-    content: "Missed the cold bore plate at 300 yards by an inch, damn it! That stage was pure crap.",
+    content: "Missed the cold bore plate at 150 yards by an inch, damn it! That stage was pure crap.",
   },
   // 4. Spam / commercial solicitation (triggers Plink COMMERCIAL / SPAM)
   {
@@ -180,79 +180,79 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-garrett": [
       "All competitors: Range is open Friday Nov 13 from 12:00 to 5:00 PM for registration and sight-in only (50, 100, and 200-yard zero).",
       "Reminder: Range opens at 7:00 AM Saturday and Sunday with sight-in until 8:30 AM. Shooter brief is at 8:30 AM and first shot is at 9:00 AM.",
-      "Saturday features 8 main match stages with lunch and dinner provided on-site for all competitors.",
-      "Sunday features 4 main match stages followed by 2 cash side match stages ($2,500 purse).",
+      "Saturday features 8 main event stages with lunch and dinner provided for all competitors.",
+      "Sunday features the final 4 main event stages followed by 2 side matches after the main event.",
     ],
     "bot-wyatt": [
       "The Bristol Hotel on State Street is where our squad is staging. Lumac Rooftop Bar has killer sunset views over the mountains.",
-      "Just tested Lapua Center-X lot 32187 at 3,420 FT elevation. Holding 1,062 fps with an ES of 7 fps. Ready for the long plates.",
-      "Stage 4 (340-yard diamond KYL): Add 0.2 MIL when the canyon draft calms down. The thermal lift drops fast after 13:00.",
+      "Just tested Lapua Center-X lot 32187. Holding 1,062 fps with an ES of 7 fps. Ready for the match.",
+      "Stage 4 KYL rack: Add 0.2 MIL when the draft calms down.",
       "If you need steaks Thursday night, 620 State right on the TN/VA state line is where it's at. Amazing ribeyes.",
     ],
     "bot-kendra": [
       "Blackbird Bakery on Piedmont Ave is open 24 hours Mon–Sat. We are hitting it for doughnuts and espresso before zeroing Friday!",
-      "The 220 acres at The Hideout are breathtaking. The ridgeline crosswinds will test your bubble level on every positional stage.",
+      "Make sure your bubble level is dialed for the positional stages.",
       "Vivian's Table inside The Bristol Hotel has an incredible Southern dinner menu and bourbon selection if you're staying downtown.",
       "Ask RO if you need the full 12-hotel list or phone numbers — the guide in the Competitor Packet is super thorough.",
     ],
     "bot-eli": [
       "I'm booking a drift boat on the South Holston River Friday morning! Trophy brown trout on dry flies. Anyone want to split the guide?",
       "Stopped by The Pinnacle shopping center off Exit 74 — Bass Pro Shops has plenty of ammo boxes and cleaning gear.",
-      "First time at The Hideout — the 24x40 covered pavilion and 20x20 fire pit setup are awesome!",
+      "Looking forward to Friday registration and confirming my 50, 100, and 200-yard zero!",
       "Can we ask RO for recommendations on budget hotels near the highway? Quality Inn or Courtyard?",
     ],
     "bot-marcus": [
-      "Delta Blues BBQ on State Street has the best slow-smoked brisket in the Tri-Cities. Squad 5 is heading there Saturday night.",
-      "Courtyard by Marriott off Exit 74 is only 14 minutes from the range gate. Clean, quiet, and easy gear loading.",
-      "Looking forward to the Sunday cash side stages after the final 4 main stages.",
-      "Lost State Distilling downtown has award-winning Tennessee whiskey. Great spot for a distillery tour after check-in Friday.",
+      "Southern Craft BBQ at The Sessions Hotel complex is a great spot for dinner.",
+      "Courtyard by Marriott off Exit 74 is only 14 minutes from the range. Clean, quiet, and easy gear loading.",
+      "Looking forward to the Sunday side matches after the final 4 main event stages.",
+      "Downtown Bristol is walkable on both sides of the Tennessee-Virginia state line.",
     ],
     "bot-sofia": [
-      "Hard Rock Hotel & Casino Bristol is where my crew is staying! 20 minutes from The Hideout and the gaming resort is buzzing.",
+      "Hard Rock Hotel & Casino Bristol is where my crew is staying! Only 10–15 minutes from The Hideout.",
       "Don't miss walking down State Street — you can literally stand with one foot in Tennessee and one foot in Virginia!",
-      "Are there RV campgrounds nearby for weekend campers? Looking to bring my rig for match weekend.",
-      "Heading to Public House on State Street after check-in — chef-driven tavern burgers and local draft beer right on the state line!",
+      "Check Airbnb and VRBO as well — lots of nearby homes and cabins in the Bristol area.",
+      "Heading to Public House on State Street after check-in — great food and drinks right downtown!",
     ],
   },
   "bristol-pro-shootout": {
     "bot-garrett": [
       "All competitors: Stage 7 now COLD. Chamber flags IN. No handling until the RO clears the line.",
-      "Attention all squads: Updated stage brief posted at the 24x40 covered pavilion. Check your rotation times.",
+      "Attention all squads: Check your rotation times before the 9:00 AM first shot.",
       "Reminder: Sight-in is open 7:00 to 8:30 AM before the 8:30 AM shooter brief.",
-      "Wind station update from Station 3: Gusting to 16 mph from 280°. Adjust your holds accordingly.",
-      "All competitors: Stage 4 target at 300 yards has been checked. DOPE should still be valid.",
+      "Wind update: Gusting to 12 mph from 280°. Adjust your holds accordingly.",
+      "All competitors: Stage 4 target at 150 yards has been checked. DOPE should still be valid.",
       "Range going HOT in 5 minutes. Final chamber flag check. ROs confirm your squads.",
     ],
     "bot-wyatt": [
-      "Just ran Stage 1 clean. The 22-degree downhill angle at 185 yards is real — add 0.3 MIL over your flat-ground DOPE.",
-      "Heads up: The mirage on Stage 4 past 250 yards is brutal between 11:00-14:00. Read through it, don't chase it.",
+      "Just ran Stage 1 clean. Watch your angle hold at 150 yards.",
+      "Heads up: The mirage on Stage 4 at 200 yards picks up around midday. Read through it, don't chase it.",
       "Confirmed: Lapua Center-X lot 32187 is holding 1062 fps today. Consistent ES of 8 fps across 20 rounds.",
-      "If you're shooting out to 300 yards — commit to your wind call.",
+      "If you're shooting out to 200 yards — commit to your wind call.",
       "Stage 7 Tank Trap tip: Use the left fork on the barricade. It's more stable and gives you a better angle on the plate.",
-      "Wind just switched from WNW to W. Adjust your holds — the canyon is channeling it differently now.",
+      "Wind just switched from WNW to W. Adjust your holds accordingly.",
     ],
     "bot-kendra": [
       "My RimX is grouping 0.28 MOA at 100 today with SK Long Range. Tuner set at 3.5 turns from home.",
-      "That downdraft off the ridge is eating elevation. I'm adding 0.15 MIL to everything past 250 yards.",
-      "Stage 3 rooftop positional — the metal is slick. Bring friction tape or you'll slide mid-string.",
+      "Watch the crosswind — I'm adding 0.15 MIL to everything at 200 yards.",
+      "Stage 3 positional — bring a good bag for stable barricade contact.",
       "Anyone else seeing their ES climb after round 150? My barrel is heat-soaking. Letting it cool between stages.",
     ],
     "bot-marcus": [
-      "Just finished Stage 8. The wind funnels through the draw and adds 0.4 MIL left.",
+      "Just finished Stage 8. The wind adds 0.4 MIL left.",
       "Squad 5 heads up: the timer on Stage 8 is tight. Get on glass fast, don't waste time on your mag change.",
       "My Krieger is holding zero beautifully. Still printing sub-MOA.",
-      "The vertical spread is mostly DA-related. We're sitting at +2,200 FT right now — add 0.2 MIL elevation.",
+      "Check your density altitude before the afternoon stages.",
     ],
     "bot-eli": [
-      "This is my first pro match and I'm nervous but excited! Any last-minute tips for the KYL stage?",
-      "Just watched GHOST clean Stage 1. That downhill hold adjustment is no joke.",
+      "This is my first Invitational and I'm excited! Any last-minute tips for the KYL stage?",
+      "Just watched GHOST clean Stage 1.",
       "Is it normal for hands to shake on the barricade stages? Asking for a friend... 😅",
       "The atmosphere here is incredible. Everyone is so helpful. Love this community.",
     ],
     "bot-sofia": [
-      "Running my B-14R in production class. She's not fancy but she's consistent. 0.45 MOA at 100 today.",
-      "First time shooting out to 300 with a .22LR. The bullet drop is wild — like watching it fall in slow motion.",
-      "Any production class shooters want to compare DOPE for Stage 4? I'm probably way off.",
+      "Running my B-14R. Consistent 0.45 MOA at 100 today.",
+      "Verified my 50, 100, and 200-yard zero this morning.",
+      "Anyone want to compare 200-yard DOPE notes before the shooter brief?",
     ],
   },
 
@@ -265,7 +265,7 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-wyatt": [
       "Squad 3 check: Everyone good on chamber flags? First shot is at 9:00 AM sharp.",
       "Reminder: Extra magazine springs and friction pads. The Tank Trap eats gear.",
-      "Squad 3 — regroup at the covered pavilion after Stage 7. Quick debrief before we rotate.",
+      "Squad 3 — regroup after Stage 7 for a quick debrief before we rotate.",
     ],
     "bot-marcus": [
       "Squad 5 roll call. Sound off below so I know everyone's checked in.",
@@ -283,7 +283,7 @@ const MESSAGE_POOLS: MessagePool = {
       "🚨 MATCH ALERT: Weather delay. Lightning detected within 5 miles. All ranges COLD. Seek shelter immediately.",
       "🚨 ALL CLEAR: Lightning has passed. Ranges going HOT in 10 minutes. Return to your staging areas.",
       "📋 OFFICIAL: Stage 6 is under review due to target malfunction. Affected squads will reshoot at end of day.",
-      "🏆 DAY 1 RESULTS: Leaderboard will be posted at the covered pavilion after the stages. Saturday lunch and dinner provided!",
+      "🏆 DAY 1 RESULTS: Leaderboard will be posted after the stages. Saturday lunch and dinner provided!",
       "⏰ SCHEDULE: Range opens at 7:00 AM, sight-in 7:00–8:30 AM, shooter brief at 8:30 AM, first shot at 9:00 AM.",
       "🔴 COLD RANGE — All ranges COLD for target reset. Estimated 15 minutes. Stay behind the yellow line.",
     ],
@@ -292,7 +292,7 @@ const MESSAGE_POOLS: MessagePool = {
   "ballistics-and-gear": {
     "bot-wyatt": [
       "Lab tested 4 lots of Center-X this week. Lot 32187 is the winner — 8 fps ES, 1062 fps average, 0.31 MOA at 100.",
-      "The ZCO 527 tracks perfectly up to 12 MIL. No tracking error. Worth every penny if you're shooting past 400.",
+      "The ZCO 527 tracks perfectly. Zero tracking error.",
       "Barrel life question: My Bartlein MTU is at 8,500 rounds and still printing. When do you guys rebarrel?",
     ],
     "bot-kendra": [
@@ -302,21 +302,21 @@ const MESSAGE_POOLS: MessagePool = {
       "The TT525P is the best glass I've ever looked through. The illumination at 35x is crystal clear even in low light.",
     ],
     "bot-eli": [
-      "Is the CZ 457 MTR competitive in production class or should I upgrade to a Vudoo eventually?",
+      "Is the CZ 457 MTR competitive or should I upgrade to a Vudoo eventually?",
       "Just ordered my first LabRadar. What distance do you guys set it up at for rimfire testing?",
-      "What's the best budget ammo for practice? I can't afford Eley Tenex for every range session.",
-      "Anyone have experience with the Vortex Razor vs the Nightforce NXS for rimfire PRS? Big price difference.",
+      "What's the best practice ammo for 50 and 100-yard positional drills?",
+      "Anyone have experience with the Vortex Razor vs the Nightforce NXS for rimfire PRS?",
     ],
     "bot-marcus": [
-      "The Ravage action is so smooth. The bolt throw is shorter than the V-22 and the trigger is phenomenal.",
-      "Nightforce ATACR 7-35 review: Glass clarity is incredible, but the turret feel on the ZCO is better. Trade-offs.",
-      "Just switched from Eley Match to RWS R50. The R50 is more consistent in cold weather — tighter ES below 45°F.",
+      "The V-22 action is so smooth and the trigger is phenomenal.",
+      "Nightforce ATACR 7-35 review: Glass clarity is incredible, and the turret feel on the ZCO is top notch.",
+      "Just switched from Eley Match to RWS R50. The R50 is very consistent in cool weather — tight ES.",
     ],
     "bot-sofia": [
-      "The Bergara B-14R is the best value in production rimfire right now. Sub-MOA out of the box for under $1K.",
+      "The Bergara B-14R is great in production rimfire right now. Sub-MOA out of the box.",
       "Is it worth upgrading my trigger? The stock Bergara trigger is decent but I've heard the Timney is a game changer.",
-      "Bushnell XRS3 at 6-36x is insane value. Tracks perfectly and the glass is 90% as good as the big names.",
-      "hey ro, what are the best hotels near the range with secure parking?",
+      "Bushnell XRS3 at 6-36x tracks great and has clear glass.",
+      "hey ro, what are the best hotels near the range?",
     ],
   },
 
@@ -334,35 +334,35 @@ const MESSAGE_POOLS: MessagePool = {
       "My husband thinks I'm crazy for flying across the country to shoot .22s at tiny plates. He's not wrong. 😂",
     ],
     "bot-kendra": [
-      "Pro tip: The BBQ place on Highway 421 near the range is incredible. Get the brisket.",
+      "Pro tip: Southern Craft BBQ and 620 State in downtown Bristol are incredible.",
       "If anyone needs barrel cleaning supplies at the range, I've got extra BoreTech and patches. Find me at Squad 4.",
     ],
     "bot-marcus": [
-      "Been competing for 12 years and Bristol is still my favorite venue. The mountain setting is unbeatable.",
-      "Who's bringing a LabRadar to the practice day? We should pool data on the lot testing.",
+      "Been competing for 12 years and Bristol is still my favorite area to visit.",
+      "Who's bringing a chronograph to Friday sight-in? We should pool data on the lot testing.",
     ],
   },
 
   "range-conditions-weather": {
     "bot-garrett": [
-      "Station 2 (3,420 FT): Wind 9 gusting 14 mph from 270° WNW. DA: +2,150 FT. Temp: 62°F. Humidity: 45%.",
-      "Station 3 (Valley Floor): Wind 6 steady from 260° W. Mirage: Heavy, full value right. DA: +1,950 FT.",
-      "UPDATED: Wind shifted to 290° NW gusting 18 mph on the ridge. Stages 4 and 12 will be affected most.",
-      "Morning fog expected tomorrow until 09:00. Visibility may limit long-range stages in the first rotation.",
+      "Station 2: Wind 9 gusting 14 mph from 270° WNW. Temp: 62°F. Humidity: 45%.",
+      "Station 3: Wind 6 steady from 260° W. Mirage: Moderate, full value right.",
+      "UPDATED: Wind shifted to 290° NW gusting 14 mph. Adjust your 150 and 200-yard holds.",
+      "Morning fog clearing by 08:30 AM before first shot.",
     ],
     "bot-kendra": [
-      "Reading mirage at Station 4 — full value right, about 8 mph equivalent. The ridge is channeling it hard.",
-      "The DA just jumped to +2,300 FT. That's going to add 0.2 MIL to everything past 350 yards.",
+      "Reading mirage at Station 4 — full value right, about 8 mph equivalent.",
+      "Verify your 100 and 200-yard holds as temperatures warm up.",
       "Temperature is climbing. Barrel heat management is going to be critical this afternoon.",
     ],
     "bot-marcus": [
-      "The crosswind through the mountain notch at Stage 1 is swirling. Don't trust a single wind read — average 3-4.",
-      "My Kestrel at the 400-yard line: 12 mph sustained from 275°. Gusts to 17. It's a challenge out there.",
+      "The crosswind at Stage 1 is swirling. Don't trust a single wind read — average 3-4.",
+      "My Kestrel at the 200-yard line: 10 mph sustained from 275°.",
       "Cloud cover rolling in from the west. Should knock the mirage down in about 30 minutes.",
     ],
     "bot-sofia": [
       "How do you guys read mirage? I can see it but I don't know how to translate it to wind holds yet.",
-      "The wind here is so different from Texas. These mountain crosswinds are unpredictable.",
+      "The wind here is so different from Texas. These mountain crosswinds are tricky.",
     ],
   },
 
@@ -379,7 +379,7 @@ const MESSAGE_POOLS: MessagePool = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
-// DOPE CARD GENERATOR — Realistic ballistic data
+// DOPE CARD GENERATOR — Realistic 50–200 yard ballistic data
 // ──────────────────────────────────────────────────────────────────────────────
 
 interface DopePreset {
@@ -390,14 +390,13 @@ interface DopePreset {
 }
 
 const DOPE_PRESETS: DopePreset[] = [
-  { distance: "85 YDS", distanceYds: 85, elevation: "2.1 MIL", description: "Stage 2 • KYL Near Rack" },
-  { distance: "150 YDS", distanceYds: 150, elevation: "3.8 MIL", description: "Stage 2 • KYL Far Rack" },
-  { distance: "185 YDS", distanceYds: 185, elevation: "4.7 MIL", description: "Stage 1 • High-Angle Boulder" },
-  { distance: "260 YDS", distanceYds: 260, elevation: "6.8 MIL", description: "Stage 3 • Rooftop Gongs" },
-  { distance: "340 YDS", distanceYds: 340, elevation: "8.4 MIL", description: "Stage 4 • Diamond KYL Rack" },
-  { distance: "400 YDS", distanceYds: 400, elevation: "10.2 MIL", description: "Stage 12 • Terminal Draw" },
-  { distance: "425 YDS", distanceYds: 425, elevation: "11.1 MIL", description: "Stage 12 • Reactive Flasher" },
-  { distance: "465 YDS", distanceYds: 465, elevation: "12.8 MIL", description: "Stage 4 • Terminal Glide" },
+  { distance: "50 YDS", distanceYds: 50, elevation: "0.0 MIL", description: "Zero Confirmation" },
+  { distance: "85 YDS", distanceYds: 85, elevation: "1.3 MIL", description: "Stage 2 • KYL Near Rack" },
+  { distance: "100 YDS", distanceYds: 100, elevation: "1.9 MIL", description: "100-Yard Precision Plate" },
+  { distance: "125 YDS", distanceYds: 125, elevation: "3.0 MIL", description: "Stage 3 • Barricade Transition" },
+  { distance: "150 YDS", distanceYds: 150, elevation: "4.2 MIL", description: "Stage 2 • KYL Far Rack" },
+  { distance: "175 YDS", distanceYds: 175, elevation: "5.6 MIL", description: "Stage 1 • Positional Steel" },
+  { distance: "200 YDS", distanceYds: 200, elevation: "7.1 MIL", description: "Stage 4 • 200-Yard Diamond" },
 ];
 
 const WIND_DIRECTIONS = ["260° W", "270° WNW", "275° WNW", "280° W", "290° NW", "250° WSW"];

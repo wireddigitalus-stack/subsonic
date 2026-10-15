@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Precision Rimfire Matches & Rulebook 2026 | Subsonic Society",
   description:
-    "Official 2026 precision rimfire match schedule, course of fire briefings, and registration. Featuring the $7,500 Subsonic Society Invitational at The Hideout (Bristol, TN • 3,420 FT).",
+    "Official 2026 precision rimfire match schedule, course of fire briefings, and registration. Featuring the Subsonic Society Invitational Money Match in Bristol, TN.",
   keywords: [
     "Precision rimfire matches 2026",
     "Subsonic Society Invitational",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "NRL22 matches Tennessee",
     "Modacam Custom Rifles match",
     "Rimfire prize table",
-    "300 yard 22LR match",
+    "22LR precision match",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/matches",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "2026 Precision Rimfire Match Schedule & Rules | Subsonic Society",
     description:
-      "Compete in premier high-country rimfire matches. 18 stages out to 465 yards. $7,500 guaranteed cash purse presented by Modacam Custom Rifles.",
+      "Compete in premier high-country rimfire matches. 12 Main Event stages followed by 2 side matches, presented by Modacam Custom Rifles.",
     url: "https://subsonicsociety.com/matches",
     siteName: "Subsonic Society",
     images: [

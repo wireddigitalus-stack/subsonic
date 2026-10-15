@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Private Chat Room & Firing Line Intel | Subsonic Society",
   description:
-    "Real-time shooter Chat Room for Subsonic Society competitors. Live match updates, 340yd DOPE drops, ridge wind conditions, and squad coordination in Bristol, TN.",
+    "Real-time shooter Chat Room for Subsonic Society competitors. Live match updates, DOPE drops, ridge wind conditions, and squad coordination in Bristol, TN.",
   keywords: [
     "Precision rimfire forum",
     "Subsonic Society chat",

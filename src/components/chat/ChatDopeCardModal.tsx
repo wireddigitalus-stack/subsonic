@@ -66,7 +66,7 @@ export function ChatDopeCardModal({
                 type="text"
                 value={dopeFormData.targetDistance}
                 onChange={(e) => setDopeFormData({ ...dopeFormData, targetDistance: e.target.value })}
-                placeholder="e.g. 340 YDS"
+                placeholder="e.g. 150 YDS"
                 className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-base sm:text-xs focus:border-amber-400 focus:outline-none"
                 required
               />

@@ -287,10 +287,10 @@ export default function ChatPage() {
   // Tactical DOPE Drop Modal State
   const [isDopeModalOpen, setIsDopeModalOpen] = useState(false);
   const [dopeFormData, setDopeFormData] = useState<DopeCardData>({
-    targetDistance: "340 YDS",
+    targetDistance: "150 YDS",
     targetDescription: "Stage 4 • Diamond KYL Rack",
-    elevationMils: "8.4 MIL",
-    windHoldMils: "L 0.6 MIL",
+    elevationMils: "3.9 MIL",
+    windHoldMils: "L 0.4 MIL",
     windVelocity: "9 MPH @ 260° WNW",
     ammo: "Lapua Center-X (1,062 FPS)",
     densityAltitude: "+2,150 FT",

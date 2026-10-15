@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Match Registration & Squad Sign-Up | Subsonic Society",
   description:
-    "Register for upcoming 2026 precision rimfire competitions. Secure your squad slot for the $7,500 Subsonic Society Invitational and regional rimfire matches.",
+    "Register for upcoming 2026 precision rimfire competitions. Secure your squad slot for the Subsonic Society Invitational Money Match and regional rimfire matches.",
   keywords: [
     "Precision rimfire match registration",
     "Subsonic Society registration",

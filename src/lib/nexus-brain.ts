@@ -45,21 +45,19 @@ CORE DOMAIN KNOWLEDGE:
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
-   - Scale: 12 main match stages (8 Saturday, 4 Sunday) + 2 cash side match stages on Sunday.
-   - Purse & Prizes: $7,500 Total Cash Purse ($5,000 Main Match Championship + $2,500 Cash Side Matches), Saturday lunch & dinner included, plus $28,500+ Prize Table. Max 120 competitors (${totalRegistered} currently confirmed).
+   - Format: 12 main event stages (8 Saturday, 4 Sunday) followed by 2 side matches on Sunday after the main event.
+   - Hospitality: Saturday lunch & dinner provided. Presented by Modacam Custom Rifles.
    - Friday Nov 13: Range open 12:00 – 5:00 PM for registration and sight-in only (50/100/200-yard zero).
-   - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 stages, lunch and dinner provided).
-   - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (4 stages + 2 side stages).
+   - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 main event stages, lunch and dinner provided).
+   - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (4 main event stages followed by 2 side matches after the main event).
 
 3. BALLISTICS & AMMUNITION SOPs:
-   - Ammo: Subsonic or standard-velocity .22LR only (< 1,120 FPS at sea level). Prohibited: Magnum or hyper-velocity rimfire (.22 WMR, .17 HMR).
-   - Chronograph: Squad chrono checks conducted.
-   - Elevation & Atmosphere: Range elevation is 3,420 FT. Thinner mountain air causes less bullet drag and lower drop than sea-level charts.
+   - Ammo: Subsonic or standard-velocity .22LR only (< 1,120 FPS at sea level).
+   - Sight-In: 50 yard, 100 yard, and 200 yard zero available.
    - Preferred match ammo lots: Lapua Center-X, Eley Tenex, SK Long Range Match, RWS R50.
 
-4. SAFETY SOPs (COLD RANGE):
-   - Strict Cold Range: Rifles must remain unloaded with yellow/orange chamber flags inserted at all times until on the firing line and given the command to load and make ready.
-   - 120-degree muzzle rule on all positional transitions. Eye and ear protection is recommended at all times.
+4. SAFETY NOTES:
+   - Eye and ear protection is recommended at all times.
 
 5. TOP SHOOTERS & PROFILES:
 ${topShooters}
@@ -78,7 +76,7 @@ DOMAIN BOUNDARY:
 /**
  * Fast deterministic intelligence solver when Gemini API key is absent, rate-limited, or offline.
  * Features comprehensive intent recognition, entity extraction for shooters, live network telemetry,
- * 300-yard DOPE solutions, match ops, and Bristol regional logistics.
+ * 50–200 yard DOPE solutions, match ops, and Bristol regional logistics.
  */
 export function getNexusDeterministicAnswer(query: string, context?: NexusQueryContext): string {
   const clean = query.trim();
@@ -98,7 +96,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("network status") ||
     lower.includes("system status")
   ) {
-    return `Telemetry confirms ${totalRegistered} registered competitors on the roster for the 2026 Invitational across Open, Production, and Senior divisions. In the EVOS 1.0 holographic network, ${totalNodes} active shooter nodes and ${expandedCount} constellation hubs are transmitting live across the telemetry net.`;
+    return `Telemetry confirms ${totalRegistered} registered competitors on the roster for the 2026 Invitational. In the EVOS 1.0 holographic network, ${totalNodes} active shooter nodes and ${expandedCount} constellation hubs are transmitting live across the telemetry net.`;
   }
 
   // 2. REGISTERED COMPETITORS, ROSTER & SQUAD CAPACITY
@@ -110,7 +108,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("who is registered") ||
     lower.includes("capacity")
   ) {
-    return `There are currently ${totalRegistered} competitors confirmed on the 2026 Invitational roster out of a capped 120-shooter capacity, representing 78% occupancy. Top-seeded competitors include World Champion Erich Leipold and 2-time National Champion Ron Verran.`;
+    return `There are currently ${totalRegistered} competitors confirmed on the 2026 Invitational roster.`;
   }
 
   // 3. LEADERSHIP: ALLEN HURLEY & ROB NEILSON
@@ -122,7 +120,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("subx") ||
     lower.includes("said done")
   ) {
-    return `Allen Hurley, callsign SUBX, is the founder and Event Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the Subsonic Society Invitational.`;
+    return `Allen Hurley, callsign SUBX, is the founder and Event Director of Subsonic Society. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the Subsonic Society Invitational.`;
   }
 
   if (
@@ -142,23 +140,15 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     return shooterMatch;
   }
 
-  // 5. STAGE 8 & DOPE BALLISTICS
-  if (
-    lower.includes("stage 8") ||
-    lower.includes("mountain hollow")
-  ) {
-    return `Stage 8 is the Mountain Hollow cold-bore engagement at 410 yards on a -6 degree slope. Elevation hold is 11.4 mils with a 1.8 mil left wind correction for a 6 mph thermal ridge draft.`;
-  }
-
+  // 5. DOPE & BALLISTICS
   if (
     lower.includes("dope") ||
     lower.includes("ballistics") ||
     lower.includes("drop") ||
     lower.includes("wind hold") ||
-    lower.includes("300 yard") ||
     lower.includes("elevation")
   ) {
-    return `At 300 yards in Bristol's 3,420-foot Appalachian mountain air, standard subsonic .22LR requires approximately 7.2 mils elevation and 1.2 mils wind hold for a 5 mph crosswind. Reduced atmospheric density at Holston Ridge results in less bullet drag than sea-level charts.`;
+    return `50 yard, 100 yard, and 200 yard zero is available during scheduled sight-in windows at The Hideout. Standard subsonic .22LR zeroed at 50 yards requires approximately 1.9 mils at 100 yards and 7.1 mils at 200 yards.`;
   }
 
   // 6. AMMUNITION & CHRONO SPECIFICATIONS
@@ -172,7 +162,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("eley") ||
     lower.includes("sk")
   ) {
-    return `Authorized ammunition is strictly standard-velocity or subsonic .22 Long Rifle with a muzzle velocity under 1,120 feet per second. Magnum or hyper-velocity rimfire is prohibited. Squad chronograph checks are conducted during Friday check-in and Saturday staging. Preferred match lots include Lapua Center-X, SK Long Range Match, and Eley Tenex.`;
+    return `Preferred match ammunition lots include Lapua Center-X, SK Long Range Match, and Eley Tenex. 50 yard, 100 yard, and 200 yard zero is available during Friday and weekend sight-in windows.`;
   }
 
   // 7. MATCH SCHEDULE & DATES
@@ -184,7 +174,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("timeline") ||
     lower.includes("agenda")
   ) {
-    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday range is open 12:00 to 5:00 PM for registration and sight-in only. Saturday opens at 7:00 AM with registration and sight-in until 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM across 8 stages with lunch and dinner provided. Sunday opens at 7:00 AM with sight-in from 7:00 to 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM for 4 stages plus 2 stages.`;
+    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday range is open 12:00 to 5:00 PM for registration and sight-in only. Saturday opens at 7:00 AM with registration and sight-in until 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM across 8 main event stages with lunch and dinner provided. Sunday opens at 7:00 AM with sight-in from 7:00 to 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM for the final 4 main event stages followed by 2 side matches after the main event.`;
   }
 
   // 8. CASH PURSE, SIDE MATCHES & PRIZE TABLE
@@ -198,7 +188,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("cold bore") ||
     lower.includes("money match")
   ) {
-    return `The 2026 Invitational features a guaranteed $7,500 total cash purse: $5,000 for the Main Match championship, and $2,500 across 2 cash side match stages. Saturday lunch and dinner are included for all competitors, accompanied by an extensive $28,500 prize table supported by industry sponsors.`;
+    return `The 2026 Subsonic Society Invitational Money Match is presented by Modacam Custom Rifles and features 12 main event stages (8 on Saturday and 4 on Sunday) followed by 2 side matches on Sunday after the main event. Saturday lunch and dinner are provided for competitors.`;
   }
 
   // 9. LOCATION
