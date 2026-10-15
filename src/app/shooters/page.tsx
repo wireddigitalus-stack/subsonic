@@ -64,11 +64,11 @@ const FALLBACK_SHOOTERS: ShooterProfile[] = [
   }
 ];
 
-const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string }): boolean => {
-  const name = (s.name || "").toUpperCase();
-  const call = (s.callsign || "").toUpperCase();
-  const id = (s.id || "").toLowerCase();
-  return (
+const isExcludedShooter = (s: { name?: string; full_name?: string; callsign?: string; id?: string; member_id?: string }): boolean => {
+  const name = (s.name || s.full_name || "").trim().toUpperCase();
+  const call = (s.callsign || "").trim().toUpperCase();
+  const id = (s.id || s.member_id || "").trim().toLowerCase();
+  if (
     name.includes("ROB NEILSON") ||
     call === "RADAR" ||
     call === "ROB" ||
@@ -79,8 +79,45 @@ const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string })
     call === "DOE" ||
     call === "JOHNDOE" ||
     id === "john-doe" ||
-    id === "johndoe"
-  );
+    id === "johndoe" ||
+    name === "TEST" ||
+    name === "TEST 2" ||
+    name === "TEST2" ||
+    name === "TEST-2" ||
+    name === "VIP PRO COMPETITOR" ||
+    name === "INVITATIONAL COMPETITOR VIP" ||
+    call === "TEST" ||
+    call === "TEST 2" ||
+    call === "TEST2" ||
+    call === "TEST-2" ||
+    id === "test" ||
+    id === "test-2" ||
+    id === "test2" ||
+    id === "shooter_test" ||
+    id === "shooter_test2" ||
+    id === "shooter_test-2" ||
+    id === "ss-pro-test" ||
+    id === "ss-pro-test2" ||
+    id === "ss-pro-test-2"
+  ) {
+    return true;
+  }
+  if (typeof window !== "undefined") {
+    try {
+      const rawDeleted = localStorage.getItem("subsonic_deleted_members");
+      if (rawDeleted) {
+        const deletedList: string[] = JSON.parse(rawDeleted);
+        if (
+          (id && deletedList.includes(id)) ||
+          (call && deletedList.includes(call.toLowerCase())) ||
+          (name && deletedList.includes(name.toLowerCase()))
+        ) {
+          return true;
+        }
+      }
+    } catch {}
+  }
+  return false;
 };
 
 const isRealShooterPhoto = (img?: string | null): boolean => {
@@ -108,97 +145,21 @@ function ShootersContent() {
 
   useEffect(() => {
     const fetchShooters = async () => {
-      let localList: ShooterProfile[] = [];
       if (typeof window !== "undefined") {
         try {
-          // Auto-sanitize any stale generic boilerplate or test profiles from previous invite tests
+          // Purge any stale test / deleted profiles from browser localStorage
+          localStorage.removeItem("subsonic_all_shooters");
           for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
             const raw = localStorage.getItem(key);
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (
-                parsed.name === "VIP Pro Competitor" || 
-                parsed.full_name === "VIP Pro Competitor" ||
-                parsed.name === "Invitational Competitor VIP"
-              ) {
-                if (parsed.name) parsed.name = parsed.callsign || "TEST";
-                if (parsed.full_name) parsed.full_name = parsed.callsign || "TEST";
-                localStorage.setItem(key, JSON.stringify(parsed));
-              }
               if (isExcludedShooter(parsed)) {
-                // If it is John Doe, purge it from test storage
-                if (String(parsed.name).toUpperCase().includes("JOHN DOE")) {
-                  localStorage.removeItem(key);
-                }
-              }
-            }
-          }
-
-          const rawAll = localStorage.getItem("subsonic_all_shooters");
-          if (rawAll) {
-            const parsed = JSON.parse(rawAll);
-            if (Array.isArray(parsed)) {
-              for (const item of parsed) {
-                if (item.name === "VIP Pro Competitor" || item.name === "Invitational Competitor VIP") {
-                  item.name = item.callsign || "TEST";
-                }
-                if (!isExcludedShooter(item)) {
-                  localList.push(item);
-                }
-              }
-            }
-          }
-          const rawPro = localStorage.getItem("subsonic_pro_full_profile");
-          if (rawPro) {
-            const pro = JSON.parse(rawPro);
-            if (pro && pro.id) {
-              if (pro.name === "VIP Pro Competitor" || pro.name === "Invitational Competitor VIP") {
-                pro.name = pro.callsign || "TEST";
-              }
-              if (!isExcludedShooter(pro) && !localList.some((s) => s.id === pro.id)) {
-                localList.unshift(pro);
-              }
-            }
-          }
-          const rawCur = localStorage.getItem("subsonic_shooter_profile");
-          if (rawCur) {
-            const cur = JSON.parse(rawCur);
-            if (cur && (cur.callsign || cur.name)) {
-              const curCallsign = cur.callsign || "TEST";
-              const curName = (!cur.name || cur.name === "VIP Pro Competitor" || cur.name === "Invitational Competitor VIP") ? curCallsign : cur.name;
-              const curId = curCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-              if (!isExcludedShooter({ name: curName, callsign: curCallsign, id: curId }) && !localList.some((s) => s.id === curId || s.callsign?.toLowerCase() === curCallsign.toLowerCase())) {
-                localList.unshift({
-                  id: curId,
-                  name: curName,
-                  callsign: curCallsign,
-                  division: cur.division || "Open Division Pro",
-                  ranking: "Appalachian Rimfire Competitor",
-                  homeRange: "The Hideout, Bristol, TN",
-                  podiums: 1,
-                  featuredMatch: "Subsonic Society Invitational 2026",
-                  image: cur.image || "/images/SS-RWB-LOGO.png",
-                  actionPhoto: cur.image || "/images/SS-RWB-LOGO.png",
-                  quote: "Precision rimfire demands absolute trust in your elevation DOPE and wind read.",
-                  accolades: ["VERIFIED COMPETITOR"],
-                  sponsors: ["Subsonic Society"],
-                  rifleSetup: {
-                    action: cur.rifleSetup || "Custom Precision Rimfire Rig",
-                    barrel: 'Match Contour 20" (1:16)',
-                    trigger: "Match Grade Trigger",
-                    chassis: "Precision Chassis",
-                    optic: "Zero Compromise Optic",
-                    mount: "Spuhr 0 MOA",
-                    ammoLot: "Lapua Center-X",
-                  },
-                  createdAt: new Date().toISOString(),
-                  status: "PUBLISHED",
-                });
+                localStorage.removeItem(key);
               }
             }
           }
         } catch (e) {
-          console.warn("Error reading local shooters:", e);
+          console.warn("Error sanitizing local shooters:", e);
         }
       }
 
@@ -210,16 +171,9 @@ function ShootersContent() {
           if (data.shooters && data.shooters.length > 0) {
             const map = new Map<string, ShooterProfile>();
             for (const s of data.shooters) {
-              if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
-                s.name = s.callsign || "TEST";
+              if (!isExcludedShooter(s)) {
+                map.set(s.id.toLowerCase(), s);
               }
-              map.set(s.id.toLowerCase(), s);
-            }
-            for (const s of localList) {
-              if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
-                s.name = s.callsign || "TEST";
-              }
-              map.set(s.id.toLowerCase(), s);
             }
             const finalShooters = Array.from(map.values()).filter((s) => !isExcludedShooter(s));
             setShooters(finalShooters);
@@ -252,21 +206,8 @@ function ShootersContent() {
         setLoading(false);
       }
 
-      // Fallback merge if API network fails
-      const fallbackMap = new Map<string, ShooterProfile>();
-      for (const s of FALLBACK_SHOOTERS) {
-        if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
-          s.name = s.callsign || "TEST";
-        }
-        fallbackMap.set(s.id.toLowerCase(), s);
-      }
-      for (const s of localList) {
-        if (s.name === "VIP Pro Competitor" || s.name === "Invitational Competitor VIP") {
-          s.name = s.callsign || "TEST";
-        }
-        fallbackMap.set(s.id.toLowerCase(), s);
-      }
-      const combined = Array.from(fallbackMap.values()).filter((s) => !isExcludedShooter(s));
+      // Fallback if API network fails
+      const combined = FALLBACK_SHOOTERS.filter((s) => !isExcludedShooter(s));
       setShooters(combined);
       if (requestedId) {
         const reqLower = requestedId.toLowerCase().replace(/^dm_/, "").trim();

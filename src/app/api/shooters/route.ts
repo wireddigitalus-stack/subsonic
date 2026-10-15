@@ -38,9 +38,9 @@ export async function GET(req: NextRequest) {
     const allShooters: ShooterProfile[] = [...shooters];
 
     for (const m of members) {
-      const call = (m.callsign || "").toUpperCase();
-      const name = (m.full_name || "").toUpperCase();
-      // Exclude non-shooters (Rob Neilson / RADAR / Master Owner) and test accounts (John Doe)
+      const call = (m.callsign || "").trim().toUpperCase();
+      const name = (m.full_name || "").trim().toUpperCase();
+      // Exclude non-shooters (Rob Neilson / RADAR / Master Owner) and test accounts (John Doe, Test, Test 2)
       if (
         call === "RADAR" ||
         call === "ROB" ||
@@ -49,7 +49,17 @@ export async function GET(req: NextRequest) {
         name.includes("ROB NEILSON") ||
         name.includes("JOHN DOE") ||
         call === "DOE" ||
-        call === "JOHNDOE"
+        call === "JOHNDOE" ||
+        name === "TEST" ||
+        name === "TEST 2" ||
+        name === "TEST2" ||
+        name === "TEST-2" ||
+        name === "VIP PRO COMPETITOR" ||
+        name === "INVITATIONAL COMPETITOR VIP" ||
+        call === "TEST" ||
+        call === "TEST 2" ||
+        call === "TEST2" ||
+        call === "TEST-2"
       ) {
         continue;
       }
@@ -77,11 +87,11 @@ export async function GET(req: NextRequest) {
       shooterCallsigns.add(call);
     }
 
-    // Filter out any occurrences of Rob Neilson or John Doe from shooters
+    // Filter out any occurrences of Rob Neilson, John Doe, or Test accounts from shooters
     const cleanShooters = allShooters.filter((s) => {
-      const name = (s.name || "").toUpperCase();
-      const call = (s.callsign || "").toUpperCase();
-      const id = (s.id || "").toLowerCase();
+      const name = (s.name || "").trim().toUpperCase();
+      const call = (s.callsign || "").trim().toUpperCase();
+      const id = (s.id || "").trim().toLowerCase();
       return (
         !name.includes("ROB NEILSON") &&
         call !== "RADAR" &&
@@ -93,7 +103,23 @@ export async function GET(req: NextRequest) {
         call !== "DOE" &&
         call !== "JOHNDOE" &&
         id !== "john-doe" &&
-        id !== "johndoe"
+        id !== "johndoe" &&
+        name !== "TEST" &&
+        name !== "TEST 2" &&
+        name !== "TEST2" &&
+        name !== "TEST-2" &&
+        name !== "VIP PRO COMPETITOR" &&
+        name !== "INVITATIONAL COMPETITOR VIP" &&
+        call !== "TEST" &&
+        call !== "TEST 2" &&
+        call !== "TEST2" &&
+        call !== "TEST-2" &&
+        id !== "test" &&
+        id !== "test-2" &&
+        id !== "test2" &&
+        id !== "shooter_test" &&
+        id !== "shooter_test2" &&
+        id !== "shooter_test-2"
       );
     });
 

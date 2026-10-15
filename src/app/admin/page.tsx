@@ -130,10 +130,10 @@ const INITIAL_SOCIETY_MEMBERS: SocietyMember[] = [
   },
 ];
 
-const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string }): boolean => {
-  const name = (s.name || "").toUpperCase();
-  const call = (s.callsign || "").toUpperCase();
-  const id = (s.id || "").toLowerCase();
+const isExcludedShooter = (s: { name?: string; full_name?: string; callsign?: string; id?: string; member_id?: string }): boolean => {
+  const name = (s.name || s.full_name || "").trim().toUpperCase();
+  const call = (s.callsign || "").trim().toUpperCase();
+  const id = (s.id || s.member_id || "").trim().toLowerCase();
   return (
     name.includes("ROB NEILSON") ||
     call === "RADAR" ||
@@ -145,7 +145,23 @@ const isExcludedShooter = (s: { name?: string; callsign?: string; id?: string })
     call === "DOE" ||
     call === "JOHNDOE" ||
     id === "john-doe" ||
-    id === "johndoe"
+    id === "johndoe" ||
+    name === "TEST" ||
+    name === "TEST 2" ||
+    name === "TEST2" ||
+    name === "TEST-2" ||
+    name === "VIP PRO COMPETITOR" ||
+    name === "INVITATIONAL COMPETITOR VIP" ||
+    call === "TEST" ||
+    call === "TEST 2" ||
+    call === "TEST2" ||
+    call === "TEST-2" ||
+    id === "test" ||
+    id === "test-2" ||
+    id === "test2" ||
+    id === "shooter_test" ||
+    id === "shooter_test2" ||
+    id === "shooter_test-2"
   );
 };
 
