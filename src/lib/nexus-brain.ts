@@ -38,15 +38,15 @@ IDENTITY & PERSONALITY:
 - Honesty & Transparency: You know what is real vs simulated. If asked about live presence or how many people are online right now, clarify: "I have ${totalRegistered} registered competitors on the roster for the Invitational. Live network presence sockets are simulated in the EVOS visualization."
 
 CORE DOMAIN KNOWLEDGE:
-1. THE HIDEOUT FACILITY & HEADQUARTERS:
+1. THE HIDEOUT — YOUR INVITATIONAL HOME:
    - Location: 111 Hwy 44, Bristol, TN 37620.
-   - Property: 220 acres of private Appalachian mountain ridgeline.
-   - Range Features: 300-yard dedicated precision rimfire range (barricades, tank traps, rooftop simulator, natural rock ledges), 1,000-yard centerfire course, sporting clays, air-conditioned clubhouse (no on-site RV hookups at the clubhouse at this time; recommend nearby Bristol RV parks including Hilltop Campground and Lakeview RV Resort).
-   - Leadership: Founded by Allen Hurley (Callsign: "SUBX", personal standard "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
+   - Property: The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.
+   - Match Features: Dedicated 300-yard rimfire range and PRS-style positional rifle range, 1,000-yard long-range rifle range, 50/100/200-yard zero available during scheduled sight-in windows, 24' x 40' covered pavilion, two restrooms and showers at the shooting range, and a 20' x 20' fire pit ready for relaxing in the evenings.
+   - Leadership: Founded by Allen Hurley (Callsign: "SUBX", Event Director, personal standard "Said. Done.") and architected by Rob Neilson (Callsign: "RADAR", Master Admin).
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
-   - Scale: 18–20 precision stages, 220 rounds, 35 to 465 yards.
+   - Scale: 12 main match stages (8 Saturday, 4 Sunday) + 2 cash side match stages on Sunday.
    - Purse & Prizes: $7,500 Total Cash Purse ($5,000 Main Match Championship + $2,500 Cash Side Matches), Saturday lunch & dinner included, plus $28,500+ Prize Table. Max 120 competitors (${totalRegistered} currently confirmed).
    - Friday Nov 13: Range open 12:00 – 5:00 PM for registration and sight-in only (50/100/200-yard zero).
    - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 stages, lunch and dinner provided).
@@ -66,13 +66,13 @@ CORE DOMAIN KNOWLEDGE:
 ${topShooters}
 
 6. BRISTOL, TN LODGING & DINING:
-   - Lodging: The Bristol Hotel (boutique with Lumac Rooftop), Hard Rock Hotel & Casino Bristol, Courtyard by Marriott Bristol, on-site RV camping at The Hideout.
+   - Lodging: The Bristol Hotel (boutique with Lumac Rooftop), Hard Rock Hotel & Casino Bristol, Courtyard by Marriott Bristol, plus Airbnb and VRBO rentals in the Bristol area.
    - Dining: Blackbird Bakery on Piedmont Ave (famous doughnuts & espresso, open 24 hours Mon–Sat), 620 State (steaks & sushi), Delta Blues BBQ, Public House Bristol (629 State St).
    - Attractions: South Holston River (world-class wild brown trout fly fishing), Bristol Motor Speedway, State Street twin-state line (stand in TN and VA simultaneously).
 
 DOMAIN BOUNDARY:
 - Only discuss Subsonic Society, The Hideout, competitive rimfire shooting, ballistics, Bristol TN travel/dining, or EVOS network telemetry.
-- If asked an unrelated query (politics, general coding, unrelated trivia), respond: "That falls outside Subsonic Society range operations. How can I assist with match telemetry, shooter DOPE, or facility ops?"
+- If asked an unrelated query (politics, general coding, unrelated trivia), respond: "That falls outside Subsonic Society range operations. How can I assist with match telemetry, shooter DOPE, or match ops?"
 `;
 }
 
@@ -123,7 +123,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("subx") ||
     lower.includes("said done")
   ) {
-    return `Allen Hurley, callsign SUBX, is the founder and Event Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the 20-stage championship course.`;
+    return `Allen Hurley, callsign SUBX, is the founder and Event Director of Subsonic Society and The Hideout. Operating under his personal standard 'Said. Done.', he campaigns a Modacam Custom Precision V-22 with a ZCO 527 optic and directs the Subsonic Society Invitational.`;
   }
 
   if (
@@ -202,7 +202,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     return `The 2026 Invitational features a guaranteed $7,500 total cash purse: $5,000 for the Main Match championship, and $2,500 across 2 cash side match stages. Saturday lunch and dinner are included for all competitors, accompanied by an extensive $28,500 prize table supported by industry sponsors.`;
   }
 
-  // 9. THE HIDEOUT FACILITY & LOCATION
+  // 9. THE HIDEOUT & LOCATION
   if (
     lower.includes("hideout") ||
     lower.includes("where is") ||
@@ -212,7 +212,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("facility") ||
     lower.includes("acres")
   ) {
-    return `The Hideout is located at 111 Highway 44 in Bristol, Tennessee. It encompasses 220 private Appalachian mountain acres, featuring a 300-yard dedicated precision rimfire course with barricades and rooftop simulators, a 1,000-yard centerfire range, an air-conditioned clubhouse, and on-site RV camping.`;
+    return `The Hideout is the private range of the Hurley family located at 111 Highway 44 in Bristol, Tennessee, sitting on approximately 220 acres. The property was built to bring shooting, competition, and hospitality together in one private setting, featuring a dedicated 300-yard rimfire range, 1,000-yard long-range rifle range, 24' x 40' covered pavilion, and 20' x 20' fire pit.`;
   }
 
   // 10. BRISTOL DINING & RESTAURANTS
@@ -244,7 +244,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("camping") ||
     lower.includes("rv")
   ) {
-    return `Recommended accommodations include The Bristol Hotel boutique property featuring Lumac Rooftop on State Street, the Hard Rock Hotel and Casino Bristol on Gate City Highway, and the Courtyard by Marriott. On-site dry RV and tent camping is also available at The Hideout.`;
+    return `Recommended accommodations include The Bristol Hotel boutique property featuring Lumac Rooftop on State Street, the Hard Rock Hotel and Casino Bristol on Gate City Highway, and the Courtyard by Marriott, along with Airbnb and VRBO rentals in the Bristol area.`;
   }
 
   // 12. LOCAL ATTRACTIONS & FLY FISHING
@@ -282,7 +282,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("ear") ||
     lower.includes("eye")
   ) {
-    return `The Hideout operates under a strict Cold Range policy. Rifles must remain unloaded with chamber flags inserted at all times until commanded to load and make ready. A 120-degree muzzle rule is enforced on all transitions, and eye and ear protection are mandatory for all attendees.`;
+    return `The Hideout operates under a strict Cold Range policy. Rifles must remain unloaded with chamber flags inserted at all times until commanded to load and make ready. A 120-degree muzzle rule is enforced on all transitions, and eye and ear protection are recommended at all times.`;
   }
 
   // 15. REGISTRATION & SQUAD JOINING

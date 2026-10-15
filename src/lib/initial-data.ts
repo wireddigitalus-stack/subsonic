@@ -7,37 +7,37 @@ export const INITIAL_MATCHES: MatchEvent[] = [
     subtitle: "The Premier $7,500 Cash Purse Championship Presented by Modacam Custom Rifles",
     date: "November 13–15, 2026",
     time: "07:00 AM EST Check-in",
-    location: "The Hideout Ridge Complex, Bristol, TN",
+    location: "The Hideout, Bristol, TN",
     locationDetails: "111 Hwy 44, Bristol, TN 37620",
     coordinates: {
       lat: 36.5951,
       lng: -82.1887,
     },
     tier: "PRO_SERIES",
-    stages: 18,
+    stages: 12,
     roundCount: 220,
-    distanceRange: "35 – 465 Yards",
+    distanceRange: "50 – 300 Yards",
     maxCompetitors: 120,
     registeredCount: 94,
     entryFee: 275,
     prizePool: "$7,500 Total Purse ($5,000 Main Match • $2,500 Cash Side Matches)",
     matchDirector: {
-      name: "Garrett 'Vapor' Vance",
-      callsign: "MD-01",
-      email: "director@subsonicsociety.com",
-      phone: "(423) 555-0198",
+      name: "Allen Hurley",
+      callsign: "SUBX",
+      email: "ahurley@subsonicsociety.com",
+      phone: "",
     },
     description:
-      "Perched high on the ridgeline overlooking the East Tennessee mountains at The Hideout, the Subsonic Society Invitational tests competitors against drastic elevation changes, variable mountain thermals, and reactive steel targets stretched out to 465 yards. Guaranteed $7,500 total purse ($5,000 Main Match • $2,500 Cash Side Matches). Saturday lunch & dinner included with registration.",
+      "The Subsonic Society Invitational brings outstanding rimfire competitors together at The Hideout in Bristol, Tennessee for a weekend of serious competition, challenging stages (8 stages Saturday, 4 stages + 2 side stages Sunday), a $7,500 total cash purse ($5,000 Main Match • $2,500 Cash Side Matches), and Saturday lunch and dinner provided.",
     stageBriefs: [
       {
         stageNumber: 1,
         name: "Holston Gap High-Angle Sniper",
-        distance: "185 yds – 340 yds",
+        distance: "185 yds – 300 yds",
         targetType: "66% IPSC & Diamond Steel",
         roundCount: 12,
         timeLimit: "90 seconds",
-        description: "Engage targets from a steep 22-degree downhill natural boulder prop. Crosswind through the mountain notch requires aggressive wind holds.",
+        description: "Engage targets from a natural boulder prop. Crosswind through the mountain notch requires careful wind holds.",
       },
       {
         stageNumber: 2,
@@ -46,7 +46,7 @@ export const INITIAL_MATCHES: MatchEvent[] = [
         targetType: "Know-Your-Limits 5-Paddles (2.0\" down to 0.25\")",
         roundCount: 10,
         timeLimit: "75 seconds",
-        description: "Clean the near rack clean before moving to the 150-yard secondary rack. Any miss wipes all stage points earned so far.",
+        description: "Clean the near rack before moving to the 150-yard secondary rack.",
       },
       {
         stageNumber: 3,
@@ -55,16 +55,16 @@ export const INITIAL_MATCHES: MatchEvent[] = [
         targetType: "Round Gongs (4\" to 8\")",
         roundCount: 12,
         timeLimit: "90 seconds",
-        description: "Fire two shots per target from three positions along a steep metal rooftop prop with slick footing.",
+        description: "Fire two shots per target from three positions along a rooftop prop.",
       },
       {
         stageNumber: 4,
-        name: "Subsonic 400-Yard Terminal Glide",
-        distance: "425 yds – 465 yds",
+        name: "300-Yard Rimfire Precision",
+        distance: "200 yds – 300 yds",
         targetType: "Square Reactive Flashers",
         roundCount: 10,
         timeLimit: "100 seconds",
-        description: "Pushing standard velocity .22LR to its extreme subsonic limits. Flight times exceed 1.5 seconds per round.",
+        description: "Precision rimfire engagement out to 300 yards.",
       },
     ],
     status: "SPOTS_FILLING",
@@ -76,7 +76,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-01",
     content:
-      "⛰️ THE BRISTOL MOUNTAIN PRO IS COMING! Targets are going up on the ridge line in Bristol, TN. We have steel hung out to 465 yards with an average 18° drop angle into the mountain draw. Standard velocity .22LR ammo only. If you haven't chronographed your match batch yet, now is the time. Registration open on Subsonic Society!",
+      "⛰️ THE SUBSONIC SOCIETY INVITATIONAL IS COMING! November 13–15, 2026 at The Hideout in Bristol, TN. Standard velocity .22LR ammo only.",
     publishedAt: "Yesterday at 4:15 PM",
     likesCount: 184,
     commentsCount: 39,
@@ -88,7 +88,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-02",
     content:
-      "🏆 Official 2026 Subsonic Society Invitational awards are finalized! Competitors taking on the 18 stages at The Hideout in Bristol, TN will battle for a guaranteed $7,500 cash purse presented by Modacam Custom Rifles across Open, Production, and Senior divisions.",
+      "🏆 Official 2026 Subsonic Society Invitational awards are finalized! Competitors at The Hideout in Bristol, TN will battle for a guaranteed $7,500 cash purse presented by Modacam Custom Rifles.",
     publishedAt: "3 days ago",
     likesCount: 312,
     commentsCount: 56,
@@ -100,7 +100,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-03",
     content:
-      "🎯 Ballistics Spotlight: At 400+ yards, a 40gr subsonic .22LR round has over 1.4 seconds of flight time. Here's a look at the wind deflection chart through the Holston Mountain ridge cut. Watch for the mid-canyon updrafts at 220 yards that cause sudden vertical dispersals.",
+      "🎯 Precision is in our DNA. Looking forward to welcoming competitors to Bristol, Tennessee.",
     publishedAt: "5 days ago",
     likesCount: 147,
     commentsCount: 28,
@@ -112,7 +112,7 @@ export const INITIAL_FACEBOOK_POSTS: FacebookPostItem[] = [
   {
     id: "fb-post-04",
     content:
-      "🔥 Shoutout to our pro shooters dialling in their Vudoo V-22 and RimX chassis setups this weekend. High-magnification optics and smooth actions are dominating the leaderboards. What glass are you running in Bristol this fall?",
+      "🔥 Shoutout to our shooters dialing in their setups for the Invitational in Bristol this fall!",
     publishedAt: "1 week ago",
     likesCount: 228,
     commentsCount: 64,
@@ -171,7 +171,7 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
       optic: "Zero Compromise Optic ZC527",
       ammo: "Lapua Center-X Hand-Sorted",
     },
-    quote: "We built The Hideout because rimfire precision deserves a home that doesn't cut corners. Two hundred and twenty acres of Tennessee ridgeline purpose-built for marksmen who take this game seriously. Said. Done.",
+    quote: "This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation. Said. Done.",
     imageUrl: "/images/SS-RWB-LOGO.png",
     podiums: 12,
   },

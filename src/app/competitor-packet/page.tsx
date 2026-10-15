@@ -393,7 +393,7 @@ export default function CompetitorPacketPage() {
               Everything you need for the championship weekend: Founder Allen Hurley’s welcome address, 
               full 3-day schedule, <strong className="text-amber-400 font-bold">$7,500 total cash prizes ($5,000 main match + $2,500 cash side matches)</strong>, 
               <strong className="text-emerald-400 font-bold">Saturday lunch &amp; dinner included</strong>, 
-              220-acre facility amenities, 12 recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
+              The Hideout match details, 12 recommended hotels, and the complete Bristol dining &amp; South Holston fly-fishing guide.
             </p>
           </div>
 
@@ -494,7 +494,7 @@ export default function CompetitorPacketPage() {
               href="#facility"
               className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-amber-500/20 hover:text-amber-400 text-slate-200 border border-white/5 hover:border-amber-500/30 transition-all text-center flex items-center justify-center font-semibold"
             >
-              The Hideout 220A
+              The Hideout
             </a>
             <a
               href="#schedule"
@@ -558,26 +558,24 @@ export default function CompetitorPacketPage() {
                   AH
                 </div>
                 <div>
-                  <div className="text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">Founder&apos;s Welcome</div>
+                  <div className="text-xs sm:text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">Welcome to the Invitational</div>
                   <h3 className="text-xl sm:text-2xl font-black text-white">Allen Hurley — Subsonic Society</h3>
                 </div>
               </div>
 
-              <div className="border-l-2 border-amber-500/50 pl-4 sm:pl-6 space-y-4 text-slate-100 text-base sm:text-lg leading-relaxed font-serif italic">
+              <div className="border-l-2 border-amber-500/50 pl-4 sm:pl-6 space-y-4 text-slate-100 text-base sm:text-lg leading-relaxed font-serif">
+                <p className="font-bold text-white not-italic">Competitors,</p>
                 <p>
-                  &ldquo;Welcome to The Hideout. We built this place because we believe rimfire precision 
-                  deserves a home that doesn&apos;t cut corners. Two hundred and twenty acres of Tennessee ridgeline, 
-                  purpose-built from the ground up for shooters who take this game seriously.&rdquo;
+                  On behalf of Subsonic Society, welcome to Bristol and thank you for accepting the Invitational Challenge. This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation.
                 </p>
                 <p>
-                  &ldquo;This match isn&apos;t just about steel and scorecards. It&apos;s about bringing together 
-                  the people who push this sport forward — competitors, builders, families, and the community 
-                  that makes it all possible. Every stage has been designed to challenge you, every detail considered 
-                  to give you the best weekend of shooting you&apos;ll find anywhere.&rdquo;
+                  You are part of a limited field coming to The Hideout for a weekend of serious competition, great people and a little fun along the way. We have worked hard to make the Invitational different — challenging stages, a meaningful cash purse, dedicated staff and spotters, hospitality, and an atmosphere where the competitors are the focus. We are proud to have Modacam Custom Rifles as the presenting sponsor of the Subsonic Society Invitational Money Match.
                 </p>
                 <p>
-                  &ldquo;Take care of the property, look out for the person next to you, and leave it better than you found it. 
-                  We&apos;re proud to have you here.&rdquo;
+                  Bristol is home for us, and I want you and anyone traveling with you to enjoy it while you are here. This packet gives you a quick guide to the match weekend, lodging, downtown dining and some of the things that make Bristol, Tennessee and Bristol, Virginia special.
+                </p>
+                <p>
+                  Most importantly, thank you for accepting the challenge and helping us build something special. We look forward to welcoming you to Bristol and seeing you on the range.
                 </p>
               </div>
 
@@ -593,60 +591,39 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 2: The Hideout 220-Acre Multi-Discipline Facility */}
+        {/* SECTION 2: The Hideout — Your Invitational Home */}
         <section id="facility" className="scroll-mt-24 space-y-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-blue-400 font-bold">
               <Navigation className="w-4 h-4" />
-              <span>Range & Property Blueprint</span>
+              <span>Private Property &amp; Match Setting</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              The Hideout — 220 Acres Purpose-Built for Shooters
+              The Hideout — Your Invitational Home
             </h2>
-            <p className="text-base text-slate-300 max-w-3xl">
-              111 Hwy 44, Bristol, TN 37620. A premier multi-discipline shooting and outdoor compound 
-              featuring elevation, natural wind channels, and state-of-the-art competitor infrastructure.
+            <p className="text-base text-slate-300 max-w-3xl leading-relaxed">
+              The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — but have no fear, it is in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-amber-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Target className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">1,000-Yard Centerfire Rifle Range</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Full 1,000-yard capability across deep Appalachian draws, used for the Sunday $1,500 Cold Bore Challenge and long-range ballistic testing.
-              </p>
-            </div>
-
             <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-blue-500/30 transition-all space-y-2.5">
               <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
                 <Target className="w-5 h-5" />
               </div>
-              <h4 className="text-lg font-bold text-white">300-Yard Dedicated Precision Rimfire Range</h4>
+              <h4 className="text-lg font-bold text-white">Dedicated 300-Yard Rimfire Range</h4>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Subsonic-optimized steel arrays, custom barricades, props, tank traps, spools, and natural rock ledges engineered specifically for rimfire precision.
+                Dedicated 300-yard rimfire range and PRS-style positional rifle range set up for the Invitational stages.
               </p>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-emerald-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                <ShieldAlert className="w-5 h-5" />
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-amber-500/30 transition-all space-y-2.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <Target className="w-5 h-5" />
               </div>
-              <h4 className="text-lg font-bold text-white">Fully Enclosed 10-Bay Pistol Pit</h4>
+              <h4 className="text-lg font-bold text-white">1,000-Yard Long-Range Rifle Range</h4>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Dedicated bermed defensive and speed pits designed for dynamic multi-target transitions, steel challenge, and tactical training.
-              </p>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-purple-500/30 transition-all space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                <Flame className="w-5 h-5" />
-              </div>
-              <h4 className="text-lg font-bold text-white">20&apos; x 20&apos; Stone Fire Pit Gathering Area</h4>
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Central community gathering hub for the Saturday evening smoked BBQ dinner, fireside match stories, and post-match camaraderie.
+                1,000-yard long-range rifle range with 50-yard, 100-yard, and 200-yard zero available during scheduled sight-in windows.
               </p>
             </div>
 
@@ -656,7 +633,17 @@ export default function CompetitorPacketPage() {
               </div>
               <h4 className="text-lg font-bold text-white">24&apos; x 40&apos; Covered Pavilion</h4>
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                Covered pavilion gathering area for competitor check-in, shooter briefings, and Saturday meals.
+                24&apos; x 40&apos; covered pavilion with two restrooms and showers at the shooting range.
+              </p>
+            </div>
+
+            <div className="p-5 sm:p-6 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-purple-500/30 transition-all space-y-2.5">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <Flame className="w-5 h-5" />
+              </div>
+              <h4 className="text-lg font-bold text-white">20&apos; x 20&apos; Fire Pit</h4>
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                20&apos; x 20&apos; fire pit ready for relaxing in the evenings after the match stages.
               </p>
             </div>
           </div>
@@ -1089,13 +1076,10 @@ export default function CompetitorPacketPage() {
 
               <div className="space-y-4 text-sm sm:text-base text-slate-200 leading-relaxed">
                 <p>
-                  The South Holston River is nationally recognized as one of the premier tailwater trout fisheries 
-                  in the entire United States. Holding between <strong className="text-white">5,000 to 6,000 wild trout per mile</strong> (predominantly wild brown trout), 
-                  trophy specimens surpassing the 20-inch mark are caught regularly.
+                  The South Holston River is one of the region&apos;s premier trout fisheries and is widely regarded among the best fly-fishing waters in the East. Cold water released from South Holston Dam supports strong brown and rainbow trout populations, and local guides offer half-day and full-day trips.
                 </p>
                 <p className="text-amber-300 font-semibold">
-                  ⚠️ Pro Tip: Mid-November coincides with the prime brown trout spawning run. 
-                  Shooters looking to book half-day or full-day drift boat float trips should reserve guide boats immediately.
+                  During the Invitational dates, designated spawning sections may be seasonally closed, so check current Tennessee fishing regulations and TVA generation schedules before fishing.
                 </p>
               </div>
 
@@ -1129,18 +1113,18 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 9: Competitor Quick Notes, Range Rules & Weather */}
+        {/* SECTION 9: Competitor Quick Notes & Safety Protocols */}
         <section id="rules" className="scroll-mt-24 space-y-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider text-red-400 font-bold">
               <ShieldAlert className="w-4 h-4" />
-              <span>Standard Operating Procedures</span>
+              <span>Competitor Quick Notes</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-white font-heading">
-              Competitor Quick Notes & Safety Protocols
+              Competitor Quick Notes &amp; Safety Protocols
             </h2>
             <p className="text-base text-slate-300 max-w-3xl">
-              Strict cold-range guidelines are enforced across all 220 acres of The Hideout facility.
+              Strict cold-range guidelines are enforced at all times at The Hideout.
             </p>
           </div>
 

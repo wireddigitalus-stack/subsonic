@@ -1,25 +1,22 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The Hideout Range | 3,420 FT Precision Rimfire Topography (Bristol, TN)",
+  title: "The Hideout | Invitational Home (Bristol, TN)",
   description:
-    "Explore The Hideout, home range of Subsonic Society. Situated at 3,420 FT on Holston Mountain in Bristol, TN. 18 stages, 465-yard cross-canyon steel, and high-altitude density ballistics.",
+    "The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line in Bristol, Tennessee.",
   keywords: [
-    "The Hideout shooting range",
-    "Bristol TN shooting range",
-    "Holston Mountain range",
-    "3420 ft elevation shooting",
-    "Cross-canyon rimfire steel",
-    "Subsonic Society home range",
-    "Appalachian precision rifle range",
+    "The Hideout Bristol TN",
+    "Subsonic Society Invitational",
+    "Bristol TN rimfire invitational",
+    "Subsonic Society",
   ],
   alternates: {
     canonical: "https://subsonicsociety.com/the-hideout",
   },
   openGraph: {
-    title: "The Hideout Range | Bristol, TN Precision Rimfire Facility",
+    title: "The Hideout | Your Invitational Home (Bristol, TN)",
     description:
-      "Perched at 3,420 FT elevation in Bristol, TN. Discover 18 match stages, extreme vertical shooting angles, and challenging ridge drafts.",
+      "The Hideout is the private range of the Hurley family on approximately 220 acres in Bristol, Tennessee.",
     url: "https://subsonicsociety.com/the-hideout",
     siteName: "Subsonic Society",
     images: [
@@ -27,7 +24,7 @@ export const metadata: Metadata = {
         url: "/assets/subsonic-social-share-clean.jpg?v=4",
         width: 1200,
         height: 630,
-        alt: "The Hideout Range at 3,420 FT Elevation - Bristol, TN",
+        alt: "The Hideout - Bristol, TN",
       },
     ],
     locale: "en_US",
@@ -35,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Hideout Range | 3,420 FT Topography",
+    title: "The Hideout | Your Invitational Home",
     description:
-      "Bristol, Tennessee's premier mountain rimfire complex. Cross-canyon steel to 465 yards.",
+      "Private 220-acre setting in Bristol, Tennessee hosting the Subsonic Society Invitational.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
@@ -64,38 +61,17 @@ const hideoutSchema = {
       ]
     },
     {
-      "@type": ["Place", "SportsActivityLocation"],
+      "@type": "Place",
       "@id": "https://subsonicsociety.com/the-hideout#place",
-      "name": "The Hideout Range Complex",
-      "description": "High-altitude precision shooting facility in the Appalachian mountains outside Bristol, Tennessee. Features 18 precision rimfire shooting positions, natural boulder barricades, and steel targets out to 465 yards.",
+      "name": "The Hideout",
+      "description": "Private property of the Hurley family on approximately 220 acres in Bristol, Tennessee, hosting the Subsonic Society Invitational.",
       "address": {
         "@type": "PostalAddress",
         "addressLocality": "Bristol",
         "addressRegion": "TN",
         "postalCode": "37620",
         "addressCountry": "US"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "elevation": "3,420 FT"
-      },
-      "amenityFeature": [
-        {
-          "@type": "LocationFeatureSpecification",
-          "name": "Target Distance",
-          "value": "25 to 465 yards"
-        },
-        {
-          "@type": "LocationFeatureSpecification",
-          "name": "Elevation",
-          "value": "3,420 Feet MSL"
-        },
-        {
-          "@type": "LocationFeatureSpecification",
-          "name": "Course of Fire",
-          "value": "18 Natural Terrain & Barricade Stages"
-        }
-      ]
+      }
     }
   ]
 };

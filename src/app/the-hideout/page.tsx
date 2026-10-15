@@ -17,8 +17,8 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The Hideout | Official Range & Topography | Subsonic Society",
-  description: "Perched at 3,420 FT in the Bristol TN high country, The Hideout is the testing ground and home facility of Subsonic Society. Steel hung out to 465 yards.",
+  title: "The Hideout | Invitational Home | Subsonic Society",
+  description: "The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line in Bristol, Tennessee.",
 };
 
 export default function TheHideoutPage() {
@@ -42,121 +42,121 @@ export default function TheHideoutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold">
             <Mountain className="w-3.5 h-3.5" />
-            <span>HOME FACILITY & BALLISTICS PROVING GROUND</span>
+            <span>THE HIDEOUT — YOUR INVITATIONAL HOME</span>
           </div>
 
           <div className="space-y-3 max-w-3xl">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               THE HIDEOUT. <br />
-              <span className="amber-gradient-text">BRISTOL, TENNESSEE HIGH COUNTRY.</span>
+              <span className="amber-gradient-text">BRISTOL, TENNESSEE.</span>
             </h1>
             <p className="text-base sm:text-xl text-slate-300 font-normal leading-relaxed">
-              Perched at 3,420 feet along the Holston mountain ridgeline, The Hideout is the spiritual home and rigorous testing facility of Subsonic Society. Here, shifting mountain thermals, canyon shadows, and steel hung past 400 yards challenge every marksman.
+              The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — but have no fear, it is in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.
             </p>
           </div>
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div className="p-4 rounded-2xl ios-glass border border-white/10">
-              <span className="text-[10px] font-mono text-slate-400 block uppercase">ELEVATION</span>
-              <span className="text-xl sm:text-2xl font-black text-white font-mono">3,420 FT</span>
-              <span className="text-[11px] text-amber-400">Low Drag Atmosphere</span>
+              <span className="text-[10px] font-mono text-slate-400 block uppercase">PRIVATE SETTING</span>
+              <span className="text-xl sm:text-2xl font-black text-white font-mono">~220 ACRES</span>
+              <span className="text-[11px] text-amber-400">Hurley Family Property</span>
             </div>
             <div className="p-4 rounded-2xl ios-glass border border-white/10">
-              <span className="text-[10px] font-mono text-slate-400 block uppercase">MAX ENGAGEMENT</span>
-              <span className="text-xl sm:text-2xl font-black text-white font-mono">465 YARDS</span>
-              <span className="text-[11px] text-blue-400">Deep Valley Steel</span>
+              <span className="text-[10px] font-mono text-slate-400 block uppercase">RIMFIRE RANGE</span>
+              <span className="text-xl sm:text-2xl font-black text-white font-mono">300 YARDS</span>
+              <span className="text-[11px] text-blue-400">Dedicated Rimfire &amp; Positional</span>
             </div>
             <div className="p-4 rounded-2xl ios-glass border border-white/10">
-              <span className="text-[10px] font-mono text-slate-400 block uppercase">FIRING LANES</span>
-              <span className="text-xl sm:text-2xl font-black text-white font-mono">24 COVERED</span>
-              <span className="text-[11px] text-emerald-400">Concrete Benches</span>
+              <span className="text-[10px] font-mono text-slate-400 block uppercase">ZERO DISTANCES</span>
+              <span className="text-xl sm:text-2xl font-black text-white font-mono">50 / 100 / 200</span>
+              <span className="text-[11px] text-emerald-400">Sight-In Available</span>
             </div>
             <div className="p-4 rounded-2xl ios-glass border border-white/10">
-              <span className="text-[10px] font-mono text-slate-400 block uppercase">COORDINATES</span>
-              <span className="text-sm sm:text-lg font-black text-purple-300 font-mono block truncate">36.59° N, 82.18° W</span>
-              <span className="text-[11px] text-slate-400">Bristol, TN</span>
+              <span className="text-[10px] font-mono text-slate-400 block uppercase">LOCATION</span>
+              <span className="text-sm sm:text-lg font-black text-purple-300 font-mono block truncate">111 HWY 44</span>
+              <span className="text-[11px] text-slate-400">Bristol, TN 37620</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Range Topography & Sectors */}
+      {/* Range Features */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">
-            Tactical Topography
+            The Hideout — Private Setting
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white">
-            FOUR SPECIALIZED SHOOTING SECTORS
+            INVITATIONAL MATCH FEATURES
           </h2>
           <p className="text-sm text-slate-400">
-            From millimeter paper zeroing to extreme long-range subsonic glide down the canyon.
+            Built to bring shooting, competition and hospitality together in one private setting.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Sector 1 */}
+          {/* Card 1 */}
           <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-amber-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-amber-400 font-bold">SECTOR 1 • ZERO RANGE</span>
+              <span className="text-xs font-mono text-amber-400 font-bold">SIGHT-IN &amp; ZERO</span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">50 / 100 / 200 YDS</span>
             </div>
-            <h3 className="text-xl font-bold text-white">50, 100 &amp; 200-Yard Zero &amp; Chrono Range</h3>
+            <h3 className="text-xl font-bold text-white">50, 100 &amp; 200-Yard Zero Available</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Dedicated 50-yard, 100-yard, and 200-yard zero range equipped for precision zero verification, lot testing, and cold-bore truing prior to match kickoff.
+              50-yard, 100-yard, and 200-yard zero available for registered competitors during scheduled sight-in hours prior to the match stages.
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
-              <li>• Zero Distances: 50-yard, 100-yard, and 200-yard targets</li>
-              <li>• Schedule: Open Friday 12:00 – 5:00 PM, Sat &amp; Sun 7:00 – 8:30 AM</li>
+              <li>• Zero Distances: 50-yard, 100-yard, and 200-yard zero</li>
+              <li>• Schedule: Friday 12:00 – 5:00 PM, Sat &amp; Sun 7:00 – 8:30 AM</li>
             </ul>
           </div>
 
-          {/* Sector 2 */}
+          {/* Card 2 */}
           <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-blue-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-blue-400 font-bold">SECTOR 2 • POSITIONAL</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">75 – 220 YDS</span>
+              <span className="text-xs font-mono text-blue-400 font-bold">RIMFIRE &amp; POSITIONAL</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">300 YDS</span>
             </div>
-            <h3 className="text-xl font-bold text-white">The Barricade Proving Grounds</h3>
+            <h3 className="text-xl font-bold text-white">Dedicated 300-Yard Rimfire &amp; PRS-Style Positional Range</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Dedicated match training ground featuring authentic competition props: steel tank traps, dual rooftop pitches, wire ranch gates, spool pyramids, and unstable suspended platforms. Steel reactive targets range from 2&quot; KYL paddles to 66% IPSC silhouettes.
+              Dedicated 300-yard rimfire range and PRS-style positional rifle range set up for the Invitational stages (8 stages Saturday, 4 stages + 2 side stages Sunday).
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
-              <li>• Props: 14 match-grade positional barricades</li>
-              <li>• Targets: AR500 reactive flashers and Know-Your-Limits racks</li>
+              <li>• Saturday: 8 Stages (First shot 9:00 AM)</li>
+              <li>• Sunday: 4 Stages + 2 Side Stages (First shot 9:00 AM)</li>
             </ul>
           </div>
 
-          {/* Sector 3 */}
+          {/* Card 3 */}
           <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-purple-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-purple-400 font-bold">SECTOR 3 • LONG GONG</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">250 – 385 YDS</span>
+              <span className="text-xs font-mono text-purple-400 font-bold">LONG RANGE</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">1,000 YDS</span>
             </div>
-            <h3 className="text-xl font-bold text-white">Holston Notch Ridge Line</h3>
+            <h3 className="text-xl font-bold text-white">1,000-Yard Long-Range Rifle Range</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Fired from natural elevated boulder shelves overlooking the hollow. Crosswinds funneling through the mountain cut produce deceptive lateral deflection requiring competitors to read mirage and pine tree branches across 3 separate distance zones.
+              1,000-yard long-range rifle range across natural Appalachian mountain terrain on the private Hurley family property.
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
-              <li>• Terrain: 18° downward slope into natural valley</li>
-              <li>• Flight Time: 1.1 to 1.5 seconds per shot</li>
+              <li>• Terrain: Natural mountain elevation and wind channels</li>
+              <li>• Setting: Private 220-acre property in Bristol, TN</li>
             </ul>
           </div>
 
-          {/* Sector 4 */}
+          {/* Card 4 */}
           <div className="ios-glass rounded-3xl p-6 sm:p-8 border border-white/10 space-y-4 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-emerald-400 font-bold">SECTOR 4 • EXTREME STEEL</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">400 – 465 YDS</span>
+              <span className="text-xs font-mono text-emerald-400 font-bold">HOSPITALITY</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white">24&apos; x 40&apos; PAVILION</span>
             </div>
-            <h3 className="text-xl font-bold text-white">The Subsonic Canyon Glide</h3>
+            <h3 className="text-xl font-bold text-white">24&apos; x 40&apos; Covered Pavilion &amp; 20&apos; x 20&apos; Fire Pit</h3>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              The ultimate rimfire test. Pushing standard velocity 40gr ammunition to its ballistic limits. Bullet drop exceeds 34 Mils (over 45 feet of trajectory arc) with flight times exceeding two full seconds before the distinctive &lsquo;clang&rsquo; returns.
+              24&apos; x 40&apos; covered pavilion, two restrooms and showers at the shooting range, and a 20&apos; x 20&apos; fire pit ready for relaxing in the evenings.
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
-              <li>• Optics Requirement: High-elevation 34mm tubes or 30+ MOA rails</li>
-              <li>• Hit Confirmation: High-visibility kinetic flasher plates</li>
+              <li>• Hospitality: Saturday lunch and dinner provided</li>
+              <li>• Gathering: 24&apos; x 40&apos; covered pavilion &amp; 20&apos; x 20&apos; fire pit</li>
             </ul>
           </div>
         </div>

@@ -224,7 +224,7 @@ export function getFaqResponse(content: string): string {
   ) {
     return `🚐 **RV Hookups & Camping Policy for The Hideout:**\n\n` +
       `**Official Range Policy:**\n` +
-      `❌ **Negative on on-site RV hookups.** We do **NOT** have RV electric, water, or sewer hookups available at the clubhouse or range facility at this time.\n\n` +
+      `❌ **Negative on on-site RV hookups.** We do **NOT** have RV electric, water, or sewer hookups available at The Hideout.\n\n` +
       `⛺ **Reputable RV Parks & Campgrounds in the Area:**\n` +
       `• **Hilltop Campground / BMS Hilltop RV** (Bristol, TN) — *Highly Recommended.* Very reputable, popular event and traveler campground perched on the ridge overlooking Bristol. Excellent access for rigs.\n` +
       `• **Lakeview RV Resort** (Bluff City / Bristol, TN — Hwy 11E) — Premier full-hookup resort (30/50 amp, water, sewer) with 87 sites, swimming pool, bathhouse, and lake recreation. Located ~10–12 min from the gate.\n` +
@@ -251,7 +251,7 @@ export function getFaqResponse(content: string): string {
       `• **Hilton Garden Inn & Hampton Inn** — 10–11 mi / 15 min. Clean, dependable, with hot breakfast.\n` +
       `• **Extended Stay America** — 10 mi / 15 min. Kitchenettes ideal for traveling shooters carrying pelican cases.\n` +
       `• **Quality Inn / Days Inn / Red Roof** — 10–11 mi. Solid budget-friendly options.\n` +
-      `• **RVs & Campers:** Note that the clubhouse has no on-site RV hookups at this time. Recommended reputable options: Hilltop Campground in Bristol and Lakeview RV Resort just 10–12 min away.`;
+      `• **RVs & Campers:** Note that there are no on-site RV hookups at The Hideout. Recommended reputable options: Hilltop Campground in Bristol and Lakeview RV Resort just 10–12 min away.`;
   }
 
   // 2. STEAKS, SUSHI & 620 STATE STREET (TOP SPOTLIGHT)
@@ -359,7 +359,7 @@ export function getFaqResponse(content: string): string {
       `For Bristol lodging, campgrounds, top restaurants (like steaks & sushi at 620 State), local attractions, and range safety rules, I'm here 24/7!`;
   }
 
-  // 6. THE HIDEOUT FACILITY & ADDRESS
+  // 6. THE HIDEOUT — YOUR INVITATIONAL HOME
   if (
     lower.includes("hideout") ||
     lower.includes("facility") ||
@@ -369,15 +369,15 @@ export function getFaqResponse(content: string): string {
     lower.includes("directions") ||
     lower.includes("acres")
   ) {
-    return `📍 **The Hideout Facility Blueprint:**\n\n` +
+    return `📍 **The Hideout — Your Invitational Home:**\n\n` +
       `• **Address:** 111 Hwy 44, Bristol, TN 37620\n` +
-      `• **Property:** 220 acres of private Appalachian mountain ridgeline\n` +
-      `• **Ranges:**\n` +
-      `  - 300-Yard Dedicated Precision Rimfire Range (Barricades, tank traps, rooftop, rock ledges)\n` +
-      `  - 1,000-Yard Centerfire Long-Range Course\n` +
-      `  - Sporting Clays & Skeet Field\n` +
-      `• **Clubhouse:** Air-conditioned pro shop, lounge, conference rooms & staging pavilions\n` +
-      `• **Camping / RVs:** No on-site RV hookups at the clubhouse at this time. Recommended nearby Bristol RV parks: Hilltop Campground and Lakeview RV Resort (10–12 min away).\n` +
+      `• **Property:** The Hideout is the private range of the Hurley family, sitting on approximately 220 acres near the Tennessee-Virginia line — in Tennessee. The property was built to bring shooting, competition and hospitality together in one private setting.\n` +
+      `• **Match Features:**\n` +
+      `  - Dedicated 300-Yard Rimfire Range & PRS-Style Positional Rifle Range\n` +
+      `  - 1,000-Yard Long-Range Rifle Range\n` +
+      `  - 50, 100 & 200-Yard Sight-In Available\n` +
+      `  - 24' x 40' Covered Pavilion & 20' x 20' Fire Pit\n` +
+      `  - Two Restrooms and Showers at the Shooting Range\n` +
       `• **Host:** Allen Hurley — Subsonic Society Founder & Event Director ("Said. Done.")`;
   }
 
@@ -403,7 +403,7 @@ export function getFaqResponse(content: string): string {
     return `🛑 **Range Officer Notice — Ballistics & Shooting Data Policy:**\n\n` +
       `Per Subsonic Society match regulations and range policy, Range Officers and RO BOT do **not** provide ballistic DOPE, wind calls, target holds, velocity data, or ammunition recommendations.\n\n` +
       `All competitors are strictly responsible for confirming their own rifle zeros, ballistic calculations, and ammunition performance on the practice line.\n\n` +
-      `I am always on frequency to assist with **Bristol lodging, dining, campgrounds, facility amenities, and cold range safety rules**!`;
+      `I am always on frequency to assist with **Bristol lodging, dining, campgrounds, The Hideout details, and cold range safety rules**!`;
   }
 
   // 8. RULES & SAFETY
@@ -430,7 +430,7 @@ export function getFaqResponse(content: string): string {
       `• **@ro rv** — RV hookup policy & reputable Bristol campgrounds (Hilltop, Lakeview, KOA)\n` +
       `• **@ro food** — Top Bristol restaurants, BBQ, steaks & sushi at 620 State, Blackbird Bakery\n` +
       `• **@ro entertainment** — Fly fishing, Hard Rock Casino, Speedway & attractions\n` +
-      `• **@ro hideout** — 220-acre facility amenities, ranges & address\n` +
+      `• **@ro hideout** — Private property details, ranges & address\n` +
       `• **@ro rules** — Safety SOPs and cold range rules\n\n` +
       `Or just ask any question about Bristol lodging, dining, campgrounds, or range safety — I'm monitoring this frequency 24/7!`;
   }

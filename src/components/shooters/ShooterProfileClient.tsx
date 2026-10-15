@@ -948,7 +948,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                   <Camera className="w-4 h-4" />
                   <span>Rifle Rig in Action</span>
                 </span>
-                <span className="text-[11px] font-mono text-slate-500">The Hideout Bay</span>
+                <span className="text-[11px] font-mono text-slate-500">The Hideout</span>
               </div>
 
               <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-white/10 relative bg-black">

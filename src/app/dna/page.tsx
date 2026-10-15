@@ -203,7 +203,7 @@ export default function SubsonicDnaPage() {
             <div className="p-4 rounded-2xl ios-glass border border-white/10">
               <span className="text-[10px] font-mono text-slate-400 block uppercase">TEST BENCH ELEVATION</span>
               <span className="text-xl sm:text-2xl font-black text-purple-400 font-mono">3,420 FT</span>
-              <span className="text-[11px] text-slate-400">The Hideout Ridge Bay</span>
+              <span className="text-[11px] text-slate-400">The Hideout • Bristol, TN</span>
             </div>
           </div>
         </div>
