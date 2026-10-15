@@ -424,11 +424,11 @@ export default function BristolProPortalPage() {
 
             <div className="space-y-3 text-xs">
               {[
-                { time: "FRIDAY 01:00 PM", title: "Registration & Zero Range Open", desc: "50-yard, 100-yard, and 200-yard zero available for verification and chrono check." },
-                { time: "SATURDAY 07:00 AM", title: "Shooter Safety Briefing", desc: "Mandatory safety meeting at the main pavilion. Squad assignments finalized." },
-                { time: "SATURDAY 08:00 AM", title: "Stages 1 through 10 Firing", desc: "High-angle mountain canyon stages commence. Lunch provided on the ridge." },
-                { time: "SUNDAY 08:00 AM", title: "Stages 11 through 18 Firing", desc: "Final 8 stages and the 465-yard Subsonic Society Cup finale." },
-                { time: "SUNDAY 03:30 PM", title: "Awards Ceremony & Trophy Presentation", desc: "Presentation of guaranteed cash purse, division trophies, and champion awards." },
+                { time: "FRIDAY 12:00 – 5:00 PM", title: "Range Open — Registration & Sight-In", desc: "Registration and 50-yard, 100-yard, and 200-yard sight-in only." },
+                { time: "SATURDAY 07:00 AM", title: "Range Open — Registration & Sight-In", desc: "Registration and sight-in open until 8:30 AM. Shooter brief at 8:30 AM." },
+                { time: "SATURDAY 09:00 AM", title: "First Shot — 8 Stages", desc: "8 main match stages commence. Lunch and dinner provided." },
+                { time: "SUNDAY 07:00 AM", title: "Range Open — Sight-In & Brief", desc: "Sight-in from 7:00 to 8:30 AM. Shooter brief at 8:30 AM." },
+                { time: "SUNDAY 09:00 AM", title: "First Shot — 4 Stages + 2 Stages", desc: "4 main stages and 2 cash side match stages, followed by Awards & Payouts." },
               ].map((item) => (
                 <div key={item.time} className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1 font-mono">
                   <div className="flex items-center justify-between">

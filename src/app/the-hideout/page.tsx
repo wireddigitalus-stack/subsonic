@@ -108,7 +108,7 @@ export default function TheHideoutPage() {
             </p>
             <ul className="text-xs text-slate-400 space-y-1 pt-2 font-mono">
               <li>• Zero Distances: 50-yard, 100-yard, and 200-yard targets</li>
-              <li>• Schedule: Open Friday 1:00 PM – 4:30 PM &amp; Saturday 6:30 AM – 7:30 AM</li>
+              <li>• Schedule: Open Friday 12:00 – 5:00 PM, Sat &amp; Sun 7:00 – 8:30 AM</li>
             </ul>
           </div>
 

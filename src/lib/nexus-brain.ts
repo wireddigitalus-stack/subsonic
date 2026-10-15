@@ -48,9 +48,9 @@ CORE DOMAIN KNOWLEDGE:
    - Dates: November 13–15, 2026.
    - Scale: 18–20 precision stages, 220 rounds, 35 to 465 yards.
    - Purse & Prizes: $7,500 Total Cash Purse ($5,000 Main Match Championship + $2,500 Cash Side Matches: $1,000 Speed Duel + $1,500 Cold Bore Challenge), Saturday & Sunday meals included, plus $28,500+ Prize Table. Max 120 competitors (${totalRegistered} currently confirmed).
-   - Friday Nov 13: 12:00 PM Check-in & zeroing; 5:30 PM Welcome BBQ.
-   - Saturday Nov 14: 7:30 AM Safety brief; 8:00 AM Stages 1–10; 4:30 PM $1,000 Rimfire Speed Duel under lights.
-   - Sunday Nov 15: 8:00 AM Stages 11–20; 1:30 PM $1,500 1,000-Yard Cold Bore Challenge; 3:30 PM Awards Banquet.
+   - Friday Nov 13: Range open 12:00 – 5:00 PM for registration and sight-in only (50/100/200-yard zero).
+   - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 stages, lunch and dinner provided).
+   - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (4 stages + 2 side stages).
 
 3. BALLISTICS & AMMUNITION SOPs:
    - Ammo: Subsonic or standard-velocity .22LR only (< 1,120 FPS at sea level). Prohibited: Magnum or hyper-velocity rimfire (.22 WMR, .17 HMR).
@@ -185,7 +185,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("timeline") ||
     lower.includes("agenda")
   ) {
-    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday check-in and zeroing begins at 12:00 PM with the Welcome BBQ at 5:30 PM. Saturday stages 1 through 10 kick off at 8:00 AM, followed by the $1,000 Rimfire Speed Duel under lights at 4:30 PM. Sunday stages 11 through 20 wrap up with the $1,500 Cold Bore Challenge at 1:30 PM and Awards Banquet at 3:30 PM.`;
+    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday range is open 12:00 to 5:00 PM for registration and sight-in only. Saturday opens at 7:00 AM with registration and sight-in until 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM across 8 stages with lunch and dinner provided. Sunday opens at 7:00 AM with sight-in from 7:00 to 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM for 4 stages plus 2 stages.`;
   }
 
   // 8. CASH PURSE, SIDE MATCHES & PRIZE TABLE

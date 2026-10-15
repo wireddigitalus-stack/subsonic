@@ -695,35 +695,14 @@ export default function CompetitorPacketPage() {
                   <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 1 • Arrival</div>
                   <h3 className="text-lg font-black text-white">Friday, Nov 13</h3>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-400 text-xs font-mono font-bold">Zero & Social</span>
+                <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-400 text-xs font-mono font-bold">Registration &amp; Sight-In</span>
               </div>
 
               <div className="space-y-3.5 font-sans">
                 <div className="flex items-start gap-3 text-sm sm:text-base">
                   <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">12:00 – 5:00 PM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Competitor Check-In:</span> Swag bags, squadding packets & match badges at Pavilion.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">1:00 – 4:30 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Zero Range Open:</span> 50-yard, 100-yard, and 200-yard zero available for verification and chrono check.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">5:00 – 7:00 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">Welcome Reception:</span> Food, refreshments, and competitor social at the main Pavilion.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">6:00 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Mandatory Safety Briefing:</span> Early session for Friday arrivals. Required for all competitors.
+                    <span className="font-bold text-white">Range Open:</span> Competitor registration and sight-in only (50-yard, 100-yard, and 200-yard zero available).
                   </div>
                 </div>
               </div>
@@ -733,7 +712,7 @@ export default function CompetitorPacketPage() {
             <div className="rounded-2xl bg-white/[0.02] border border-amber-500/30 p-5 sm:p-6 space-y-4 shadow-lg shadow-amber-500/5">
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 2 • 14 Stages</div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Day 2 • 8 Stages</div>
                   <h3 className="text-lg font-black text-white">Saturday, Nov 14</h3>
                 </div>
                 <span className="px-2.5 py-1 rounded bg-amber-500 text-black text-xs font-black uppercase font-mono">$5,000 Main Match</span>
@@ -741,44 +720,37 @@ export default function CompetitorPacketPage() {
 
               <div className="space-y-3.5 font-sans">
                 <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">6:30 AM</div>
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 AM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Gates Open:</span> Hot breakfast & fresh coffee served at the Pavilion.
+                    <span className="font-bold text-white">Range Open:</span> Gates open for Saturday arrival.
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 text-sm sm:text-base">
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 – 8:30 AM</div>
+                  <div className="text-slate-200">
+                    <span className="font-bold text-amber-400">Registration &amp; Sight-In:</span> Competitor check-in and 50/100/200-yard sight-in open until 8:30 AM.
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm sm:text-base bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
-                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">7:15 AM</div>
+                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">8:30 AM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Safety Briefing:</span> Final session for Saturday morning arrivals.
+                    <span className="font-bold text-amber-400">Shooter Briefing:</span> Mandatory safety and match briefing at the Pavilion.
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">8:00 AM – 12:00</div>
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">9:00 AM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Stages 1–8:</span> First flight of precision barricade & distance stages.
+                    <span className="font-bold text-white">First Shot — 8 Stages:</span> Main match stages commence.
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">12:00 – 1:00 PM</div>
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">Hospitality</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Catered Lunch:</span> Provided on-site at Pavilion.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">1:00 – 4:30 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-white">Stages 9–14:</span> Afternoon rotation across mountain steel arrays.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">5:30 – 8:00 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Smoked BBQ Feast & Fire Pit:</span> Competitor dinner at the 20x20 stone fire pit.
+                    <span className="font-bold text-amber-400">Lunch &amp; Dinner Provided:</span> On-site lunch and dinner provided for competitors.
                   </div>
                 </div>
               </div>
@@ -788,7 +760,7 @@ export default function CompetitorPacketPage() {
             <div className="rounded-2xl bg-white/[0.02] border border-white/10 p-5 sm:p-6 space-y-4">
               <div className="border-b border-white/10 pb-3 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">Day 3 • Finals & Cash</div>
+                  <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">Day 3 • 4 Stages + 2 Side Stages</div>
                   <h3 className="text-lg font-black text-white">Sunday, Nov 15</h3>
                 </div>
                 <span className="px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-400 text-xs font-mono font-bold">$2,500 Side Matches</span>
@@ -798,39 +770,35 @@ export default function CompetitorPacketPage() {
                 <div className="flex items-start gap-3 text-sm sm:text-base">
                   <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 AM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Gates Open:</span> Coffee & light breakfast at Pavilion.
+                    <span className="font-bold text-white">Range Open:</span> Gates open for Sunday competition.
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">8:00 – 11:30 AM</div>
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">7:00 – 8:30 AM</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-white">Stages 15–18:</span> Final championship course stages.
+                    <span className="font-bold text-amber-400">Sight-In:</span> 50-yard, 100-yard, and 200-yard sight-in open until 8:30 AM.
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 text-sm sm:text-base bg-amber-500/10 p-3 rounded-xl border border-amber-500/20">
+                  <div className="font-mono text-amber-400 shrink-0 w-24 sm:w-28 font-bold">8:30 AM</div>
+                  <div className="text-slate-200">
+                    <span className="font-bold text-amber-400">Shooter Briefing:</span> Morning safety and finals briefing.
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 text-sm sm:text-base">
+                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">9:00 AM</div>
+                  <div className="text-slate-200">
+                    <span className="font-bold text-white">First Shot — 4 Stages:</span> Final 4 main match championship stages.
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 text-sm sm:text-base bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
-                  <div className="font-mono text-emerald-400 shrink-0 w-24 sm:w-28 font-bold">12:00 PM</div>
+                  <div className="font-mono text-emerald-400 shrink-0 w-24 sm:w-28 font-bold">2 Stages</div>
                   <div className="text-slate-200">
-                    <span className="font-bold text-emerald-400">Cash Side Matches ($2,500 Purse):</span>
-                    <ul className="mt-1 list-disc list-inside space-y-1 text-slate-200">
-                      <li>$1,500 1,000-Yard Cold Bore Challenge</li>
-                      <li>$1,000 Rimfire Speed Steel Duel</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">1:30 PM</div>
-                  <div className="text-slate-200">
-                    <span className="font-bold text-amber-400">Awards Ceremony:</span> $5,000 Main Match &amp; $2,500 Side Match cash payouts, trophy presentations &amp; prize table checks.
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 text-sm sm:text-base">
-                  <div className="font-mono text-slate-300 font-bold shrink-0 w-24 sm:w-28">2:30 PM</div>
-                  <div className="text-slate-300">
-                    Range closes & competitor departure.
+                    <span className="font-bold text-emerald-400">2 Cash Side Match Stages ($2,500 Purse):</span> Special cash side stages following the 4 main stages, followed by Awards &amp; Payouts.
                   </div>
                 </div>
               </div>
@@ -1212,8 +1180,8 @@ export default function CompetitorPacketPage() {
                 Zero Range Protocols
               </h4>
               <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
-                50-yard, 100-yard, and 200-yard zero will be available on Friday from 1:00 PM to 4:30 PM. 
-                Limited zero access will be available Saturday morning from 6:30 AM to 7:30 AM before the mandatory safety briefing.
+                50-yard, 100-yard, and 200-yard zero will be available on Friday from 12:00 PM to 5:00 PM (registration and sight-in only), 
+                and on Saturday and Sunday mornings from 7:00 AM to 8:30 AM prior to the 8:30 AM shooter briefing.
               </p>
             </div>
 
