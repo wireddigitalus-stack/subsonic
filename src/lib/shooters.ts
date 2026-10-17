@@ -161,12 +161,23 @@ export async function refreshShootersFromDb(maxAgeMs = 3000): Promise<void> {
   return shootersRefreshInFlight;
 }
 
+const deletedShooterIds = new Set<string>();
+
+export function isShooterExplicitlyDeleted(idOrCallsign?: string): boolean {
+  if (!idOrCallsign) return false;
+  return deletedShooterIds.has(idOrCallsign.trim().toLowerCase());
+}
+
 export function getShootersFromStorage(): ShooterProfile[] {
   if (db && shootersLastRefreshMs === 0) void refreshShootersFromDb();
 
   try {
     const map = new Map<string, ShooterProfile>();
-    for (const seed of SEED_SHOOTERS) map.set(seed.id.toLowerCase(), seed);
+    for (const seed of SEED_SHOOTERS) {
+      if (!deletedShooterIds.has(seed.id.toLowerCase()) && !deletedShooterIds.has(seed.callsign.toLowerCase())) {
+        map.set(seed.id.toLowerCase(), seed);
+      }
+    }
 
     // Local files (skipped on the live site where the database is authoritative)
     if (!DB_AUTHORITATIVE) {
@@ -196,8 +207,16 @@ export function getShootersFromStorage(): ShooterProfile[] {
     map.delete("said done");
     map.delete("ss-2026-0002");
 
+    for (const delId of Array.from(deletedShooterIds)) {
+      map.delete(delId);
+    }
+
     memoryShooters = Array.from(map.values()).filter(
-      (s) => s.id !== "allen-hurley" && s.callsign?.toUpperCase() !== "SAID DONE"
+      (s) =>
+        s.id !== "allen-hurley" &&
+        s.callsign?.toUpperCase() !== "SAID DONE" &&
+        !deletedShooterIds.has(s.id.toLowerCase()) &&
+        !deletedShooterIds.has((s.callsign || "").toLowerCase())
     );
     return memoryShooters;
   } catch (err) {
@@ -213,6 +232,8 @@ export async function upsertShooterToDb(shooter: ShooterProfile): Promise<void> 
 }
 
 function applyShooterLocally(shooter: ShooterProfile): void {
+  deletedShooterIds.delete(shooter.id.toLowerCase());
+  if (shooter.callsign) deletedShooterIds.delete(shooter.callsign.toLowerCase());
   const current = getShootersFromStorage();
   const index = current.findIndex((s) => s.id.toLowerCase() === shooter.id.toLowerCase());
   let updated: ShooterProfile[];
@@ -265,11 +286,8 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   if (!idOrCallsign) return false;
   const clean = idOrCallsign.trim().toLowerCase();
 
-  // Root executive protection
+  // Only block deleting non-shooter developer system account
   if (
-    clean === "subx" ||
-    clean === "ss-pro-subx" ||
-    clean === "allen" ||
     clean === "rob-neilson" ||
     clean === "radar" ||
     clean === "rob" ||
@@ -279,25 +297,40 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   }
 
   const current = getShootersFromStorage();
-  const strippedPro = clean.replace(/^ss-pro-/, "");
+  const strippedPro = clean.replace(/^ss-pro-/, "").replace(/^shooter_/, "");
 
   const target = current.find(
     (s) =>
       s.id.toLowerCase() === clean ||
+      s.id.toLowerCase() === strippedPro ||
       s.callsign.toLowerCase() === clean ||
       s.callsign.toLowerCase() === strippedPro ||
       s.name.toLowerCase() === clean ||
       s.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") === clean
   );
 
-  if (!target) return true; // Already deleted or client-only
+  deletedShooterIds.add(clean);
+  deletedShooterIds.add(strippedPro);
+  if (target) {
+    deletedShooterIds.add(target.id.toLowerCase());
+    if (target.callsign) deletedShooterIds.add(target.callsign.toLowerCase());
+  }
 
-  const filtered = current.filter(
-    (s) =>
+  const filtered = current.filter((s) => {
+    if (!target) {
+      return (
+        s.id.toLowerCase() !== clean &&
+        s.id.toLowerCase() !== strippedPro &&
+        s.callsign.toLowerCase() !== clean &&
+        s.callsign.toLowerCase() !== strippedPro
+      );
+    }
+    return (
       s.id.toLowerCase() !== target.id.toLowerCase() &&
       s.callsign.toLowerCase() !== target.callsign.toLowerCase() &&
       s.name.toLowerCase() !== target.name.toLowerCase()
-  );
+    );
+  });
 
   memoryShooters = filtered;
   saveAllShootersToStorage(filtered);
@@ -305,8 +338,12 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   lastShooterDbDelete = (async () => {
     if (!db) return;
     try {
-      const { error } = await db.from("shooters").delete().eq("id", target.id);
+      const targetId = target?.id || strippedPro || clean;
+      const { error } = await db.from("shooters").delete().eq("id", targetId);
       if (error) console.error("Error deleting shooter from database:", error.message);
+      if (target?.callsign) {
+        await db.from("shooters").delete().ilike("callsign", target.callsign);
+      }
     } catch (err) {
       console.error("Database delete error (shooters):", err);
     }
@@ -315,8 +352,9 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
   // Cross-clean matching society member if exists
   try {
     const { deleteMemberFromStorage } = require("@/lib/members");
-    if (target.callsign) deleteMemberFromStorage(target.callsign);
-    deleteMemberFromStorage(target.id);
+    if (target?.callsign) deleteMemberFromStorage(target.callsign);
+    if (target?.id) deleteMemberFromStorage(target.id);
+    deleteMemberFromStorage(strippedPro);
   } catch (e) {
     // avoid cyclic errors
   }

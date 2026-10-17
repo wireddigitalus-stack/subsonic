@@ -6,6 +6,7 @@ import {
   getShooterBySlug,
   deleteShooterFromStorageAsync,
   refreshShootersFromDb,
+  isShooterExplicitlyDeleted,
   SEED_SHOOTERS,
 } from "@/lib/shooters";
 import { refreshMembersFromDb, getMembersFromStorage, addOrUpdateMemberAsync } from "@/lib/members";
@@ -64,6 +65,7 @@ export async function GET(req: NextRequest) {
         continue;
       }
       if (!call || shooterCallsigns.has(call)) continue;
+      if (isShooterExplicitlyDeleted(call) || isShooterExplicitlyDeleted(m.member_id)) continue;
       const isOwner = call === "SUBX" || call === "ALLEN" || m.role === "OWNER_ADMIN";
       allShooters.push({
         id: `shooter_${m.member_id || call.toLowerCase()}`,
@@ -270,6 +272,8 @@ export async function POST(req: NextRequest) {
       ? "subx" 
       : existingShooter?.id || body.id || (rawSlug.length > 2 ? rawSlug : `shooter-${Date.now().toString(36)}`);
 
+    const isProfileUpdate = body.isProfileUpdate === true;
+
     // Parse accolades & sponsors if sent as comma-separated string or array
     const accolades = Array.isArray(body.accolades)
       ? body.accolades
@@ -296,38 +300,67 @@ export async function POST(req: NextRequest) {
       pin: body.pin && String(body.pin).trim()
         ? (isHashedPin(String(body.pin).trim()) ? String(body.pin).trim() : await hashPin(String(body.pin).trim()))
         : existingShooter?.pin,
-      division: isRob
+      division: isProfileUpdate && typeof body.division === "string" && body.division.trim()
+        ? body.division.trim()
+        : isRob
         ? "Lead Developer & Tech Advisor"
         : isAllen
-        ? "Owner Admin / Executive"
+        ? (existingShooter?.division || "Owner Admin / Executive")
         : (body.division || existingShooter?.division || "Open Division Pro"),
-      ranking: isRob
+      ranking: isProfileUpdate && typeof body.ranking === "string"
+        ? body.ranking.trim()
+        : isRob
         ? "Owner • Lead Systems Developer"
         : isAllen
-        ? "Founder • Subsonic Society"
+        ? (existingShooter?.ranking || "Founder • Subsonic Society")
         : (body.ranking || existingShooter?.ranking || "Appalachian Rimfire Competitor"),
-      homeRange: body.homeRange || existingShooter?.homeRange || "The Hideout, Bristol, TN",
-      podiums: typeof body.podiums === "number" ? body.podiums : (existingShooter?.podiums || 0),
+      homeRange: isProfileUpdate && typeof body.homeRange === "string"
+        ? body.homeRange.trim()
+        : (body.homeRange || existingShooter?.homeRange || "The Hideout, Bristol, TN"),
+      podiums: typeof body.podiums === "number" && !isNaN(body.podiums)
+        ? Math.max(0, body.podiums)
+        : (existingShooter?.podiums || 0),
       email: body.email ? String(body.email).trim().toLowerCase() : existingShooter?.email,
       phone: body.phone ? String(body.phone).trim() : existingShooter?.phone,
       mailingAddress: body.mailingAddress ? String(body.mailingAddress).trim() : existingShooter?.mailingAddress,
       featuredMatch: body.featuredMatch || existingShooter?.featuredMatch || "Subsonic Society Invitational Money Match 2026",
-      image: body.image || existingShooter?.image || "/images/SS-RWB-LOGO.png",
-      actionPhoto: body.actionPhoto || existingShooter?.actionPhoto || body.image || "/images/SS-RWB-LOGO.png",
+      image: isProfileUpdate && typeof body.image === "string"
+        ? (body.image || "/images/SS-RWB-LOGO.png")
+        : (body.image || existingShooter?.image || "/images/SS-RWB-LOGO.png"),
+      actionPhoto: isProfileUpdate && typeof body.actionPhoto === "string"
+        ? (body.actionPhoto || body.image || "/images/SS-RWB-LOGO.png")
+        : (body.actionPhoto || existingShooter?.actionPhoto || body.image || "/images/SS-RWB-LOGO.png"),
       posterImage: body.posterImage || existingShooter?.posterImage,
-      quote: body.quote || existingShooter?.quote || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
-      accolades: accolades.length > 0 ? accolades : ["COMPETITOR"],
-      sponsors: sponsors.length > 0 ? sponsors : ["Subsonic Society"],
-      rifleSetup: {
-        action: body.rifleSetup?.action || body.action || existingShooter?.rifleSetup?.action || "Vudoo V-22 / Rimfire Action",
-        barrel: body.rifleSetup?.barrel || body.barrel || existingShooter?.rifleSetup?.barrel || "20\" Match Contour (1:16)",
-        trigger: body.rifleSetup?.trigger || body.trigger || existingShooter?.rifleSetup?.trigger || "Precision Match Trigger (6 oz)",
-        chassis: body.rifleSetup?.chassis || body.chassis || existingShooter?.rifleSetup?.chassis || "Competition Stock / Chassis",
-        optic: body.rifleSetup?.optic || body.optic || existingShooter?.rifleSetup?.optic || "Precision Scope with MOA/MIL Reticle",
-        mount: body.rifleSetup?.mount || body.mount || existingShooter?.rifleSetup?.mount || "Heavy Duty Match Rings",
-        tuner: body.rifleSetup?.tuner || body.tuner || existingShooter?.rifleSetup?.tuner || "Precision Rimfire Tuner",
-        ammoLot: body.rifleSetup?.ammoLot || body.ammoLot || existingShooter?.rifleSetup?.ammoLot || "Lapua Center-X / SK Match",
-      },
+      quote: isProfileUpdate && typeof body.quote === "string"
+        ? body.quote.trim()
+        : (body.quote || existingShooter?.quote || "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind."),
+      accolades: isProfileUpdate && Array.isArray(body.accolades)
+        ? accolades
+        : (accolades.length > 0 ? accolades : ["COMPETITOR"]),
+      sponsors: isProfileUpdate && Array.isArray(body.sponsors)
+        ? sponsors
+        : (sponsors.length > 0 ? sponsors : ["Subsonic Society"]),
+      rifleSetup: isProfileUpdate && body.rifleSetup
+        ? {
+            action: String(body.rifleSetup.action ?? "").trim(),
+            barrel: String(body.rifleSetup.barrel ?? "").trim(),
+            trigger: String(body.rifleSetup.trigger ?? "").trim(),
+            chassis: String(body.rifleSetup.chassis ?? "").trim(),
+            optic: String(body.rifleSetup.optic ?? "").trim(),
+            mount: String(body.rifleSetup.mount ?? "").trim(),
+            tuner: String(body.rifleSetup.tuner ?? "").trim(),
+            ammoLot: String(body.rifleSetup.ammoLot ?? "").trim(),
+          }
+        : {
+            action: body.rifleSetup?.action || body.action || existingShooter?.rifleSetup?.action || "Vudoo V-22 / Rimfire Action",
+            barrel: body.rifleSetup?.barrel || body.barrel || existingShooter?.rifleSetup?.barrel || "20\" Match Contour (1:16)",
+            trigger: body.rifleSetup?.trigger || body.trigger || existingShooter?.rifleSetup?.trigger || "Precision Match Trigger (6 oz)",
+            chassis: body.rifleSetup?.chassis || body.chassis || existingShooter?.rifleSetup?.chassis || "Competition Stock / Chassis",
+            optic: body.rifleSetup?.optic || body.optic || existingShooter?.rifleSetup?.optic || "Precision Scope with MOA/MIL Reticle",
+            mount: body.rifleSetup?.mount || body.mount || existingShooter?.rifleSetup?.mount || "Heavy Duty Match Rings",
+            tuner: body.rifleSetup?.tuner || body.tuner || existingShooter?.rifleSetup?.tuner || "Precision Rimfire Tuner",
+            ammoLot: body.rifleSetup?.ammoLot || body.ammoLot || existingShooter?.rifleSetup?.ammoLot || "Lapua Center-X / SK Match",
+          },
       interview: Array.isArray(body.interview) ? body.interview : (existingShooter?.interview || [
         {
           question: "What is your advice for precision rimfire matches in mountain wind?",

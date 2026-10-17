@@ -388,11 +388,13 @@ function ShootersContent() {
 
                         {/* Podiums & View Full Profile Chevron */}
                         <div className="flex items-center gap-2 shrink-0">
-                          <div className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-mono font-bold flex items-center gap-1 border border-white/5">
-                            <Trophy className="w-3 h-3 text-amber-400" />
-                            <span>{shooter.podiums}</span>
-                            <span className="hidden sm:inline text-[9px] text-slate-400">Podiums</span>
-                          </div>
+                          {(shooter.podiums ?? 0) > 0 && (
+                            <div className="px-2.5 py-1 rounded-full bg-white/10 text-white text-[11px] font-mono font-bold flex items-center gap-1 border border-white/5">
+                              <Trophy className="w-3 h-3 text-amber-400" />
+                              <span>{shooter.podiums}</span>
+                              <span className="hidden sm:inline text-[9px] text-slate-400">Podiums</span>
+                            </div>
+                          )}
 
                           <div className="w-8 h-8 rounded-xl bg-white/5 group-hover:bg-amber-500/20 group-hover:text-amber-400 text-slate-400 flex items-center justify-center transition-colors">
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -444,12 +446,14 @@ function ShootersContent() {
                 </div>
 
                 <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5 gap-2.5">
-                  <div className="text-right">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase">PODIUM FINISHES</span>
-                    <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono block">
-                      {selectedShooter.podiums}
-                    </span>
-                  </div>
+                  {(selectedShooter.podiums ?? 0) > 0 && (
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase">PODIUM FINISHES</span>
+                      <span className="text-2xl sm:text-3xl font-black text-amber-400 font-mono block">
+                        {selectedShooter.podiums}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap items-center justify-end gap-2">
                     <button
@@ -573,6 +577,17 @@ function ShootersContent() {
                 : s
             )
           );
+        }}
+        onDeleted={(deletedId) => {
+          setShooters((prev) => {
+            const next = prev.filter(
+              (s) =>
+                s.id.toLowerCase() !== deletedId.toLowerCase() &&
+                s.callsign?.toLowerCase() !== deletedId.toLowerCase()
+            );
+            if (next.length > 0) setSelectedShooter(next[0]);
+            return next;
+          });
         }}
       />
     </div>

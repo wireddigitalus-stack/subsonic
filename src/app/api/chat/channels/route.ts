@@ -7,12 +7,19 @@ import {
 
 export const dynamic = "force-dynamic";
 
-function isCallerAdmin(callsign?: string, role?: string): boolean {
+function isCallerAdmin(req: NextRequest, callsign?: string, role?: string): boolean {
   const normRole = (role || "").toUpperCase();
   const normCallsign = (callsign || "").toUpperCase();
+  const cookieCallsign = (req.cookies.get("subsonic_member_callsign")?.value || "").toUpperCase();
+  const hasAdminSession = Boolean(req.cookies.get("subsonic_admin_session")?.value);
   const adminRoles = ["MASTER_OWNER", "DEV_ADMIN", "OWNER_ADMIN", "ADMIN", "MODERATOR"];
   const adminCallsigns = ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN", "AHURLEY", "HURLEY", "SAID DONE"];
-  return adminRoles.includes(normRole) || adminCallsigns.includes(normCallsign);
+  return (
+    hasAdminSession ||
+    adminRoles.includes(normRole) ||
+    adminCallsigns.includes(normCallsign) ||
+    adminCallsigns.includes(cookieCallsign)
+  );
 }
 
 export async function GET() {
@@ -30,7 +37,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, desc, badge, color, adminOnly, callsign, role } = body;
 
-    if (!isCallerAdmin(callsign, role)) {
+    if (!isCallerAdmin(req, callsign, role)) {
       return NextResponse.json(
         { error: "Only administrators can create new chat rooms." },
         { status: 403 }
@@ -101,7 +108,7 @@ export async function DELETE(req: NextRequest) {
       } catch {}
     }
 
-    if (!isCallerAdmin(callsign || undefined, role || undefined)) {
+    if (!isCallerAdmin(req, callsign || undefined, role || undefined)) {
       return NextResponse.json(
         { error: "Only administrators can remove chat rooms." },
         { status: 403 }

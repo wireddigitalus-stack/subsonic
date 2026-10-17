@@ -370,6 +370,8 @@ export default function ChatPage() {
   // Custom Admin-Created Channels State
   const [customChannels, setCustomChannels] = useState<ChannelConfig[]>([]);
   const [isNewRoomModalOpen, setIsNewRoomModalOpen] = useState(false);
+  const [roomPendingDelete, setRoomPendingDelete] = useState<string | null>(null);
+  const deletedRoomIdsRef = useRef<Set<string>>(new Set());
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomDesc, setNewRoomDesc] = useState("");
   const [newRoomBadge, setNewRoomBadge] = useState("MATCH ROOM");
@@ -553,8 +555,10 @@ export default function ChatPage() {
         return;
       }
 
+      deletedRoomIdsRef.current.delete(data.channel.id);
+
       if (Array.isArray(data.channels)) {
-        setCustomChannels(data.channels);
+        setCustomChannels(data.channels.filter((c: ChannelConfig) => !deletedRoomIdsRef.current.has(c.id)));
       } else {
         setCustomChannels((prev) => [
           ...prev.filter((c) => c.id !== data.channel.id),
@@ -572,11 +576,10 @@ export default function ChatPage() {
     }
   };
 
-  const handleDeleteRoom = async (roomId: string) => {
+  const confirmDeleteRoom = async (roomId: string) => {
     if (!roomId || roomId === "invitational") return;
-    if (typeof window !== "undefined" && !window.confirm(`Remove chat room #${roomId}?`)) {
-      return;
-    }
+    deletedRoomIdsRef.current.add(roomId);
+    setRoomPendingDelete(null);
 
     setCustomChannels((prev) => prev.filter((c) => c.id !== roomId));
     if (currentChannel === roomId) {
@@ -596,13 +599,21 @@ export default function ChatPage() {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.channels)) {
-          setCustomChannels(data.channels);
+          setCustomChannels(
+            data.channels.filter((c: ChannelConfig) => !deletedRoomIdsRef.current.has(c.id))
+          );
         }
       }
       playTacticalChirp(700);
     } catch (err) {
       console.error("Failed to delete room:", err);
     }
+  };
+
+  const handleDeleteRoom = (roomId: string) => {
+    if (!roomId || roomId === "invitational") return;
+    setRoomPendingDelete(roomId);
+    playTacticalChirp(900);
   };
 
   // Channel engagement & post counters map (dynamic per-room transmission & reaction counts)
@@ -1066,7 +1077,9 @@ export default function ChatPage() {
         const data = await res.json();
 
         if (Array.isArray(data.customChannels)) {
-          setCustomChannels(data.customChannels);
+          setCustomChannels(
+            data.customChannels.filter((c: ChannelConfig) => !deletedRoomIdsRef.current.has(c.id))
+          );
         }
 
         // 1. Process messages for active channel
@@ -2973,15 +2986,16 @@ export default function ChatPage() {
                     <button
                       type="button"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         handleDeleteRoom(ch.id);
                       }}
                       title={`Remove #${ch.name}`}
-                      className={`ml-0.5 p-0.5 rounded hover:bg-red-500/20 ${
-                        isActive ? "opacity-75 hover:opacity-100" : "text-slate-400 hover:text-red-400"
+                      className={`ml-0.5 p-1.5 -mr-1 rounded-lg hover:bg-red-500/20 active:bg-red-500/30 ${
+                        isActive ? "opacity-90 hover:opacity-100" : "text-slate-300 hover:text-red-400"
                       }`}
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
@@ -3049,15 +3063,16 @@ export default function ChatPage() {
                       <button
                         type="button"
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           handleDeleteRoom(ch.id);
                         }}
                         title={`Delete #${ch.name}`}
-                        className={`ml-0.5 p-0.5 rounded transition-colors ${
-                          isActive ? "opacity-75 hover:opacity-100" : "text-slate-400 hover:text-red-400"
+                        className={`ml-0.5 p-1 -mr-0.5 rounded-lg transition-colors ${
+                          isActive ? "opacity-85 hover:opacity-100" : "text-slate-300 hover:text-red-400"
                         }`}
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
@@ -3919,11 +3934,12 @@ export default function ChatPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleDeleteRoom(ch.id)}
-                          className="ml-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0"
+                          onClick={() => confirmDeleteRoom(ch.id)}
+                          className="ml-2 px-2.5 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 transition-colors shrink-0 flex items-center gap-1 text-[11px] font-mono font-bold"
                           title={`Delete #${ch.name}`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
                         </button>
                       </div>
                     );
@@ -3931,6 +3947,64 @@ export default function ChatPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* IN-APP DELETE ROOM CONFIRMATION MODAL (Works in iOS Saved-to-Home-Screen PWA) */}
+      {roomPendingDelete && (
+        <div
+          className="fixed inset-0 z-[110] bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setRoomPendingDelete(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl bg-zinc-950 border border-red-500/40 p-5 space-y-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center">
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-white">
+                    Delete Chat Room?
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    #{roomPendingDelete}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRoomPendingDelete(null)}
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Remove <span className="text-white font-mono font-bold">#{roomPendingDelete}</span> from the active chat rooms list?
+            </p>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setRoomPendingDelete(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => confirmDeleteRoom(roomPendingDelete)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>DELETE ROOM</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

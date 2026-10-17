@@ -64,6 +64,7 @@ interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved?: (updatedShooter: ShooterProfile) => void;
+  onDeleted?: (deletedId: string) => void;
   initialShooter?: any;
 }
 
@@ -71,6 +72,7 @@ export function ProfileEditModal({
   isOpen,
   onClose,
   onSaved,
+  onDeleted,
   initialShooter,
 }: ProfileEditModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -78,6 +80,8 @@ export function ProfileEditModal({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [confirmDeleteProfile, setConfirmDeleteProfile] = useState(false);
+  const [isDeletingProfile, setIsDeletingProfile] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [clipboardNotice, setClipboardNotice] = useState<string | null>(null);
   const [copiedProfile, setCopiedProfile] = useState(false);
@@ -615,9 +619,9 @@ export function ProfileEditModal({
       isProfileUpdate: true,
       isIntake: false,
       division: division.trim() || "Open Division",
-      ranking: ranking.trim() || (isRob ? "Owner • Lead Systems Developer" : isAllen ? "Founder • Subsonic Society" : "Verified Competitor"),
-      podiums: Number(podiums) || existingProfileData?.podiums || 0,
-      homeRange: homeRange.trim() || "The Hideout, Bristol, TN",
+      ranking: ranking.trim(),
+      podiums: typeof podiums === "number" && !isNaN(podiums) ? Math.max(0, podiums) : 0,
+      homeRange: homeRange.trim(),
       email: existingProfileData?.email || initialShooter?.email,
       phone: existingProfileData?.phone || initialShooter?.phone,
       mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress,
@@ -726,6 +730,58 @@ export function ProfileEditModal({
     } catch (err: any) {
       setErrorMessage(err.message || "An unexpected error occurred while saving.");
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteProfile = async () => {
+    const cleanCallsign = callsign.trim().toUpperCase();
+    const targetId =
+      shooterId ||
+      existingProfileData?.id ||
+      initialShooter?.id ||
+      cleanCallsign.toLowerCase();
+
+    if (!targetId) {
+      setErrorMessage("Could not determine profile ID to delete.");
+      return;
+    }
+
+    setIsDeletingProfile(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch(`/api/shooters?id=${encodeURIComponent(targetId)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete profile.");
+      }
+
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("subsonic_pro_full_profile");
+          window.dispatchEvent(
+            new CustomEvent("subsonic_profile_deleted", {
+              detail: { id: targetId, callsign: cleanCallsign },
+            })
+          );
+        } catch {}
+      }
+
+      playTacticalChirp(700);
+      setIsDeletingProfile(false);
+      setConfirmDeleteProfile(false);
+      if (onDeleted) {
+        onDeleted(targetId);
+      }
+      onClose();
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/shooters")) {
+        window.location.href = "/shooters";
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "Failed to delete shooter profile.");
+      setIsDeletingProfile(false);
     }
   };
 
@@ -1207,71 +1263,100 @@ export function ProfileEditModal({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Ranking / Title
-                    </label>
-                    <input
-                      type="text"
-                      value={ranking}
-                      onChange={(e) => setRanking(e.target.value)}
-                      placeholder="e.g. Southeast Champion • PRS Rimfire Competitor"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-                    />
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
-                      {PRESET_RANKINGS.map((presetRank) => {
-                        const active = ranking === presetRank;
-                        return (
-                          <button
-                            key={presetRank}
-                            type="button"
-                            onClick={() => setRanking(presetRank)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-                              active
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
-                          >
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                        Ranking / Title
+                      </label>
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          if (e.target.value) setRanking(e.target.value);
+                        }}
+                        className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                      >
+                        <option value="">Quick Fill Preset...</option>
+                        {PRESET_RANKINGS.map((presetRank) => (
+                          <option key={presetRank} value={presetRank}>
                             {presetRank}
-                          </button>
-                        );
-                      })}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Home Club / Home Range
-                    </label>
-                    <input
-                      type="text"
-                      value={homeRange}
-                      onChange={(e) => setHomeRange(e.target.value)}
-                      placeholder="e.g. The Hideout, Bristol, TN"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-                    />
-                    <div className="flex flex-wrap gap-1.5">
-                      {["The Hideout, Bristol, TN", "Kettlefoot Rod & Gun Club, Bristol, VA"].map((rangePreset) => (
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={ranking}
+                        onChange={(e) => setRanking(e.target.value)}
+                        placeholder="e.g. Southeast Champion • PRS Rimfire Competitor"
+                        className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                      />
+                      {ranking && (
                         <button
-                          key={rangePreset}
                           type="button"
-                          onClick={() => setHomeRange(rangePreset)}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-                            homeRange === rangePreset
-                              ? "bg-amber-500 text-black font-bold"
-                              : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                          }`}
+                          onClick={() => setRanking("")}
+                          title="Clear Ranking / Title"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                         >
-                          {rangePreset}
+                          <X className="w-3.5 h-3.5" />
                         </button>
-                      ))}
+                      )}
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Competitor Bio / Personal Quote
-                    </label>
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                        Home Club / Home Range
+                      </label>
+                      <select
+                        value=""
+                        onChange={(e) => {
+                          if (e.target.value) setHomeRange(e.target.value);
+                        }}
+                        className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                      >
+                        <option value="">Quick Fill Range...</option>
+                        <option value="The Hideout, Bristol, TN">The Hideout, Bristol, TN</option>
+                        <option value="Kettlefoot Rod & Gun Club, Bristol, VA">Kettlefoot Rod &amp; Gun Club, Bristol, VA</option>
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={homeRange}
+                        onChange={(e) => setHomeRange(e.target.value)}
+                        placeholder="e.g. The Hideout, Bristol, TN"
+                        className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                      />
+                      {homeRange && (
+                        <button
+                          type="button"
+                          onClick={() => setHomeRange("")}
+                          title="Clear Home Range"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                        Competitor Bio / Personal Quote
+                      </label>
+                      {quote && (
+                        <button
+                          type="button"
+                          onClick={() => setQuote("")}
+                          className="text-[10px] font-mono text-red-400 hover:text-red-300 cursor-pointer"
+                        >
+                          Clear Bio
+                        </button>
+                      )}
+                    </div>
                     <textarea
                       rows={3}
                       value={quote}
@@ -1288,120 +1373,160 @@ export function ProfileEditModal({
                 <div className="space-y-4 animate-fadeIn">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Precision Action
-                      </label>
-                      <input
-                        type="text"
-                        value={rifleAction}
-                        onChange={(e) => setRifleAction(e.target.value)}
-                        placeholder="e.g. Modacam Custom Precision V-22"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {["Modacam Custom V-22", "Zermatt RimX", "Vudoo V-22", "CZ 457", "Bergara B-14R"].map((item) => (
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                          Precision Action
+                        </label>
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) setRifleAction(e.target.value);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Presets...</option>
+                          {["Modacam Custom V-22", "Zermatt RimX", "Vudoo V-22", "CZ 457", "Bergara B-14R"].map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={rifleAction}
+                          onChange={(e) => setRifleAction(e.target.value)}
+                          placeholder="e.g. Modacam Custom Precision V-22"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {rifleAction && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setRifleAction(item)}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
-                              rifleAction === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setRifleAction("")}
+                            title="Clear Action"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Match Barrel
-                      </label>
-                      <input
-                        type="text"
-                        value={barrel}
-                        onChange={(e) => setBarrel(e.target.value)}
-                        placeholder='e.g. 22" Custom Fluted Match Contour'
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {['22" Modacam Custom', '24" Bartlein Heavy', '22" MullerWorks', '20" Proof Research'].map((item) => (
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                          Match Barrel
+                        </label>
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) setBarrel(e.target.value);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Presets...</option>
+                          {['22" Modacam Custom', '24" Bartlein Heavy', '22" MullerWorks', '20" Proof Research'].map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={barrel}
+                          onChange={(e) => setBarrel(e.target.value)}
+                          placeholder='e.g. 22" Custom Fluted Match Contour'
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {barrel && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setBarrel(item)}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
-                              barrel === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setBarrel("")}
+                            title="Clear Barrel"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Competition Chassis / Stock
-                      </label>
-                      <input
-                        type="text"
-                        value={chassis}
-                        onChange={(e) => setChassis(e.target.value)}
-                        placeholder="e.g. MDT ACC Elite"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {["MDT ACC Elite", "Foundation Centurion", "MPA BA Comp", "KRG Whiskey-3"].map((item) => (
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                          Competition Chassis / Stock
+                        </label>
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) setChassis(e.target.value);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Presets...</option>
+                          {["MDT ACC Elite", "Foundation Centurion", "MPA BA Comp", "KRG Whiskey-3"].map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={chassis}
+                          onChange={(e) => setChassis(e.target.value)}
+                          placeholder="e.g. MDT ACC Elite"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {chassis && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setChassis(item)}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
-                              chassis === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setChassis("")}
+                            title="Clear Chassis"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Competition Optic
-                      </label>
-                      <input
-                        type="text"
-                        value={optic}
-                        onChange={(e) => setOptic(e.target.value)}
-                        placeholder="e.g. Zero Compromise Optic ZC527"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1.5 pt-0.5">
-                        {["ZCO 527", "Nightforce ATACR 7-35", "Kahles K525i", "Vortex Razor Gen III"].map((item) => (
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                          Competition Optic
+                        </label>
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (e.target.value) setOptic(e.target.value);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-amber-300 focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Presets...</option>
+                          {["ZCO 527", "Nightforce ATACR 7-35", "Kahles K525i", "Vortex Razor Gen III"].map((item) => (
+                            <option key={item} value={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={optic}
+                          onChange={(e) => setOptic(e.target.value)}
+                          placeholder="e.g. Zero Compromise Optic ZC527"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {optic && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setOptic(item)}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
-                              optic === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setOptic("")}
+                            title="Clear Optic"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1411,28 +1536,24 @@ export function ProfileEditModal({
                       <label className="text-xs font-mono text-slate-300 font-bold uppercase">
                         Trigger
                       </label>
-                      <input
-                        type="text"
-                        value={trigger}
-                        onChange={(e) => setTrigger(e.target.value)}
-                        placeholder="e.g. TriggerTech Diamond Pro"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {["TriggerTech Diamond", "Bix'n Andy"].map((item) => (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={trigger}
+                          onChange={(e) => setTrigger(e.target.value)}
+                          placeholder="e.g. TriggerTech Diamond"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {trigger && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setTrigger(item)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
-                              trigger === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setTrigger("")}
+                            title="Clear Trigger"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
 
@@ -1440,28 +1561,24 @@ export function ProfileEditModal({
                       <label className="text-xs font-mono text-slate-300 font-bold uppercase">
                         Tuner / Brake
                       </label>
-                      <input
-                        type="text"
-                        value={tuner}
-                        onChange={(e) => setTuner(e.target.value)}
-                        placeholder="e.g. Harmonic Tuner"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {["ATS Tuner", "EC Tuner"].map((item) => (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={tuner}
+                          onChange={(e) => setTuner(e.target.value)}
+                          placeholder="e.g. Harmonic Tuner"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {tuner && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setTuner(item)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
-                              tuner === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setTuner("")}
+                            title="Clear Tuner"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
 
@@ -1469,79 +1586,85 @@ export function ProfileEditModal({
                       <label className="text-xs font-mono text-slate-300 font-bold uppercase">
                         Ammunition Lot
                       </label>
-                      <input
-                        type="text"
-                        value={ammoLot}
-                        onChange={(e) => setAmmoLot(e.target.value)}
-                        placeholder="e.g. Lapua Center-X"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                      />
-                      <div className="flex flex-wrap gap-1 pt-0.5">
-                        {["Lapua Center-X", "Lapua Midas+", "Eley Tenex"].map((item) => (
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={ammoLot}
+                          onChange={(e) => setAmmoLot(e.target.value)}
+                          placeholder="e.g. Lapua Center-X"
+                          className="w-full pl-3.5 pr-9 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                        />
+                        {ammoLot && (
                           <button
-                            key={item}
                             type="button"
-                            onClick={() => setAmmoLot(item)}
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
-                              ammoLot === item
-                                ? "bg-amber-500 text-black font-bold"
-                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                            }`}
+                            onClick={() => setAmmoLot("")}
+                            title="Clear Ammo"
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           >
-                            {item}
+                            <X className="w-3.5 h-3.5" />
                           </button>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* TAB 4: SPONSORS & ACCOLADES (Preset Buttons + Active Chips + Bio, matching Sign-Up) */}
+              {/* TAB 4: SPONSORS & ACCOLADES */}
               {activeTab === "SPONSORS" && (
                 <div className="space-y-6 animate-fadeIn">
                   {/* ACCOLADES SECTION */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-mono font-bold text-amber-400 uppercase block">
-                        Accolades &amp; Career Honors
-                      </label>
-                      <p className="text-[11px] text-slate-400">
-                        Tap any preset badge below to toggle it on or off, or add a custom title.
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="space-y-0.5">
+                        <label className="text-xs font-mono font-bold text-amber-400 uppercase block">
+                          Accolades &amp; Career Honors ({accoladesList.length})
+                        </label>
+                        <p className="text-[11px] text-slate-400">
+                          Tap the <span className="text-red-400 font-bold">✕</span> on any badge below to remove it, or tap a preset to add it back.
+                        </p>
+                      </div>
+                      {accoladesList.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setAccoladesList([])}
+                          className="px-2.5 py-1 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 text-[10px] font-mono font-bold shrink-0 cursor-pointer"
+                        >
+                          Clear All
+                        </button>
+                      )}
                     </div>
 
                     {/* Active Accolades Chips */}
-                    {accoladesList.length > 0 && (
-                      <div className="space-y-1.5">
-                        <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                          Active on Your Profile ({accoladesList.length}):
-                        </span>
-                        <div className="flex flex-wrap gap-2">
-                          {accoladesList.map((acc) => (
-                            <span
-                              key={acc}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-mono font-bold"
+                    {accoladesList.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-black/50 border border-white/10">
+                        {accoladesList.map((acc) => (
+                          <span
+                            key={acc}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-mono font-bold"
+                          >
+                            <span>{acc}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeAccolade(acc)}
+                              title={`Remove ${acc}`}
+                              className="w-5 h-5 rounded-full bg-red-500/25 hover:bg-red-500/50 text-red-200 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
                             >
-                              <span>{acc}</span>
-                              <button
-                                type="button"
-                                onClick={() => removeAccolade(acc)}
-                                title={`Remove ${acc}`}
-                                className="w-4 h-4 rounded-full bg-black/40 hover:bg-red-500/30 text-amber-200 hover:text-red-300 flex items-center justify-center transition-colors cursor-pointer"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs font-mono text-slate-400">
+                        No accolades currently listed on your profile. Tap a preset below or type your own to add one.
                       </div>
                     )}
 
                     {/* Preset Accolades Buttons (Exact Match to Sign-Up) */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 pt-1">
                       <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                        Tap Preset Accolades to Add / Remove:
+                        Preset Accolades (Tap to Add or Remove):
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {PRESET_ACCOLADES.map((acc) => {
@@ -1592,46 +1715,56 @@ export function ProfileEditModal({
 
                   {/* SPONSORS SECTION */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-xs font-mono font-bold text-blue-400 uppercase block">
-                        Presenting Sponsors &amp; Factory Partners
-                      </label>
-                      <p className="text-[11px] text-slate-400">
-                        Tap a sponsor below to toggle it on your profile, or add custom sponsors.
-                      </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="space-y-0.5">
+                        <label className="text-xs font-mono font-bold text-blue-400 uppercase block">
+                          Presenting Sponsors &amp; Factory Partners ({sponsorsList.length})
+                        </label>
+                        <p className="text-[11px] text-slate-400">
+                          Tap the <span className="text-red-400 font-bold">✕</span> on any sponsor below to remove it, or tap a preset to add it back.
+                        </p>
+                      </div>
+                      {sponsorsList.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setSponsorsList([])}
+                          className="px-2.5 py-1 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 text-[10px] font-mono font-bold shrink-0 cursor-pointer"
+                        >
+                          Clear All
+                        </button>
+                      )}
                     </div>
 
                     {/* Active Sponsors Chips */}
-                    {sponsorsList.length > 0 && (
-                      <div className="space-y-1.5">
-                        <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                          Active Sponsors ({sponsorsList.length}):
-                        </span>
-                        <div className="flex flex-wrap gap-2">
-                          {sponsorsList.map((sp) => (
-                            <span
-                              key={sp}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/50 text-blue-200 text-xs font-mono font-bold"
+                    {sponsorsList.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-black/50 border border-white/10">
+                        {sponsorsList.map((sp) => (
+                          <span
+                            key={sp}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/50 text-blue-200 text-xs font-mono font-bold"
+                          >
+                            <span>{sp}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeSponsor(sp)}
+                              title={`Remove ${sp}`}
+                              className="w-5 h-5 rounded-full bg-red-500/25 hover:bg-red-500/50 text-red-200 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
                             >
-                              <span>{sp}</span>
-                              <button
-                                type="button"
-                                onClick={() => removeSponsor(sp)}
-                                title={`Remove ${sp}`}
-                                className="w-4 h-4 rounded-full bg-black/40 hover:bg-red-500/30 text-blue-200 hover:text-red-300 flex items-center justify-center transition-colors cursor-pointer"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-xs font-mono text-slate-400">
+                        No sponsors currently listed on your profile. Tap a preset below or type your own to add one.
                       </div>
                     )}
 
                     {/* Preset Sponsors Buttons */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 pt-1">
                       <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
-                        Tap Preset Sponsors to Add / Remove:
+                        Preset Sponsors (Tap to Add or Remove):
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {POPULAR_SPONSORS.map((sp) => {
@@ -1684,9 +1817,20 @@ export function ProfileEditModal({
 
                   {/* COMPETITOR BIO SECTION */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase block">
-                      Competitor Bio / Personal Quote
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-mono text-slate-300 font-bold uppercase block">
+                        Competitor Bio / Personal Quote
+                      </label>
+                      {quote && (
+                        <button
+                          type="button"
+                          onClick={() => setQuote("")}
+                          className="text-[10px] font-mono text-red-400 hover:text-red-300 cursor-pointer"
+                        >
+                          Clear Bio
+                        </button>
+                      )}
+                    </div>
                     <textarea
                       rows={3}
                       value={quote}
@@ -1702,57 +1846,93 @@ export function ProfileEditModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t border-white/10 bg-black/60 flex items-center justify-between gap-3 shrink-0">
-          <div className="text-xs text-slate-400 flex items-center gap-2">
-            {saveSuccess ? (
-              <span className="text-emerald-400 font-bold flex items-center gap-1.5 animate-fadeIn">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Profile &amp; Photos Synced!</span>
-              </span>
-            ) : (
-              <span className="hidden sm:inline">Original resolution preserved • Top-aligned</span>
-            )}
-          </div>
+        <div className="p-4 sm:p-5 border-t border-white/10 bg-black/60 flex flex-col gap-3 shrink-0">
+          {confirmDeleteProfile && (
+            <div className="p-3 rounded-2xl bg-red-950/60 border border-red-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+              <div className="text-xs text-red-200 font-mono">
+                Delete <span className="font-bold text-white">{name || callsign}</span>&apos;s shooter profile? You can create a new one anytime.
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteProfile(false)}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isDeletingProfile}
+                  onClick={handleDeleteProfile}
+                  className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-extrabold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{isDeletingProfile ? "Deleting..." : "Yes, Delete Profile"}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
-            >
-              Close / Cancel
-            </button>
-
-            <button
-              type="submit"
-              form="profile-edit-form"
-              disabled={isSaving || saveSuccess}
-              className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                saveSuccess
-                  ? "bg-emerald-500 text-white"
-                  : "bg-amber-500 hover:bg-amber-400 text-black shadow-tactical-glow active:scale-95"
-              }`}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
-                  <span>Saving...</span>
-                </>
-              ) : saveSuccess ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>Saved!</span>
-                </>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              {saveSuccess ? (
+                <span className="text-emerald-400 text-xs font-bold flex items-center gap-1.5 animate-fadeIn">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Profile &amp; Photos Synced!</span>
+                </span>
               ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Save Profile Changes</span>
-                </>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteProfile((prev) => !prev)}
+                  className="px-3 py-2 rounded-xl text-xs font-mono font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Delete this shooter profile"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Profile</span>
+                </button>
               )}
-            </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+
+              <button
+                type="submit"
+                form="profile-edit-form"
+                disabled={isSaving || saveSuccess}
+                className={`px-4 sm:px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                  saveSuccess
+                    ? "bg-emerald-500 text-white"
+                    : "bg-amber-500 hover:bg-amber-400 text-black shadow-tactical-glow active:scale-95"
+                }`}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-black" />
+                    <span>Saving...</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>Saved!</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    <span>Save Profile Changes</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

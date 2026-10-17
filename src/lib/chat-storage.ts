@@ -877,12 +877,43 @@ export async function saveStoredCustomChannel(
 }
 
 export async function deleteStoredCustomChannel(channelId: string): Promise<boolean> {
-  const cleanId = channelId.toLowerCase().trim();
+  const cleanId = channelId
+    .toLowerCase()
+    .trim()
+    .replace(/^#+/, "")
+    .replace(/[^a-z0-9-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
   if (!cleanId || cleanId === "invitational") return false;
   const rowId = `ch_cfg_${cleanId}`;
 
   if (db) {
     await db.from("chat_messages").delete().eq("id", rowId);
+    const { data } = await db
+      .from("chat_messages")
+      .select("id, content")
+      .eq("channel_id", "__system_channels__");
+    if (data && data.length > 0) {
+      const extraIds: string[] = [];
+      for (const row of data) {
+        try {
+          const parsed = JSON.parse(row.content);
+          const pid = String(parsed?.id || "").toLowerCase().trim();
+          const pname = String(parsed?.name || "").toLowerCase().trim();
+          if (
+            pid === cleanId ||
+            pname === cleanId ||
+            pid === channelId.toLowerCase().trim() ||
+            pname === channelId.toLowerCase().trim()
+          ) {
+            extraIds.push(row.id);
+          }
+        } catch {}
+      }
+      if (extraIds.length > 0) {
+        await db.from("chat_messages").delete().in("id", extraIds);
+      }
+    }
     return true;
   }
 
@@ -894,6 +925,12 @@ export async function deleteStoredCustomChannel(channelId: string): Promise<bool
       try {
         const parsed: StoredChatMessage = JSON.parse(line);
         if (parsed.id === rowId) continue;
+        if (parsed.channelId === "__system_channels__") {
+          try {
+            const cfg = JSON.parse(parsed.content);
+            if (cfg?.id === cleanId || cfg?.name === cleanId) continue;
+          } catch {}
+        }
         kept.push(line);
       } catch {
         kept.push(line);
@@ -905,3 +942,4 @@ export async function deleteStoredCustomChannel(channelId: string): Promise<bool
     return false;
   }
 }
+
