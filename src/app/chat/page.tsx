@@ -2449,7 +2449,7 @@ export default function ChatPage() {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   href="/"
-                  title="Return to Main Site"
+                  title="Return to Home"
                   className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-black/60 hover:bg-white/10 border border-white/15 text-white transition-all group shrink-0 shadow-sm"
                 >
                   <div className="w-5 h-5 rounded-full overflow-hidden border border-amber-400/80 bg-black shrink-0">
@@ -2463,7 +2463,7 @@ export default function ChatPage() {
                   </div>
                   <ChevronLeft className="w-3.5 h-3.5 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
                   <span className="font-extrabold text-[11px] font-mono tracking-wider text-slate-200 group-hover:text-amber-400">
-                    PORTAL
+                    HOME
                   </span>
                   <span className="text-white/20">/</span>
                   <span className="text-amber-400 font-bold">CHAT ROOM</span>

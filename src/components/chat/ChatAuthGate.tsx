@@ -98,7 +98,7 @@ export function ChatAuthGate({
         <div className="pt-3 border-t border-white/10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1">
             <Link href="/" className="hover:text-slate-300 transition-colors">
-              ← Return to Main Portal
+              ← Return to Home
             </Link>
             <span className="hidden sm:inline text-slate-700">•</span>
             <Link 
