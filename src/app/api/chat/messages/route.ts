@@ -9,8 +9,9 @@ import {
   deleteStoredChatMessage,
   purgeChatForCallsign,
   toggleStoredChatMessageReaction,
+  getStoredCustomChannels,
 } from "@/lib/chat-storage";
-import { recordHeartbeat, getPresenceSnapshot } from "@/lib/chat-presence";
+import { recordHeartbeat, getPresenceSnapshotAsync } from "@/lib/chat-presence";
 import { ChatMessage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -42,10 +43,7 @@ export async function GET(req: NextRequest) {
     const excludeCallsign = searchParams.get("excludeCallsign") || undefined;
     const userCallsign = searchParams.get("userCallsign") || undefined;
 
-    if (userCallsign) {
-      recordHeartbeat(userCallsign);
-    }
-    const { onlineCallsigns, lastActiveMap } = getPresenceSnapshot();
+    const { onlineCallsigns, lastActiveMap } = await getPresenceSnapshotAsync(userCallsign);
 
     if (pollUnread) {
       const sinceMs = sinceParam ? parseInt(sinceParam, 10) : 0;
@@ -65,7 +63,10 @@ export async function GET(req: NextRequest) {
     const sinceMs = sinceParam ? parseInt(sinceParam, 10) : undefined;
     const limit = limitParam ? parseInt(limitParam, 10) : 100;
 
-    const messages = await getStoredChatMessages(channel, limit, sinceMs);
+    const [messages, customChannels] = await Promise.all([
+      getStoredChatMessages(channel, limit, sinceMs),
+      getStoredCustomChannels(),
+    ]);
     const latestTimestamp = messages.length > 0 ? messages[messages.length - 1].createdAtMs : (sinceMs || 0);
 
     // If caller specified their callsign, fetch active DM threads and unread counts
@@ -79,6 +80,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       messages,
+      customChannels,
       latestTimestamp,
       count: messages.length,
       dmConversations,

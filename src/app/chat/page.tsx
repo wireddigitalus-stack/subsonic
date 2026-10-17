@@ -59,7 +59,9 @@ import {
   Radar,
   Hash,
   Camera,
-  LogOut
+  LogOut,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 import { INITIAL_CHAT_MESSAGES } from "@/lib/initial-data";
@@ -99,6 +101,8 @@ interface ChannelConfig {
   desc: string;
   netType: "PUBLIC" | "PRO";
   activeUsers: number;
+  adminOnly?: boolean;
+  isCustom?: boolean;
 }
 
 const ALL_CHANNELS: ChannelConfig[] = [
@@ -294,8 +298,29 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Active channel list (Invitational Official Comms)
-  const visibleChannels = ALL_CHANNELS;
+  // Custom Admin-Created Channels State
+  const [customChannels, setCustomChannels] = useState<ChannelConfig[]>([]);
+  const [isNewRoomModalOpen, setIsNewRoomModalOpen] = useState(false);
+  const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomDesc, setNewRoomDesc] = useState("");
+  const [newRoomBadge, setNewRoomBadge] = useState("MATCH ROOM");
+  const [newRoomAdminOnly, setNewRoomAdminOnly] = useState(false);
+  const [isSavingNewRoom, setIsSavingNewRoom] = useState(false);
+  const [newRoomError, setNewRoomError] = useState<string | null>(null);
+
+  // Active channel list (Invitational Official Comms + Admin-Created Rooms)
+  const visibleChannels = useMemo(() => {
+    const merged: ChannelConfig[] = [...ALL_CHANNELS];
+    for (const ch of customChannels) {
+      if (ch.id === "invitational") continue;
+      if (ch.adminOnly && !isShooterAdmin) continue;
+      if (!merged.some((m) => m.id === ch.id)) {
+        merged.push(ch);
+      }
+    }
+    return merged;
+  }, [customChannels, isShooterAdmin]);
+
   const currentChannelData = useMemo(() => {
     if (isDirectMode && activeDirectPartner) {
       return {
@@ -307,8 +332,8 @@ export default function ChatPage() {
         activeUsers: 2,
       };
     }
-    return ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
-  }, [currentChannel, isDirectMode, activeDirectPartner]);
+    return visibleChannels.find((ch) => ch.id === currentChannel) || visibleChannels[0] || ALL_CHANNELS[0];
+  }, [currentChannel, isDirectMode, activeDirectPartner, visibleChannels]);
 
   const filteredMessages = useMemo(() => {
     const avatarByCallsign = new Map<string, string>();
@@ -416,10 +441,102 @@ export default function ChatPage() {
     playTacticalChirp(900);
   }, []);
 
+  const handleOpenNewRoomModal = useCallback(() => {
+    setNewRoomName("");
+    setNewRoomDesc("");
+    setNewRoomBadge("MATCH ROOM");
+    setNewRoomAdminOnly(false);
+    setNewRoomError(null);
+    setIsNewRoomModalOpen(true);
+    playTacticalChirp(1100);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleCreateNewRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRoomName.trim()) {
+      setNewRoomError("Please enter a room name (e.g. lunch-menu).");
+      return;
+    }
+
+    setIsSavingNewRoom(true);
+    setNewRoomError(null);
+    try {
+      const res = await fetch("/api/chat/channels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newRoomName.trim(),
+          desc: newRoomDesc.trim() || `Match room #${newRoomName.trim().toLowerCase()}`,
+          badge: newRoomBadge.trim() || (newRoomAdminOnly ? "ADMIN ONLY" : "MATCH ROOM"),
+          adminOnly: newRoomAdminOnly,
+          callsign: shooterProfile.callsign,
+          role: shooterProfile.role,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.channel) {
+        setNewRoomError(data.error || "Could not create room.");
+        setIsSavingNewRoom(false);
+        return;
+      }
+
+      if (Array.isArray(data.channels)) {
+        setCustomChannels(data.channels);
+      } else {
+        setCustomChannels((prev) => [
+          ...prev.filter((c) => c.id !== data.channel.id),
+          data.channel,
+        ]);
+      }
+
+      setCurrentChannel(data.channel.id);
+      setIsNewRoomModalOpen(false);
+      setIsSavingNewRoom(false);
+      playTacticalChirp(1200);
+    } catch {
+      setNewRoomError("Network error while creating room.");
+      setIsSavingNewRoom(false);
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
+    if (!roomId || roomId === "invitational") return;
+    if (typeof window !== "undefined" && !window.confirm(`Remove chat room #${roomId}?`)) {
+      return;
+    }
+
+    setCustomChannels((prev) => prev.filter((c) => c.id !== roomId));
+    if (currentChannel === roomId) {
+      setCurrentChannel("invitational");
+    }
+
+    try {
+      const res = await fetch("/api/chat/channels", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: roomId,
+          callsign: shooterProfile.callsign,
+          role: shooterProfile.role,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.channels)) {
+          setCustomChannels(data.channels);
+        }
+      }
+      playTacticalChirp(700);
+    } catch (err) {
+      console.error("Failed to delete room:", err);
+    }
+  };
+
   // Channel engagement & post counters map (dynamic per-room transmission & reaction counts)
   const channelEngagementMap = useMemo(() => {
     const map: Record<string, { postCount: number; reactionCount: number; dopeCount: number }> = {};
-    for (const ch of ALL_CHANNELS) {
+    for (const ch of visibleChannels) {
       map[ch.id] = { postCount: 0, reactionCount: 0, dopeCount: 0 };
     }
     for (const m of messages) {
@@ -443,7 +560,7 @@ export default function ChatPage() {
       }
     }
     return map;
-  }, [messages]);
+  }, [messages, visibleChannels]);
 
   const currentChannelEngagement = channelEngagementMap[currentChannel] || {
     postCount: filteredMessages.length,
@@ -875,6 +992,10 @@ export default function ChatPage() {
         const res = await fetch(url);
         if (!res.ok || !isMounted) return;
         const data = await res.json();
+
+        if (Array.isArray(data.customChannels)) {
+          setCustomChannels(data.customChannels);
+        }
 
         // 1. Process messages for active channel
         if (Array.isArray(data.messages)) {
@@ -2132,15 +2253,29 @@ export default function ChatPage() {
                     </button>
 
                     {isShooterAdmin && (
-                      <Link
-                        href="/admin"
-                        target="_blank"
-                        onClick={() => setIsChatMobileUserMenuOpen(false)}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
-                      >
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                        <span>Admin Control Center</span>
-                      </Link>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsChatMobileUserMenuOpen(false);
+                            handleOpenNewRoomModal();
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:text-white hover:bg-amber-500/15 transition-colors text-left cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4 text-amber-400" />
+                          <span>Add New Chat Room</span>
+                        </button>
+
+                        <Link
+                          href="/admin"
+                          target="_blank"
+                          onClick={() => setIsChatMobileUserMenuOpen(false)}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
+                        >
+                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                          <span>Admin Control Center</span>
+                        </Link>
+                      </>
                     )}
 
                     <div className="border-t border-white/10 my-1" />
@@ -2163,6 +2298,17 @@ export default function ChatPage() {
 
             {/* Mobile Actions: Tactical Menu */}
             <div className="flex items-center gap-1.5 shrink-0">
+              {isShooterAdmin && (
+                <button
+                  type="button"
+                  onClick={handleOpenNewRoomModal}
+                  className="h-7 px-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1 active:scale-95 transition-all"
+                  title="Add New Chat Room (Admin)"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="font-extrabold text-[11px]">ROOM</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -2214,7 +2360,7 @@ export default function ChatPage() {
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs">
                   <Hash className="w-3.5 h-3.5 text-amber-400" />
                   <span className="font-bold text-slate-200">
-                    {ALL_CHANNELS.find((c) => c.id === currentChannel)?.name || "invitational"}
+                    {visibleChannels.find((c) => c.id === currentChannel)?.name || "invitational"}
                   </span>
                 </div>
               </div>
@@ -2315,15 +2461,29 @@ export default function ChatPage() {
                       </button>
 
                       {isShooterAdmin && (
-                        <Link
-                          href="/admin"
-                          target="_blank"
-                          onClick={() => setIsChatUserMenuOpen(false)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
-                        >
-                          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                          <span>Admin Control Center</span>
-                        </Link>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsChatUserMenuOpen(false);
+                              handleOpenNewRoomModal();
+                            }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:text-white hover:bg-amber-500/15 transition-colors text-left cursor-pointer"
+                          >
+                            <Plus className="w-4 h-4 text-amber-400" />
+                            <span>Add New Chat Room</span>
+                          </button>
+
+                          <Link
+                            href="/admin"
+                            target="_blank"
+                            onClick={() => setIsChatUserMenuOpen(false)}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
+                          >
+                            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                            <span>Admin Control Center</span>
+                          </Link>
+                        </>
                       )}
 
                       <div className="border-t border-white/10 my-1" />
@@ -2453,6 +2613,18 @@ export default function ChatPage() {
               <span>Moderated</span>
             </div>
 
+            {isShooterAdmin && (
+              <button
+                type="button"
+                onClick={handleOpenNewRoomModal}
+                className="h-7 px-2 sm:px-2.5 rounded-lg border text-[11px] flex items-center gap-1 font-mono font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/35 transition-all cursor-pointer"
+                title="Add New Chat Room (Admin Only)"
+              >
+                <Plus className="w-3.5 h-3.5 text-amber-400" />
+                <span>Room</span>
+              </button>
+            )}
+
             {/* Active Marksmen Online Roster Pill */}
             <button
               type="button"
@@ -2470,51 +2642,91 @@ export default function ChatPage() {
         </div>
       )}
 
-      {/* 2. CHANNEL SELECTOR — ZERO HORIZONTAL OVERFLOW ON MOBILE (Hidden on mobile if in Fullscreen since top bar handles it) */}
-      <div id="tour-step-channels" className={`shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1 ${isFullscreen ? "hidden md:block" : ""}`}>
-        {/* MOBILE OPEN ROOM BAR (Fits 100% width, no side-scroll) */}
+      {/* 2. CHANNEL SELECTOR — Visible on mobile & desktop so switching rooms (e.g. #invitational, #lunch-menu) and adding rooms (Admin) is 1 tap */}
+      <div id="tour-step-channels" className="shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1">
+        {/* MOBILE ROOM BAR (Horizontally scrollable room pills + Admin '+ Room' button) */}
         <div className="md:hidden">
-          <div className="w-full p-2.5 px-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-lg font-mono font-black text-sm flex items-center justify-center shrink-0 bg-amber-500 text-black">
-                #
-              </div>
-              <div className="min-w-0 text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-white text-sm whitespace-nowrap truncate max-w-[150px]">
-                    {currentChannelData.name}
-                  </span>
-                  <span className="text-xs font-mono px-2 py-0.5 rounded font-bold border shrink-0 bg-amber-500/20 text-amber-300 border-amber-500/30">
-                    {currentChannelData.badge}
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            {visibleChannels.map((ch) => {
+              const isActive = currentChannel === ch.id;
+              const unread = unreadCounts[ch.id] || 0;
+              const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
+              const isCustomRoom = ch.id !== "invitational";
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs font-mono text-cyan-200 bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
-                <MessageSquare className="w-3 h-3 text-cyan-400" />
-                {currentChannelEngagement.postCount}
-              </span>
-            </div>
+              return (
+                <div
+                  key={ch.id}
+                  onClick={() => setCurrentChannel(ch.id)}
+                  className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border cursor-pointer active:scale-95 ${
+                    isActive
+                      ? "bg-amber-500 text-black font-bold border-amber-400 shadow-sm"
+                      : "bg-white/[0.04] border-white/10 text-slate-200 hover:bg-white/[0.08]"
+                  }`}
+                >
+                  <span className={isActive ? "text-black font-bold" : "text-amber-400 font-bold"}>#</span>
+                  <span className="font-mono font-bold">{ch.name}</span>
+                  {ch.adminOnly && (
+                    <Lock className={`w-3 h-3 ${isActive ? "text-black" : "text-emerald-400"}`} />
+                  )}
+                  <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5 ${
+                    isActive ? "bg-black/25 text-white" : "bg-white/10 text-slate-300"
+                  }`}>
+                    <MessageSquare className="w-2.5 h-2.5" />
+                    <span>{engagement.postCount}</span>
+                  </span>
+                  {unread > 0 && !isActive && (
+                    <span className="min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
+                  {isShooterAdmin && isCustomRoom && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRoom(ch.id);
+                      }}
+                      title={`Remove #${ch.name}`}
+                      className={`ml-0.5 p-0.5 rounded hover:bg-red-500/20 ${
+                        isActive ? "text-black/70 hover:text-red-900" : "text-slate-400 hover:text-red-400"
+                      }`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+
+            {isShooterAdmin && (
+              <button
+                type="button"
+                onClick={handleOpenNewRoomModal}
+                className="whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-mono font-bold shrink-0 flex items-center gap-1 border border-amber-500/40 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 active:scale-95 transition-all"
+                title="Create a new chat room (Admin Only)"
+              >
+                <Plus className="w-3.5 h-3.5 text-amber-400" />
+                <span>New Room</span>
+              </button>
+            )}
           </div>
         </div>
 
         {/* DESKTOP CHANNEL SELECTOR BAR (Hidden on mobile & small tablets) */}
         <div className="hidden md:block">
           <div className="flex items-center justify-between gap-3">
-            {/* Desktop Channel Pill on Left */}
+            {/* Desktop Channel Pills on Left */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
               {visibleChannels.map((ch) => {
                 const isActive = currentChannel === ch.id;
                 const unread = unreadCounts[ch.id] || 0;
                 const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
+                const isCustomRoom = ch.id !== "invitational";
                 return (
-                  <button
+                  <div
                     key={ch.id}
-                    type="button"
                     onClick={() => setCurrentChannel(ch.id)}
-                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border relative ${
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border relative cursor-pointer ${
                       isActive
                         ? "bg-amber-500 text-black font-bold border-amber-400"
                         : "bg-white/[0.03] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.06]"
@@ -2522,6 +2734,9 @@ export default function ChatPage() {
                   >
                     <span className={isActive ? "text-black font-bold" : "text-amber-400"}>#</span>
                     <span className="font-medium">{ch.name}</span>
+                    {ch.adminOnly && (
+                      <Lock className={`w-3 h-3 ${isActive ? "text-black" : "text-emerald-400"}`} />
+                    )}
 
                     {/* Post Counter Badge on Pill */}
                     <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5 ${
@@ -2538,9 +2753,37 @@ export default function ChatPage() {
                         {unread > 9 ? "9+" : unread}
                       </span>
                     ) : null}
-                  </button>
+
+                    {isShooterAdmin && isCustomRoom && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteRoom(ch.id);
+                        }}
+                        title={`Delete #${ch.name}`}
+                        className={`ml-0.5 p-0.5 rounded transition-colors ${
+                          isActive ? "text-black/70 hover:text-red-900" : "text-slate-400 hover:text-red-400"
+                        }`}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 );
               })}
+
+              {isShooterAdmin && (
+                <button
+                  type="button"
+                  onClick={handleOpenNewRoomModal}
+                  className="whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-mono font-bold shrink-0 flex items-center gap-1 border border-amber-500/40 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 transition-all cursor-pointer"
+                  title="Add a new chat room (Admin Only)"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Add Room</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -2570,6 +2813,9 @@ export default function ChatPage() {
             onLogout={handleLogout}
             onlineCallsigns={onlineCallsigns}
             lastActiveMap={lastActiveMap}
+            isAdmin={isShooterAdmin}
+            onOpenNewRoomModal={handleOpenNewRoomModal}
+            onDeleteRoom={handleDeleteRoom}
           />
         )}
 
@@ -3044,7 +3290,7 @@ export default function ChatPage() {
       <ChannelPickerModal
         isOpen={isChannelModalOpen}
         onClose={() => setIsChannelModalOpen(false)}
-        channels={ALL_CHANNELS}
+        channels={visibleChannels}
         currentChannel={currentChannel}
         onSelectChannel={(chId) => setCurrentChannel(chId)}
         unreadCounts={unreadCounts}
@@ -3073,7 +3319,9 @@ export default function ChatPage() {
         onlineCallsigns={onlineCallsigns}
         lastActiveMap={lastActiveMap}
         directPartners={directPartners}
+        shooterProfile={shooterProfile}
         onStartDirectComms={handleStartDirectComms}
+        onOpenDossier={handleOpenDossier}
         onPlayChirp={playTacticalChirp}
       />
 
@@ -3116,8 +3364,243 @@ export default function ChatPage() {
         onOpenTerms={() => setIsTermsModalOpen(true)}
         onLogout={handleLogout}
         isAdmin={isShooterAdmin}
+        onOpenNewRoomModal={handleOpenNewRoomModal}
       />
+
+      {/* 10. ADMIN-ONLY CREATE & MANAGE CHAT ROOMS MODAL (MOBILE-FIRST) */}
+      {isNewRoomModalOpen && isShooterAdmin && (
+        <div
+          className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+          onClick={() => setIsNewRoomModalOpen(false)}
+        >
+          <div
+            className="w-full sm:max-w-md bg-[#0B0F17] sm:ios-glass rounded-t-3xl sm:rounded-3xl border-t sm:border border-white/15 shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90dvh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white leading-tight">
+                    Add New Chat Room
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Admin-only • Create smaller rooms (lunch menu, stage updates, staff)
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewRoomModalOpen(false)}
+                className="p-2 rounded-xl bg-white/10 text-slate-300 hover:text-white transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* 1-Tap Mobile Quick Presets */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                Quick Templates (Tap to Fill)
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewRoomName("lunch-menu");
+                    setNewRoomDesc("Daily lunch menus, food orders & dining updates");
+                    setNewRoomBadge("FOOD & MENU");
+                    setNewRoomAdminOnly(false);
+                  }}
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                >
+                  <div className="text-xs font-bold text-white">#lunch-menu</div>
+                  <div className="text-[10px] text-slate-400 truncate">Food &amp; daily menus</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewRoomName("stage-updates");
+                    setNewRoomDesc("Live stage briefings, squad schedules & range calls");
+                    setNewRoomBadge("STAGE OPS");
+                    setNewRoomAdminOnly(false);
+                  }}
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                >
+                  <div className="text-xs font-bold text-white">#stage-updates</div>
+                  <div className="text-[10px] text-slate-400 truncate">Stage &amp; range updates</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewRoomName("lodging-dining");
+                    setNewRoomDesc("Bristol hotels, dinner spots & evening meetups");
+                    setNewRoomBadge("HOSPITALITY");
+                    setNewRoomAdminOnly(false);
+                  }}
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                >
+                  <div className="text-xs font-bold text-white">#lodging-dining</div>
+                  <div className="text-[10px] text-slate-400 truncate">Hotels &amp; dinner plans</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewRoomName("admin-staff");
+                    setNewRoomDesc("Private admin & match staff coordination");
+                    setNewRoomBadge("ADMIN ONLY");
+                    setNewRoomAdminOnly(true);
+                  }}
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-500/40 text-left transition-all active:scale-95"
+                >
+                  <div className="text-xs font-bold text-emerald-300 flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
+                    <span>#admin-staff</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate">Admins only private room</div>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateNewRoom} className="space-y-3.5">
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-200">
+                  Room Name
+                </label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-amber-400 font-mono font-bold text-sm">#</span>
+                  <input
+                    type="text"
+                    value={newRoomName}
+                    onChange={(e) => setNewRoomName(e.target.value)}
+                    placeholder="e.g. lunch-menu"
+                    className="w-full pl-8 pr-3 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white font-mono text-base sm:text-sm focus:border-amber-400 focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-mono font-bold text-slate-200">
+                  Short Topic / Description (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={newRoomDesc}
+                  onChange={(e) => setNewRoomDesc(e.target.value)}
+                  placeholder="e.g. Saturday catered lunch menu & drink options"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-base sm:text-sm focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-bold text-slate-200">
+                  Who Can View This Room?
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewRoomAdminOnly(false);
+                      if (newRoomBadge === "ADMIN ONLY") setNewRoomBadge("MATCH ROOM");
+                    }}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      !newRoomAdminOnly
+                        ? "bg-amber-500 text-black border-amber-400"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>All Shooters</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewRoomAdminOnly(true);
+                      setNewRoomBadge("ADMIN ONLY");
+                    }}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all ${
+                      newRoomAdminOnly
+                        ? "bg-emerald-500 text-black border-emerald-400"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Admins Only</span>
+                  </button>
+                </div>
+              </div>
+
+              {newRoomError && (
+                <div className="p-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-mono">
+                  {newRoomError}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsNewRoomModalOpen(false)}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingNewRoom}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-mono text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{isSavingNewRoom ? "CREATING..." : "CREATE ROOM"}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Existing Custom Rooms List for Easy Mobile Deletion */}
+            {customChannels.length > 0 && (
+              <div className="pt-3 border-t border-white/10 space-y-2">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">
+                  Active Custom Rooms ({customChannels.length})
+                </span>
+                <div className="space-y-1.5">
+                  {customChannels.map((ch) => (
+                    <div
+                      key={ch.id}
+                      className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/10"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-amber-400 font-mono font-bold text-xs">#</span>
+                          <span className="text-white font-mono font-bold text-xs truncate">{ch.name}</span>
+                          {ch.adminOnly && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
+                              ADMIN ONLY
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate">{ch.desc}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteRoom(ch.id)}
+                        className="ml-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0"
+                        title={`Delete #${ch.name}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 

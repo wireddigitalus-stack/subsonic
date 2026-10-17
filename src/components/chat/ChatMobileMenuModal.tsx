@@ -19,7 +19,8 @@ import {
   Radar,
   ChevronRight,
   MessageSquare,
-  Camera
+  Camera,
+  Plus
 } from "lucide-react";
 import { getUserInitials, getAvatarColor } from "@/lib/avatar-colors";
 
@@ -49,6 +50,7 @@ interface ChatMobileMenuModalProps {
   onOpenTerms: () => void;
   onLogout: () => void;
   isAdmin: boolean;
+  onOpenNewRoomModal?: () => void;
 }
 
 export function ChatMobileMenuModal({
@@ -68,6 +70,7 @@ export function ChatMobileMenuModal({
   onOpenTerms,
   onLogout,
   isAdmin,
+  onOpenNewRoomModal,
 }: ChatMobileMenuModalProps) {
   if (!isOpen) return null;
 
@@ -204,6 +207,31 @@ export function ChatMobileMenuModal({
               </div>
               <ChevronRight className="w-4 h-4 text-slate-500" />
             </button>
+
+            {/* Add New Chat Room (Admin/Owner only) */}
+            {isAdmin && onOpenNewRoomModal && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenNewRoomModal();
+                }}
+                className="w-full p-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 flex items-center justify-between text-left transition-colors"
+              >
+                <div className="flex items-center gap-2.5 text-amber-300">
+                  <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
+                    <Plus className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="text-xs">
+                    <div className="font-bold text-white">Add New Chat Room</div>
+                    <div className="text-[11px] text-amber-300 font-mono">
+                      Create room (e.g. lunch menu, updates)
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-amber-400" />
+              </button>
+            )}
 
             {/* Admin Console (Admin/Owner only) */}
             {isAdmin && (

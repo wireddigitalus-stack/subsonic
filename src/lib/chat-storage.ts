@@ -153,6 +153,8 @@ export async function getStoredChatMessages(
       } else {
         query = query.eq("channel_id", channelId);
       }
+    } else {
+      query = query.neq("channel_id", "__system_channels__");
     }
     if (sinceMs) query = query.gt("created_at", new Date(sinceMs).toISOString());
 
@@ -212,6 +214,8 @@ export async function getStoredChatMessages(
           } else if (parsed.channelId !== channelId) {
             continue;
           }
+        } else if (parsed.channelId === "__system_channels__") {
+          continue;
         }
         messages.push(parsed);
       } catch {
@@ -725,3 +729,175 @@ export async function purgeChatForCallsign(callsign: string): Promise<number> {
   return count;
 }
 
+export interface StoredCustomChannel {
+  id: string;
+  name: string;
+  badge: string;
+  desc: string;
+  netType: "PRO" | "PUBLIC";
+  activeUsers: number;
+  adminOnly?: boolean;
+  isCustom?: boolean;
+  createdBy?: string;
+  createdAtMs?: number;
+}
+
+const SYSTEM_CHANNELS_ID = "__system_channels__";
+
+export async function getStoredCustomChannels(): Promise<StoredCustomChannel[]> {
+  if (db) {
+    try {
+      const { data, error } = await db
+        .from("chat_messages")
+        .select("*")
+        .eq("channel_id", SYSTEM_CHANNELS_ID)
+        .order("created_at", { ascending: true });
+
+      if (error || !data) return [];
+
+      const channels: StoredCustomChannel[] = [];
+      for (const row of data) {
+        try {
+          const parsed = JSON.parse(row.content || "{}");
+          if (parsed && parsed.id && parsed.name && parsed.id !== "invitational") {
+            channels.push({
+              id: parsed.id,
+              name: parsed.name,
+              badge: parsed.badge || (parsed.adminOnly ? "ADMIN ONLY" : "MATCH ROOM"),
+              desc: parsed.desc || "Match updates & smaller topic discussions",
+              netType: "PRO",
+              activeUsers: parsed.activeUsers || 94,
+              adminOnly: Boolean(parsed.adminOnly),
+              isCustom: true,
+              createdBy: parsed.createdBy || row.author?.callsign || "ADMIN",
+              createdAtMs: new Date(row.created_at).getTime(),
+            });
+          }
+        } catch {}
+      }
+      return channels;
+    } catch (err) {
+      console.error("getStoredCustomChannels error:", err);
+      return [];
+    }
+  }
+
+  // Offline fallback
+  try {
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const map = new Map<string, StoredCustomChannel>();
+    for (const line of raw.trim().split("\n").filter(Boolean)) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.channelId !== SYSTEM_CHANNELS_ID) continue;
+        const ch = JSON.parse(parsed.content || "{}");
+        if (ch && ch.id && ch.name && ch.id !== "invitational") {
+          map.set(ch.id, {
+            id: ch.id,
+            name: ch.name,
+            badge: ch.badge || (ch.adminOnly ? "ADMIN ONLY" : "MATCH ROOM"),
+            desc: ch.desc || "Match updates & smaller topic discussions",
+            netType: "PRO",
+            activeUsers: ch.activeUsers || 94,
+            adminOnly: Boolean(ch.adminOnly),
+            isCustom: true,
+            createdBy: ch.createdBy || parsed.author?.callsign || "ADMIN",
+            createdAtMs: parsed.createdAtMs || Date.now(),
+          });
+        }
+      } catch {}
+    }
+    return Array.from(map.values());
+  } catch {
+    return [];
+  }
+}
+
+export async function saveStoredCustomChannel(
+  channel: StoredCustomChannel,
+  creatorCallsign: string
+): Promise<StoredCustomChannel> {
+  const cleanId = channel.id
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9-_]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  if (!cleanId || cleanId === "invitational" || cleanId === SYSTEM_CHANNELS_ID) {
+    throw new Error("Invalid or reserved room name.");
+  }
+
+  const normalized: StoredCustomChannel = {
+    id: cleanId,
+    name: cleanId,
+    badge: (channel.badge || (channel.adminOnly ? "ADMIN ONLY" : "MATCH ROOM")).toUpperCase().slice(0, 18),
+    desc: (channel.desc || `Topic room #${cleanId}`).slice(0, 140),
+    netType: "PRO",
+    activeUsers: 94,
+    adminOnly: Boolean(channel.adminOnly),
+    isCustom: true,
+    createdBy: creatorCallsign || "ADMIN",
+    createdAtMs: Date.now(),
+  };
+
+  const rowId = `ch_cfg_${cleanId}`;
+  const sysRecord: StoredChatMessage = {
+    id: rowId,
+    channelId: SYSTEM_CHANNELS_ID,
+    type: "STANDARD",
+    author: {
+      id: "admin_channel_config",
+      name: creatorCallsign || "Admin",
+      callsign: creatorCallsign || "ADMIN",
+      role: "OWNER_ADMIN",
+    },
+    content: JSON.stringify(normalized),
+    timestamp: formatDisplayTime(normalized.createdAtMs!),
+    reactions: [],
+    moderationStatus: "APPROVED",
+    createdAtMs: normalized.createdAtMs!,
+  };
+
+  if (db) {
+    const { error } = await db.from("chat_messages").upsert(mapToDb(sysRecord), { onConflict: "id" });
+    if (error) {
+      throw new Error(`Failed to save custom room: ${error.message}`);
+    }
+    return normalized;
+  }
+
+  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+  await fs.appendFile(CHAT_FILE, JSON.stringify(sysRecord) + "\n", "utf-8");
+  return normalized;
+}
+
+export async function deleteStoredCustomChannel(channelId: string): Promise<boolean> {
+  const cleanId = channelId.toLowerCase().trim();
+  if (!cleanId || cleanId === "invitational") return false;
+  const rowId = `ch_cfg_${cleanId}`;
+
+  if (db) {
+    await db.from("chat_messages").delete().eq("id", rowId);
+    return true;
+  }
+
+  try {
+    const raw = await fs.readFile(CHAT_FILE, "utf-8");
+    const lines = raw.trim().split("\n").filter(Boolean);
+    const kept: string[] = [];
+    for (const line of lines) {
+      try {
+        const parsed: StoredChatMessage = JSON.parse(line);
+        if (parsed.id === rowId) continue;
+        kept.push(line);
+      } catch {
+        kept.push(line);
+      }
+    }
+    await fs.writeFile(CHAT_FILE, kept.join("\n") + (kept.length > 0 ? "\n" : ""), "utf-8");
+    return true;
+  } catch {
+    return false;
+  }
+}
