@@ -678,7 +678,7 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
 
-        {/* SECTION 8: Quick Notes for Competitors & Event Info (Verbatim from Page 4 of PDF + Allen's Exact Updates) */}
+        {/* SECTION 8: Quick Notes for Competitors & Event Info */}
         <section id="notes" className="scroll-mt-24 space-y-6">
           <h2 className="text-2xl sm:text-3xl font-black text-white font-heading">
             Quick Notes for Competitors
@@ -693,12 +693,6 @@ export default function CompetitorPacketPage() {
                 Bristol spans two states, so your hotel, dinner and evening entertainment may move you back and forth between Tennessee and Virginia.
               </li>
               <li>
-                Additional directions to 111 Hwy 44 and competitor arrival instructions will be sent before match weekend.
-              </li>
-              <li>
-                Plan to spend Saturday evening at The Hideout, and leave room in your Sunday schedule for the two cash side matches after the main event.
-              </li>
-              <li>
                 For sightseeing or fishing plans, confirm seasonal hours, reservations and operating schedules before leaving the hotel.
               </li>
               <li>50 yard, 100 yard, and 200 yard zero available.</li>
@@ -710,30 +704,6 @@ export default function CompetitorPacketPage() {
             <p className="text-base sm:text-lg font-black uppercase tracking-wider text-amber-400">
               COME FOR THE MATCH. STAY FOR THE EXPERIENCE. DISCOVER BRISTOL.
             </p>
-          </div>
-
-          {/* Event Director Contact */}
-          <div className="p-6 sm:p-7 rounded-2xl bg-zinc-950 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-            <div>
-              <div className="text-xs sm:text-sm font-mono text-slate-300 uppercase tracking-wider font-semibold">
-                Event Director
-              </div>
-              <div className="text-lg sm:text-xl font-bold text-white mt-0.5">
-                Allen Hurley • Subsonic Society
-              </div>
-              <div className="text-sm sm:text-base text-slate-300">
-                111 Hwy 44, Bristol, TN 37620
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <a
-                href="mailto:ahurley@subsonicsociety.com"
-                className="w-full sm:w-auto px-5 py-3 rounded-xl text-sm font-black bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center justify-center gap-2 shadow-tactical-glow"
-              >
-                <span>Contact Subsonic</span>
-              </a>
-            </div>
           </div>
         </section>
       </div>
