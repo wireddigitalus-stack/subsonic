@@ -342,11 +342,11 @@ export function ChatMessageList({
                 {/* Message Header: Author, Badge, Timestamp */}
                 <div className="flex items-center justify-between gap-1.5">
                   <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                    {/* Avatar — clickable to open profile & start DM */}
+                    {/* Avatar — clickable to open profile */}
                     <button
                       type="button"
                       onClick={() => handleAuthorClick(msg.author)}
-                      title={`View ${msg.author.name} Profile & Direct Chat`}
+                      title={`View ${msg.author.name} Profile`}
                       className="flex w-8 h-8 md:w-9 md:h-9 rounded-full items-center justify-center font-mono font-bold text-xs ring-2 shrink-0 transition-transform active:scale-95 hover:ring-cyan-400 cursor-pointer overflow-hidden shadow-sm"
                       style={
                         !msg.author.avatarUrl && !isRO
@@ -376,7 +376,7 @@ export function ChatMessageList({
                         <button
                           type="button"
                           onClick={() => handleAuthorClick(msg.author)}
-                          title={`View ${msg.author.name} Profile & Direct Chat`}
+                          title={`View ${msg.author.name} Profile`}
                           className={`text-sm font-semibold truncate text-left hover:underline underline-offset-2 transition-all cursor-pointer ${
                             isRO ? "text-cyan-300 font-bold" : isMasterOwner ? "text-blue-400 font-black" : isOwnerAdmin ? "text-emerald-300" : isAdmin ? "text-cyan-300" : isMod ? "text-purple-300" : "text-white"
                           }`}

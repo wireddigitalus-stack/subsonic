@@ -187,23 +187,21 @@ export function ChatChannelSidebar({
             </div>
           </div>
 
-          {/* Section 2: Point-to-Point Direct Comms */}
+          {/* Section 2: Squad Roster */}
           {directPartners.length > 0 && (
             <div>
               <div className="flex items-center justify-between px-1 mb-2.5 shrink-0 pt-2 border-t border-white/10">
                 <span className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                  Direct Chat (1-on-1)
+                  <User className="w-3.5 h-3.5 text-amber-400" />
+                  Squad Roster
                 </span>
                 <span className="text-xs font-mono font-medium text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  Closed Net
+                  {directPartners.length} Shooters
                 </span>
               </div>
 
               <div className="space-y-1.5">
                 {directPartners.map((partner) => {
-                  const isActive = currentChannel === partner.id;
-                  const unread = unreadCounts[partner.id] || 0;
                   const isRO = partner.callsign === "RO" || partner.callsign === "RO BOT" || partner.id === "dm_ro";
                   const pCallsign = (partner.callsign || "").toUpperCase();
                   const isMasterOwner = partner.role === "MASTER_OWNER" || pCallsign === "ROB" || pCallsign === "RADAR";
@@ -219,18 +217,10 @@ export function ChatChannelSidebar({
                   return (
                     <div
                       key={partner.id}
-                      className={`group w-full rounded-xl transition-all border flex items-center justify-between p-2.5 ${
-                        isActive
-                          ? "bg-white/[0.08] border-amber-500/30 text-white"
-                          : "bg-transparent border-transparent hover:bg-white/[0.04] text-slate-300"
-                      }`}
+                      onClick={() => onOpenDossier && onOpenDossier(partner)}
+                      className="group w-full rounded-xl transition-all border border-transparent hover:bg-white/[0.04] text-slate-300 flex items-center justify-between p-2.5 cursor-pointer"
                     >
-                      {/* Left: Switch to DM channel */}
-                      <button
-                        type="button"
-                        onClick={() => setCurrentChannel(partner.id)}
-                        className="flex items-center gap-2.5 min-w-0 flex-1 text-left"
-                      >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 text-left">
                         {/* Avatar / Icon with Status Dot */}
                         <div className="relative shrink-0">
                           <div
@@ -246,8 +236,6 @@ export function ChatChannelSidebar({
                           >
                             {partner.image ? (
                               <img src={partner.image} alt="" className="w-full h-full object-cover" />
-                            ) : isRO ? (
-                              "🤖"
                             ) : isMasterOwner ? (
                               <Radar className="w-4 h-4 text-cyan-300 stroke-[2.2] drop-shadow-[0_0_6px_rgba(6,182,212,0.85)] animate-pulse" />
                             ) : (
@@ -268,24 +256,17 @@ export function ChatChannelSidebar({
                         {/* Partner Name & Subtitle */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <span className={`text-sm font-bold truncate ${
-                              isActive ? (isRO ? "text-cyan-300" : isMasterOwner ? "text-blue-300" : "text-amber-300") : "text-white"
-                            }`}>
+                            <span className="text-sm font-bold truncate text-white group-hover:text-amber-300 transition-colors">
                               {partner.name}
                             </span>
                             <span className={`text-xs font-mono font-bold shrink-0 ${
-                              isRO ? "text-cyan-400" : isMasterOwner ? "text-blue-400" : "text-slate-300"
+                              isMasterOwner ? "text-blue-400" : "text-slate-300"
                             }`}>
                               [{partner.callsign}]
                             </span>
                           </div>
                           <div className="text-xs font-mono text-slate-300 truncate flex items-center gap-1">
-                            {isRO ? (
-                              <span className="text-cyan-300 font-semibold flex items-center gap-1">
-                                <Bot className="w-3 h-3 text-cyan-400" />
-                                <span>AI Range Officer · 24/7 Intel</span>
-                              </span>
-                            ) : isOnline ? (
+                            {isOnline ? (
                               <span className="text-emerald-400 flex items-center gap-1 font-medium">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shrink-0 animate-pulse" />
                                 <span>Active now</span>
@@ -302,30 +283,19 @@ export function ChatChannelSidebar({
                             )}
                           </div>
                         </div>
-                      </button>
+                      </div>
 
-                      {/* Right: Unread Badge + Dossier Info Trigger */}
-                      <div className="flex items-center gap-1 shrink-0 ml-1.5">
-                        {unread > 0 && !isActive && (
-                          <span className="min-w-[18px] h-4.5 px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
-                            {unread}
-                          </span>
-                        )}
-
-                        {onOpenDossier && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenDossier(partner);
-                            }}
-                            className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-amber-300 transition-colors"
+                      {/* Right: Dossier Info Trigger */}
+                      {onOpenDossier && (
+                        <div className="flex items-center gap-1 shrink-0 ml-1.5">
+                          <span
+                            className="p-1 rounded-lg group-hover:bg-white/10 text-slate-400 group-hover:text-amber-300 transition-colors"
                             title={`View ${partner.callsign} Profile`}
                           >
                             <Info className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}

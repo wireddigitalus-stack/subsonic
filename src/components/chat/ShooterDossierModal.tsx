@@ -238,22 +238,8 @@ export function ShooterDossierModal({
           </div>
         )}
 
-        {/* Action Buttons: Direct Chat & Full Profile */}
+        {/* Action Button: Full Profile */}
         <div className="pt-2 space-y-2">
-          <button
-            type="button"
-            onClick={() => onStartDirectComms(shooter)}
-            className={`w-full py-3 px-4 rounded-xl font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
-              isRO
-                ? "bg-cyan-500 hover:bg-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.35)]"
-                : "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.35)]"
-            }`}
-          >
-            <Lock className="w-4 h-4 text-black" />
-            <span>Open Direct Chat with {shooter.callsign}</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
-          </button>
-
           {!isRO && (
             <Link
               href={`/shooters?id=${shooter.id?.replace(/^dm_/, "") || shooter.callsign.toLowerCase()}`}
@@ -264,11 +250,6 @@ export function ShooterDossierModal({
               <span>View Full Shooter Profile &rarr;</span>
             </Link>
           )}
-
-          <p className="text-[10px] text-center text-slate-500 font-mono mt-2 flex items-center justify-center gap-1">
-            <Lock className="w-2.5 h-2.5 text-emerald-400" />
-            <span>Closed Net · Point-to-Point Transmission</span>
-          </p>
         </div>
       </div>
     </div>

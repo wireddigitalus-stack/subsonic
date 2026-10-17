@@ -194,19 +194,6 @@ export function ActiveMarksmenModal({
                         )}
                       </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onPlayChirp) onPlayChirp(1200);
-                        onStartDirectComms(partner);
-                        onClose();
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 text-xs font-medium shrink-0 transition-all flex items-center gap-1.5"
-                    >
-                      <MessageSquare className="w-3 h-3 text-cyan-400" />
-                      <span>Message</span>
-                    </button>
                   </div>
                 );
               })
@@ -257,18 +244,6 @@ export function ActiveMarksmenModal({
                         </span>
                       </div>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (onPlayChirp) onPlayChirp(1200);
-                        onStartDirectComms(partner);
-                        onClose();
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors shrink-0"
-                    >
-                      DM
-                    </button>
                   </div>
                 );
               })}

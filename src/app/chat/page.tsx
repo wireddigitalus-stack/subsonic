@@ -2376,125 +2376,31 @@ export default function ChatPage() {
 
       {/* 2. CHANNEL SELECTOR — ZERO HORIZONTAL OVERFLOW ON MOBILE (Hidden on mobile if in Fullscreen since top bar handles it) */}
       <div id="tour-step-channels" className={`shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1 ${isFullscreen ? "hidden md:block" : ""}`}>
-        {/* MOBILE TACTICAL FREQUENCY DIAL BUTTON (Fits 100% width, no side-scroll) */}
+        {/* MOBILE OPEN ROOM BAR (Fits 100% width, no side-scroll) */}
         <div className="md:hidden">
-          <div className="flex items-center gap-1.5">
-            {isDirectMode && (
-              <button
-                type="button"
-                onClick={handleBackToInvitational}
-                className="p-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-all shadow-sm"
-                title="Return to #invitational"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span className="font-mono uppercase font-bold text-xs">BACK</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                setChannelModalInitialTab("DIRECT");
-                setIsChannelModalOpen(true);
-                playTacticalChirp(1100);
-              }}
-              className="w-full p-2.5 px-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.06] flex items-center justify-between gap-2 transition-all active:scale-[0.99]"
-            >
-              {isDirectMode && activeDirectPartner ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="relative shrink-0">
-                    <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-1 overflow-hidden ${
-                        activeDirectPartner.role === "MASTER_OWNER"
-                          ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
-                          : activeDirectPartner.role === "OWNER_ADMIN"
-                          ? "bg-emerald-500 text-black ring-emerald-300 font-black"
-                          : "bg-white/10 text-amber-400 ring-white/10"
-                      }`}
-                    >
-                      {activeDirectPartner.image ? (
-                        <img
-                          src={activeDirectPartner.image}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      ) : activeDirectPartner.role === "MASTER_OWNER" ? (
-                        <Radar className="w-3.5 h-3.5 text-cyan-300 stroke-[2.2]" />
-                      ) : activeDirectPartner.role === "OWNER_ADMIN" ? (
-                        "A"
-                      ) : (
-                        activeDirectPartner.callsign.slice(0, 2)
-                      )}
-                    </div>
-                    <span
-                      className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
-                        activeDirectPartner.status === "online"
-                          ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
-                          : "bg-zinc-600"
-                      }`}
-                    />
-                  </div>
-                  <div className="min-w-0 text-left">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-white text-xs whitespace-nowrap truncate max-w-[130px]">
-                        {activeDirectPartner.name}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400 font-bold shrink-0">
-                        [{activeDirectPartner.callsign}]
-                      </span>
-                    </div>
-                    <div className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          activeDirectPartner.status === "online"
-                            ? "bg-emerald-400 animate-pulse"
-                            : "bg-zinc-500"
-                        }`}
-                      />
-                      <span className="truncate">
-                        {activeDirectPartner.status === "online"
-                          ? "Direct Net Active"
-                          : "Offline"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-7 h-7 rounded-lg font-mono font-black text-sm flex items-center justify-center shrink-0 bg-amber-500 text-black">
-                    #
-                  </div>
-                  <div className="min-w-0 text-left">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-white text-sm whitespace-nowrap truncate max-w-[150px]">
-                        {currentChannelData.name}
-                      </span>
-                      <span className="text-xs font-mono px-2 py-0.5 rounded font-bold border shrink-0 bg-amber-500/20 text-amber-300 border-amber-500/30">
-                        {currentChannelData.badge}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 shrink-0">
-                {!isDirectMode && unreadDmCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-red-500 text-white font-mono text-[10px] font-bold flex items-center gap-1 animate-pulse">
-                    <Lock className="w-2.5 h-2.5" />
-                    <span>{unreadDmCount} Direct</span>
+          <div className="w-full p-2.5 px-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-lg font-mono font-black text-sm flex items-center justify-center shrink-0 bg-amber-500 text-black">
+                #
+              </div>
+              <div className="min-w-0 text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono font-bold text-white text-sm whitespace-nowrap truncate max-w-[150px]">
+                    {currentChannelData.name}
                   </span>
-                )}
-                {!isDirectMode && unreadDmCount === 0 && (
-                  <span className="text-xs font-mono text-cyan-200 bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
-                    <MessageSquare className="w-3 h-3 text-cyan-400" />
-                    {currentChannelEngagement.postCount}
+                  <span className="text-xs font-mono px-2 py-0.5 rounded font-bold border shrink-0 bg-amber-500/20 text-amber-300 border-amber-500/30">
+                    {currentChannelData.badge}
                   </span>
-                )}
-                <div className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/35 font-mono text-xs font-bold text-emerald-300 flex items-center gap-1">
-                  <Lock className="w-3 h-3 text-emerald-400" />
-                  <span>{isDirectMode ? "SWITCH" : "DIRECT"}</span>
                 </div>
               </div>
-            </button>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-mono text-cyan-200 bg-cyan-950/40 border border-cyan-500/30 px-2 py-0.5 rounded flex items-center gap-1 font-semibold">
+                <MessageSquare className="w-3 h-3 text-cyan-400" />
+                {currentChannelEngagement.postCount}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -2539,24 +2445,6 @@ export default function ChatPage() {
                   </button>
                 );
               })}
-
-              {/* Active Direct Comms Pill */}
-              {isDirectMode && activeDirectPartner && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-emerald-950/40 border border-emerald-500/30 text-white shrink-0 animate-fadeIn">
-                  <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-emerald-300 font-bold truncate max-w-[200px]">
-                    DM: {activeDirectPartner.name} [{activeDirectPartner.callsign}]
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleBackToInvitational}
-                    className="ml-1 p-0.5 rounded hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
-                    title="Close direct view and return to #invitational"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>

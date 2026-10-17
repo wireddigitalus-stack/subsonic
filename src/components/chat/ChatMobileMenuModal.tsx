@@ -172,43 +172,6 @@ export function ChatMobileMenuModal({
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <div className="space-y-1 pt-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold px-1">
-              Frequencies & Comms
-            </span>
-
-            {/* Direct Comms (1-on-1) */}
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenDirectChats();
-              }}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <Lock className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Direct Comms (1-on-1)</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Private encrypted channels
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {unreadDmCount > 0 && (
-                  <span className="min-w-[18px] h-4.5 px-1.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-                    {unreadDmCount}
-                  </span>
-                )}
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </div>
-            </button>
-          </div>
-
           {/* Tools & Utilities */}
           <div className="space-y-1 pt-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold px-1">
