@@ -25,6 +25,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
+import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
 
 // Seed fallback data to guarantee immediate rendering even if network lags
 const FALLBACK_SHOOTERS: ShooterProfile[] = [
@@ -142,6 +143,7 @@ function ShootersContent() {
   const [selectedShooter, setSelectedShooter] = useState<ShooterProfile>(FALLBACK_SHOOTERS[0]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
 
   useEffect(() => {
     const fetchShooters = async () => {
@@ -449,13 +451,24 @@ function ShootersContent() {
                     </span>
                   </div>
 
-                  <Link
-                    href={`/shooters/${selectedShooter.id}`}
-                    className="px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                  >
-                    <span>Full SEO Profile</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </Link>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsProfileEditOpen(true)}
+                      className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Edit Profile &amp; Photos</span>
+                    </button>
+
+                    <Link
+                      href={`/shooters/${selectedShooter.id}`}
+                      className="px-3.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                    >
+                      <span>Full SEO Profile</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
               </div>
 
@@ -567,6 +580,21 @@ function ShootersContent() {
         </div>
       </section>
 
+      <ProfileEditModal
+        isOpen={isProfileEditOpen}
+        onClose={() => setIsProfileEditOpen(false)}
+        initialShooter={selectedShooter}
+        onSaved={(updated) => {
+          setSelectedShooter(updated);
+          setShooters((prev) =>
+            prev.map((s) =>
+              s.id === updated.id || s.callsign?.toUpperCase() === updated.callsign?.toUpperCase()
+                ? updated
+                : s
+            )
+          );
+        }}
+      />
     </div>
   );
 }

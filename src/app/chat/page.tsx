@@ -2113,9 +2113,7 @@ export default function ChatPage() {
                       type="button"
                       onClick={() => {
                         setIsChatMobileUserMenuOpen(false);
-                        setProfileForm(shooterProfile);
-                        setProfileActiveTab("EDIT");
-                        setIsProfileModalOpen(true);
+                        setIsFullProfileModalOpen(true);
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                     >
@@ -2346,9 +2344,7 @@ export default function ChatPage() {
                         type="button"
                         onClick={() => {
                           setIsChatUserMenuOpen(false);
-                          setProfileForm(shooterProfile);
-                          setProfileActiveTab("EDIT");
-                          setIsProfileModalOpen(true);
+                          setIsFullProfileModalOpen(true);
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                       >
@@ -2877,9 +2873,7 @@ export default function ChatPage() {
             onOpenDossier={handleOpenDossier}
             shooterProfile={shooterProfile}
             onEditProfile={() => {
-              setProfileForm(shooterProfile);
-              setProfileActiveTab("EDIT");
-              setIsProfileModalOpen(true);
+              setIsFullProfileModalOpen(true);
             }}
             onLogout={handleLogout}
             onlineCallsigns={onlineCallsigns}
@@ -3004,7 +2998,10 @@ export default function ChatPage() {
 
                 <button
                   type="button"
-                  onClick={() => setProfileActiveTab("EDIT")}
+                  onClick={() => {
+                    setIsProfileModalOpen(false);
+                    setIsFullProfileModalOpen(true);
+                  }}
                   className={`flex-1 py-2 px-3 rounded-xl text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
                     profileActiveTab === "EDIT"
                       ? isMasterOwner
@@ -3013,8 +3010,8 @@ export default function ChatPage() {
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  <Sliders className="w-3.5 h-3.5" />
-                  <span>{isMasterOwner ? "Edit Systems Profile" : "Edit Callsign & Rig"}</span>
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Edit Profile &amp; Photos</span>
                 </button>
               </div>
 
@@ -3042,14 +3039,7 @@ export default function ChatPage() {
                       className="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95"
                     >
                       <Camera className="w-4 h-4" />
-                      <span>Upload Photos & Edit Full Dossier 📸</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setProfileActiveTab("EDIT")}
-                      className="text-[11px] font-mono text-slate-400 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
-                    >
-                      <span>{isMasterOwner ? "Quick edit system credentials or tech architecture →" : "Quick edit callsign or rifle build →"}</span>
+                      <span>Edit Profile &amp; Photos</span>
                     </button>
                   </div>
                 </div>
@@ -3413,9 +3403,7 @@ export default function ChatPage() {
           setIsProfileModalOpen(true);
         }}
         onEditProfile={() => {
-          setProfileForm(shooterProfile);
-          setProfileActiveTab("EDIT");
-          setIsProfileModalOpen(true);
+          setIsFullProfileModalOpen(true);
         }}
         onOpenChannels={() => {
           setChannelModalInitialTab("MATCH");

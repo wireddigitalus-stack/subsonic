@@ -32,7 +32,7 @@ export function formatBytes(bytes: number): string {
 }
 
 export async function compressImageFile(
-  file: File,
+  file: File | Blob,
   _options: CompressionOptions = {}
 ): Promise<CompressionResult> {
   const originalSizeBytes = file.size;
