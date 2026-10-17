@@ -619,7 +619,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                     <img
                       src={shooter.image!}
                       alt={displayName}
-                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-zinc-900/90 via-black to-zinc-950 relative overflow-hidden">
@@ -854,7 +854,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 <img
                   src={shooter.actionPhoto}
                   alt={`${displayName} in competition`}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-top"
                 />
               </div>
             </div>

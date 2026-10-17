@@ -518,7 +518,7 @@ export function ProfileEditModal({
                           <img
                             src={headshotPhoto}
                             alt="Headshot Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-top"
                           />
                         ) : (
                           <div
@@ -537,7 +537,7 @@ export function ProfileEditModal({
                           {headshotPhoto ? "✓ Custom Photo Loaded" : "Default Tactical Insignia Active"}
                         </div>
                         <p className="text-[11px] leading-relaxed">
-                          Mobile camera capture and standard gallery images are automatically compressed into ultra-fast WebP format (under 100KB) for instant loading.
+                          Original image resolution is preserved without cropping or resizing, aligned to top so faces remain clearly visible.
                         </p>
                       </div>
                     </div>
@@ -577,7 +577,7 @@ export function ProfileEditModal({
                           {isCompressingAction ? (
                             <>
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                              <span>Optimizing...</span>
+                              <span>Loading...</span>
                             </>
                           ) : (
                             <>
@@ -606,7 +606,7 @@ export function ProfileEditModal({
                         <img
                           src={actionPhoto}
                           alt="Action Rig Preview"
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover object-top"
                         />
                       </div>
                     ) : (

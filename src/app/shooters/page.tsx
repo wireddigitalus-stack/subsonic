@@ -264,39 +264,13 @@ function ShootersContent() {
         </nav>
       </div>
 
-      {/* Header with Call-to-Action */}
+      {/* Header */}
       <section className="relative pt-6 pb-8 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-semibold">
               <Users className="w-3.5 h-3.5" />
               <span>SUBSONIC SOCIETY ATHLETE PROFILES</span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2.5">
-              <Link
-                href="/chat"
-                className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-white border border-emerald-500/40 font-bold text-xs flex items-center gap-2 shadow-[0_0_12px_rgba(16,185,129,0.2)] transition-all active:scale-95"
-                title="Return to Live Chat Room"
-              >
-                <MessageSquare className="w-4 h-4 text-emerald-400" />
-                <span>← Return to Live Chat</span>
-              </Link>
-
-              <Link
-                href="/invite/pro"
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all active:scale-95"
-              >
-                <Sparkles className="w-4 h-4 fill-black" />
-                <span>Claim Pro Profile (VIP Code)</span>
-              </Link>
-
-              <Link
-                href="/invite"
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs border border-white/10 transition-all"
-              >
-                <span>Member Invite</span>
-              </Link>
             </div>
           </div>
 
@@ -305,9 +279,6 @@ function ShootersContent() {
               MEET THE MARKSMEN. <br />
               <span className="amber-gradient-text">GEAR, DISCIPLINE & INTERVIEWS.</span>
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Real competitors. Real equipment. No sponsored fluff. Explore the exact actions, barrels, triggers, and ammunition lots run by regional and national precision rimfire podium finishers.
-            </p>
           </div>
         </div>
       </section>
@@ -321,13 +292,6 @@ function ShootersContent() {
               <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold px-1">
                 Featured Competitors ({filteredShooters.length})
               </span>
-              <Link
-                href="/invite/pro"
-                className="text-[11px] font-mono text-amber-400 hover:underline flex items-center gap-1"
-              >
-                <span>Claim Profile (VIP Code)</span>
-                <ChevronRight className="w-3 h-3" />
-              </Link>
             </div>
 
             {/* Quick Search */}
@@ -378,7 +342,7 @@ function ShootersContent() {
                               <img
                                 src={shooter.image!}
                                 alt={getShooterDisplayName(shooter)}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover object-top"
                               />
                             ) : (
                               <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-500/25 via-black to-zinc-900 text-amber-300 font-mono font-black text-xs uppercase tracking-wider">
@@ -438,24 +402,6 @@ function ShootersContent() {
                 })
               )}
             </div>
-
-            {/* VIP Code Claim Card */}
-            <div className="p-5 rounded-2xl ios-glass border border-amber-500/20 bg-amber-500/5 space-y-3 mt-4 lg:mt-6">
-              <span className="text-xs font-mono text-amber-400 font-bold uppercase block flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Competitor VIP Onboarding</span>
-              </span>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Have an invitation code from match directors? Enter your VIP code to build and publish your competitor profile.
-              </p>
-              <Link
-                href="/invite/pro"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                <span>Redeem VIP Code</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
           </div>
 
           {/* Right Column: Deep Profile & Rifle Breakdown (Desktop Live Preview) */}
@@ -469,7 +415,7 @@ function ShootersContent() {
                       <img
                         src={selectedShooter.image}
                         alt={getShooterDisplayName(selectedShooter)}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-amber-400 font-black text-xl">
@@ -567,21 +513,21 @@ function ShootersContent() {
                     <img
                       src={selectedShooter.posterImage}
                       alt={`${selectedShooter.name} Spotlight Poster`}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain object-top"
                     />
                   </div>
                 </div>
-              ) : selectedShooter.actionPhoto ? (
+              ) : isRealShooterPhoto(selectedShooter.actionPhoto) ? (
                 <div className="space-y-2">
                   <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider flex items-center gap-1">
                     <Camera className="w-3 h-3 text-cyan-400" />
                     <span>Rifle Rig in Action</span>
                   </span>
-                  <div className="w-full h-48 sm:h-64 rounded-2xl overflow-hidden border border-white/10 relative bg-black">
+                  <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/10 relative bg-black">
                     <img
                       src={selectedShooter.actionPhoto}
                       alt={`${selectedShooter.name} Rifle Rig`}
-                      className="w-full h-full object-cover object-center"
+                      className="w-full h-full object-cover object-top"
                     />
                   </div>
                 </div>
@@ -621,18 +567,6 @@ function ShootersContent() {
         </div>
       </section>
 
-      {/* Floating Tactical Back to Chat Quick-Return Button (Desktop) */}
-      <div className="fixed bottom-6 right-6 z-40 hidden md:block">
-        <Link
-          href="/chat"
-          className="ios-glass px-4 py-2.5 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-500/50 text-emerald-300 hover:text-white font-mono text-xs font-bold flex items-center gap-2 shadow-[0_4px_20px_rgba(16,185,129,0.35)] transition-all active:scale-95 hover:border-emerald-400 group"
-          title="Return directly to Subsonic Society Live Chat"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-          <MessageSquare className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-          <span>← Return to Live Chat</span>
-        </Link>
-      </div>
     </div>
   );
 }

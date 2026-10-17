@@ -43,6 +43,15 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
   const [isSavingShooter, setIsSavingShooter] = useState(false);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
 
+  const readFileAsOriginalDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Failed to read image"));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const formatShooterProfileText = (shooter: ShooterProfile | Partial<ShooterProfile>) => {
     const lines = [
       `=== SUBSONIC SOCIETY COMPETITOR PROFILE ===`,
@@ -63,12 +72,154 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
       shooter.rifleSetup?.optic ? `Optic: ${shooter.rifleSetup.optic}` : null,
       shooter.rifleSetup?.ammoLot ? `Ammo Lot: ${shooter.rifleSetup.ammoLot}` : null,
       shooter.quote ? `Quote: "${shooter.quote}"` : null,
+      shooter.image ? `Headshot Image: ${shooter.image}` : null,
+      shooter.actionPhoto ? `Action Shot Banner: ${shooter.actionPhoto}` : null,
+      shooter.posterImage ? `Poster Image: ${shooter.posterImage}` : null,
       `Status: ${shooter.status || "PUBLISHED"}`,
       `Registered: ${shooter.createdAt || "N/A"}`,
       `Live Profile URL: https://subsonicsociety.com/shooters?id=${shooter.id}`,
       `==========================================`
     ].filter(Boolean).join("\n");
     return lines;
+  };
+
+  const applyPastedProfileText = (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    // If user pasted a direct image URL or data URL
+    if (trimmed.startsWith("data:image/") || /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)/i.test(trimmed) || trimmed.startsWith("/assets/") || trimmed.startsWith("/images/")) {
+      setEditForm((prev) => ({
+        ...prev,
+        image: prev.image && prev.image !== "/images/SS-RWB-LOGO.png" ? prev.image : trimmed,
+        actionPhoto: trimmed,
+      }));
+      setSaveNotice("Image pasted into shooter profile (original size preserved).");
+      return;
+    }
+
+    const extractLine = (label: string): string | undefined => {
+      const regex = new RegExp(`^${label}:\\s*(.+)$`, "mi");
+      const m = trimmed.match(regex);
+      return m ? m[1].trim() : undefined;
+    };
+
+    const fullName = extractLine("Full Name");
+    const callsign = extractLine("Callsign");
+    const division = extractLine("Division") || extractLine("Classification / Division");
+    const ranking = extractLine("Ranking");
+    const homeRange = extractLine("Home Range");
+    const podiums = extractLine("Podiums") || extractLine("Career Podiums");
+    const pin = extractLine("Chat Access PIN") || extractLine("Login PIN");
+    const accolades = extractLine("Accolades");
+    const sponsors = extractLine("Sponsors");
+    const action = extractLine("Rifle Action") || extractLine("Primary Rifle Rig");
+    const barrel = extractLine("Barrel");
+    const trigger = extractLine("Trigger");
+    const chassis = extractLine("Chassis");
+    const optic = extractLine("Optic");
+    const ammoLot = extractLine("Ammo Lot");
+    const quoteRaw = extractLine("Quote");
+    const headshotImg = extractLine("Headshot Image");
+    const actionShotImg = extractLine("Action Shot Banner");
+    const posterImg = extractLine("Poster Image");
+
+    setEditForm((prev) => ({
+      ...prev,
+      name: fullName && fullName !== "N/A" ? fullName : prev.name,
+      callsign: callsign && callsign !== "N/A" ? callsign.toUpperCase() : prev.callsign,
+      division: division && division !== "N/A" ? division : prev.division,
+      ranking: ranking && ranking !== "N/A" ? ranking : prev.ranking,
+      homeRange: homeRange && homeRange !== "N/A" ? homeRange : prev.homeRange,
+      podiums: podiums !== undefined ? parseInt(podiums, 10) || 0 : prev.podiums,
+      pin: pin && pin !== "N/A" ? pin : prev.pin,
+      accolades: accolades ? accolades.split(",").map((s) => s.trim()).filter(Boolean) : prev.accolades,
+      sponsors: sponsors ? sponsors.split(",").map((s) => s.trim()).filter(Boolean) : prev.sponsors,
+      quote: quoteRaw ? quoteRaw.replace(/^"|"$/g, "") : prev.quote,
+      image: headshotImg || prev.image,
+      actionPhoto: actionShotImg || prev.actionPhoto,
+      posterImage: posterImg || prev.posterImage,
+      rifleSetup: {
+        action: action && action !== "N/A" ? action : prev.rifleSetup?.action || "",
+        barrel: barrel && barrel !== "N/A" ? barrel : prev.rifleSetup?.barrel || "",
+        trigger: trigger && trigger !== "N/A" ? trigger : prev.rifleSetup?.trigger || "",
+        chassis: chassis && chassis !== "N/A" ? chassis : prev.rifleSetup?.chassis || "",
+        optic: optic && optic !== "N/A" ? optic : prev.rifleSetup?.optic || "",
+        ammoLot: ammoLot && ammoLot !== "N/A" ? ammoLot : prev.rifleSetup?.ammoLot || "",
+      },
+    }));
+    setSaveNotice("Pasted profile & image data applied. Click Save Profile Changes to publish.");
+  };
+
+  const handlePasteFromClipboardButton = async (targetSlot?: "image" | "actionPhoto") => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.read) {
+        try {
+          const items = await navigator.clipboard.read();
+          for (const item of items) {
+            const imageType = item.types.find((t) => t.startsWith("image/"));
+            if (imageType) {
+              const blob = await item.getType(imageType);
+              const file = new File([blob], "pasted-image.png", { type: imageType });
+              const dataUrl = await readFileAsOriginalDataUrl(file);
+              if (targetSlot === "image") {
+                setEditForm((prev) => ({ ...prev, image: dataUrl }));
+                setSaveNotice("Headshot image pasted at original resolution (no resize).");
+              } else if (targetSlot === "actionPhoto") {
+                setEditForm((prev) => ({ ...prev, actionPhoto: dataUrl }));
+                setSaveNotice("Action shot banner pasted at original resolution (no resize).");
+              } else {
+                setEditForm((prev) => ({
+                  ...prev,
+                  image: prev.image && prev.image !== "/images/SS-RWB-LOGO.png" ? prev.image : dataUrl,
+                  actionPhoto: dataUrl,
+                }));
+                setSaveNotice("Image pasted from clipboard at original resolution.");
+              }
+              return;
+            }
+          }
+        } catch {}
+      }
+      if (typeof navigator !== "undefined" && navigator.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (targetSlot && (text.trim().startsWith("data:image/") || text.trim().startsWith("http") || text.trim().startsWith("/"))) {
+          setEditForm((prev) => ({ ...prev, [targetSlot]: text.trim() }));
+          setSaveNotice(`${targetSlot === "image" ? "Headshot" : "Action shot banner"} pasted.`);
+          return;
+        }
+        applyPastedProfileText(text);
+      }
+    } catch {
+      setSaveNotice("Press Cmd+V / Ctrl+V anywhere in this window to paste profile or image.");
+    }
+  };
+
+  const handleModalClipboardPaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith("image/")) {
+          const file = items[i].getAsFile();
+          if (file) {
+            e.preventDefault();
+            const dataUrl = await readFileAsOriginalDataUrl(file);
+            setEditForm((prev) => ({
+              ...prev,
+              image: prev.image && prev.image !== "/images/SS-RWB-LOGO.png" ? prev.image : dataUrl,
+              actionPhoto: dataUrl,
+            }));
+            setSaveNotice("Clipboard image pasted at original resolution (not edited or resized).");
+            return;
+          }
+        }
+      }
+    }
+    const text = e.clipboardData?.getData("text/plain");
+    if (text && text.includes("=== SUBSONIC SOCIETY")) {
+      e.preventDefault();
+      applyPastedProfileText(text);
+    }
   };
 
   const handleCopyShooterProfile = (shooter: ShooterProfile | Partial<ShooterProfile>, targetId?: string) => {
@@ -98,12 +249,12 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
       const res = await fetch("/api/shooters", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({ ...editForm, isProfileUpdate: true }),
       });
 
       const data = await res.json();
       if (res.ok && data.shooter) {
-        setSaveNotice("Profile saved successfully.");
+        setSaveNotice("Profile & images saved successfully.");
         if (onShooterUpdated) {
           onShooterUpdated(data.shooter);
         }
@@ -131,7 +282,7 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
               </h3>
             </div>
             <p className="text-xs text-slate-300">
-              Profiles generated automatically from competitor registrations. View, edit, or copy full profile contents for admin operations.
+              Profiles generated automatically from competitor registrations. View, edit, or copy &amp; paste full profile contents and original uncropped photos.
             </p>
           </div>
 
@@ -192,8 +343,8 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl overflow-hidden border border-amber-400/60 bg-black relative shrink-0">
-                      {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") ? (
-                        <img src={shooter.image} alt={shooter.name} className="w-full h-full object-cover" />
+                      {shooter.image?.startsWith("data:") || shooter.image?.startsWith("/") || shooter.image?.startsWith("http") ? (
+                        <img src={shooter.image} alt={shooter.name} className="w-full h-full object-cover object-top" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-amber-400 font-bold text-xs">
                           {shooter.callsign?.slice(0, 2) || "SS"}
@@ -219,6 +370,17 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                     <span className="text-base font-mono font-black text-amber-400">{shooter.podiums}</span>
                   </div>
                 </div>
+
+                {/* Action Shot Banner Preview in Admin Card if present */}
+                {shooter.actionPhoto && !shooter.actionPhoto.includes("SS-RWB-LOGO") && (
+                  <div className="w-full h-36 rounded-xl overflow-hidden border border-white/10 bg-black relative">
+                    <img
+                      src={shooter.actionPhoto}
+                      alt={`${shooter.name} Action Banner`}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                )}
 
                 {/* Accolades */}
                 {shooter.accolades && shooter.accolades.length > 0 && (
@@ -268,7 +430,7 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                     type="button"
                     onClick={() => handleCopyShooterProfile(shooter, shooter.id)}
                     className="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                    title="Copy all contents of shooter profile for easy use by admin"
+                    title="Copy all contents & images of shooter profile"
                   >
                     <Copy className="w-3.5 h-3.5 text-amber-400" />
                     <span>{copiedId === shooter.id ? "✓ Copied!" : "Copy Profile"}</span>
@@ -280,13 +442,13 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                     className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold flex items-center gap-1.5 transition-colors"
                   >
                     <Edit3 className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Edit Profile</span>
+                    <span>Edit Profile &amp; Photos</span>
                   </button>
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   <Link
-                    href={`/shooters?id=${shooter.id}`}
+                    href={`/shooters/${shooter.id}`}
                     target="_blank"
                     className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-bold flex items-center gap-1 transition-colors"
                   >
@@ -309,34 +471,46 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
       </div>
 
       {/* ==================================================================== */}
-      {/* SHOOTER PROFILE INSPECTION & EDIT MODAL (WITH ONE-CLICK COPY ALL)    */}
+      {/* SHOOTER PROFILE INSPECTION & EDIT MODAL (WITH COPY & PASTE + IMAGES) */}
       {/* ==================================================================== */}
       {inspectingShooter && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+        <div
+          onPaste={handleModalClipboardPaste}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
           <div className="w-full max-w-2xl max-h-[92vh] overflow-y-auto ios-glass-card rounded-3xl p-5 sm:p-7 border border-amber-500/40 shadow-tactical-glow relative space-y-5 my-auto">
-            {/* Modal Header with Copy Profile Button */}
+            {/* Modal Header with Copy & Paste Profile Buttons */}
             <div className="flex items-start justify-between border-b border-white/10 pb-4 gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Target className="w-5 h-5 text-amber-400" />
                   <h3 className="text-base sm:text-lg font-black text-white">
-                    COMPETITOR PROFILE &amp; RIG SPECS
+                    COMPETITOR PROFILE, PHOTOS &amp; RIG SPECS
                   </h3>
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                     {editForm.callsign || inspectingShooter.callsign}
                   </span>
                 </div>
                 <p className="text-xs text-slate-300">
-                  Inspect and edit competitor profile details or copy entire record for administrative use.
+                  Copy or paste full profile data &amp; images (Cmd+V / Ctrl+V). Images are never cropped or resized and always align to top.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handlePasteFromClipboardButton()}
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  title="Paste copied profile or clipboard image"
+                >
+                  <span>Paste Profile / Image</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => handleCopyShooterProfile(editForm, "modal_header")}
                   className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                  title="Copy all contents of shooter profile"
+                  title="Copy all contents & images of shooter profile"
                 >
                   <Copy className="w-3.5 h-3.5 text-amber-400" />
                   <span>{copiedId === "modal_header" ? "✓ Profile Copied!" : "Copy Full Profile"}</span>
@@ -360,6 +534,150 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
 
             {/* Edit Form */}
             <form onSubmit={handleSaveShooter} className="space-y-4 pt-1">
+              {/* Paired Shooter Images: Headshot & Action Shot Banner (Copy / Paste / Original Upload) */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider">
+                    Shooter Profile Images (Original Resolution • Top-Aligned)
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Paste image or URL directly
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Headshot Portrait */}
+                  <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-mono text-slate-200 uppercase font-bold">
+                        Headshot / Portrait Photo
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        {editForm.image && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard?.writeText(editForm.image || "");
+                              setSaveNotice("Headshot image copied to clipboard.");
+                            }}
+                            className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono text-amber-300"
+                          >
+                            Copy
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handlePasteFromClipboardButton("image")}
+                          className="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-[10px] font-mono text-cyan-300"
+                        >
+                          Paste
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="w-full h-36 rounded-xl overflow-hidden border border-white/10 bg-black flex items-center justify-center">
+                      {editForm.image && !editForm.image.includes("SS-RWB-LOGO") ? (
+                        <img
+                          src={editForm.image}
+                          alt="Headshot Preview"
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <span className="text-[11px] font-mono text-slate-500">No Headshot Set</span>
+                      )}
+                    </div>
+
+                    <input
+                      type="text"
+                      value={editForm.image || ""}
+                      onChange={(e) => setEditForm((prev) => ({ ...prev, image: e.target.value }))}
+                      placeholder="Paste image URL or data:image/..."
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-white/10 text-white text-[11px] font-mono focus:outline-none focus:border-amber-400"
+                    />
+
+                    <label className="block w-full text-center py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-[11px] font-mono font-bold cursor-pointer transition-colors">
+                      <span>Upload Original Headshot</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const dataUrl = await readFileAsOriginalDataUrl(file);
+                          setEditForm((prev) => ({ ...prev, image: dataUrl }));
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {/* Action Shot Banner */}
+                  <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-mono text-cyan-300 uppercase font-bold">
+                        Action Shot Banner
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        {editForm.actionPhoto && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard?.writeText(editForm.actionPhoto || "");
+                              setSaveNotice("Action shot banner copied to clipboard.");
+                            }}
+                            className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono text-amber-300"
+                          >
+                            Copy
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handlePasteFromClipboardButton("actionPhoto")}
+                          className="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-[10px] font-mono text-cyan-300"
+                        >
+                          Paste
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="w-full h-36 rounded-xl overflow-hidden border border-white/10 bg-black flex items-center justify-center">
+                      {editForm.actionPhoto && !editForm.actionPhoto.includes("SS-RWB-LOGO") ? (
+                        <img
+                          src={editForm.actionPhoto}
+                          alt="Action Banner Preview"
+                          className="w-full h-full object-cover object-top"
+                        />
+                      ) : (
+                        <span className="text-[11px] font-mono text-slate-500">No Action Banner Set</span>
+                      )}
+                    </div>
+
+                    <input
+                      type="text"
+                      value={editForm.actionPhoto || ""}
+                      onChange={(e) => setEditForm((prev) => ({ ...prev, actionPhoto: e.target.value }))}
+                      placeholder="Paste action shot URL or data:image/..."
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-black/60 border border-white/10 text-white text-[11px] font-mono focus:outline-none focus:border-cyan-400"
+                    />
+
+                    <label className="block w-full text-center py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-[11px] font-mono font-bold cursor-pointer transition-colors">
+                      <span>Upload Original Action Banner</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const dataUrl = await readFileAsOriginalDataUrl(file);
+                          setEditForm((prev) => ({ ...prev, actionPhoto: dataUrl }));
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[11px] font-mono text-slate-300 uppercase">
@@ -495,7 +813,7 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                     type="button"
                     onClick={() => handleCopyShooterProfile(editForm, "modal_footer")}
                     className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-amber-300 font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all"
-                    title="Copy all contents of shooter profile"
+                    title="Copy all contents & images of shooter profile"
                   >
                     <Copy className="w-4 h-4 text-amber-400" />
                     <span>{copiedId === "modal_footer" ? "✓ Profile Copied!" : "Copy All Profile Data"}</span>

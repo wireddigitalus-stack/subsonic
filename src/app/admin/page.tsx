@@ -304,6 +304,8 @@ export default function AdminDashboardPage() {
     quote?: string;
     accolades?: string[];
     sponsors?: string[];
+    image?: string;
+    actionPhoto?: string;
   }>({
     member_id: "",
     full_name: "",
@@ -328,6 +330,8 @@ export default function AdminDashboardPage() {
     quote: "",
     accolades: [],
     sponsors: [],
+    image: "",
+    actionPhoto: "",
   });
   const [memberModalTab, setMemberModalTab] = useState<"DETAILS" | "BLUEPRINT" | "PASS">("DETAILS");
   const [isSavingMember, setIsSavingMember] = useState(false);
@@ -918,6 +922,8 @@ export default function AdminDashboardPage() {
       quote: shooter?.quote || "",
       accolades: shooter?.accolades || [],
       sponsors: shooter?.sponsors || [],
+      image: shooter?.image || "",
+      actionPhoto: shooter?.actionPhoto || "",
     });
     setMemberModalTab("DETAILS");
     setShowDeleteConfirm(false);
@@ -953,7 +959,7 @@ export default function AdminDashboardPage() {
             s.name?.toLowerCase() === memberForm.full_name.toLowerCase()
         );
 
-        if (matchingShooter || memberForm.action || memberForm.optic || memberForm.shooterId || memberForm.role === "PRO_COMPETITOR") {
+        if (matchingShooter || memberForm.action || memberForm.optic || memberForm.shooterId || memberForm.image || memberForm.actionPhoto || memberForm.role === "PRO_COMPETITOR") {
           try {
             const shooterPayload = {
               id: memberForm.shooterId || matchingShooter?.id || memberForm.callsign.toLowerCase().replace(/[^a-z0-9]/g, "_"),
@@ -964,6 +970,8 @@ export default function AdminDashboardPage() {
               podiums: Number(memberForm.podiums) || 0,
               homeRange: memberForm.homeRange || "The Hideout, Bristol TN",
               pin: memberForm.pin,
+              image: memberForm.image || matchingShooter?.image,
+              actionPhoto: memberForm.actionPhoto || matchingShooter?.actionPhoto,
               rifleSetup: {
                 action: memberForm.action || "",
                 barrel: memberForm.barrel || "",
@@ -1031,6 +1039,8 @@ export default function AdminDashboardPage() {
       memberForm.homeRange ? `Home Range: ${memberForm.homeRange}` : null,
       memberForm.accolades && memberForm.accolades.length > 0 ? `Accolades: ${memberForm.accolades.join(", ")}` : null,
       memberForm.sponsors && memberForm.sponsors.length > 0 ? `Sponsors: ${memberForm.sponsors.join(", ")}` : null,
+      `Headshot Image: ${memberForm.image || "None"}`,
+      `Action Shot Banner: ${memberForm.actionPhoto || "None"}`,
       `Login PIN: ${memberForm.pin || selectedMember.pin || "N/A"}`,
       `Registered: ${selectedMember.created_at || "N/A"}`,
       memberForm.notes ? `Staff Notes: ${memberForm.notes}` : (selectedMember.notes ? `Staff Notes: ${selectedMember.notes}` : null),
@@ -3758,6 +3768,200 @@ export default function AdminDashboardPage() {
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, ammoLot: e.target.value }))}
                         placeholder="e.g. Lapua Center-X Lot 39281"
                         className="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shooter Profile Photos (Original Unresized + Top-Aligned) */}
+                <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-mono text-cyan-400 font-bold uppercase tracking-wider block">
+                      Profile Photos (Paired with Copy &amp; Paste)
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      Original resolution preserved • Top-aligned for faces
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Headshot Image */}
+                    <div className="p-3 rounded-xl bg-black/60 border border-white/10 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono font-bold text-slate-200 uppercase">Headshot / Portrait</span>
+                        {memberForm.image && (
+                          <button
+                            type="button"
+                            onClick={() => setMemberForm((prev) => ({ ...prev, image: "" }))}
+                            className="text-[10px] font-mono text-red-400 hover:underline"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      {memberForm.image && (
+                        <div className="w-full h-36 rounded-lg overflow-hidden border border-white/10 bg-black">
+                          <img
+                            src={memberForm.image}
+                            alt="Headshot preview"
+                            className="w-full h-full object-cover object-top"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1.5">
+                        <label className="flex-1 px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold text-center cursor-pointer transition-colors">
+                          Upload Original
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                if (typeof reader.result === "string") {
+                                  setMemberForm((prev) => ({ ...prev, image: reader.result as string }));
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                        {memberForm.image && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof navigator !== "undefined" && navigator.clipboard && memberForm.image) {
+                                navigator.clipboard.writeText(memberForm.image);
+                                setMemberActionNotice("Headshot image copied to clipboard.");
+                                setTimeout(() => setMemberActionNotice(null), 2500);
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-mono text-[10px] font-bold"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={memberForm.image || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, image: e.target.value }))}
+                        onPaste={(e) => {
+                          const items = e.clipboardData?.items;
+                          if (items) {
+                            for (let i = 0; i < items.length; i++) {
+                              if (items[i].type.startsWith("image/")) {
+                                e.preventDefault();
+                                const file = items[i].getAsFile();
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = () => {
+                                    if (typeof reader.result === "string") {
+                                      setMemberForm((prev) => ({ ...prev, image: reader.result as string }));
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                                return;
+                              }
+                            }
+                          }
+                        }}
+                        placeholder="Paste image or URL..."
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-black/50 border border-white/10 text-[11px] font-mono text-slate-300 focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    {/* Action Shot Banner */}
+                    <div className="p-3 rounded-xl bg-black/60 border border-white/10 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono font-bold text-cyan-300 uppercase">Action Shot Banner</span>
+                        {memberForm.actionPhoto && (
+                          <button
+                            type="button"
+                            onClick={() => setMemberForm((prev) => ({ ...prev, actionPhoto: "" }))}
+                            className="text-[10px] font-mono text-red-400 hover:underline"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      {memberForm.actionPhoto && (
+                        <div className="w-full h-36 rounded-lg overflow-hidden border border-white/10 bg-black">
+                          <img
+                            src={memberForm.actionPhoto}
+                            alt="Action banner preview"
+                            className="w-full h-full object-cover object-top"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1.5">
+                        <label className="flex-1 px-2.5 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-bold text-center cursor-pointer transition-colors">
+                          Upload Original
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onload = () => {
+                                if (typeof reader.result === "string") {
+                                  setMemberForm((prev) => ({ ...prev, actionPhoto: reader.result as string }));
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                        {memberForm.actionPhoto && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof navigator !== "undefined" && navigator.clipboard && memberForm.actionPhoto) {
+                                navigator.clipboard.writeText(memberForm.actionPhoto);
+                                setMemberActionNotice("Action shot banner copied to clipboard.");
+                                setTimeout(() => setMemberActionNotice(null), 2500);
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 font-mono text-[10px] font-bold"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={memberForm.actionPhoto || ""}
+                        onChange={(e) => setMemberForm((prev) => ({ ...prev, actionPhoto: e.target.value }))}
+                        onPaste={(e) => {
+                          const items = e.clipboardData?.items;
+                          if (items) {
+                            for (let i = 0; i < items.length; i++) {
+                              if (items[i].type.startsWith("image/")) {
+                                e.preventDefault();
+                                const file = items[i].getAsFile();
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = () => {
+                                    if (typeof reader.result === "string") {
+                                      setMemberForm((prev) => ({ ...prev, actionPhoto: reader.result as string }));
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                                return;
+                              }
+                            }
+                          }
+                        }}
+                        placeholder="Paste image or URL..."
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-black/50 border border-white/10 text-[11px] font-mono text-slate-300 focus:outline-none focus:border-cyan-400"
                       />
                     </div>
                   </div>
