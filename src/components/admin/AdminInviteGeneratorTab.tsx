@@ -341,52 +341,17 @@ export function AdminInviteGeneratorTab() {
           </div>
 
           <form onSubmit={handleGenerate} className="space-y-5">
-            {/* Tier Selector */}
-            <div className="space-y-2">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Invitation Tier *
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setTier("PRO")}
-                  className={`p-4 rounded-2xl text-left border transition-all ${
-                    tier === "PRO"
-                      ? "bg-amber-500/15 border-amber-500/50 shadow-tactical-glow text-white"
-                      : "bg-black/30 border-white/10 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-black text-amber-400 uppercase">
-                      PRO COMPETITOR VIP
-                    </span>
-                    <Sparkles className="w-4 h-4 text-amber-400" />
-                  </div>
-                  <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-                    Unlocks full marksman profile, rifle blueprint, photo compressor & auto-publishes to /shooters/[callsign].
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setTier("MEMBER")}
-                  className={`p-4 rounded-2xl text-left border transition-all ${
-                    tier === "MEMBER"
-                      ? "bg-blue-500/15 border-blue-500/50 shadow-tactical-glow text-white"
-                      : "bg-black/30 border-white/10 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-black text-blue-400 uppercase">
-                      STANDARD MEMBER
-                    </span>
-                    <Users className="w-4 h-4 text-blue-400" />
-                  </div>
-                  <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-                    Issues digital member badge, creates callsign & PIN, and unlocks private chat comms.
-                  </p>
-                </button>
+            {/* Shooter Onboarding Tier Info */}
+            <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/50 text-white">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-black text-amber-400 uppercase">
+                  SHOOTER ONBOARDING INVITE
+                </span>
+                <Sparkles className="w-4 h-4 text-amber-400" />
               </div>
+              <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                Unlocks full shooter profile, rifle setup, photo upload &amp; publishes to /shooters/[callsign].
+              </p>
             </div>
 
             {/* Recipient Details */}

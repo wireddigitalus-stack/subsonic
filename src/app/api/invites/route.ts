@@ -39,7 +39,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const tier: InviteTier = body.tier === "PRO" ? "PRO" : "MEMBER";
+    const tier: InviteTier = "PRO";
     const recipientName = (body.recipientName || "").trim();
     const recipientEmail = (body.recipientEmail || "").trim();
     const recipientPhone = (body.recipientPhone || "").trim();
@@ -87,15 +87,9 @@ export async function POST(req: NextRequest) {
     saveAllInvitesToStorage(updated);
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://subsonic-omega.vercel.app";
-    const inviteUrl =
-      tier === "PRO"
-        ? `${baseUrl}/invite/pro?code=${finalCode}`
-        : `${baseUrl}/invite?code=${finalCode}`;
+    const inviteUrl = `${baseUrl}/invite/pro?code=${finalCode}`;
 
-    const smsText =
-      tier === "PRO"
-        ? `You're invited as a VIP Pro Competitor to Subsonic Society! Your invite code is: ${finalCode}. Build your marksman profile and enter the private Chat Room here: ${inviteUrl}`
-        : `You're invited to join Subsonic Society! Your private access code is: ${finalCode}. Complete your profile and enter the live Chat Room here: ${inviteUrl}`;
+    const smsText = `You're invited as a Competitor to the Subsonic Society Invitational! Your invite code is: ${finalCode}. Build your shooter profile here: ${inviteUrl}`;
 
     return NextResponse.json({
       success: true,
