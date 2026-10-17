@@ -864,7 +864,7 @@ function ProInviteContent() {
           </div>
         </section>
 
-        {/* Step 2: Smart Dual Photo Upload with AI Compression */}
+        {/* Step 2: Shooter Headshot & Action Shooting Image Upload */}
         <section className="p-6 sm:p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-6">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div className="flex items-center gap-3">
@@ -873,12 +873,12 @@ function ProInviteContent() {
               </div>
               <div>
                 <span className="text-[10px] font-mono uppercase text-blue-400 font-bold">Section 2</span>
-                <h2 className="text-lg font-black text-white">Smart Image Optimization (Up to 2 Photos)</h2>
+                <h2 className="text-lg font-black text-white">Shooter Photos (Headshot &amp; Action Shooting Image)</h2>
               </div>
             </div>
 
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
-              Auto-Compress to &lt;150KB
+              Original Resolution
             </span>
           </div>
 
@@ -888,7 +888,7 @@ function ProInviteContent() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono font-bold text-amber-400 uppercase">
-                    1. Marksman Headshot Portrait
+                    1. Shooter Headshot
                   </span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold border border-red-500/30">
                     REQUIRED *
@@ -897,7 +897,7 @@ function ProInviteContent() {
                 {headshotResult && (
                   <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" />
-                    <span>-{headshotResult.savingsPercent}% Reduced</span>
+                    <span>Uploaded</span>
                   </span>
                 )}
               </div>
@@ -910,7 +910,7 @@ function ProInviteContent() {
                     <img
                       src={headshotResult.dataUrl}
                       alt="Headshot Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
                     />
                   ) : (
                     <Camera className="w-8 h-8 text-amber-400 animate-pulse" />
@@ -936,28 +936,28 @@ function ProInviteContent() {
 
                   {headshotResult ? (
                     <div className="text-[11px] font-mono text-slate-400 space-y-0.5">
-                      <div>Size: <strong className="text-emerald-400">{headshotResult.compressedSizeFormatted}</strong> (was {headshotResult.originalSizeFormatted})</div>
-                      <div>Resolution: {headshotResult.width}x{headshotResult.height}px WebP</div>
+                      <div>Size: <strong className="text-emerald-400">{headshotResult.compressedSizeFormatted}</strong></div>
+                      <div>Resolution: {headshotResult.width}x{headshotResult.height}px</div>
                     </div>
                   ) : (
                     <p className="text-[11px] text-amber-200/90 leading-snug">
-                      <strong>Required for official athlete profile:</strong> Upload a clear photo of yourself. Smartphone selfies will be auto-cropped and compressed to 1:1 portrait.
+                      <strong>Used on your public shooter profile:</strong> Upload a clear headshot photo of yourself.
                     </p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Photo 2: Rifle Rig / Barricade Action */}
+            {/* Photo 2: Action Shooting Image */}
             <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-blue-400 uppercase">
-                  2. Rifle Rig in Action (Wide)
+                  2. Action Shooting Image
                 </span>
                 {actionPhotoResult && (
                   <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" />
-                    <span>-{actionPhotoResult.savingsPercent}% Reduced</span>
+                    <span>Uploaded</span>
                   </span>
                 )}
               </div>
@@ -968,7 +968,7 @@ function ProInviteContent() {
                     <img
                       src={actionPhotoResult.dataUrl}
                       alt="Action Photo Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
                     />
                   ) : (
                     <Crosshair className="w-8 h-8 text-slate-600" />
@@ -983,7 +983,7 @@ function ProInviteContent() {
                 <div className="space-y-2 flex-1">
                   <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{actionPhotoResult ? "Replace Action Shot" : "Upload Action Shot"}</span>
+                    <span>{actionPhotoResult ? "Replace Action Shooting Image" : "Upload Action Shooting Image"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -994,12 +994,12 @@ function ProInviteContent() {
 
                   {actionPhotoResult ? (
                     <div className="text-[11px] font-mono text-slate-400 space-y-0.5">
-                      <div>Size: <strong className="text-emerald-400">{actionPhotoResult.compressedSizeFormatted}</strong> (was {actionPhotoResult.originalSizeFormatted})</div>
-                      <div>Resolution: {actionPhotoResult.width}x{actionPhotoResult.height}px WebP</div>
+                      <div>Size: <strong className="text-emerald-400">{actionPhotoResult.compressedSizeFormatted}</strong></div>
+                      <div>Resolution: {actionPhotoResult.width}x{actionPhotoResult.height}px</div>
                     </div>
                   ) : (
                     <p className="text-[11px] text-slate-400 leading-snug">
-                      Show your match jersey, barricade setup, or range action photo.
+                      Upload an action shooting photo for Subsonic Society marketing &amp; media.
                     </p>
                   )}
                 </div>

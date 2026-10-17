@@ -372,14 +372,30 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
                   </div>
                 </div>
 
-                {/* Action Shot Banner Preview in Admin Card if present */}
+                {/* Action Shooting Image Preview in Admin Card (Marketing / Admin Only) */}
                 {shooter.actionPhoto && !shooter.actionPhoto.includes("SS-RWB-LOGO") && (
-                  <div className="w-full h-36 rounded-xl overflow-hidden border border-white/10 bg-black relative">
-                    <img
-                      src={shooter.actionPhoto}
-                      alt={`${shooter.name} Action Banner`}
-                      className="w-full h-full object-cover object-top"
-                    />
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="text-cyan-400 font-bold uppercase">Action Shooting Image (Marketing Only)</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard?.writeText(shooter.actionPhoto!);
+                          setCopiedId(`${shooter.id}-action`);
+                          setTimeout(() => setCopiedId(null), 2000);
+                        }}
+                        className="px-2 py-0.5 rounded bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 font-bold cursor-pointer"
+                      >
+                        {copiedId === `${shooter.id}-action` ? "✓ Copied Image" : "Copy Action Image"}
+                      </button>
+                    </div>
+                    <div className="w-full h-36 rounded-xl overflow-hidden border border-white/10 bg-black relative">
+                      <img
+                        src={shooter.actionPhoto}
+                        alt={`${shooter.name} Action Shooting Image`}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    </div>
                   </div>
                 )}
 

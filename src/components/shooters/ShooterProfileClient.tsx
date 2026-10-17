@@ -829,29 +829,8 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
 
 
 
-        {/* ─── SECTION 3: RIFLE BUILD, ACTION PHOTO & TECHNICAL INTERVIEW ─── */}
+        {/* ─── SECTION 3: RIFLE BUILD & TECHNICAL INTERVIEW ─── */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Action Photo Showcase (Only rendered when shooter has a real action photo, never the Subsonic logo) */}
-          {isRealShooterPhoto(shooter.actionPhoto) && (
-            <div className="rounded-3xl bg-white/[0.02] border border-white/10 p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold flex items-center gap-1.5">
-                  <Camera className="w-4 h-4" />
-                  <span>Rifle Rig in Action</span>
-                </span>
-                <span className="text-[11px] font-mono text-slate-500">The Hideout</span>
-              </div>
-
-              <div className="w-full h-72 sm:h-80 rounded-2xl overflow-hidden border border-white/10 relative bg-black">
-                <img
-                  src={shooter.actionPhoto}
-                  alt={`${displayName} in competition`}
-                  className="w-full h-full object-cover object-top"
-                />
-              </div>
-            </div>
-          )}
-
           {/* Rifle Build & Equipment Specs */}
           {shooter.rifleSetup && (
             <div className="rounded-3xl bg-white/[0.02] border border-white/10 p-6 space-y-4">

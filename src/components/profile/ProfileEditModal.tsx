@@ -875,20 +875,20 @@ export function ProfileEditModal({
                     </div>
                   </div>
 
-                  {/* Slot 2: Action / Match Photo */}
+                  {/* Slot 2: Action Shooting Image (Marketing / Admin Use) */}
                   <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <label className="text-sm font-bold text-white uppercase tracking-wide">
-                            Action Shot Banner
+                            Action Shooting Image
                           </label>
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-                            Top-Justified Banner
+                            Marketing / Admin Only
                           </span>
                         </div>
                         <p className="text-xs text-slate-400 mt-0.5">
-                          Featured on your shooter profile banner. Always top-justified so faces remain in the shot.
+                          Saved in Admin Dashboard for Subsonic Society marketing &amp; media (not shown on public profile).
                         </p>
                       </div>
 

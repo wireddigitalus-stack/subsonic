@@ -530,20 +530,6 @@ function ShootersContent() {
                     />
                   </div>
                 </div>
-              ) : isRealShooterPhoto(selectedShooter.actionPhoto) ? (
-                <div className="space-y-2">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider flex items-center gap-1">
-                    <Camera className="w-3 h-3 text-cyan-400" />
-                    <span>Rifle Rig in Action</span>
-                  </span>
-                  <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden border border-white/10 relative bg-black">
-                    <img
-                      src={selectedShooter.actionPhoto}
-                      alt={`${selectedShooter.name} Rifle Rig`}
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                </div>
               ) : null}
 
               {/* Quote */}
