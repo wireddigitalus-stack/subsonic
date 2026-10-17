@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { FullHomePage } from "@/components/home/FullHomePage";
+import CompetitorPacketPage from "./competitor-packet/page";
 
 export default function HomePage() {
   // Safety net: strip any lingering chat-active class from a prior chat session
@@ -11,5 +11,5 @@ export default function HomePage() {
     }
   }, []);
 
-  return <FullHomePage />;
+  return <CompetitorPacketPage />;
 }

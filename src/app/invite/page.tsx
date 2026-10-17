@@ -213,8 +213,7 @@ function StandardInviteContent() {
         } catch {}
       }
 
-      setMemberResult(memberObj);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      router.push(`/?welcome=${encodeURIComponent(assignedCallsign)}`);
     } catch (err: any) {
       setFormError(err.message || "Failed creating member credential. Please try again.");
     } finally {

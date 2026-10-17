@@ -372,8 +372,8 @@ function ProInviteContent() {
         } catch (e) { console.warn("localStorage profile warning:", e); }
       }
 
-      // Straight to the Competitor Information Page, with a welcome banner + chat link
-      router.push(`/competitor-packet?welcome=${encodeURIComponent(savedShooter.callsign)}`);
+      // Straight to the Home / 2026 Invitational Page
+      router.push(`/?welcome=${encodeURIComponent(savedShooter.callsign)}`);
     } catch (err: any) {
       setFormError(err.message || "Failed generating your profile. Please try again.");
       window.scrollTo({ top: 0, behavior: "smooth" });

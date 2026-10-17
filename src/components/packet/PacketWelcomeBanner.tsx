@@ -47,20 +47,11 @@ export function PacketWelcomeBanner() {
             </h2>
             <p className="text-sm text-slate-300">
               Everything you need for the match is below — schedule, Course of Fire and Bristol hotels.
-              Your private Chat Room access is active.
             </p>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-          <Link
-            href="/chat"
-            className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all active:scale-95"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Enter Private Chat Room</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
           <Link
             href={`/shooters/${profileSlug}`}
             className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all"
