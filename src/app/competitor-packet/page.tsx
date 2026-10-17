@@ -460,7 +460,6 @@ export default function CompetitorPacketPage() {
               </div>
 
               <div className="pt-3 space-y-1 border-t border-white/10 text-sm sm:text-base">
-                <div className="font-bold text-amber-400">Said. Done.</div>
                 <div className="font-bold text-white">Allen Hurley</div>
                 <div className="text-slate-300">Founder, Subsonic Society</div>
               </div>

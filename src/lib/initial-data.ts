@@ -101,7 +101,7 @@ export const INITIAL_ATHLETES: AthleteProfile[] = [
       optic: "Zero Compromise Optic ZC527",
       ammo: "Lapua Center-X Hand-Sorted",
     },
-    quote: "This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation. Said. Done.",
+    quote: "This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation.",
     imageUrl: "/images/SS-RWB-LOGO.png",
     podiums: 12,
   },

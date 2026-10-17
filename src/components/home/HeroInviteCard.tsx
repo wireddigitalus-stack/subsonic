@@ -99,9 +99,6 @@ export function HeroInviteCard() {
                 <p>
                   When you finish, you’ll arrive directly at the official <strong className="text-white font-semibold">Competitor Information Page</strong>, giving you everything you need for the match: range schedule, Course of Fire briefings, and recommended Bristol hotel accommodations.
                 </p>
-                <p>
-                  You’ll also receive a direct link straight into our <strong className="text-cyan-400 font-semibold">private Chat Room</strong>, which you can use for internal squad conversations, questions with match directors, and live DOPE coordination.
-                </p>
                 <div className="pt-1 flex items-center gap-2 text-amber-400 font-bold text-xs sm:text-sm">
                   <span>Let’s start your journey below:</span>
                   <ArrowRight className="w-4 h-4 stroke-[2.5]" />

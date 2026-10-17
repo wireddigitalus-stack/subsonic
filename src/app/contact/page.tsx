@@ -104,16 +104,6 @@ export default function ContactPage() {
               Have a question regarding the Subsonic Society Invitational, sponsorship, or competitor invitations? Send a message below.
             </p>
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Link
-              href="/invite"
-              className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center gap-2 shadow-tactical-glow transition-all"
-            >
-              <Key className="w-4 h-4 fill-black" />
-              <span>Claim Invitation Pass</span>
-            </Link>
-          </div>
         </div>
       </div>
 
