@@ -48,8 +48,14 @@ export function ChatChannelSidebar({
   const selfCallsign = (shooterProfile?.callsign || "").toUpperCase();
   const selfIsMaster = shooterProfile?.role === "MASTER_OWNER" || selfCallsign === "RADAR" || selfCallsign === "ROB";
   const selfIsOwner = shooterProfile?.role === "OWNER_ADMIN" || selfCallsign === "SUBX" || selfCallsign === "ALLEN";
-  // You're pinned at the top — don't list yourself again under Direct Chat
-  directPartners = directPartners.filter((p) => p.callsign.toUpperCase() !== selfCallsign);
+  // You're pinned at the top — don't list yourself or RO BOT under Direct Chat
+  directPartners = directPartners.filter(
+    (p) =>
+      p.callsign.toUpperCase() !== selfCallsign &&
+      p.id !== "dm_ro" &&
+      p.callsign.toUpperCase() !== "RO BOT" &&
+      p.callsign.toUpperCase() !== "RO"
+  );
   return (
     <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
       <div className="ios-glass rounded-2xl md:rounded-3xl p-4 sm:p-5 border border-white/10 flex flex-col h-full min-h-0">

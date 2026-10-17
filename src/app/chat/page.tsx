@@ -114,18 +114,6 @@ const ALL_CHANNELS: ChannelConfig[] = [
 
 const INITIAL_DIRECT_PARTNERS: DirectPartner[] = [
   {
-    id: "dm_ro",
-    callsign: "RO BOT",
-    name: "RO BOT",
-    role: "OFFICIAL",
-    badgeText: "AI Range Officer",
-    division: "Autonomous AI Range Officer",
-    status: "online",
-    bio: "Official Autonomous AI Assistant & Range Officer for The Hideout. Available 24/7 with expert intel on Bristol lodging, campgrounds, dining, local entertainment, and range safety.",
-    rifleSetup: "Autonomous AI Agent • Range Safety & Bristol Intel",
-    isBot: true,
-  },
-  {
     id: "dm_allen",
     callsign: "SUBX",
     name: "Allen Hurley",
@@ -324,6 +312,14 @@ export default function ChatPage() {
 
   const filteredMessages = messages
     .filter((m) => m.channelId === currentChannel)
+    .filter(
+      (m) =>
+        m.author?.id !== "plink_ai_moderator" &&
+        m.author?.callsign?.toUpperCase() !== "RO" &&
+        m.author?.callsign?.toUpperCase() !== "RO BOT" &&
+        m.author?.name?.toUpperCase() !== "RO" &&
+        m.author?.name?.toUpperCase() !== "RO BOT"
+    )
     .filter((m, idx, arr) => arr.findIndex((x) => x.id === m.id || (x.author.id === m.author.id && x.content === m.content && x.content.includes("Welcome to The Hideout"))) === idx);
 
   const handleOpenDossier = useCallback((shooter: DirectPartner) => {
@@ -368,6 +364,14 @@ export default function ChatPage() {
       map[ch.id] = { postCount: 0, reactionCount: 0, dopeCount: 0 };
     }
     for (const m of messages) {
+      if (
+        m.author?.id === "plink_ai_moderator" ||
+        m.author?.callsign?.toUpperCase() === "RO" ||
+        m.author?.callsign?.toUpperCase() === "RO BOT" ||
+        m.author?.name?.toUpperCase() === "RO BOT"
+      ) {
+        continue;
+      }
       if (!map[m.channelId]) {
         map[m.channelId] = { postCount: 0, reactionCount: 0, dopeCount: 0 };
       }
@@ -409,9 +413,7 @@ export default function ChatPage() {
   const [showScrollFab, setShowScrollFab] = useState(false);
 
   // Pinned announcement banner
-  const [pinnedAnnouncement] = useState<string | null>(
-    "🔴 MATCH DAY ACTIVE — Holston Ridge Stage 1 now open. Range COLD until 08:00. Chamber flags in."
-  );
+  const [pinnedAnnouncement] = useState<string | null>(null);
   const [announcementCollapsed, setAnnouncementCollapsed] = useState(true);
 
   // Unread counts per channel (channelId -> count)
@@ -1035,11 +1037,7 @@ export default function ChatPage() {
           const myCallsign = (shooterProfile.callsign || "").toUpperCase();
           const partnersMap = new Map<string, DirectPartner>();
 
-          // 1. Ensure RO BOT is always the first partner
-          const roBot = prev.find((p) => p.id === "dm_ro") || INITIAL_DIRECT_PARTNERS[0];
-          partnersMap.set("dm_ro", roBot);
-
-          // 2. Add Executives if not current user
+          // 1. Add Executives if not current user
           if (myCallsign !== "SUBX" && myCallsign !== "ALLEN" && myCallsign !== "SAID DONE") {
             const allenId = getDmChannelId(myCallsign, "SUBX");
             partnersMap.set(allenId, {
@@ -1070,11 +1068,12 @@ export default function ChatPage() {
             });
           }
 
-          // 3. Map all registered shooters from database (excluding deleted members and test accounts)
+          // 2. Map all registered shooters from database (excluding deleted members and test accounts)
           for (const s of shooters) {
             const sCallsign = (s.callsign || "").toUpperCase();
             const sName = (s.name || "").toUpperCase();
             if (!sCallsign || sCallsign === myCallsign) continue;
+            if (sCallsign === "RO" || sCallsign === "RO BOT" || sName === "RO BOT") continue;
             if (sCallsign === "DOE" || sCallsign === "JOHNDOE" || sName.includes("JOHN DOE")) continue;
             if (deletedList.has(sCallsign.toLowerCase()) || (s.id && deletedList.has(s.id.toLowerCase()))) continue;
 
@@ -1100,11 +1099,13 @@ export default function ChatPage() {
             });
           }
 
-          // 4. Preserve any existing DM partners added dynamically (excluding deleted members)
+          // 3. Preserve any existing DM partners added dynamically (excluding deleted members and RO BOT)
           for (const p of prev) {
-            if (p.callsign.toUpperCase() !== myCallsign) {
+            const pCall = (p.callsign || "").toUpperCase();
+            if (p.id === "dm_ro" || pCall === "RO" || pCall === "RO BOT") continue;
+            if (pCall !== myCallsign) {
               if (deletedList.has(p.callsign.toLowerCase()) || deletedList.has(p.id.toLowerCase())) continue;
-              const canonicalId = p.id === "dm_ro" ? "dm_ro" : getDmChannelId(myCallsign, p.callsign);
+              const canonicalId = getDmChannelId(myCallsign, p.callsign);
               if (!partnersMap.has(canonicalId)) {
                 partnersMap.set(canonicalId, { ...p, id: canonicalId });
               }
@@ -1112,7 +1113,12 @@ export default function ChatPage() {
           }
 
           return Array.from(partnersMap.values()).filter(
-            (p) => !deletedList.has(p.callsign.toLowerCase()) && !deletedList.has(p.id.toLowerCase())
+            (p) =>
+              p.id !== "dm_ro" &&
+              p.callsign.toUpperCase() !== "RO" &&
+              p.callsign.toUpperCase() !== "RO BOT" &&
+              !deletedList.has(p.callsign.toLowerCase()) &&
+              !deletedList.has(p.id.toLowerCase())
           );
         });
       } catch (err) {
@@ -1129,7 +1135,6 @@ export default function ChatPage() {
   // ── First-Login Welcome: Allen only ───────────────────────────────────────
   // Allen's welcome (with Competitor Packet button) shows ONE time per user —
   // the first time they enter chat. Tracked per callsign in localStorage.
-  // The old RO BOT auto-welcome was removed; RO still answers "hey ro" / "@ro".
   useEffect(() => {
     if (!authChecked || !isAuthenticated || !shooterProfile.callsign) return;
 
@@ -1162,7 +1167,7 @@ export default function ChatPage() {
         division: "Executive / Match Host",
         rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
       },
-      content: `Welcome to The Hideout, ${shooterProfile.callsign}. Two hundred and twenty acres of Tennessee ridgeline purpose-built for precision rimfire. Enjoy the chat, respect the range, and check the Competitor Packet below for schedule, Course of Fire and hotels. Said. Done.`,
+      content: `Welcome to The Hideout, ${shooterProfile.callsign}. Two hundred and twenty acres of Tennessee ridgeline purpose-built for precision rimfire. Enjoy the chat, respect the range, and check the Competitor Packet below for schedule, Course of Fire and hotels.`,
       timestamp: allenTimestamp,
       reactions: [],
       moderationStatus: "APPROVED",
@@ -1175,102 +1180,6 @@ export default function ChatPage() {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentChannel, isAuthenticated, authChecked, shooterProfile.callsign]);
-
-  // ── RO: Message & Direct Comms Watcher ────────────────────────────────────
-  // Fires on every new message. RO monitors both public frequency and direct chats
-  // for safety violations, code of conduct, and inquiries.
-  useEffect(() => {
-    if (!isAuthenticated) return;
-    const lastMsg = messages[messages.length - 1];
-    if (!lastMsg) return;
-    // Never react to our own messages
-    if (lastMsg.author.id === "plink_ai_moderator") return;
-    // Only respond to messages in the currently viewed channel
-    if (lastMsg.channelId !== currentChannel) return;
-    // If in 1-on-1 with RO, handleTransmit already provides RO's direct reply
-    if (currentChannel === "dm_ro") return;
-
-    // FIX 1: Each message is evaluated exactly once (re-renders/sync must not re-trigger)
-    if (roProcessedIdsRef.current.has(lastMsg.id)) return;
-    roProcessedIdsRef.current.add(lastMsg.id);
-
-    // FIX 2 + 3: Only moderate live transmissions authored in THIS browser
-    // (the sender's own device) or local simulation bots. Synced history from
-    // other users is moderated on their own device — prevents every viewer
-    // spawning duplicate warnings for someone who may already be offline.
-    const myCall = (shooterProfile.callsign || "").toUpperCase();
-    const isMine = (lastMsg.author.callsign || "").toUpperCase() === myCall && !!myCall;
-    const isLocalBot = lastMsg.id.startsWith("bot_");
-    if (!isMine && !isLocalBot) return;
-    const msgMs = (lastMsg as any).createdAtMs as number | undefined;
-    if (msgMs && msgMs < roSessionStartRef.current) return;
-
-    // FIX 4: Flood = same text 3+ times from same author within 30 seconds
-    const now = Date.now();
-    const authorKey = lastMsg.author.id;
-    const normalized = (lastMsg.content || "").trim().toLowerCase();
-    const recent = (roRecentByAuthorRef.current[authorKey] || []).filter((r) => now - r.t < 30000);
-    recent.push({ text: normalized, t: now });
-    roRecentByAuthorRef.current[authorKey] = recent;
-    const dupCount = recent.filter((r) => r.text === normalized).length;
-    const floodPrev = dupCount >= 3 && normalized.length > 5 ? lastMsg.content : undefined;
-
-    const isDirect = currentChannel.startsWith("dm_");
-    const response = analyzeMsgForPlink(lastMsg, plinkWarningHistory, floodPrev, isDirect);
-
-    if (!response) return;
-
-    // Natural delay — feels like Plink is reading and thinking
-    const delay = 1500 + Math.random() * 1000;
-    const timer = setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        buildPlinkMessage(response.content, currentChannel, response.warningTier),
-      ]);
-
-      if (soundEnabledRef.current) {
-        playTacticalChirp(response.warningTier >= 2 ? 800 : 1200);
-      }
-
-      // Update warning count for this user
-      if (response.warningTier > 0) {
-        setPlinkWarningHistory((prev) => ({
-          ...prev,
-          [lastMsg.author.id]: (prev[lastMsg.author.id] || 0) + 1,
-        }));
-      }
-
-      // Escalate to admin abuse log if needed
-      if (response.shouldEscalate) {
-        recordCommsAbuseAlert({
-            severity: response.warningTier >= 3 ? "CRITICAL" : "HIGH",
-            category:
-              response.violationType === "FIREARM_SALE"
-                ? "ILLEGAL_COMMERCE"
-                : response.violationType === "HARASSMENT"
-                ? "PHYSICAL_THREAT"
-                : response.violationType === "COMMERCIAL"
-                ? "SPAM_SOLICITATION"
-                : "UNSPORTSMANLIKE",
-            shooterName: lastMsg.author.name,
-            shooterCallsign: lastMsg.author.callsign || lastMsg.author.name,
-            shooterRole: lastMsg.author.role,
-            squad: lastMsg.channelId,
-            channel: lastMsg.channelId,
-            messageContent: lastMsg.content,
-            toxicityScore: response.warningTier * 30,
-            threatScore: response.violationType === "HARASSMENT" ? 85 : 20,
-            policyScore: 90,
-            status: "ACTIVE",
-            aiRationale: `RO BOT detected: ${response.violationType}`,
-            autoActionTaken: `Tier ${response.warningTier} warning issued in chat`,
-          });
-      }
-    }, delay);
-
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length, isAuthenticated]);
 
   // Handle ESC key to exit fullscreen
   useEffect(() => {
@@ -2121,20 +2030,6 @@ export default function ChatPage() {
                       <span>Edit Profile &amp; Photos</span>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsChatMobileUserMenuOpen(false);
-                        setProfileForm(shooterProfile);
-                        setProfileActiveTab("PASS");
-                        setIsProfileModalOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
-                    >
-                      <QrCode className="w-4 h-4 text-emerald-400" />
-                      <span>Digital Member Pass</span>
-                    </button>
-
                     {isShooterAdmin && (
                       <Link
                         href="/admin"
@@ -2165,27 +2060,8 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Mobile Actions: Audio Toggle + Tactical Menu */}
+            {/* Mobile Actions: Tactical Menu */}
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                type="button"
-                onClick={handleToggleSound}
-                className={`h-7 px-2 rounded-lg border flex items-center gap-1 text-[11px] font-mono font-bold transition-all ${
-                  soundEnabled
-                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                    : "bg-white/5 text-slate-500 border-white/10"
-                }`}
-                title={soundEnabled ? "Audio Tones: ON (Tap to mute)" : "Audio Tones: OFF (Tap to unmute)"}
-                aria-label="Toggle Tactical Audio Tones"
-              >
-                {soundEnabled ? (
-                  <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                ) : (
-                  <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                )}
-                <span className="text-[10px]">{soundEnabled ? "TONES" : "MUTED"}</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => {
@@ -2207,7 +2083,7 @@ export default function ChatPage() {
 
           {/* Desktop Top Bar: 2x Stacked Command & Telemetry Tiers */}
           <div className="hidden sm:flex flex-col gap-2">
-            {/* ROW 1: Identity, Room Selector, Admin & Primary Action Controls */}
+            {/* ROW 1: Identity, Room Indicator & Account Options */}
             <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/10">
               {/* Left: Brand Portal Breadcrumb & Active Channel Indicator */}
               <div className="flex items-center gap-2 sm:gap-3">
@@ -2233,48 +2109,17 @@ export default function ChatPage() {
                   <span className="text-amber-400 font-bold">CHAT ROOM</span>
                 </Link>
 
-                {/* Quick Channel / Room Selector Chip */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsChannelModalOpen(true);
-                    playTacticalChirp(1100);
-                  }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs transition-all"
-                  title="Switch Comms Channel"
-                >
+                {/* Active Main Room Indicator */}
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-xs">
                   <Hash className="w-3.5 h-3.5 text-amber-400" />
                   <span className="font-bold text-slate-200">
-                    {ALL_CHANNELS.find((c) => c.id === currentChannel)?.name || currentChannel}
+                    {ALL_CHANNELS.find((c) => c.id === currentChannel)?.name || "invitational"}
                   </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
+                </div>
               </div>
 
-              {/* Right: Shooter Profiles, Admin Link, Terms, Lock, and Profile Pill */}
+              {/* Right: Profile Pill */}
               <div className="flex items-center gap-2">
-                <Link
-                  href="/shooters"
-                  title="Explore Full Shooter Profiles & Accolades"
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-[11px] font-mono text-purple-300 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.15)]"
-                >
-                  <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                  <span className="font-bold">SHOOTER PROFILES</span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsTermsModalOpen(true);
-                    playTacticalChirp(1100);
-                  }}
-                  title="Subsonic Society Terms of Use & Code of Conduct"
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/40 hover:bg-white/[0.06] border border-white/10 text-[11px] text-slate-400 hover:text-slate-200 transition-colors shrink-0"
-                >
-                  <Scale className="w-3 h-3 text-amber-400 shrink-0" />
-                  <span>TERMS &amp; CONDUCT</span>
-                </button>
-
                 {/* Unified User Account & Session Options */}
                 <div className="relative" ref={chatUserMenuRef}>
                   <button
@@ -2356,19 +2201,6 @@ export default function ChatPage() {
                         type="button"
                         onClick={() => {
                           setIsChatUserMenuOpen(false);
-                          setProfileActiveTab("PASS");
-                          setIsProfileModalOpen(true);
-                        }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
-                      >
-                        <QrCode className="w-4 h-4 text-emerald-400" />
-                        <span>Digital Member Pass</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsChatUserMenuOpen(false);
                           setIsRosterModalOpen(true);
                           playTacticalChirp(1050);
                         }}
@@ -2441,7 +2273,7 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              {/* Right: Tactical Utilities (Roster, Tour Guide, Fullscreen, Audio, Pass) */}
+              {/* Right: Tactical Utilities (Roster, Fullscreen) */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
@@ -2458,20 +2290,6 @@ export default function ChatPage() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsTourOpen(true);
-                    playTacticalChirp(1100);
-                  }}
-                  data-telemetry="chat_start_tour"
-                  className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-white border-amber-500/30 transition-all font-medium"
-                  title="Start Interactive Chat Tour"
-                >
-                  <Compass className="w-3.5 h-3.5 text-amber-400" />
-                  <span>TOUR GUIDE</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => setIsFullscreen(true)}
                   data-telemetry="chat_enter_fullscreen"
                   className="px-2.5 py-1 rounded-xl border text-[11px] sm:text-xs flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white border-white/10 transition-colors"
@@ -2479,41 +2297,6 @@ export default function ChatPage() {
                 >
                   <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
                   <span>Fullscreen</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleSound}
-                  className={`h-7 px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-mono font-semibold transition-all ${
-                    soundEnabled
-                      ? "bg-amber-500/15 text-amber-300 border-amber-500/40 hover:bg-amber-500/25"
-                      : "bg-transparent text-slate-500 border-white/5 hover:bg-white/[0.04] hover:text-slate-400"
-                  }`}
-                  title={soundEnabled ? "Tactical Audio Tones: ON (Click to mute)" : "Tactical Audio Tones: MUTED (Click to unmute)"}
-                  aria-label="Toggle Tactical Radio Audio"
-                >
-                  {soundEnabled ? (
-                    <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  ) : (
-                    <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  )}
-                  <span>{soundEnabled ? "TONES ON" : "MUTED"}</span>
-                </button>
-
-                <button
-                  id="tour-step-pass"
-                  type="button"
-                  onClick={() => {
-                    setProfileForm(shooterProfile);
-                    setProfileActiveTab("PASS");
-                    setIsProfileModalOpen(true);
-                  }}
-                  title="View Digital Member Pass & Scannable QR Code"
-                  data-telemetry="chat_view_digital_pass"
-                  className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all"
-                >
-                  <QrCode className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Pass</span>
                 </button>
               </div>
             </div>
@@ -2545,26 +2328,17 @@ export default function ChatPage() {
             </button>
           </div>
 
-          {/* Center: Tappable Room Name (cleanly spaced, properly truncated) */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsChannelModalOpen(true);
-              playTacticalChirp(1100);
-            }}
-            className="flex items-center gap-1.5 sm:gap-2 font-mono text-left min-w-0 group flex-1 justify-center px-1"
-            title="Switch room"
-          >
+          {/* Center: Room Name */}
+          <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-left min-w-0 flex-1 justify-center px-1">
             <span className="text-amber-400 font-bold text-sm sm:text-base md:text-lg">#</span>
-            <span className="font-mono font-bold text-sm sm:text-base md:text-lg text-white whitespace-nowrap truncate max-w-[110px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none group-hover:text-amber-300 transition-colors">
+            <span className="font-mono font-bold text-sm sm:text-base md:text-lg text-white whitespace-nowrap truncate max-w-[110px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none">
               {currentChannelData.name}
             </span>
             <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
               <MessageSquare className="w-3 h-3 text-cyan-400" />
               <span>{currentChannelEngagement.postCount}</span>
             </span>
-            <ChevronDown className="w-3.5 h-3.5 text-amber-400/80 group-hover:text-amber-300 shrink-0" />
-          </button>
+          </div>
 
           {/* Right: Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -2577,20 +2351,6 @@ export default function ChatPage() {
               <ShieldCheck className="w-3 h-3 text-emerald-400" />
               <span>Moderated</span>
             </div>
-
-            {/* Terms & Code of Conduct */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsTermsModalOpen(true);
-                playTacticalChirp(1100);
-              }}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/40 hover:bg-amber-500/10 border border-white/10 hover:border-amber-400/40 text-xs text-slate-200 hover:text-amber-300 font-mono transition-colors font-semibold"
-              title="Terms of Use & Code of Conduct"
-            >
-              <Scale className="w-3 h-3 text-amber-400" />
-              <span>TERMS</span>
-            </button>
 
             {/* Active Marksmen Online Roster Pill */}
             <button
@@ -2605,33 +2365,13 @@ export default function ChatPage() {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="hidden xs:inline">{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
             </button>
-
-            {/* Audio Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleSound}
-              className={`h-7 px-2 rounded-lg border flex items-center justify-center gap-1 font-mono font-semibold transition-all ${
-                soundEnabled
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                  : "bg-white/5 text-slate-500 border-white/10"
-              }`}
-              title={soundEnabled ? "Audio Tones: ON (Click to mute)" : "Audio Tones: MUTED (Click to unmute)"}
-              aria-label="Toggle Audio"
-            >
-              {soundEnabled ? (
-                <Volume2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              ) : (
-                <VolumeX className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-              )}
-              <span className="text-[10px] font-bold">{soundEnabled ? "TONES ON" : "MUTED"}</span>
-            </button>
           </div>
         </div>
       )}
 
       {/* 2. CHANNEL SELECTOR — ZERO HORIZONTAL OVERFLOW ON MOBILE (Hidden on mobile if in Fullscreen since top bar handles it) */}
       <div id="tour-step-channels" className={`shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1 ${isFullscreen ? "hidden md:block" : ""}`}>
-        {/* MOBILE TACTICAL FREQUENCY DIAL BUTTON (Fits 100% width, no side-scroll, voice & text searchable) */}
+        {/* MOBILE TACTICAL FREQUENCY DIAL BUTTON (Fits 100% width, no side-scroll) */}
         <div className="md:hidden">
           <div className="flex items-center gap-1.5">
             {isDirectMode && (
@@ -2639,7 +2379,7 @@ export default function ChatPage() {
                 type="button"
                 onClick={handleBackToInvitational}
                 className="p-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-all shadow-sm"
-                title="Return to match channels"
+                title="Return to #invitational"
               >
                 <ArrowLeft className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span className="font-mono uppercase font-bold text-xs">BACK</span>
@@ -2648,7 +2388,7 @@ export default function ChatPage() {
             <button
               type="button"
               onClick={() => {
-                setChannelModalInitialTab(isDirectMode ? "DIRECT" : "ALL");
+                setChannelModalInitialTab("DIRECT");
                 setIsChannelModalOpen(true);
                 playTacticalChirp(1100);
               }}
@@ -2659,9 +2399,7 @@ export default function ChatPage() {
                   <div className="relative shrink-0">
                     <div
                       className={`w-7 h-7 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-1 overflow-hidden ${
-                        activeDirectPartner.callsign === "RO" || activeDirectPartner.id === "dm_ro"
-                          ? "bg-cyan-950 text-cyan-300 ring-cyan-400/60 font-black"
-                          : activeDirectPartner.role === "MASTER_OWNER"
+                        activeDirectPartner.role === "MASTER_OWNER"
                           ? "bg-blue-800 text-cyan-200 ring-cyan-400 font-black"
                           : activeDirectPartner.role === "OWNER_ADMIN"
                           ? "bg-emerald-500 text-black ring-emerald-300 font-black"
@@ -2674,8 +2412,6 @@ export default function ChatPage() {
                           alt=""
                           className="w-full h-full object-cover"
                         />
-                      ) : activeDirectPartner.callsign === "RO" ? (
-                        "🤖"
                       ) : activeDirectPartner.role === "MASTER_OWNER" ? (
                         <Radar className="w-3.5 h-3.5 text-cyan-300 stroke-[2.2]" />
                       ) : activeDirectPartner.role === "OWNER_ADMIN" ? (
@@ -2686,7 +2422,7 @@ export default function ChatPage() {
                     </div>
                     <span
                       className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-black ${
-                        activeDirectPartner.status === "online" || activeDirectPartner.callsign === "RO"
+                        activeDirectPartner.status === "online"
                           ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
                           : "bg-zinc-600"
                       }`}
@@ -2704,13 +2440,13 @@ export default function ChatPage() {
                     <div className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
                       <span
                         className={`w-1.5 h-1.5 rounded-full ${
-                          activeDirectPartner.status === "online" || activeDirectPartner.callsign === "RO"
+                          activeDirectPartner.status === "online"
                             ? "bg-emerald-400 animate-pulse"
                             : "bg-zinc-500"
                         }`}
                       />
                       <span className="truncate">
-                        {activeDirectPartner.status === "online" || activeDirectPartner.callsign === "RO"
+                        {activeDirectPartner.status === "online"
                           ? "Direct Net Active"
                           : "Offline"}
                       </span>
@@ -2748,9 +2484,9 @@ export default function ChatPage() {
                     {currentChannelEngagement.postCount}
                   </span>
                 )}
-                <div className="px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 font-mono text-xs font-bold text-amber-300 flex items-center gap-1">
-                  <span>{isDirectMode ? "SWITCH" : "ROOMS"}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-amber-400" />
+                <div className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/35 font-mono text-xs font-bold text-emerald-300 flex items-center gap-1">
+                  <Lock className="w-3 h-3 text-emerald-400" />
+                  <span>{isDirectMode ? "SWITCH" : "DIRECT"}</span>
                 </div>
               </div>
             </button>
@@ -2760,7 +2496,7 @@ export default function ChatPage() {
         {/* DESKTOP CHANNEL SELECTOR BAR (Hidden on mobile & small tablets) */}
         <div className="hidden md:block">
           <div className="flex items-center justify-between gap-3">
-            {/* Desktop Channel Pills on Left */}
+            {/* Desktop Channel Pill on Left */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
               {visibleChannels.map((ch) => {
                 const isActive = currentChannel === ch.id;
@@ -2816,39 +2552,6 @@ export default function ChatPage() {
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Right: Terms & Browse Rooms */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsTermsModalOpen(true);
-                  playTacticalChirp(1100);
-                }}
-                className="px-2.5 py-1 rounded-xl bg-black/50 hover:bg-amber-500/10 border border-white/15 hover:border-amber-400/40 text-slate-300 hover:text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-all group shrink-0 shadow-sm"
-                title="Subsonic Society Terms of Use & Code of Conduct"
-              >
-                <Scale className="w-3.5 h-3.5 text-amber-400/90 group-hover:text-amber-400 shrink-0" />
-                <span className="font-bold tracking-wider">TERMS OF USE &amp; CODE OF CONDUCT</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsChannelModalOpen(true);
-                  playTacticalChirp(1100);
-                }}
-                className="px-2.5 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-mono flex items-center gap-1.5 transition-all"
-                title="Search and switch rooms"
-              >
-                <Radio className="w-3.5 h-3.5 text-amber-400" />
-                <span>Browse All Rooms</span>
-              </button>
-
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hidden sm:inline">
-                {activeNetTab === "PRO" ? "VERIFIED SQUAD CHAT" : "OPEN SOCIETY"}
-              </span>
             </div>
           </div>
         </div>

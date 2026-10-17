@@ -157,25 +157,14 @@ export function ChatMobileMenuModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-0.5">
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenPass();
-                }}
-                className="py-2 px-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
-              >
-                <QrCode className="w-3.5 h-3.5 text-amber-400" />
-                <span>MEMBER PASS</span>
-              </button>
+            <div className="pt-0.5">
               <button
                 type="button"
                 onClick={() => {
                   onClose();
                   onEditProfile?.();
                 }}
-                className="py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 font-mono text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
+                className="w-full py-2 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 font-mono text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all active:scale-[0.99]"
               >
                 <Camera className="w-3.5 h-3.5 text-cyan-400" />
                 <span>EDIT PROFILE</span>
@@ -218,29 +207,6 @@ export function ChatMobileMenuModal({
                 <ChevronRight className="w-4 h-4 text-slate-500" />
               </div>
             </button>
-
-            {/* Public Channel Selector */}
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenChannels();
-              }}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                  <Radio className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Match Channels</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Switch public rooms
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            </button>
           </div>
 
           {/* Tools & Utilities */}
@@ -248,58 +214,6 @@ export function ChatMobileMenuModal({
             <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold px-1">
               Match Tools & Intel
             </span>
-
-            {/* Shooter Profiles Directory */}
-            <Link
-              href="/shooters"
-              onClick={onClose}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                  <Users className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Shooter Directory</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Verified match competitor profiles
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            </Link>
-
-            {/* Audio Toggle */}
-            <button
-              type="button"
-              onClick={onToggleSound}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400">
-                  {soundEnabled ? (
-                    <Volume2 className="w-3.5 h-3.5" />
-                  ) : (
-                    <VolumeX className="w-3.5 h-3.5 text-slate-500" />
-                  )}
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Tactical Audio FX</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Chirps and incoming alerts
-                  </div>
-                </div>
-              </div>
-              <span
-                className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
-                  soundEnabled
-                    ? "bg-amber-500/20 text-amber-300"
-                    : "bg-white/5 text-slate-500"
-                }`}
-              >
-                {soundEnabled ? "ON" : "OFF"}
-              </span>
-            </button>
 
             {/* Fullscreen Handheld Mode */}
             <button
@@ -322,52 +236,6 @@ export function ChatMobileMenuModal({
                   <div className="font-bold text-white">Handheld Fullscreen</div>
                   <div className="text-[11px] text-slate-400 font-mono">
                     {isFullscreen ? "Exit immersive view" : "Maximize screen space"}
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            </button>
-
-            {/* Guided Tour */}
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenTour();
-              }}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400">
-                  <Compass className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Interactive Tour</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Replay feature walkthrough
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            </button>
-
-            {/* Terms of Use & Safety Code of Conduct */}
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                onOpenTerms();
-              }}
-              className="w-full p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 flex items-center justify-between text-left transition-colors"
-            >
-              <div className="flex items-center gap-2.5 text-slate-200">
-                <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400">
-                  <Scale className="w-3.5 h-3.5" />
-                </div>
-                <div className="text-xs">
-                  <div className="font-bold text-white">Code of Conduct</div>
-                  <div className="text-[11px] text-slate-400 font-mono">
-                    Match rules & safety policy
                   </div>
                 </div>
               </div>

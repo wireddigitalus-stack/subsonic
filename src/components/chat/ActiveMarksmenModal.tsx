@@ -115,46 +115,7 @@ export function ActiveMarksmenModal({
 
         {/* Scrollable Roster Body */}
         <div className="flex-1 overflow-y-auto space-y-4 no-scrollbar pr-1">
-          {/* 1. Official AI Range Officer (Always on net) */}
-          {roPartner && !search.trim() && (
-            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full bg-amber-500 text-black flex items-center justify-center font-bold text-lg shrink-0 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
-                  🤖
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-sm font-bold text-white">RO BOT</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-bold">
-                      AI RANGE OFFICER
-                    </span>
-                    <span className="text-[9px] font-mono text-emerald-400 font-bold flex items-center gap-1 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-                      ONLINE 24/7
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 truncate mt-0.5">
-                    Range safety rules, cold line SOPs &amp; Bristol dining/lodging
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (onPlayChirp) onPlayChirp(1200);
-                  onStartDirectComms(roPartner);
-                  onClose();
-                }}
-                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-xs shrink-0 transition-all flex items-center gap-1"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Chat</span>
-              </button>
-            </div>
-          )}
-
-          {/* 2. Currently Online Marksmen */}
+          {/* Currently Online Marksmen */}
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">

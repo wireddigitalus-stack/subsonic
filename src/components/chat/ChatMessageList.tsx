@@ -221,11 +221,6 @@ export function ChatMessageList({
                     <Lock className="w-2.5 h-2.5 text-emerald-400" />
                     <span>Closed Net</span>
                   </span>
-                  <span className="text-slate-500">·</span>
-                  <span className="text-amber-400 font-bold flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/25">
-                    <Bot className="w-2.5 h-2.5 text-cyan-400" />
-                    <span>AI Range Officer Monitored</span>
-                  </span>
                 </div>
               </div>
             </div>
@@ -243,26 +238,7 @@ export function ChatMessageList({
             </button>
           )}
         </div>
-      ) : (
-        /* Pinned Match Director Announcement — desktop only */
-        pinnedAnnouncement && (
-          <div
-            className={`shrink-0 border-b border-amber-500/30 transition-all hidden md:flex ${announcementCollapsed ? "py-1" : "py-2 sm:py-2.5"} px-2.5 sm:px-4 bg-amber-950/60 items-center justify-between gap-2 cursor-pointer`}
-            onClick={() => setAnnouncementCollapsed(!announcementCollapsed)}
-          >
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <Pin className="w-3 h-3 text-amber-400 shrink-0" />
-              <span className={`text-[11px] text-amber-200 ${announcementCollapsed ? "truncate" : "leading-relaxed"}`}>
-                {pinnedAnnouncement}
-              </span>
-            </div>
-            {announcementCollapsed
-              ? <ChevronDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              : <ChevronUp className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            }
-          </div>
-        )
-      )}
+      ) : null}
 
       {/* Messages Stream — flex-1 fills all available space, scrolls internally */}
       <div
@@ -281,37 +257,7 @@ export function ChatMessageList({
                 <p className="text-xs text-slate-400 leading-relaxed">
                   Direct communication channel with <strong className="text-white">{activeDirectPartner?.name || "this competitor"}</strong>. Messages are private to this net.
                 </p>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-[10px] font-mono text-cyan-300">
-                  <Bot className="w-3 h-3 text-cyan-400 shrink-0" />
-                  <span>Monitored by RO BOT · Autonomous AI Match & Safety Agent</span>
-                </div>
               </div>
-
-              {(activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") && (
-                <div className="p-3.5 rounded-2xl bg-black/60 border border-cyan-500/30 text-left space-y-2.5 shadow-[0_0_20px_rgba(6,182,212,0.12)]">
-                  <div className="text-[11px] font-mono text-cyan-300 font-bold flex items-center gap-1.5">
-                    <Bot className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Autonomous AI Assistant Quick Inquiries:</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                    {[
-                      "Where should I stay in Bristol?",
-                      "What are the best dinner spots?",
-                      "What are reputable RV campgrounds?",
-                      "Tell me about South Holston fly fishing"
-                    ].map((promptText, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setInputText(promptText)}
-                        className="text-[10px] font-mono p-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-200 border border-white/10 hover:border-cyan-500/30 transition-all text-left"
-                      >
-                        &ldquo;{promptText}&rdquo;
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center py-16 space-y-3">
@@ -832,98 +778,6 @@ export function ChatMessageList({
           <span className="text-xs font-mono text-slate-300 font-medium">[{shooterProfile.callsign}] transmitting...</span>
         </div>
       )}
-
-      {/* Quick Radio Chips above input — hidden on mobile to maximize room */}
-      <div id="tour-step-plink" className="hidden sm:flex px-3 pt-2.5 pb-1.5 bg-black/70 items-center justify-between gap-2 border-t border-white/10 shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
-          <Radio className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-          {isDirectMode ? (
-            (activeDirectPartner?.callsign === "RO" || activeDirectPartner?.callsign === "RO BOT" || activeDirectPartner?.id === "dm_ro") ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("What are the recommended hotels in Bristol?")}
-                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-200 border border-cyan-500/40 transition-all shrink-0 shadow-[0_0_8px_rgba(6,182,212,0.15)]"
-                >
-                  🏨 &ldquo;Bristol Lodging&rdquo;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("What are the best dinner and BBQ spots near the match?")}
-                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-950/25 hover:bg-cyan-900/40 text-slate-200 hover:text-cyan-100 border border-white/10 hover:border-cyan-500/30 transition-all shrink-0"
-                >
-                  🍖 &ldquo;Bristol Food&rdquo;
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("Copy that. On frequency.")}
-                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-slate-200 hover:text-amber-200 border border-white/10 transition-all shrink-0"
-                >
-                  📻 &ldquo;Copy that&rdquo;
-                </button>
-                <button
-                  type="button"
-                  onClick={() => quickBroadcast("What squad are you running in?")}
-                  className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-all shrink-0"
-                >
-                  🎯 &ldquo;Which squad?&rdquo;
-                </button>
-              </>
-            )
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setInputText("hey ro ");
-                  playTacticalChirp(1100);
-                }}
-                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-500/35 transition-all flex items-center gap-1.5 shrink-0"
-                title="Chat with RO BOT, your AI Range Officer"
-              >
-                🤖 &ldquo;Hey RO&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Chamber flag inserted. Rifle safe.")}
-                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-emerald-500/20 text-emerald-300 border border-white/10 transition-all shrink-0"
-              >
-                🚩 &ldquo;Chamber Flag In&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Range is cold. Chamber flags in.")}
-                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-amber-300 border border-white/10 transition-all shrink-0"
-              >
-                🛑 &ldquo;Cold&rdquo;
-              </button>
-              <button
-                type="button"
-                onClick={() => quickBroadcast("Heading to staging area.")}
-                className="whitespace-nowrap text-xs font-medium px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-cyan-200 border border-white/10 transition-all shrink-0"
-              >
-                📍 &ldquo;At Staging&rdquo;
-              </button>
-            </>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            setIsChannelModalOpen(true);
-            playTacticalChirp(1000);
-          }}
-          className="text-xs font-mono font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg hover:bg-white/5 transition-colors"
-        >
-          <span className="truncate max-w-[140px]">
-            {isDirectMode ? `🔒 ${activeDirectPartner?.callsign || "DM"}` : `#${currentChannelData.name}`}
-          </span>
-        </button>
-      </div>
 
       {/* Fullscreen Lightbox Modal */}
       {viewingImageUrl && (

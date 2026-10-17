@@ -158,6 +158,7 @@ export function ChannelPickerModal({
 
   // Filter direct partners
   const filteredPartners = directPartners.filter((p) => {
+    if (p.id === "dm_ro" || p.callsign.toUpperCase() === "RO BOT" || p.callsign.toUpperCase() === "RO") return false;
     if (activeFilterTab === "MATCH") return false;
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
