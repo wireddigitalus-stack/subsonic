@@ -106,24 +106,26 @@ function ProInviteContent() {
     const isChatAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
     const rawShooter = localStorage.getItem("subsonic_shooter_profile");
     const rawMember = localStorage.getItem("subsonic_member_profile");
+    const rawFull = localStorage.getItem("subsonic_pro_full_profile");
+    const hasCookieCallsign = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("subsonic_member_callsign="));
+
     let hasSavedCallsign = false;
     try {
-      if (rawShooter) {
-        const parsed = JSON.parse(rawShooter);
-        if (parsed?.callsign && parsed.callsign !== "GUEST") {
-          hasSavedCallsign = true;
-        }
-      }
-      if (!hasSavedCallsign && rawMember) {
-        const parsedMem = JSON.parse(rawMember);
-        if (parsedMem?.callsign && parsedMem.callsign !== "GUEST") {
-          hasSavedCallsign = true;
+      for (const raw of [rawShooter, rawMember, rawFull]) {
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.callsign && parsed.callsign !== "GUEST") {
+            hasSavedCallsign = true;
+            break;
+          }
         }
       }
     } catch {}
 
-    if (isChatAuth || hasSavedCallsign) {
-      router.replace("/");
+    if (isChatAuth || hasSavedCallsign || hasCookieCallsign) {
+      window.location.replace("/");
       return;
     }
 
@@ -132,7 +134,7 @@ function ProInviteContent() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.authenticated && data?.session) {
-          router.replace("/");
+          window.location.replace("/");
         } else {
           setCheckingExistingAuth(false);
         }
@@ -168,6 +170,37 @@ function ProInviteContent() {
         body: JSON.stringify({ code: clean }),
       });
       const data = await res.json();
+
+      // If this invite link was already claimed to sign up, restore session & go straight to Home (/)
+      if (data.alreadyClaimed) {
+        if (typeof window !== "undefined") {
+          try {
+            if (data.shooter) {
+              const s = data.shooter;
+              const rigStr =
+                typeof s.rifleSetup === "object" && s.rifleSetup
+                  ? [s.rifleSetup.action, s.rifleSetup.optic].filter(Boolean).join(" / ")
+                  : s.rifleSetup || "Precision Rimfire";
+              localStorage.setItem(
+                "subsonic_shooter_profile",
+                JSON.stringify({
+                  name: s.name || data.claimedCallsign,
+                  callsign: (s.callsign || data.claimedCallsign || "").toUpperCase(),
+                  role: "PRO_COMPETITOR",
+                  division: s.division || "Open Division Pro",
+                  rifleSetup: rigStr,
+                  badgeText: "PRO SHOOTER",
+                  image: s.image,
+                })
+              );
+              localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(s));
+            }
+            localStorage.setItem("subsonic_chat_authenticated", "true");
+          } catch {}
+          window.location.replace("/");
+          return;
+        }
+      }
 
       if (!res.ok || !data.valid) {
         setCodeValid(false);
@@ -523,6 +556,15 @@ function ProInviteContent() {
     );
   }
 
+  if (checkingExistingAuth) {
+    return (
+      <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-12 space-y-3">
+        <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono text-slate-400">Checking your shooter session...</p>
+      </div>
+    );
+  }
+
   // GATE SCREEN: Must enter or validate invite code first
   if (!codeValid) {
     return (
@@ -583,12 +625,21 @@ function ProInviteContent() {
             </button>
           </div>
 
-          <div className="pt-2 border-t border-white/5 text-[11px] text-slate-400">
-            Need an invite code? Contact Event Director{" "}
-            <span className="text-white font-semibold">Allen Hurley</span> or email{" "}
-            <a href="mailto:info@subsonicsociety.com" className="text-amber-400 hover:underline">
-              info@subsonicsociety.com
-            </a>
+          <div className="pt-3 border-t border-white/10 space-y-2.5">
+            <Link
+              href="/"
+              className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+            >
+              <span>Already Signed Up? Go to Home Page</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <div className="text-[11px] text-slate-400">
+              Need an invite code? Contact Event Director{" "}
+              <span className="text-white font-semibold">Allen Hurley</span> or email{" "}
+              <a href="mailto:info@subsonicsociety.com" className="text-amber-400 hover:underline">
+                info@subsonicsociety.com
+              </a>
+            </div>
           </div>
         </div>
       </div>

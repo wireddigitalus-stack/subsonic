@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { pin: _omit, ...publicShooter } = shooter;
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       shooter: publicShooter,
       member: {
@@ -218,6 +218,12 @@ export async function POST(req: NextRequest) {
       },
       profileUrl: `/shooters/${shooter.id}`,
     });
+    response.cookies.set("subsonic_member_callsign", callsign, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+    return response;
   } catch (err: any) {
     console.error("Onboarding failed:", err);
     // Roll back anything already created so the member can simply try again

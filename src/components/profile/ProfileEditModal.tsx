@@ -23,6 +23,43 @@ import { compressImageFile } from "@/lib/imageCompression";
 import { getAvatarColor, getUserInitials, DARK_AVATAR_COLORS } from "@/lib/avatar-colors";
 import { playTacticalChirp } from "@/lib/chat-audio";
 
+const PRESET_ACCOLADES = [
+  "TEAM USA 🇺🇸",
+  "NATIONAL CHAMPION 🏆",
+  "APPALACHIAN CUP 1ST 🥇",
+  "REGIONAL PODIUM FINISHER ⭐",
+  "TOP LADY MARKSMAN 🎯",
+  "PRODUCTION CLASS WINNER 🎖️",
+  "CERTIFIED RANGE OFFICER 🛡️",
+  "MASTER CLASS SHOOTER 👑",
+];
+
+const POPULAR_SPONSORS = [
+  "Modacam Custom Rifles",
+  "Subsonic Society",
+  "Zero Compromise Optic",
+  "MDT",
+  "Lapua",
+  "TriggerTech",
+];
+
+const PRESET_DIVISIONS = [
+  "Open Division Pro",
+  "Open Rimfire Pro",
+  "Production Class",
+  "Senior Division",
+  "Ladies Rimfire Division",
+  "Junior Marksman",
+];
+
+const PRESET_RANKINGS = [
+  "Pro Competitor",
+  "PRS Rimfire Competitor",
+  "NRL22 Competitor",
+  "Master Class Marksman",
+  "Southeast Champion",
+];
+
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -69,9 +106,82 @@ export function ProfileEditModal({
   const [tuner, setTuner] = useState("");
   const [ammoLot, setAmmoLot] = useState("");
 
-  // Accolades & Sponsors
-  const [accoladesText, setAccoladesText] = useState("");
-  const [sponsorsText, setSponsorsText] = useState("");
+  // Accolades & Sponsors (Interactive Array + Custom Input, matching Sign-Up)
+  const [accoladesList, setAccoladesList] = useState<string[]>([]);
+  const [customAccolade, setCustomAccolade] = useState("");
+  const [sponsorsList, setSponsorsList] = useState<string[]>([]);
+  const [customSponsor, setCustomSponsor] = useState("");
+
+  // Normalize accolade string to strip/compare base text (so "TEAM USA" matches "TEAM USA 🇺🇸")
+  const normalizeAccoladeBase = (val: string) =>
+    val.replace(/[^\x20-\x7E]/g, "").trim().toUpperCase();
+
+  const isAccoladeSelected = (preset: string) => {
+    const presetBase = normalizeAccoladeBase(preset);
+    return accoladesList.some(
+      (a) => a.toUpperCase() === preset.toUpperCase() || normalizeAccoladeBase(a) === presetBase
+    );
+  };
+
+  const toggleAccolade = (preset: string) => {
+    const presetBase = normalizeAccoladeBase(preset);
+    setAccoladesList((prev) => {
+      const exists = prev.some(
+        (a) => a.toUpperCase() === preset.toUpperCase() || normalizeAccoladeBase(a) === presetBase
+      );
+      if (exists) {
+        return prev.filter(
+          (a) => a.toUpperCase() !== preset.toUpperCase() && normalizeAccoladeBase(a) !== presetBase
+        );
+      }
+      return [...prev, preset];
+    });
+  };
+
+  const addCustomAccolade = () => {
+    const clean = customAccolade.trim().toUpperCase();
+    if (!clean) return;
+    // If they typed a preset name without the emoji (e.g. "TEAM USA"), use the official preset with badge!
+    const matchedPreset = PRESET_ACCOLADES.find(
+      (p) => normalizeAccoladeBase(p) === normalizeAccoladeBase(clean)
+    );
+    const finalAcc = matchedPreset || clean;
+    if (!isAccoladeSelected(finalAcc)) {
+      setAccoladesList((prev) => [...prev, finalAcc]);
+    }
+    setCustomAccolade("");
+  };
+
+  const removeAccolade = (acc: string) => {
+    setAccoladesList((prev) => prev.filter((item) => item !== acc));
+  };
+
+  const toggleSponsor = (sp: string) => {
+    setSponsorsList((prev) => {
+      const exists = prev.some((item) => item.toLowerCase() === sp.toLowerCase());
+      if (exists) {
+        return prev.filter((item) => item.toLowerCase() !== sp.toLowerCase());
+      }
+      return [...prev, sp];
+    });
+  };
+
+  const addCustomSponsor = () => {
+    const clean = customSponsor.trim();
+    if (!clean) return;
+    const matchedPreset = POPULAR_SPONSORS.find(
+      (p) => p.toLowerCase() === clean.toLowerCase()
+    );
+    const finalSp = matchedPreset || clean;
+    if (!sponsorsList.some((s) => s.toLowerCase() === finalSp.toLowerCase())) {
+      setSponsorsList((prev) => [...prev, finalSp]);
+    }
+    setCustomSponsor("");
+  };
+
+  const removeSponsor = (sp: string) => {
+    setSponsorsList((prev) => prev.filter((item) => item !== sp));
+  };
 
   // Image upload states
   const [isCompressingHeadshot, setIsCompressingHeadshot] = useState(false);
@@ -190,8 +300,26 @@ export function ProfileEditModal({
     setTuner(rig.tuner || "");
     setAmmoLot(rig.ammoLot || "");
 
-    setAccoladesText(Array.isArray(p.accolades) ? p.accolades.join(", ") : "");
-    setSponsorsText(Array.isArray(p.sponsors) ? p.sponsors.join(", ") : "");
+    // Upgrade any plain "TEAM USA" without flag to "TEAM USA 🇺🇸" automatically
+    const rawAcc = Array.isArray(p.accolades)
+      ? p.accolades.filter(Boolean)
+      : typeof p.accolades === "string"
+      ? p.accolades.split(",").map((s: string) => s.trim()).filter(Boolean)
+      : [];
+    const normalizedAcc = rawAcc.map((acc: string) => {
+      const matched = PRESET_ACCOLADES.find(
+        (preset) => normalizeAccoladeBase(preset) === normalizeAccoladeBase(acc)
+      );
+      return matched || acc;
+    });
+    setAccoladesList(normalizedAcc);
+
+    const rawSp = Array.isArray(p.sponsors)
+      ? p.sponsors.filter(Boolean)
+      : typeof p.sponsors === "string"
+      ? p.sponsors.split(",").map((s: string) => s.trim()).filter(Boolean)
+      : [];
+    setSponsorsList(rawSp);
   };
 
   // Format profile text for Copy/Paste pairing with Admin Dashboard
@@ -204,8 +332,8 @@ export function ProfileEditModal({
       `Ranking / Title: ${ranking || "Pro Competitor"}`,
       `Career Podiums: ${podiums ?? 0}`,
       `Home Range: ${homeRange || "The Hideout, Bristol TN"}`,
-      `Accolades: ${accoladesText || "None"}`,
-      `Sponsors: ${sponsorsText || "None"}`,
+      `Accolades: ${accoladesList.join(", ") || "None"}`,
+      `Sponsors: ${sponsorsList.join(", ") || "None"}`,
       `Rifle Action: ${rifleAction || "N/A"}`,
       `Barrel: ${barrel || "N/A"}`,
       `Trigger: ${trigger || "N/A"}`,
@@ -297,8 +425,12 @@ export function ProfileEditModal({
     if (parsedRanking !== undefined) setRanking(parsedRanking);
     if (parsedPodiums !== undefined && !isNaN(Number(parsedPodiums))) setPodiums(Number(parsedPodiums));
     if (parsedHomeRange !== undefined) setHomeRange(parsedHomeRange);
-    if (parsedAccolades !== undefined) setAccoladesText(parsedAccolades);
-    if (parsedSponsors !== undefined) setSponsorsText(parsedSponsors);
+    if (parsedAccolades !== undefined) {
+      setAccoladesList(parsedAccolades.split(",").map((s) => s.trim()).filter(Boolean));
+    }
+    if (parsedSponsors !== undefined) {
+      setSponsorsList(parsedSponsors.split(",").map((s) => s.trim()).filter(Boolean));
+    }
     if (parsedAction !== undefined) setRifleAction(parsedAction);
     if (parsedBarrel !== undefined) setBarrel(parsedBarrel);
     if (parsedTrigger !== undefined) setTrigger(parsedTrigger);
@@ -453,8 +585,8 @@ export function ProfileEditModal({
     setErrorMessage(null);
 
     const cleanCallsign = callsign.trim().toUpperCase();
-    const accolades = accoladesText.split(",").map((s) => s.trim()).filter(Boolean);
-    const sponsors = sponsorsText.split(",").map((s) => s.trim()).filter(Boolean);
+    const accolades = accoladesList.map((s) => s.trim()).filter(Boolean);
+    const sponsors = sponsorsList.map((s) => s.trim()).filter(Boolean);
 
     const isRob =
       cleanCallsign === "RADAR" ||
@@ -493,8 +625,8 @@ export function ProfileEditModal({
       image: headshotPhoto || "",
       actionPhoto: actionPhoto || "",
       posterImage: existingProfileData?.posterImage || initialShooter?.posterImage,
-      accolades: accolades.length > 0 ? accolades : existingProfileData?.accolades || [],
-      sponsors: sponsors.length > 0 ? sponsors : existingProfileData?.sponsors || [],
+      accolades,
+      sponsors,
       rifleSetup: {
         action: rifleAction.trim(),
         barrel: barrel.trim(),
@@ -605,28 +737,28 @@ export function ProfileEditModal({
     <div
       onPaste={handleModalClipboardPaste}
       onClick={() => onClose()}
-      className="fixed inset-0 z-[100] pointer-events-auto flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-[100] pointer-events-auto flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
     >
       <div
-        className="relative w-full max-w-2xl bg-zinc-950 border border-amber-500/30 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden pointer-events-auto"
+        className="relative w-full max-w-2xl bg-zinc-950 border border-amber-500/30 rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[94vh] overflow-hidden pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-white/10 bg-black/60 flex items-center justify-between gap-3 shrink-0 flex-wrap">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-              <Camera className="w-5 h-5" />
+        <div className="p-3.5 sm:p-5 border-b border-white/10 bg-black/60 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wider">
+                <h2 className="text-xs sm:text-base font-black text-white uppercase tracking-wider truncate">
                   Edit Profile &amp; Photos
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                   {callsign || "SHOOTER"}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate">
+              <p className="hidden sm:block text-[11px] text-slate-400 truncate">
                 Unified Competitor Editor • Paired with Admin Copy &amp; Paste
               </p>
             </div>
@@ -636,7 +768,7 @@ export function ProfileEditModal({
             <button
               type="button"
               onClick={() => handlePasteFromClipboardButton()}
-              className="px-2.5 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-300 font-mono text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer"
+              className="px-2 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/35 text-cyan-300 font-mono text-[10px] sm:text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer"
               title="Paste full profile or image from clipboard"
             >
               <ClipboardPaste className="w-3.5 h-3.5 text-cyan-400" />
@@ -646,11 +778,11 @@ export function ProfileEditModal({
             <button
               type="button"
               onClick={handleCopyFullProfile}
-              className="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 font-mono text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer"
+              className="px-2 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 font-mono text-[10px] sm:text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer"
               title="Copy full profile & images to clipboard"
             >
               <Copy className="w-3.5 h-3.5 text-amber-400" />
-              <span>{copiedProfile ? "✓ Copied" : "Copy Profile"}</span>
+              <span>{copiedProfile ? "✓ Copied" : "Copy"}</span>
             </button>
 
             <button
@@ -668,58 +800,58 @@ export function ProfileEditModal({
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center border-b border-white/10 bg-black/30 px-3 sm:px-5 gap-1 shrink-0 overflow-x-auto no-scrollbar">
+        {/* Navigation Tabs (All 4 fit on mobile screen without sideways scroll) */}
+        <div className="grid grid-cols-4 border-b border-white/10 bg-black/30 px-1 sm:px-4 shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab("PHOTOS")}
-            className={`py-3 px-3 sm:px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-1 sm:px-3 text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
               activeTab === "PHOTOS"
                 ? "border-amber-400 text-amber-300 bg-amber-500/5 font-bold"
                 : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <Camera className="w-3.5 h-3.5" />
-            <span>Profile Photos</span>
+            <Camera className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Photos</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("INTEL")}
-            className={`py-3 px-3 sm:px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-1 sm:px-3 text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
               activeTab === "INTEL"
                 ? "border-amber-400 text-amber-300 bg-amber-500/5 font-bold"
                 : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <User className="w-3.5 h-3.5" />
-            <span>Shooter Intel</span>
+            <User className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Shooter Intel</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("RIG")}
-            className={`py-3 px-3 sm:px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-1 sm:px-3 text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
               activeTab === "RIG"
                 ? "border-amber-400 text-amber-300 bg-amber-500/5 font-bold"
                 : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <Crosshair className="w-3.5 h-3.5" />
-            <span>Rifle Rig</span>
+            <Crosshair className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Rifle Rig</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("SPONSORS")}
-            className={`py-3 px-3 sm:px-4 text-xs font-semibold flex items-center gap-2 border-b-2 transition-all whitespace-nowrap cursor-pointer ${
+            className={`py-2.5 sm:py-3 px-1 sm:px-3 text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 border-b-2 transition-all cursor-pointer ${
               activeTab === "SPONSORS"
                 ? "border-amber-400 text-amber-300 bg-amber-500/5 font-bold"
                 : "border-transparent text-slate-400 hover:text-slate-200"
             }`}
           >
-            <Trophy className="w-3.5 h-3.5" />
-            <span>Sponsors &amp; Bio</span>
+            <Trophy className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Sponsors &amp; Bio</span>
           </button>
         </div>
 
@@ -1039,66 +1171,112 @@ export function ProfileEditModal({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Division
+                        Competition Division
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={division}
                         onChange={(e) => setDivision(e.target.value)}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-                      />
+                      >
+                        {!PRESET_DIVISIONS.includes(division) && division && (
+                          <option value={division}>{division}</option>
+                        )}
+                        <option value="Open Division Pro">Open Division Pro</option>
+                        <option value="Open Rimfire Pro">Open Rimfire Pro</option>
+                        <option value="Production Class">Production Class</option>
+                        <option value="Senior Division">Senior Division (55+)</option>
+                        <option value="Ladies Rimfire Division">Ladies Rimfire Division</option>
+                        <option value="Junior Marksman">Junior Marksman</option>
+                      </select>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Ranking / Title
-                      </label>
-                      <input
-                        type="text"
-                        value={ranking}
-                        onChange={(e) => setRanking(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                        Career Podiums
+                      <label className="text-xs font-mono text-amber-400 font-bold uppercase">
+                        Career Podium Finishes
                       </label>
                       <input
                         type="number"
                         min={0}
                         value={podiums}
                         onChange={(e) => setPodiums(parseInt(e.target.value) || 0)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-amber-400 font-mono font-bold text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Home Range Facility
+                      Ranking / Title
+                    </label>
+                    <input
+                      type="text"
+                      value={ranking}
+                      onChange={(e) => setRanking(e.target.value)}
+                      placeholder="e.g. Southeast Champion • PRS Rimfire Competitor"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
+                    />
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                      {PRESET_RANKINGS.map((presetRank) => {
+                        const active = ranking === presetRank;
+                        return (
+                          <button
+                            key={presetRank}
+                            type="button"
+                            onClick={() => setRanking(presetRank)}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+                              active
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {presetRank}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
+                      Home Club / Home Range
                     </label>
                     <input
                       type="text"
                       value={homeRange}
                       onChange={(e) => setHomeRange(e.target.value)}
+                      placeholder="e.g. The Hideout, Bristol, TN"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
                     />
+                    <div className="flex flex-wrap gap-1.5">
+                      {["The Hideout, Bristol, TN", "Kettlefoot Rod & Gun Club, Bristol, VA"].map((rangePreset) => (
+                        <button
+                          key={rangePreset}
+                          type="button"
+                          onClick={() => setHomeRange(rangePreset)}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+                            homeRange === rangePreset
+                              ? "bg-amber-500 text-black font-bold"
+                              : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                          }`}
+                        >
+                          {rangePreset}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Competitor Bio / Personal Motto
+                      Competitor Bio / Personal Quote
                     </label>
                     <textarea
                       rows={3}
                       value={quote}
                       onChange={(e) => setQuote(e.target.value)}
-                      placeholder="Competitor quote or bio..."
+                      placeholder="Share a brief competitor bio, shooting philosophy, or wind-reading quote..."
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none resize-none"
                     />
                   </div>
@@ -1120,6 +1298,22 @@ export function ProfileEditModal({
                         placeholder="e.g. Modacam Custom Precision V-22"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {["Modacam Custom V-22", "Zermatt RimX", "Vudoo V-22", "CZ 457", "Bergara B-14R"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setRifleAction(item)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
+                              rifleAction === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1133,6 +1327,22 @@ export function ProfileEditModal({
                         placeholder='e.g. 22" Custom Fluted Match Contour'
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {['22" Modacam Custom', '24" Bartlein Heavy', '22" MullerWorks', '20" Proof Research'].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setBarrel(item)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
+                              barrel === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -1148,6 +1358,22 @@ export function ProfileEditModal({
                         placeholder="e.g. MDT ACC Elite"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {["MDT ACC Elite", "Foundation Centurion", "MPA BA Comp", "KRG Whiskey-3"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setChassis(item)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
+                              chassis === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1161,6 +1387,22 @@ export function ProfileEditModal({
                         placeholder="e.g. Zero Compromise Optic ZC527"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {["ZCO 527", "Nightforce ATACR 7-35", "Kahles K525i", "Vortex Razor Gen III"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setOptic(item)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-mono transition-all cursor-pointer ${
+                              optic === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -1176,6 +1418,22 @@ export function ProfileEditModal({
                         placeholder="e.g. TriggerTech Diamond Pro"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {["TriggerTech Diamond", "Bix'n Andy"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setTrigger(item)}
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                              trigger === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1189,6 +1447,22 @@ export function ProfileEditModal({
                         placeholder="e.g. Harmonic Tuner"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {["ATS Tuner", "EC Tuner"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setTuner(item)}
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                              tuner === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -1202,37 +1476,223 @@ export function ProfileEditModal({
                         placeholder="e.g. Lapua Center-X"
                         className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
                       />
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {["Lapua Center-X", "Lapua Midas+", "Eley Tenex"].map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => setAmmoLot(item)}
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer ${
+                              ammoLot === item
+                                ? "bg-amber-500 text-black font-bold"
+                                : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                            }`}
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* TAB 4: SPONSORS & ACCOLADES */}
+              {/* TAB 4: SPONSORS & ACCOLADES (Preset Buttons + Active Chips + Bio, matching Sign-Up) */}
               {activeTab === "SPONSORS" && (
-                <div className="space-y-4 animate-fadeIn">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Presenting Sponsors &amp; Partners (Comma-separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={sponsorsText}
-                      onChange={(e) => setSponsorsText(e.target.value)}
-                      placeholder="e.g. Modacam Custom Rifles, Subsonic Society, Zero Compromise Optic, MDT"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
-                    />
+                <div className="space-y-6 animate-fadeIn">
+                  {/* ACCOLADES SECTION */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono font-bold text-amber-400 uppercase block">
+                        Accolades &amp; Career Honors
+                      </label>
+                      <p className="text-[11px] text-slate-400">
+                        Tap any preset badge below to toggle it on or off, or add a custom title.
+                      </p>
+                    </div>
+
+                    {/* Active Accolades Chips */}
+                    {accoladesList.length > 0 && (
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                          Active on Your Profile ({accoladesList.length}):
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {accoladesList.map((acc) => (
+                            <span
+                              key={acc}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-mono font-bold"
+                            >
+                              <span>{acc}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeAccolade(acc)}
+                                title={`Remove ${acc}`}
+                                className="w-4 h-4 rounded-full bg-black/40 hover:bg-red-500/30 text-amber-200 hover:text-red-300 flex items-center justify-center transition-colors cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Preset Accolades Buttons (Exact Match to Sign-Up) */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                        Tap Preset Accolades to Add / Remove:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {PRESET_ACCOLADES.map((acc) => {
+                          const selected = isAccoladeSelected(acc);
+                          return (
+                            <button
+                              key={acc}
+                              type="button"
+                              onClick={() => toggleAccolade(acc)}
+                              className={`px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                                selected
+                                  ? "bg-amber-500 text-black shadow-tactical-glow"
+                                  : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                              }`}
+                            >
+                              {selected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                              <span>{acc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Add Custom Accolade */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="text"
+                        value={customAccolade}
+                        onChange={(e) => setCustomAccolade(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addCustomAccolade();
+                          }
+                        }}
+                        placeholder="Add custom title (e.g. 2026 BRISTOL CHAMPION)"
+                        className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-xs font-mono uppercase focus:border-amber-400 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomAccolade}
+                        className="px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold shrink-0 cursor-pointer"
+                      >
+                        + Add
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-mono text-slate-300 font-bold uppercase">
-                      Accolades &amp; Career Honors (Comma-separated)
+                  {/* SPONSORS SECTION */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-mono font-bold text-blue-400 uppercase block">
+                        Presenting Sponsors &amp; Factory Partners
+                      </label>
+                      <p className="text-[11px] text-slate-400">
+                        Tap a sponsor below to toggle it on your profile, or add custom sponsors.
+                      </p>
+                    </div>
+
+                    {/* Active Sponsors Chips */}
+                    {sponsorsList.length > 0 && (
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                          Active Sponsors ({sponsorsList.length}):
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {sponsorsList.map((sp) => (
+                            <span
+                              key={sp}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/50 text-blue-200 text-xs font-mono font-bold"
+                            >
+                              <span>{sp}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeSponsor(sp)}
+                                title={`Remove ${sp}`}
+                                className="w-4 h-4 rounded-full bg-black/40 hover:bg-red-500/30 text-blue-200 hover:text-red-300 flex items-center justify-center transition-colors cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Preset Sponsors Buttons */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                        Tap Preset Sponsors to Add / Remove:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {POPULAR_SPONSORS.map((sp) => {
+                          const selected = sponsorsList.some(
+                            (item) => item.toLowerCase() === sp.toLowerCase()
+                          );
+                          return (
+                            <button
+                              key={sp}
+                              type="button"
+                              onClick={() => toggleSponsor(sp)}
+                              className={`px-3 py-2 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+                                selected
+                                  ? "bg-blue-500 text-white font-bold shadow-tactical-glow"
+                                  : "bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
+                              }`}
+                            >
+                              {selected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                              <span>{sp}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Add Custom Sponsor */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="text"
+                        value={customSponsor}
+                        onChange={(e) => setCustomSponsor(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addCustomSponsor();
+                          }
+                        }}
+                        placeholder="Add custom sponsor name..."
+                        className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white text-xs font-mono focus:border-blue-400 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomSponsor}
+                        className="px-4 py-2.5 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-xs font-mono font-bold shrink-0 cursor-pointer"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* COMPETITOR BIO SECTION */}
+                  <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                    <label className="text-xs font-mono text-slate-300 font-bold uppercase block">
+                      Competitor Bio / Personal Quote
                     </label>
-                    <input
-                      type="text"
-                      value={accoladesText}
-                      onChange={(e) => setAccoladesText(e.target.value)}
-                      placeholder="e.g. FOUNDER 👑, TEAM USA 🇺🇸, NATIONAL CHAMPION, MATCH HOST"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none"
+                    <textarea
+                      rows={3}
+                      value={quote}
+                      onChange={(e) => setQuote(e.target.value)}
+                      placeholder="Share a brief competitor bio, shooting philosophy, or wind-reading quote..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-mono text-xs focus:border-amber-400 focus:outline-none resize-none"
                     />
                   </div>
                 </div>

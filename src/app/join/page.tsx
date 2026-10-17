@@ -27,19 +27,25 @@ export default function JoinSocietyGatePage() {
     const isChatAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
     const rawShooter = localStorage.getItem("subsonic_shooter_profile");
     const rawMember = localStorage.getItem("subsonic_member_profile");
+    const rawFull = localStorage.getItem("subsonic_pro_full_profile");
+    const hasCookieCallsign = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("subsonic_member_callsign="));
+
     let hasSavedCallsign = false;
     try {
-      if (rawShooter) {
-        const parsed = JSON.parse(rawShooter);
-        if (parsed?.callsign && parsed.callsign !== "GUEST") hasSavedCallsign = true;
-      }
-      if (!hasSavedCallsign && rawMember) {
-        const parsedMem = JSON.parse(rawMember);
-        if (parsedMem?.callsign && parsedMem.callsign !== "GUEST") hasSavedCallsign = true;
+      for (const raw of [rawShooter, rawMember, rawFull]) {
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.callsign && parsed.callsign !== "GUEST") {
+            hasSavedCallsign = true;
+            break;
+          }
+        }
       }
     } catch {}
-    if (isChatAuth || hasSavedCallsign) {
-      router.replace("/");
+    if (isChatAuth || hasSavedCallsign || hasCookieCallsign) {
+      window.location.replace("/");
     }
   }, [router]);
 
@@ -61,6 +67,36 @@ export default function JoinSocietyGatePage() {
         body: JSON.stringify({ code: clean }),
       });
       const data = await res.json();
+
+      if (data.alreadyClaimed) {
+        if (typeof window !== "undefined") {
+          try {
+            if (data.shooter) {
+              const s = data.shooter;
+              const rigStr =
+                typeof s.rifleSetup === "object" && s.rifleSetup
+                  ? [s.rifleSetup.action, s.rifleSetup.optic].filter(Boolean).join(" / ")
+                  : s.rifleSetup || "Precision Rimfire";
+              localStorage.setItem(
+                "subsonic_shooter_profile",
+                JSON.stringify({
+                  name: s.name || data.claimedCallsign,
+                  callsign: (s.callsign || data.claimedCallsign || "").toUpperCase(),
+                  role: "PRO_COMPETITOR",
+                  division: s.division || "Open Division Pro",
+                  rifleSetup: rigStr,
+                  badgeText: "PRO SHOOTER",
+                  image: s.image,
+                })
+              );
+              localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(s));
+            }
+            localStorage.setItem("subsonic_chat_authenticated", "true");
+          } catch {}
+          window.location.replace("/");
+          return;
+        }
+      }
 
       if (!res.ok || !data.valid) {
         setErrorMessage(data.error || "Invalid or expired invitation code. Please check your credentials.");

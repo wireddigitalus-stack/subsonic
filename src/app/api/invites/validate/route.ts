@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getInvitesFromStorage, refreshInvitesFromDb } from "@/lib/invites";
+import { getShootersFromStorage, refreshShootersFromDb } from "@/lib/shooters";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +36,43 @@ export async function POST(req: NextRequest) {
     }
 
     if (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses) {
+      const claimedCallsign =
+        Array.isArray(invite.claimedBy) && invite.claimedBy.length > 0
+          ? String(invite.claimedBy[invite.claimedBy.length - 1]).toUpperCase()
+          : null;
+
+      if (claimedCallsign) {
+        await refreshShootersFromDb(0);
+        const shooters = getShootersFromStorage();
+        const foundShooter = shooters.find(
+          (s) =>
+            s.callsign?.toUpperCase() === claimedCallsign ||
+            s.id?.toLowerCase() === claimedCallsign.toLowerCase()
+        );
+        const publicShooter = foundShooter
+          ? (() => {
+              const { pin: _omit, ...rest } = foundShooter as any;
+              return rest;
+            })()
+          : null;
+
+        const claimedRes = NextResponse.json({
+          valid: false,
+          alreadyClaimed: true,
+          claimedCallsign,
+          shooter: publicShooter,
+          error: "Already registered! Redirecting you to the Home page...",
+        });
+        claimedRes.cookies.set("subsonic_member_callsign", claimedCallsign, {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: "lax",
+        });
+        return claimedRes;
+      }
+
       return NextResponse.json(
-        { valid: false, error: "This invite code has already reached its maximum usage limit." },
+        { valid: false, alreadyClaimed: true, error: "This invite code has already been registered." },
         { status: 410 }
       );
     }

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
               s.id?.toLowerCase() === finalCallsign.toLowerCase()
           );
 
-          return NextResponse.json({
+          const execRes = NextResponse.json({
             authenticated: true,
             profile: {
               name: exec.name,
@@ -92,6 +92,12 @@ export async function POST(req: NextRequest) {
               created_at: '2026-07-04T12:00:00Z',
             },
           });
+          execRes.cookies.set('subsonic_member_callsign', finalCallsign, {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: 'lax',
+          });
+          return execRes;
         }
       }
     }
@@ -179,11 +185,17 @@ export async function POST(req: NextRequest) {
       created_at: member.created_at,
     } : null;
     
-    return NextResponse.json({
+    const response = NextResponse.json({
       authenticated: true,
       profile: profileData,
       member: memberData,
     });
+    response.cookies.set('subsonic_member_callsign', cleanCallsign, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+    return response;
   } catch (error) {
     console.error('Chat auth error:', error);
     return NextResponse.json({ error: 'Authentication service error.' }, { status: 500 });
