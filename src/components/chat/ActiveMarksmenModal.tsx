@@ -166,7 +166,7 @@ export function ActiveMarksmenModal({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <h3 className="font-mono font-bold text-sm sm:text-base text-white tracking-wide uppercase">
-              In Chat Now
+              Active Users
             </h3>
             <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
               {Math.max(1, allLivePartners.length)} Online
@@ -189,7 +189,7 @@ export function ActiveMarksmenModal({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search who is in chat..."
+            placeholder="Search active users..."
             className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/50 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
           />
         </div>
@@ -201,7 +201,7 @@ export function ActiveMarksmenModal({
             <div className="flex items-center justify-between px-1">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Live in Chat Room ({currentlyOnline.length})
+                Active Users Online ({currentlyOnline.length})
               </span>
             </div>
 

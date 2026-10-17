@@ -34,112 +34,94 @@ export interface ChatChannelSidebarProps {
   onDeleteRoom?: (id: string) => void;
 }
 
+const ROOM_COLOR_THEMES: Record<
+  string,
+  {
+    dot: string;
+    hash: string;
+    activeCard: string;
+    inactiveCard: string;
+    badgeActive: string;
+    badgeInactive: string;
+  }
+> = {
+  amber: {
+    dot: "bg-amber-400",
+    hash: "text-amber-400",
+    activeCard: "bg-amber-500/15 border-amber-500/40 text-white shadow-[inset_3px_0_0_0_#f59e0b]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-amber-500/30 hover:bg-amber-500/[0.06] text-slate-200",
+    badgeActive: "bg-amber-500 text-black",
+    badgeInactive: "bg-amber-500/15 text-amber-300 border border-amber-500/30",
+  },
+  emerald: {
+    dot: "bg-emerald-400",
+    hash: "text-emerald-400",
+    activeCard: "bg-emerald-500/15 border-emerald-500/40 text-white shadow-[inset_3px_0_0_0_#10b981]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-emerald-500/30 hover:bg-emerald-500/[0.06] text-slate-200",
+    badgeActive: "bg-emerald-500 text-black",
+    badgeInactive: "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30",
+  },
+  cyan: {
+    dot: "bg-cyan-400",
+    hash: "text-cyan-400",
+    activeCard: "bg-cyan-500/15 border-cyan-500/40 text-white shadow-[inset_3px_0_0_0_#06b6d4]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-cyan-500/30 hover:bg-cyan-500/[0.06] text-slate-200",
+    badgeActive: "bg-cyan-400 text-black",
+    badgeInactive: "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30",
+  },
+  purple: {
+    dot: "bg-purple-400",
+    hash: "text-purple-400",
+    activeCard: "bg-purple-500/15 border-purple-500/40 text-white shadow-[inset_3px_0_0_0_#a855f7]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-purple-500/30 hover:bg-purple-500/[0.06] text-slate-200",
+    badgeActive: "bg-purple-500 text-white",
+    badgeInactive: "bg-purple-500/15 text-purple-300 border border-purple-500/30",
+  },
+  rose: {
+    dot: "bg-rose-400",
+    hash: "text-rose-400",
+    activeCard: "bg-rose-500/15 border-rose-500/40 text-white shadow-[inset_3px_0_0_0_#f43f5e]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-rose-500/30 hover:bg-rose-500/[0.06] text-slate-200",
+    badgeActive: "bg-rose-500 text-white",
+    badgeInactive: "bg-rose-500/15 text-rose-300 border border-rose-500/30",
+  },
+  blue: {
+    dot: "bg-blue-400",
+    hash: "text-blue-400",
+    activeCard: "bg-blue-500/15 border-blue-500/40 text-white shadow-[inset_3px_0_0_0_#3b82f6]",
+    inactiveCard: "bg-white/[0.02] border-white/10 hover:border-blue-500/30 hover:bg-blue-500/[0.06] text-slate-200",
+    badgeActive: "bg-blue-500 text-white",
+    badgeInactive: "bg-blue-500/15 text-blue-300 border border-blue-500/30",
+  },
+};
+
+function resolveRoomColorKey(ch: any, idx: number): string {
+  if (ch?.color && ROOM_COLOR_THEMES[ch.color]) return ch.color;
+  const id = (ch?.id || "").toLowerCase();
+  if (id === "invitational") return "amber";
+  if (id.includes("lunch") || id.includes("food") || id.includes("menu")) return "emerald";
+  if (id.includes("stage") || id.includes("range") || id.includes("dope")) return "cyan";
+  if (id.includes("lodg") || id.includes("hotel") || id.includes("dining")) return "purple";
+  if (id.includes("admin") || id.includes("staff") || ch?.adminOnly) return "rose";
+  const keys = ["emerald", "cyan", "purple", "blue", "rose", "amber"];
+  return keys[idx % keys.length];
+}
+
 export function ChatChannelSidebar({
   visibleChannels,
   currentChannel,
   setCurrentChannel,
   channelEngagementMap,
-  directPartners = [],
   unreadCounts = {},
-  onOpenDossier,
   shooterProfile,
   onEditProfile,
   onLogout,
-  onlineCallsigns = [],
-  lastActiveMap = {},
   isAdmin = false,
   onOpenNewRoomModal,
   onDeleteRoom,
 }: ChatChannelSidebarProps) {
   const selfCallsign = (shooterProfile?.callsign || "").toUpperCase();
   const selfIsMaster = shooterProfile?.role === "MASTER_OWNER" || selfCallsign === "RADAR" || selfCallsign === "ROB";
-
-  // Build unified list of everyone currently IN CHAT NOW (online within 90s + current user)
-  const inChatNowList = React.useMemo(() => {
-    const now = Date.now();
-    const activeWindowMs = 90_000;
-    const onlineSet = new Set(onlineCallsigns.map((c) => c.toUpperCase()));
-
-    // Normalize executive aliases so ALLEN <-> SUBX and ROB <-> RADAR never duplicate
-    const normalizeKey = (cs: string) => {
-      const upper = (cs || "").trim().toUpperCase();
-      if (["ALLEN", "AHURLEY", "HURLEY", "SAID DONE", "SAIDDONE", "SUBX"].includes(upper)) return "SUBX";
-      if (["ROB", "LTDAN", "RADAR"].includes(upper)) return "RADAR";
-      return upper;
-    };
-
-    const isKeyOnline = (cs: string) => {
-      const key = normalizeKey(cs);
-      const raw = (cs || "").toUpperCase();
-      if (key === normalizeKey(selfCallsign)) return true;
-      if (onlineSet.has(key) || onlineSet.has(raw)) return true;
-      if (key === "SUBX" && (onlineSet.has("ALLEN") || onlineSet.has("SUBX"))) return true;
-      if (key === "RADAR" && (onlineSet.has("ROB") || onlineSet.has("RADAR"))) return true;
-      const lastSeen =
-        (lastActiveMap && (lastActiveMap[key] || lastActiveMap[raw])) ||
-        (key === "SUBX" ? lastActiveMap?.["ALLEN"] || 0 : 0) ||
-        (key === "RADAR" ? lastActiveMap?.["ROB"] || 0 : 0);
-      return lastSeen > 0 && now - lastSeen < activeWindowMs;
-    };
-
-    const resultMap = new Map<string, DirectPartner & { isSelf?: boolean }>();
-
-    // 1. Always include current logged-in user first
-    if (shooterProfile && selfCallsign && selfCallsign !== "GUEST") {
-      const myKey = normalizeKey(selfCallsign);
-      const matchedSelf = directPartners.find((p) => normalizeKey(p.callsign) === myKey);
-      resultMap.set(myKey, {
-        id: `self_${myKey}`,
-        callsign: shooterProfile.callsign,
-        name: shooterProfile.name || matchedSelf?.name || shooterProfile.callsign,
-        role: (shooterProfile.role as any) || matchedSelf?.role || "MEMBER",
-        badgeText: shooterProfile.badgeText || matchedSelf?.badgeText || "ONLINE",
-        division: shooterProfile.division || matchedSelf?.division || "Competitor",
-        rifleSetup: shooterProfile.rifleSetup || matchedSelf?.rifleSetup,
-        image: shooterProfile.image || matchedSelf?.image,
-        avatarColor: shooterProfile.avatarColor || matchedSelf?.avatarColor,
-        status: "online",
-        isSelf: true,
-      });
-    }
-
-    // 2. Include any partner from directPartners who is currently online
-    for (const p of directPartners) {
-      if (p.id === "dm_ro" || p.callsign.toUpperCase() === "RO" || p.callsign.toUpperCase() === "RO BOT") continue;
-      const key = normalizeKey(p.callsign);
-      if (!key || resultMap.has(key)) continue;
-      if (isKeyOnline(p.callsign)) {
-        resultMap.set(key, {
-          ...p,
-          status: "online",
-        });
-      }
-    }
-
-    // 3. Include any onlineCallsign not yet in resultMap (e.g. a member who isn't in shooters table)
-    for (const rawCs of onlineCallsigns) {
-      const key = normalizeKey(rawCs);
-      if (!key || key === "RO" || key === "RO BOT" || key === "GUEST" || resultMap.has(key)) continue;
-      const matched = directPartners.find((p) => normalizeKey(p.callsign) === key);
-      if (matched) {
-        resultMap.set(key, { ...matched, status: "online" });
-      } else {
-        const isAllen = key === "SUBX";
-        const isRadar = key === "RADAR";
-        resultMap.set(key, {
-          id: `online_${key}`,
-          callsign: key,
-          name: isAllen ? "Allen Hurley" : isRadar ? "Rob Neilson" : key,
-          role: isRadar ? "MASTER_OWNER" : isAllen ? "OWNER_ADMIN" : "PRO_COMPETITOR",
-          badgeText: isRadar ? "MASTER ADMIN" : isAllen ? "OWNER ADMIN" : "IN CHAT",
-          division: isRadar ? "Master Admin" : isAllen ? "Owner Admin / Executive" : "Society Member",
-          status: "online",
-        });
-      }
-    }
-
-    return Array.from(resultMap.values());
-  }, [shooterProfile, selfCallsign, directPartners, onlineCallsigns, lastActiveMap]);
 
   return (
     <div className="hidden lg:flex lg:col-span-4 flex-col h-full min-h-0">
@@ -188,7 +170,7 @@ export function ChatChannelSidebar({
                   type="button"
                   onClick={onEditProfile}
                   title="Edit Profile & Photos"
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors"
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
                 >
                   <Camera className="w-3.5 h-3.5 text-amber-400" />
                 </button>
@@ -198,7 +180,7 @@ export function ChatChannelSidebar({
                   type="button"
                   onClick={onLogout}
                   title="Log Out of Chat"
-                  className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors flex items-center gap-1 text-xs font-semibold"
+                  className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="text-[11px]">LOGOUT</span>
@@ -208,12 +190,12 @@ export function ChatChannelSidebar({
           </div>
         )}
 
-        {/* Scrollable Channels & In-Chat-Now List */}
+        {/* Scrollable Chat Rooms List (Color-Coded) */}
         <div className="space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar pr-0.5">
           <div>
             <div className="flex items-center justify-between px-1 mb-2">
               <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">
-                Chat Rooms
+                Chat Rooms ({visibleChannels.length})
               </span>
               {isAdmin && onOpenNewRoomModal && (
                 <button
@@ -228,12 +210,14 @@ export function ChatChannelSidebar({
               )}
             </div>
 
-            <div className="space-y-1.5">
-              {visibleChannels.map((ch) => {
+            <div className="space-y-2">
+              {visibleChannels.map((ch, idx) => {
                 const isActive = currentChannel === ch.id;
                 const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
                 const unread = unreadCounts[ch.id] || 0;
                 const isCustomRoom = ch.id !== "invitational";
+                const colorKey = resolveRoomColorKey(ch, idx);
+                const theme = ROOM_COLOR_THEMES[colorKey] || ROOM_COLOR_THEMES.amber;
 
                 return (
                   <div
@@ -241,17 +225,16 @@ export function ChatChannelSidebar({
                     onClick={() => setCurrentChannel(ch.id)}
                     data-telemetry={`chat_channel_${ch.id}`}
                     className={`group w-full p-3 rounded-xl text-left transition-all border relative cursor-pointer ${
-                      isActive
-                        ? "bg-white/[0.08] border-amber-500/30 text-white"
-                        : "bg-transparent border-transparent hover:bg-white/[0.04] text-slate-300"
+                      isActive ? theme.activeCard : theme.inactiveCard
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1 gap-2">
                       <div className="flex items-center gap-1.5 font-mono font-bold text-sm min-w-0">
-                        <span className={isActive ? "text-amber-400" : "text-slate-500"}>#</span>
+                        <span className={`w-2 h-2 rounded-full shrink-0 ${theme.dot}`} />
+                        <span className={theme.hash}>#</span>
                         <span className="truncate">{ch.name}</span>
                         {ch.adminOnly && (
-                          <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <Lock className="w-3 h-3 text-rose-400 shrink-0" />
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -261,11 +244,7 @@ export function ChatChannelSidebar({
                         </span>
 
                         <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                          ch.adminOnly
-                            ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                            : isActive
-                            ? "bg-amber-500 text-black"
-                            : "bg-white/10 text-slate-200"
+                          isActive ? theme.badgeActive : theme.badgeInactive
                         }`}>
                           {ch.badge}
                         </span>
@@ -284,7 +263,7 @@ export function ChatChannelSidebar({
                               onDeleteRoom(ch.id);
                             }}
                             title={`Delete #${ch.name}`}
-                            className="p-1 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="p-1 rounded-md text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -307,149 +286,7 @@ export function ChatChannelSidebar({
               })}
             </div>
           </div>
-
-          {/* Section 2: In Chat Now (Live Online Users Only — No 94-Shooter Static Roster) */}
-          <div className="pt-2 border-t border-white/10">
-            <div className="flex items-center justify-between px-1 mb-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                In Chat Now
-              </span>
-              <span className="text-[11px] font-mono font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                {inChatNowList.length} Online
-              </span>
-            </div>
-
-            <div className="space-y-1.5">
-              {inChatNowList.map((partner) => {
-                const pCallsign = (partner.callsign || "").toUpperCase();
-                const isMasterOwner = partner.role === "MASTER_OWNER" || pCallsign === "ROB" || pCallsign === "RADAR";
-                const pColor = getAvatarColor(partner.avatarColor, pCallsign || partner.name);
-                const pInitials = getUserInitials(partner.name, partner.callsign);
-
-                return (
-                  <div
-                    key={partner.id}
-                    onClick={() => onOpenDossier && onOpenDossier(partner)}
-                    className="group w-full rounded-xl transition-all border border-white/5 bg-white/[0.02] hover:bg-white/[0.06] text-slate-300 flex items-center justify-between p-2.5 cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1 text-left">
-                      <div className="relative shrink-0">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-emerald-400/40 text-white overflow-hidden shadow-sm shrink-0"
-                          style={
-                            !partner.image
-                              ? {
-                                  backgroundColor: pColor.hex,
-                                  boxShadow: `inset 0 0 0 1px ${pColor.borderHex}`,
-                                }
-                              : undefined
-                          }
-                        >
-                          {partner.image ? (
-                            <img src={partner.image} alt="" className="w-full h-full object-cover" />
-                          ) : isMasterOwner ? (
-                            <Radar className="w-4 h-4 text-cyan-300 stroke-[2.2] animate-pulse" />
-                          ) : (
-                            <span className="text-white font-bold tracking-wider text-[11px]">
-                              {pInitials}
-                            </span>
-                          )}
-                        </div>
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-black bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)] animate-pulse" />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold truncate text-white group-hover:text-amber-300 transition-colors">
-                            {partner.name}
-                          </span>
-                          <span className={`text-xs font-mono font-bold shrink-0 ${
-                            isMasterOwner ? "text-cyan-300" : "text-amber-300"
-                          }`}>
-                            [{partner.callsign}]
-                          </span>
-                          {partner.isSelf && (
-                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 shrink-0">
-                              YOU
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs font-mono text-emerald-400 truncate flex items-center gap-1 font-medium">
-                          <span>Active now</span>
-                          <span className="text-slate-500">•</span>
-                          <span className="text-slate-300 truncate">{partner.division || "Competitor"}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {onOpenDossier && (
-                      <div className="flex items-center gap-1 shrink-0 ml-1.5">
-                        <span
-                          className="p-1 rounded-lg group-hover:bg-white/10 text-slate-400 group-hover:text-amber-300 transition-colors"
-                          title={`View ${partner.callsign} Profile`}
-                        >
-                          <Info className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
-
-        {/* Bottom Member Account & Quick Logout Bar */}
-        {shooterProfile?.callsign && (
-          <div className="pt-3 mt-2 border-t border-white/10 shrink-0 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => onEditProfile && onEditProfile()}
-              className="flex items-center gap-2 min-w-0 flex-1 p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors text-left cursor-pointer"
-              title="Edit Profile & Photos"
-            >
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-white/20 text-white overflow-hidden shrink-0"
-                style={
-                  !shooterProfile.image
-                    ? { backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex }
-                    : undefined
-                }
-              >
-                {shooterProfile.image ? (
-                  <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
-                ) : (shooterProfile.role === "MASTER_OWNER" || shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB") ? (
-                  <Radar className="w-4 h-4 text-cyan-300" />
-                ) : (
-                  <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-mono font-bold text-white truncate">
-                  {shooterProfile.callsign}
-                </div>
-                <div className="text-[10px] text-amber-400 flex items-center gap-1">
-                  <Camera className="w-3 h-3" />
-                  <span>Edit Profile</span>
-                </div>
-              </div>
-            </button>
-
-            {onLogout && (
-              <button
-                type="button"
-                onClick={onLogout}
-                className="px-2.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer"
-                title="Log Out of Chat"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Log Out</span>
-              </button>
-            )}
-          </div>
-        )}
-
       </div>
     </div>
   );

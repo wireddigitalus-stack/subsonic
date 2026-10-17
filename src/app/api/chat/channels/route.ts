@@ -28,7 +28,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, desc, badge, adminOnly, callsign, role } = body;
+    const { name, desc, badge, color, adminOnly, callsign, role } = body;
 
     if (!isCallerAdmin(callsign, role)) {
       return NextResponse.json(
@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
         desc: desc?.trim() || `Match room #${cleanId}`,
         netType: "PRO",
         activeUsers: 94,
+        color: color || "emerald",
         adminOnly: Boolean(adminOnly),
         isCustom: true,
       },

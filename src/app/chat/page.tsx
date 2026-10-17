@@ -103,6 +103,74 @@ interface ChannelConfig {
   activeUsers: number;
   adminOnly?: boolean;
   isCustom?: boolean;
+  color?: string;
+}
+
+const ROOM_COLOR_OPTIONS = [
+  { id: "amber", label: "Gold", dot: "bg-amber-400", ring: "ring-amber-400", bg: "bg-amber-500/20 border-amber-400 text-amber-200" },
+  { id: "emerald", label: "Emerald", dot: "bg-emerald-400", ring: "ring-emerald-400", bg: "bg-emerald-500/20 border-emerald-400 text-emerald-200" },
+  { id: "cyan", label: "Cyan", dot: "bg-cyan-400", ring: "ring-cyan-400", bg: "bg-cyan-500/20 border-cyan-400 text-cyan-200" },
+  { id: "purple", label: "Purple", dot: "bg-purple-400", ring: "ring-purple-400", bg: "bg-purple-500/20 border-purple-400 text-purple-200" },
+  { id: "rose", label: "Crimson", dot: "bg-rose-400", ring: "ring-rose-400", bg: "bg-rose-500/20 border-rose-400 text-rose-200" },
+  { id: "blue", label: "Blue", dot: "bg-blue-400", ring: "ring-blue-400", bg: "bg-blue-500/20 border-blue-400 text-blue-200" },
+] as const;
+
+const ROOM_PILL_THEMES: Record<
+  string,
+  {
+    dot: string;
+    hash: string;
+    activePill: string;
+    inactivePill: string;
+  }
+> = {
+  amber: {
+    dot: "bg-amber-400",
+    hash: "text-amber-400",
+    activePill: "bg-amber-500 text-black font-bold border-amber-400 shadow-sm",
+    inactivePill: "bg-amber-500/[0.08] border-amber-500/30 text-amber-100 hover:bg-amber-500/15",
+  },
+  emerald: {
+    dot: "bg-emerald-400",
+    hash: "text-emerald-400",
+    activePill: "bg-emerald-500 text-black font-bold border-emerald-400 shadow-sm",
+    inactivePill: "bg-emerald-500/[0.08] border-emerald-500/30 text-emerald-100 hover:bg-emerald-500/15",
+  },
+  cyan: {
+    dot: "bg-cyan-400",
+    hash: "text-cyan-400",
+    activePill: "bg-cyan-400 text-black font-bold border-cyan-300 shadow-sm",
+    inactivePill: "bg-cyan-500/[0.08] border-cyan-500/30 text-cyan-100 hover:bg-cyan-500/15",
+  },
+  purple: {
+    dot: "bg-purple-400",
+    hash: "text-purple-400",
+    activePill: "bg-purple-500 text-white font-bold border-purple-400 shadow-sm",
+    inactivePill: "bg-purple-500/[0.08] border-purple-500/30 text-purple-100 hover:bg-purple-500/15",
+  },
+  rose: {
+    dot: "bg-rose-400",
+    hash: "text-rose-400",
+    activePill: "bg-rose-500 text-white font-bold border-rose-400 shadow-sm",
+    inactivePill: "bg-rose-500/[0.08] border-rose-500/30 text-rose-100 hover:bg-rose-500/15",
+  },
+  blue: {
+    dot: "bg-blue-400",
+    hash: "text-blue-400",
+    activePill: "bg-blue-500 text-white font-bold border-blue-400 shadow-sm",
+    inactivePill: "bg-blue-500/[0.08] border-blue-500/30 text-blue-100 hover:bg-blue-500/15",
+  },
+};
+
+function getRoomPillTheme(ch: ChannelConfig, index: number) {
+  if (ch.color && ROOM_PILL_THEMES[ch.color]) return ROOM_PILL_THEMES[ch.color];
+  if (ch.id === "invitational") return ROOM_PILL_THEMES.amber;
+  if (ch.adminOnly) return ROOM_PILL_THEMES.rose;
+  if (ch.id.includes("lunch") || ch.id.includes("food") || ch.id.includes("menu")) return ROOM_PILL_THEMES.emerald;
+  if (ch.id.includes("stage") || ch.id.includes("ops")) return ROOM_PILL_THEMES.cyan;
+  if (ch.id.includes("lodging") || ch.id.includes("dining") || ch.id.includes("hotel")) return ROOM_PILL_THEMES.purple;
+  const palette = ["emerald", "cyan", "purple", "blue", "rose"];
+  return ROOM_PILL_THEMES[palette[index % palette.length]];
 }
 
 const ALL_CHANNELS: ChannelConfig[] = [
@@ -113,6 +181,7 @@ const ALL_CHANNELS: ChannelConfig[] = [
     desc: "The Hideout Invitational: Match Ops, Bristol Lodging, Food & Entertainment",
     netType: "PRO",
     activeUsers: 94,
+    color: "amber",
   },
 ];
 
@@ -305,6 +374,7 @@ export default function ChatPage() {
   const [newRoomDesc, setNewRoomDesc] = useState("");
   const [newRoomBadge, setNewRoomBadge] = useState("MATCH ROOM");
   const [newRoomAdminOnly, setNewRoomAdminOnly] = useState(false);
+  const [newRoomColor, setNewRoomColor] = useState<string>("emerald");
   const [isSavingNewRoom, setIsSavingNewRoom] = useState(false);
   const [newRoomError, setNewRoomError] = useState<string | null>(null);
 
@@ -446,6 +516,7 @@ export default function ChatPage() {
     setNewRoomDesc("");
     setNewRoomBadge("MATCH ROOM");
     setNewRoomAdminOnly(false);
+    setNewRoomColor("emerald");
     setNewRoomError(null);
     setIsNewRoomModalOpen(true);
     playTacticalChirp(1100);
@@ -470,6 +541,7 @@ export default function ChatPage() {
           desc: newRoomDesc.trim() || `Match room #${newRoomName.trim().toLowerCase()}`,
           badge: newRoomBadge.trim() || (newRoomAdminOnly ? "ADMIN ONLY" : "MATCH ROOM"),
           adminOnly: newRoomAdminOnly,
+          color: newRoomColor,
           callsign: shooterProfile.callsign,
           role: shooterProfile.role,
         }),
@@ -2287,7 +2359,7 @@ export default function ChatPage() {
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                     >
                       <Users className="w-4 h-4 text-emerald-400" />
-                      <span className="flex-1">In Chat Now</span>
+                      <span className="flex-1">Active Users</span>
                       <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
                         {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
                       </span>
@@ -2509,7 +2581,7 @@ export default function ChatPage() {
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                       >
                         <Users className="w-4 h-4 text-emerald-400" />
-                        <span className="flex-1">In Chat Now</span>
+                        <span className="flex-1">Active Users</span>
                         <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
                           {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
                         </span>
@@ -2609,7 +2681,7 @@ export default function ChatPage() {
                     playTacticalChirp(1050);
                   }}
                   className="h-7 px-2 sm:px-2.5 rounded-lg border text-[10px] sm:text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all cursor-pointer"
-                  title="View Active Marksmen Online Roster"
+                  title="View Active Users"
                 >
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
@@ -2748,7 +2820,7 @@ export default function ChatPage() {
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                   >
                     <Users className="w-4 h-4 text-emerald-400" />
-                    <span className="flex-1">In Chat Now</span>
+                    <span className="flex-1">Active Users</span>
                     <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
                       {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
                     </span>
@@ -2830,7 +2902,7 @@ export default function ChatPage() {
               </button>
             )}
 
-            {/* Active Marksmen Online Roster Pill */}
+            {/* Active Users Online Roster Pill */}
             <button
               type="button"
               onClick={() => {
@@ -2838,7 +2910,7 @@ export default function ChatPage() {
                 playTacticalChirp(1050);
               }}
               className="h-7 px-2 sm:px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all cursor-pointer"
-              title="View In Chat Now Roster"
+              title="View Active Users"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
@@ -2865,29 +2937,29 @@ export default function ChatPage() {
         {/* MOBILE ROOM BAR (Horizontally scrollable room pills + Admin '+ Room' button) */}
         <div className="md:hidden">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-            {visibleChannels.map((ch) => {
+            {visibleChannels.map((ch, idx) => {
               const isActive = currentChannel === ch.id;
               const unread = unreadCounts[ch.id] || 0;
               const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
               const isCustomRoom = ch.id !== "invitational";
+              const pillTheme = getRoomPillTheme(ch, idx);
 
               return (
                 <div
                   key={ch.id}
                   onClick={() => setCurrentChannel(ch.id)}
                   className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border cursor-pointer active:scale-95 ${
-                    isActive
-                      ? "bg-amber-500 text-black font-bold border-amber-400 shadow-sm"
-                      : "bg-white/[0.04] border-white/10 text-slate-200 hover:bg-white/[0.08]"
+                    isActive ? pillTheme.activePill : pillTheme.inactivePill
                   }`}
                 >
-                  <span className={isActive ? "text-black font-bold" : "text-amber-400 font-bold"}>#</span>
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${isActive ? "bg-black/60" : pillTheme.dot}`} />
+                  <span className={isActive ? "font-bold opacity-80" : `${pillTheme.hash} font-bold`}>#</span>
                   <span className="font-mono font-bold">{ch.name}</span>
                   {ch.adminOnly && (
-                    <Lock className={`w-3 h-3 ${isActive ? "text-black" : "text-emerald-400"}`} />
+                    <Lock className={`w-3 h-3 ${isActive ? "opacity-80" : "text-rose-400"}`} />
                   )}
                   <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5 ${
-                    isActive ? "bg-black/25 text-white" : "bg-white/10 text-slate-300"
+                    isActive ? "bg-black/25 text-white" : "bg-black/30 text-slate-200"
                   }`}>
                     <MessageSquare className="w-2.5 h-2.5" />
                     <span>{engagement.postCount}</span>
@@ -2906,7 +2978,7 @@ export default function ChatPage() {
                       }}
                       title={`Remove #${ch.name}`}
                       className={`ml-0.5 p-0.5 rounded hover:bg-red-500/20 ${
-                        isActive ? "text-black/70 hover:text-red-900" : "text-slate-400 hover:text-red-400"
+                        isActive ? "opacity-75 hover:opacity-100" : "text-slate-400 hover:text-red-400"
                       }`}
                     >
                       <X className="w-3 h-3" />
@@ -2935,32 +3007,33 @@ export default function ChatPage() {
           <div className="flex items-center justify-between gap-3">
             {/* Desktop Channel Pills on Left */}
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
-              {visibleChannels.map((ch) => {
+              {visibleChannels.map((ch, idx) => {
                 const isActive = currentChannel === ch.id;
                 const unread = unreadCounts[ch.id] || 0;
                 const engagement = channelEngagementMap[ch.id] || { postCount: 0, reactionCount: 0, dopeCount: 0 };
                 const isCustomRoom = ch.id !== "invitational";
+                const pillTheme = getRoomPillTheme(ch, idx);
+
                 return (
                   <div
                     key={ch.id}
                     onClick={() => setCurrentChannel(ch.id)}
                     className={`whitespace-nowrap px-3 py-1.5 rounded-xl text-xs transition-all shrink-0 flex items-center gap-1.5 border relative cursor-pointer ${
-                      isActive
-                        ? "bg-amber-500 text-black font-bold border-amber-400"
-                        : "bg-white/[0.03] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.06]"
+                      isActive ? pillTheme.activePill : pillTheme.inactivePill
                     }`}
                   >
-                    <span className={isActive ? "text-black font-bold" : "text-amber-400"}>#</span>
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isActive ? "bg-black/60" : pillTheme.dot}`} />
+                    <span className={isActive ? "font-bold opacity-80" : `${pillTheme.hash} font-bold`}>#</span>
                     <span className="font-medium">{ch.name}</span>
                     {ch.adminOnly && (
-                      <Lock className={`w-3 h-3 ${isActive ? "text-black" : "text-emerald-400"}`} />
+                      <Lock className={`w-3 h-3 ${isActive ? "opacity-80" : "text-rose-400"}`} />
                     )}
 
                     {/* Post Counter Badge on Pill */}
                     <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5 ${
                       isActive
                         ? "bg-black/30 text-white"
-                        : "bg-white/10 text-slate-300"
+                        : "bg-black/30 text-slate-200"
                     }`} title={`${engagement.postCount} posts in #${ch.name}`}>
                       <MessageSquare className="w-2.5 h-2.5" />
                       <span>{engagement.postCount}</span>
@@ -2981,7 +3054,7 @@ export default function ChatPage() {
                         }}
                         title={`Delete #${ch.name}`}
                         className={`ml-0.5 p-0.5 rounded transition-colors ${
-                          isActive ? "text-black/70 hover:text-red-900" : "text-slate-400 hover:text-red-400"
+                          isActive ? "opacity-75 hover:opacity-100" : "text-slate-400 hover:text-red-400"
                         }`}
                       >
                         <X className="w-3 h-3" />
@@ -3632,10 +3705,14 @@ export default function ChatPage() {
                     setNewRoomDesc("Daily lunch menus, food orders & dining updates");
                     setNewRoomBadge("FOOD & MENU");
                     setNewRoomAdminOnly(false);
+                    setNewRoomColor("emerald");
                   }}
-                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-500/40 text-left transition-all active:scale-95"
                 >
-                  <div className="text-xs font-bold text-white">#lunch-menu</div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                    <span>#lunch-menu</span>
+                  </div>
                   <div className="text-[10px] text-slate-400 truncate">Food &amp; daily menus</div>
                 </button>
                 <button
@@ -3645,10 +3722,14 @@ export default function ChatPage() {
                     setNewRoomDesc("Live stage briefings, squad schedules & range calls");
                     setNewRoomBadge("STAGE OPS");
                     setNewRoomAdminOnly(false);
+                    setNewRoomColor("cyan");
                   }}
-                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-cyan-500/15 border border-white/10 hover:border-cyan-500/40 text-left transition-all active:scale-95"
                 >
-                  <div className="text-xs font-bold text-white">#stage-updates</div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
+                    <span>#stage-updates</span>
+                  </div>
                   <div className="text-[10px] text-slate-400 truncate">Stage &amp; range updates</div>
                 </button>
                 <button
@@ -3658,10 +3739,14 @@ export default function ChatPage() {
                     setNewRoomDesc("Bristol hotels, dinner spots & evening meetups");
                     setNewRoomBadge("HOSPITALITY");
                     setNewRoomAdminOnly(false);
+                    setNewRoomColor("purple");
                   }}
-                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-amber-500/15 border border-white/10 hover:border-amber-500/40 text-left transition-all active:scale-95"
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-purple-500/15 border border-white/10 hover:border-purple-500/40 text-left transition-all active:scale-95"
                 >
-                  <div className="text-xs font-bold text-white">#lodging-dining</div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />
+                    <span>#lodging-dining</span>
+                  </div>
                   <div className="text-[10px] text-slate-400 truncate">Hotels &amp; dinner plans</div>
                 </button>
                 <button
@@ -3671,10 +3756,12 @@ export default function ChatPage() {
                     setNewRoomDesc("Private admin & match staff coordination");
                     setNewRoomBadge("ADMIN ONLY");
                     setNewRoomAdminOnly(true);
+                    setNewRoomColor("rose");
                   }}
-                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-500/40 text-left transition-all active:scale-95"
+                  className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-rose-500/15 border border-white/10 hover:border-rose-500/40 text-left transition-all active:scale-95"
                 >
-                  <div className="text-xs font-bold text-emerald-300 flex items-center gap-1">
+                  <div className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-rose-400 shrink-0" />
                     <Lock className="w-3 h-3" />
                     <span>#admin-staff</span>
                   </div>
@@ -3712,6 +3799,32 @@ export default function ChatPage() {
                   placeholder="e.g. Saturday catered lunch menu & drink options"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white text-base sm:text-sm focus:border-amber-400 focus:outline-none"
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-mono font-bold text-slate-200">
+                  Room Color
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                  {ROOM_COLOR_OPTIONS.map((opt) => {
+                    const isSelected = newRoomColor === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setNewRoomColor(opt.id)}
+                        className={`py-2 px-2 rounded-xl border text-[11px] font-mono font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 ${
+                          isSelected
+                            ? `${opt.bg} ring-1 ${opt.ring}`
+                            : "bg-white/[0.04] border-white/10 text-slate-300 hover:bg-white/[0.08]"
+                        }`}
+                      >
+                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${opt.dot}`} />
+                        <span>{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -3784,33 +3897,37 @@ export default function ChatPage() {
                   Active Custom Rooms ({customChannels.length})
                 </span>
                 <div className="space-y-1.5">
-                  {customChannels.map((ch) => (
-                    <div
-                      key={ch.id}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/10"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-amber-400 font-mono font-bold text-xs">#</span>
-                          <span className="text-white font-mono font-bold text-xs truncate">{ch.name}</span>
-                          {ch.adminOnly && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
-                              ADMIN ONLY
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-400 truncate">{ch.desc}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteRoom(ch.id)}
-                        className="ml-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0"
-                        title={`Delete #${ch.name}`}
+                  {customChannels.map((ch, idx) => {
+                    const pillTheme = getRoomPillTheme(ch, idx);
+                    return (
+                      <div
+                        key={ch.id}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/10"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${pillTheme.dot}`} />
+                            <span className={`${pillTheme.hash} font-mono font-bold text-xs`}>#</span>
+                            <span className="text-white font-mono font-bold text-xs truncate">{ch.name}</span>
+                            {ch.adminOnly && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">
+                                ADMIN ONLY
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400 truncate">{ch.desc}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRoom(ch.id)}
+                          className="ml-2 p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors shrink-0"
+                          title={`Delete #${ch.name}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

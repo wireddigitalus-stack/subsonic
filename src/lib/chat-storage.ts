@@ -736,6 +736,7 @@ export interface StoredCustomChannel {
   desc: string;
   netType: "PRO" | "PUBLIC";
   activeUsers: number;
+  color?: string;
   adminOnly?: boolean;
   isCustom?: boolean;
   createdBy?: string;
@@ -767,6 +768,7 @@ export async function getStoredCustomChannels(): Promise<StoredCustomChannel[]> 
               desc: parsed.desc || "Match updates & smaller topic discussions",
               netType: "PRO",
               activeUsers: parsed.activeUsers || 94,
+              color: parsed.color || "emerald",
               adminOnly: Boolean(parsed.adminOnly),
               isCustom: true,
               createdBy: parsed.createdBy || row.author?.callsign || "ADMIN",
@@ -799,6 +801,7 @@ export async function getStoredCustomChannels(): Promise<StoredCustomChannel[]> 
             desc: ch.desc || "Match updates & smaller topic discussions",
             netType: "PRO",
             activeUsers: ch.activeUsers || 94,
+            color: ch.color || "emerald",
             adminOnly: Boolean(ch.adminOnly),
             isCustom: true,
             createdBy: ch.createdBy || parsed.author?.callsign || "ADMIN",
@@ -835,6 +838,7 @@ export async function saveStoredCustomChannel(
     desc: (channel.desc || `Topic room #${cleanId}`).slice(0, 140),
     netType: "PRO",
     activeUsers: 94,
+    color: channel.color || "emerald",
     adminOnly: Boolean(channel.adminOnly),
     isCustom: true,
     createdBy: creatorCallsign || "ADMIN",

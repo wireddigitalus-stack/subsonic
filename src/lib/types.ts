@@ -33,6 +33,9 @@ export interface ChannelConfig {
   desc: string;
   netType: "PUBLIC" | "PRO";
   activeUsers: number;
+  color?: string;
+  adminOnly?: boolean;
+  isCustom?: boolean;
 }
 
 export interface DirectPartner {
