@@ -86,16 +86,6 @@ export function Footer() {
                   Contact & Inquiries
                 </Link>
               </li>
-              <li>
-                <Link href="/invite/pro" className="text-amber-400 font-bold hover:underline transition-all">
-                  Redeem Code
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-amber-400 transition-colors">
-                  Terms of Use &amp; Rules
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -168,9 +158,6 @@ export function Footer() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               ENCRYPTED TELEMETRY ACTIVE
             </span>
-            <Link href="/terms" className="hover:text-slate-200">
-              Terms of Use
-            </Link>
             <Link href="/shooters" className="hover:text-slate-200">
               Shooter Profiles
             </Link>
