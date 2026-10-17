@@ -855,10 +855,11 @@ export default function ChatPage() {
                 if (
                   serverMsg.content !== m.content ||
                   serverMsg.isEdited !== m.isEdited ||
+                  serverMsg.imageUrl !== m.imageUrl ||
                   JSON.stringify(serverMsg.reactions) !== JSON.stringify(m.reactions) ||
                   serverMsg.moderationStatus !== m.moderationStatus
                 ) {
-                  return { ...m, ...serverMsg };
+                  return { ...m, ...serverMsg, imageUrl: serverMsg.imageUrl || m.imageUrl };
                 }
               }
               return m;
@@ -868,8 +869,11 @@ export default function ChatPage() {
             if (data.messages.length > 0) {
               const oldestServerMs = data.messages[0].createdAtMs || 0;
               const serverIdSet = new Set(data.messages.map((m: ChatMessage) => m.id));
+              const nowMs = Date.now();
               updated = updated.filter((m: any) => {
                 if (m.channelId && m.channelId !== currentChannel) return true;
+                // Keep newly sent local messages for 15s while their POST (e.g. photo upload) is in flight
+                if (m.createdAtMs && nowMs - m.createdAtMs < 15000) return true;
                 if (m.createdAtMs && m.createdAtMs >= oldestServerMs && !serverIdSet.has(m.id)) {
                   if (m.id.startsWith("msg_local_") || m.id.startsWith("mock_")) return true;
                   return false;
@@ -1406,12 +1410,13 @@ export default function ChatPage() {
       });
     }
 
-    const newMsg: ChatMessage = {
+    const newMsg: ChatMessage & { createdAtMs?: number } = {
       id: "msg_" + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
       channelId: currentChannel,
       type: type,
       dopeCard: dopeCard,
       imageUrl: imageUrl || undefined,
+      createdAtMs: Date.now(),
       author: {
         id: "usr_" + shooterProfile.callsign.toLowerCase(),
         name: shooterProfile.name,

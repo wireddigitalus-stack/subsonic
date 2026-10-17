@@ -300,14 +300,14 @@ export async function getUserDmConversations(userCallsign: string): Promise<User
         partnerName,
         partnerRole: m.author?.role,
         partnerDivision: m.author?.division,
-        latestMessage: m.content || (m.dopeCard ? "🎯 DOPE Card" : "Direct Transmission"),
+        latestMessage: m.content || (m.imageUrl ? "📷 Photo" : m.dopeCard ? "🎯 DOPE Card" : "Direct Transmission"),
         timestamp: m.timestamp || "",
         createdAtMs: m.createdAtMs || 0,
         unreadCount: isIncoming ? 1 : 0,
       });
     } else {
       if ((m.createdAtMs || 0) > existing.createdAtMs) {
-        existing.latestMessage = m.content || (m.dopeCard ? "🎯 DOPE Card" : "Direct Transmission");
+        existing.latestMessage = m.content || (m.imageUrl ? "📷 Photo" : m.dopeCard ? "🎯 DOPE Card" : "Direct Transmission");
         existing.timestamp = m.timestamp || "";
         existing.createdAtMs = m.createdAtMs || 0;
         if (!isAuthor) {

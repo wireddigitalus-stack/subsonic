@@ -121,8 +121,8 @@ export async function POST(req: NextRequest) {
 
     const rawMsg = body.message as ChatMessage;
 
-    if (!rawMsg || (!rawMsg.content?.trim() && !rawMsg.dopeCard)) {
-      return NextResponse.json({ error: "Message content or DOPE card required." }, { status: 400 });
+    if (!rawMsg || (!rawMsg.content?.trim() && !rawMsg.dopeCard && !rawMsg.imageUrl)) {
+      return NextResponse.json({ error: "Message content, photo, or DOPE card required." }, { status: 400 });
     }
 
     // Record heartbeat for author on transmit
@@ -136,6 +136,7 @@ export async function POST(req: NextRequest) {
       channelId: rawMsg.channelId || "invitational",
       type: rawMsg.type || "STANDARD",
       dopeCard: rawMsg.dopeCard,
+      imageUrl: rawMsg.imageUrl || undefined,
       author: {
         id: rawMsg.author?.id || "anonymous_marksman",
         name: rawMsg.author?.name || "Verified Marksman",
@@ -147,7 +148,7 @@ export async function POST(req: NextRequest) {
         avatarUrl: rawMsg.author?.avatarUrl,
         avatarColor: rawMsg.author?.avatarColor,
       },
-      content: rawMsg.content,
+      content: rawMsg.content || "",
       timestamp: rawMsg.timestamp || new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
       reactions: rawMsg.reactions || [],
       moderationStatus: rawMsg.moderationStatus || "APPROVED",
