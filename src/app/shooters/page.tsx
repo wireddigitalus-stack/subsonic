@@ -413,9 +413,9 @@ function ShootersContent() {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-amber-400/80 shadow-[0_0_25px_rgba(245,158,11,0.4)] bg-black relative shrink-0">
-                    {selectedShooter.image?.startsWith("data:") || selectedShooter.image?.startsWith("/") ? (
+                    {isRealShooterPhoto(selectedShooter.image) ? (
                       <img
-                        src={selectedShooter.image}
+                        src={selectedShooter.image!}
                         alt={getShooterDisplayName(selectedShooter)}
                         className="w-full h-full object-cover object-top"
                       />
@@ -531,12 +531,6 @@ function ShootersContent() {
                   </div>
                 </div>
               ) : null}
-
-              {/* Quote */}
-              <div className="relative p-5 rounded-2xl bg-black/40 border border-white/5 italic text-slate-200 text-sm leading-relaxed">
-                <Quote className="w-6 h-6 text-amber-500/40 absolute top-3 right-3 pointer-events-none" />
-                &ldquo;{selectedShooter.quote}&rdquo;
-              </div>
 
 
 

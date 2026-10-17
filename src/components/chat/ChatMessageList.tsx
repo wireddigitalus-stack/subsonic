@@ -174,6 +174,7 @@ export function ChatMessageList({
       badgeText: isRO ? "AI Range Officer" : (author.badgeText || author.role),
       division: isRO ? "Autonomous AI Range Officer" : author.division,
       rifleSetup: isRO ? "Autonomous AI Agent • Range Safety & Bristol Intel" : author.rifleSetup,
+      image: author.avatarUrl,
       status: isRO ? "online" : "online",
       bio: isRO 
         ? "Official Autonomous AI Range Officer for The Hideout. 24/7 intel on Bristol lodging, campgrounds, dining, and range safety." 

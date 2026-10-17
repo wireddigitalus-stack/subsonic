@@ -151,14 +151,30 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
       }
     }
 
-    if (shooter && shooter.name !== "VIP Pro Competitor" && shooter.name !== "Invitational Competitor VIP") {
-      return;
-    }
-
     const findShooterLocallyOrRemotely = async () => {
       const cleanSlug = slug.toLowerCase().trim();
 
-      // 1. Check local storage full profile
+      // 1. Always fetch freshest shooter record from server API first so uploaded headshots appear immediately
+      try {
+        const res = await fetch(`/api/shooters?slug=${encodeURIComponent(cleanSlug)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.shooter) {
+            setShooter(sanitizeShooter(data.shooter));
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("API fetch shooter failed:", err);
+      }
+
+      if (shooter && shooter.name !== "VIP Pro Competitor" && shooter.name !== "Invitational Competitor VIP" && isRealShooterPhoto(shooter.image)) {
+        setLoading(false);
+        return;
+      }
+
+      // 2. Check local storage full profile fallback
       if (typeof window !== "undefined") {
         try {
           const rawFull = localStorage.getItem("subsonic_pro_full_profile");
@@ -173,42 +189,11 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             ) {
               setShooter(sanitized);
               setLoading(false);
-              fetch("/api/shooters", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...sanitized, isProfileUpdate: true, isIntake: false }),
-              }).catch(() => {});
               return;
             }
           }
 
-          // 2. Check all shooters array in local storage
-          const rawAll = localStorage.getItem("subsonic_all_shooters");
-          if (rawAll) {
-            const list: ShooterProfile[] = JSON.parse(rawAll);
-            const match = list.find((s) => {
-              const san = sanitizeShooter(s);
-              return (
-                san?.id?.toLowerCase() === cleanSlug ||
-                san?.callsign?.toLowerCase() === cleanSlug ||
-                san?.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug ||
-                cleanSlug === "vip-pro-competitor"
-              );
-            });
-            if (match) {
-              const sanMatch = sanitizeShooter(match);
-              setShooter(sanMatch);
-              setLoading(false);
-              fetch("/api/shooters", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...sanMatch, isProfileUpdate: true, isIntake: false }),
-              }).catch(() => {});
-              return;
-            }
-          }
-
-          // 3. Check current shooter profile
+          // 3. Check current shooter profile in local storage
           const rawCur = localStorage.getItem("subsonic_shooter_profile");
           if (rawCur) {
             const parsed = JSON.parse(rawCur);
@@ -222,33 +207,33 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
               parsed.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-") === cleanSlug ||
               cleanSlug === "vip-pro-competitor"
             ) {
-              const constructed: ShooterProfile = {
-                id: cleanSlug,
-                name: curName,
-                callsign: curCallsign,
-                division: parsed.division || "Open Division Pro",
-                ranking: "Appalachian Rimfire Competitor",
-                homeRange: "The Hideout, Bristol, TN",
-                podiums: 1,
-                featuredMatch: "Subsonic Society Invitational 2026",
-                image: isRealShooterPhoto(parsed.image) ? parsed.image : "",
-                actionPhoto: isRealShooterPhoto(parsed.actionPhoto) ? parsed.actionPhoto : "",
-                quote: "Precision rimfire in the Appalachian mountains requires absolute consistency and reading the true wind.",
-                accolades: ["VERIFIED COMPETITOR"],
-                sponsors: ["Modacam Custom Rifles"],
-                rifleSetup: {
-                  action: parsed.rifleSetup || "Custom Precision Rimfire Rig",
-                  barrel: "Match Contour Barrel",
-                  trigger: "Match Grade Trigger",
-                  chassis: "Precision Chassis",
-                  optic: "Zero Compromise Optic / Precision Scope",
-                  mount: "Precision Mount",
-                  ammoLot: "Lapua Center-X / SK Match",
-                },
-                createdAt: new Date().toISOString(),
-                status: "PUBLISHED",
-              };
-              setShooter(constructed);
+              setShooter((prev) => ({
+                ...(prev || {
+                  id: cleanSlug,
+                  name: curName,
+                  callsign: curCallsign,
+                  division: parsed.division || "Open Division Pro",
+                  ranking: "Appalachian Rimfire Competitor",
+                  homeRange: "The Hideout, Bristol, TN",
+                  podiums: 1,
+                  featuredMatch: "Subsonic Society Invitational 2026",
+                  quote: "",
+                  accolades: ["VERIFIED COMPETITOR"],
+                  sponsors: ["Modacam Custom Rifles"],
+                  rifleSetup: {
+                    action: parsed.rifleSetup || "Custom Precision Rimfire Rig",
+                    barrel: "Match Contour Barrel",
+                    trigger: "Match Grade Trigger",
+                    chassis: "Precision Chassis",
+                    optic: "Zero Compromise Optic / Precision Scope",
+                    mount: "Precision Mount",
+                    ammoLot: "Lapua Center-X / SK Match",
+                  },
+                  createdAt: new Date().toISOString(),
+                  status: "PUBLISHED",
+                }),
+                image: isRealShooterPhoto(parsed.image) ? parsed.image : (prev?.image || ""),
+              }));
               setLoading(false);
               return;
             }
@@ -256,21 +241,6 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
         } catch (e) {
           console.warn("Local storage check error:", e);
         }
-      }
-
-      // 4. Try fetching from server API
-      try {
-        const res = await fetch(`/api/shooters?slug=${encodeURIComponent(cleanSlug)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.shooter) {
-            setShooter(sanitizeShooter(data.shooter));
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn("API fetch shooter failed:", err);
       }
 
       setLoading(false);
@@ -581,8 +551,8 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
             {/* ─── CENTER STAGE: Shooter Portrait / Card Showcase ─────────── */}
             <div className="lg:col-span-4 flex flex-col items-center justify-center relative w-full">
               
-              {/* If shooter has full tournament poster graphic, display in natural ratio (aspect-[682/1024]) */}
-              {shooter.posterImage ? (
+              {/*If shooter has a real headshot, prioritize it in the profile portrait frame; otherwise fall back to posterImage*/}
+              {!isRealShooterPhoto(shooter.image) && shooter.posterImage ? (
                 <div className="relative w-full max-w-sm sm:max-w-md aspect-[682/1024] rounded-3xl overflow-hidden border-2 border-amber-500/60 shadow-[0_0_60px_rgba(245,158,11,0.4)] bg-black group">
                   <img
                     src={shooter.posterImage}
@@ -609,7 +579,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                   </div>
                 </div>
               ) : (
-                /* Outer Golden / Metallic Rim Frame for standard portraits */
+                /* Outer Golden / Metallic Rim Frame for standard headshots */
                 <div className="relative w-full max-w-sm sm:max-w-md aspect-[3/4] rounded-3xl overflow-hidden border-2 border-amber-500/50 shadow-[0_0_50px_rgba(245,158,11,0.35)] bg-gradient-to-b from-zinc-900 to-black group">
                   {isRealShooterPhoto(shooter.image) ? (
                     <img
@@ -693,7 +663,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                     className="px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors shadow-sm"
                   >
                     <Maximize2 className="w-3 h-3 text-amber-400" />
-                    <span>View Full Poster Graphic</span>
+                    <span>View Full Photo</span>
                   </button>
                 ) : (
                   <button
@@ -767,19 +737,6 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                         <span className="truncate">{acc}</span>
                       </div>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Bio Quote with Cursive Script Signature */}
-              {shooter.quote && (
-                <div className="relative p-5 rounded-2xl bg-black/60 border border-white/10 space-y-3">
-                  <Quote className="w-8 h-8 text-amber-500/20 absolute top-4 right-4 pointer-events-none" />
-                  <p className="italic text-slate-200 text-sm sm:text-base leading-relaxed font-serif">
-                    &ldquo;{shooter.quote}&rdquo;
-                  </p>
-                  <div className="font-signature text-2xl sm:text-3xl text-amber-300/90 pt-1 tracking-wide">
-                    — {shooter.signature || displayName}
                   </div>
                 </div>
               )}

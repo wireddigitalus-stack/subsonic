@@ -1,7 +1,9 @@
 import React from "react";
 import { Metadata } from "next";
-import { getShooterBySlug } from "@/lib/shooters";
+import { getShooterBySlug, refreshShootersFromDb } from "@/lib/shooters";
 import { ShooterProfileClient } from "@/components/shooters/ShooterProfileClient";
+
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: {
@@ -11,6 +13,7 @@ interface PageProps {
 
 // Generate dynamic metadata for maximum SEO & AI SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  await refreshShootersFromDb(0);
   const shooter = getShooterBySlug(params.slug);
 
   if (!shooter) {
@@ -91,7 +94,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function ShooterDetailPage({ params }: PageProps) {
+export default async function ShooterDetailPage({ params }: PageProps) {
+  await refreshShootersFromDb(0);
   const shooter = getShooterBySlug(params.slug);
 
   return <ShooterProfileClient slug={params.slug} initialShooter={shooter} />;

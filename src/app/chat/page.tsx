@@ -310,23 +310,82 @@ export default function ChatPage() {
     return ALL_CHANNELS.find((ch) => ch.id === currentChannel) || ALL_CHANNELS[0];
   }, [currentChannel, isDirectMode, activeDirectPartner]);
 
-  const filteredMessages = messages
-    .filter((m) => m.channelId === currentChannel)
-    .filter(
-      (m) =>
-        m.author?.id !== "plink_ai_moderator" &&
-        m.author?.callsign?.toUpperCase() !== "RO" &&
-        m.author?.callsign?.toUpperCase() !== "RO BOT" &&
-        m.author?.name?.toUpperCase() !== "RO" &&
-        m.author?.name?.toUpperCase() !== "RO BOT"
-    )
-    .filter((m, idx, arr) => arr.findIndex((x) => x.id === m.id || (x.author.id === m.author.id && x.content === m.content && x.content.includes("Welcome to The Hideout"))) === idx);
+  const filteredMessages = useMemo(() => {
+    const avatarByCallsign = new Map<string, string>();
+    for (const p of directPartners) {
+      if (p.callsign && p.image && !p.image.includes("SS-RWB-LOGO")) {
+        avatarByCallsign.set(p.callsign.toUpperCase(), p.image);
+        if (p.callsign.toUpperCase() === "SUBX") {
+          avatarByCallsign.set("ALLEN", p.image);
+          avatarByCallsign.set("AHURLEY", p.image);
+        }
+      }
+    }
+    if (shooterProfile?.callsign && shooterProfile?.image && !shooterProfile.image.includes("SS-RWB-LOGO")) {
+      const myCall = shooterProfile.callsign.toUpperCase();
+      avatarByCallsign.set(myCall, shooterProfile.image);
+      if (myCall === "SUBX") {
+        avatarByCallsign.set("ALLEN", shooterProfile.image);
+        avatarByCallsign.set("AHURLEY", shooterProfile.image);
+      }
+    }
+
+    return messages
+      .filter((m) => m.channelId === currentChannel)
+      .filter(
+        (m) =>
+          m.author?.id !== "plink_ai_moderator" &&
+          m.author?.callsign?.toUpperCase() !== "RO" &&
+          m.author?.callsign?.toUpperCase() !== "RO BOT" &&
+          m.author?.name?.toUpperCase() !== "RO" &&
+          m.author?.name?.toUpperCase() !== "RO BOT"
+      )
+      .filter(
+        (m, idx, arr) =>
+          arr.findIndex(
+            (x) =>
+              x.id === m.id ||
+              (x.author.id === m.author.id &&
+                x.content === m.content &&
+                x.content.includes("Welcome to The Hideout"))
+          ) === idx
+      )
+      .map((m) => {
+        const call = (m.author?.callsign || "").toUpperCase();
+        const isAllen = call === "SUBX" || call === "ALLEN" || call === "AHURLEY" || m.author?.name?.toLowerCase().includes("allen hurley");
+        const latestAvatar =
+          avatarByCallsign.get(call) ||
+          (isAllen ? avatarByCallsign.get("SUBX") : undefined) ||
+          (m.author?.avatarUrl && !m.author.avatarUrl.includes("SS-RWB-LOGO") ? m.author.avatarUrl : undefined);
+        if (latestAvatar && latestAvatar !== m.author?.avatarUrl) {
+          return {
+            ...m,
+            author: {
+              ...m.author,
+              avatarUrl: latestAvatar,
+            },
+          };
+        }
+        return m;
+      });
+  }, [messages, currentChannel, directPartners, shooterProfile?.callsign, shooterProfile?.image]);
 
   const handleOpenDossier = useCallback((shooter: DirectPartner) => {
-    setSelectedDossierShooter(shooter);
+    const call = (shooter.callsign || "").toUpperCase();
+    const matchedPartner = directPartners.find(
+      (p) => p.callsign.toUpperCase() === call || (call === "ALLEN" && p.callsign.toUpperCase() === "SUBX")
+    );
+    const selfMatch =
+      shooterProfile?.callsign?.toUpperCase() === call ? shooterProfile.image : undefined;
+    setSelectedDossierShooter({
+      ...(matchedPartner || {}),
+      ...shooter,
+      image: shooter.image || matchedPartner?.image || selfMatch,
+    });
     setIsDossierModalOpen(true);
     playTacticalChirp(1100);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [directPartners, shooterProfile?.callsign, shooterProfile?.image]);
 
   const handleStartDirectComms = useCallback((shooter: DirectPartner) => {
     const myCallsign = shooterProfile.callsign || "";
@@ -1037,13 +1096,42 @@ export default function ChatPage() {
         const deletedRaw = typeof window !== "undefined" ? localStorage.getItem("subsonic_deleted_members") : null;
         const deletedList = new Set(deletedRaw ? (JSON.parse(deletedRaw) as string[]).map((x) => x.toLowerCase()) : []);
 
+        const myCallsign = (shooterProfile.callsign || "").toUpperCase();
+
+        // Sync current logged-in shooter's headshot from database if available
+        const myServerShooter = shooters.find((s) => {
+          const sc = (s.callsign || "").toUpperCase();
+          return (
+            sc === myCallsign ||
+            (myCallsign === "SUBX" && (sc === "ALLEN" || s.id?.toLowerCase() === "subx"))
+          );
+        });
+        if (
+          myServerShooter?.image &&
+          !myServerShooter.image.includes("SS-RWB-LOGO") &&
+          myServerShooter.image !== shooterProfile.image
+        ) {
+          setShooterProfile((prev) => {
+            const next = { ...prev, image: myServerShooter.image };
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem("subsonic_shooter_profile", JSON.stringify(next));
+              } catch {}
+            }
+            return next;
+          });
+          setProfileForm((prev) => ({ ...prev, image: myServerShooter.image }));
+        }
+
         setDirectPartners((prev) => {
-          const myCallsign = (shooterProfile.callsign || "").toUpperCase();
           const partnersMap = new Map<string, DirectPartner>();
 
           // 1. Add Executives if not current user
           if (myCallsign !== "SUBX" && myCallsign !== "ALLEN" && myCallsign !== "SAID DONE") {
             const allenId = getDmChannelId(myCallsign, "SUBX");
+            const allenRecord = shooters.find(
+              (s) => (s.callsign || "").toUpperCase() === "SUBX" || s.id?.toLowerCase() === "subx"
+            );
             partnersMap.set(allenId, {
               id: allenId,
               callsign: "SUBX",
@@ -1054,6 +1142,10 @@ export default function ChatPage() {
               status: "offline",
               bio: "Executive Match Host & Founder of The Hideout Invitational.",
               rifleSetup: "Modacam Custom Precision V-22 / ZCO 527",
+              image:
+                allenRecord?.image && !allenRecord.image.includes("SS-RWB-LOGO")
+                  ? allenRecord.image
+                  : undefined,
             });
           }
 
@@ -1086,20 +1178,24 @@ export default function ChatPage() {
             const isMaster = sCallsign === "RADAR" || sCallsign === "ROB";
 
             const existing = partnersMap.get(chId);
+            const validImage =
+              s.image && !s.image.includes("SS-RWB-LOGO")
+                ? s.image
+                : existing?.image;
             partnersMap.set(chId, {
+              ...(existing || {}),
               id: chId,
               callsign: s.callsign,
               name: s.name || s.callsign,
               role: isMaster ? "MASTER_OWNER" : isOwner ? "OWNER_ADMIN" : (s.role || "PRO_COMPETITOR"),
               badgeText: isMaster ? "DEV ADVISOR" : isOwner ? "OWNER ADMIN" : (s.ranking || s.division || "PRO SHOOTER"),
               division: s.division || "Pro Invitational Division",
-              status: "offline",
+              status: existing?.status || "offline",
               bio: s.bio || s.quote || "Verified competitor on direct encrypted frequency.",
               rifleSetup: typeof s.rifleSetup === "object"
                 ? `${s.rifleSetup.action || ""} ${s.rifleSetup.optic || ""}`.trim()
                 : (s.rifleSetup || "Precision Rimfire"),
-              image: s.image,
-              ...(existing || {}),
+              image: validImage,
             });
           }
 

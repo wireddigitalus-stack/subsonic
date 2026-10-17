@@ -65,6 +65,12 @@ export async function POST(req: NextRequest) {
             ? 'SUBX'
             : cleanCallsign;
 
+          const execShooter = getShootersFromStorage().find(
+            (s) =>
+              s.callsign?.toUpperCase() === finalCallsign ||
+              s.id?.toLowerCase() === finalCallsign.toLowerCase()
+          );
+
           return NextResponse.json({
             authenticated: true,
             profile: {
@@ -74,6 +80,7 @@ export async function POST(req: NextRequest) {
               division: exec.division,
               rifleSetup: exec.rifleSetup,
               badgeText: exec.badgeText,
+              image: execShooter?.image || undefined,
             },
             member: {
               member_id: exec.memberId,
