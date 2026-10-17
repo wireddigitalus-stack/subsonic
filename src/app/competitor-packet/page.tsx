@@ -290,13 +290,6 @@ export default function CompetitorPacketPage() {
               <Download className="w-4 h-4" />
               <span>Download PDF Packet</span>
             </a>
-            <button
-              onClick={handleShare}
-              className="px-3.5 py-2 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white transition-all flex items-center gap-2"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>{copiedLink ? "Link Copied!" : "Share Guide"}</span>
-            </button>
           </div>
         </div>
       </div>

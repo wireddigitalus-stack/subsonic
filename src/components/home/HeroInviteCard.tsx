@@ -183,7 +183,7 @@ export function HeroInviteCard() {
                 ) : (
                   <>
                     <Key className="w-4 h-4 fill-black" />
-                    <span>REDEEM CODE</span>
+                    <span>ENTER CODE</span>
                     <ArrowRight className="w-4 h-4 stroke-[3]" />
                   </>
                 )}
@@ -206,16 +206,6 @@ export function HeroInviteCard() {
                   className="text-emerald-400 hover:text-emerald-300 font-bold underline flex items-center gap-1"
                 >
                   <span>Enter Chat Room →</span>
-                </Link>
-              </div>
-
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <span className="text-slate-400">Need an invitation?</span>
-                <Link
-                  href="/contact"
-                  className="text-amber-400 hover:text-amber-300 font-bold underline"
-                >
-                  Contact Match Directorate
                 </Link>
               </div>
             </div>

@@ -127,7 +127,7 @@ export function HeroSection() {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Button 2: REDEEM CODE (INVITATION ONLY) */}
+          {/* Button 2: ENTER CODE (INVITATION ONLY) */}
           <Link
             href="/invite/pro"
             data-telemetry="hero_primary_btn_invite"
@@ -137,7 +137,7 @@ export function HeroSection() {
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-black/15 flex items-center justify-center text-black shrink-0">
                 <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black" />
               </div>
-              <span className="truncate">REDEEM CODE</span>
+              <span className="truncate">ENTER CODE</span>
             </div>
             <ChevronRight className="w-4 h-4 text-black shrink-0" />
           </Link>

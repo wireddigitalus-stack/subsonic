@@ -258,19 +258,6 @@ export function Navbar() {
 
           {/* Desktop Navigation: Full Public Menus */}
           <div className="hidden lg:flex items-center gap-1 bg-white/[0.02] px-2 py-1 rounded-xl border border-white/5">
-            {/* Overview */}
-            <Link
-              href="/"
-              data-telemetry="nav_link_overview"
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                pathname === "/"
-                  ? "bg-white/15 text-white shadow-sm"
-                  : "text-slate-300 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              Overview
-            </Link>
-
             {/* Submenu 1: The Society */}
             <div 
               className="relative"
@@ -292,56 +279,41 @@ export function Navbar() {
               </button>
 
               {activeDropdown === "society" && (
-                <div className="absolute top-full left-0 mt-2 w-72 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
+                <div className="absolute top-full left-0 mt-2 w-64 ios-glass rounded-2xl p-2 border border-white/10 shadow-2xl backdrop-blur-2xl animate-fadeIn space-y-1">
                   <Link
                     href="/chat"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
                       <MessageSquare className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
-                        <span>Competitor Chat Room</span>
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        DOPE drops & squad chat
-                      </p>
+                    <div className="text-xs font-bold text-white group-hover:text-emerald-400 flex items-center gap-1.5">
+                      <span>Competitor Chat Room</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Live</span>
                     </div>
                   </Link>
 
                   <Link
                     href="/partners"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
                       <Award className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-purple-400">
-                        Modacam & Partners
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Presenting sponsors & industry leaders
-                      </p>
+                    <div className="text-xs font-bold text-white group-hover:text-purple-400">
+                      Modacam & Partners
                     </div>
                   </Link>
 
                   <Link
                     href="/contact"
-                    className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
                       <Mail className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-400">
-                        Contact & Inquiries
-                      </div>
-                      <p className="text-[11px] text-slate-400 leading-snug mt-0.5">
-                        Match inquiries, sponsorship & leads
-                      </p>
+                    <div className="text-xs font-bold text-white group-hover:text-cyan-400">
+                      Contact & Inquiries
                     </div>
                   </Link>
                 </div>
@@ -514,15 +486,6 @@ export function Navbar() {
                 >
                   <Lock className="w-3.5 h-3.5 text-amber-400" />
                   <span>Member Login</span>
-                </Link>
-
-                <Link
-                  href="/invite/pro"
-                  data-telemetry="nav_primary_invite_cta"
-                  className="hidden sm:flex px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow hover:brightness-110 active:scale-95 transition-all items-center gap-1.5"
-                >
-                  <Key className="w-3.5 h-3.5 fill-black" />
-                  <span>Redeem Code</span>
                 </Link>
               </div>
             )}
@@ -713,12 +676,12 @@ export function Navbar() {
                 </div>
               ) : (
                 <Link
-                  href="/invite/pro"
+                  href="/chat"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-3 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-tactical-glow flex items-center justify-center gap-2 active:scale-95 transition-all"
+                  className="w-full py-3 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white flex items-center justify-center gap-2 active:scale-95 transition-all"
                 >
-                  <Key className="w-4 h-4 fill-black" />
-                  <span>Redeem Code</span>
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  <span>Member Login</span>
                 </Link>
               )}
             </div>
