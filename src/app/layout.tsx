@@ -11,17 +11,20 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Subsonic Society | Precision Rimfire Media & Bristol TN Mountain Championships",
+  title: "Subsonic Society Invitational Money Match | Nov 13–15, 2026 • Bristol, TN",
   description:
-    "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
+    "Official 2026 Competitor Packet for the Subsonic Society Invitational Money Match presented by Modacam Custom Rifles. November 13–15, 2026 at The Hideout (111 Hwy 44, Bristol, TN). Invite-only precision .22LR rimfire competition featuring 12 Main Event Stages and 2 Side Matches.",
   keywords: [
     "Subsonic Society",
+    "Subsonic Society Invitational Money Match",
+    "Modacam Custom Rifles",
+    "The Hideout Bristol TN",
+    "2026 Competitor Packet",
+    "Precision Rimfire Money Match",
+    ".22LR Invitational",
     "Bristol TN shooting competition",
     "precision rimfire",
-    "PRS Rimfire",
-    "NRL22",
-    ".22LR precision rifle",
-    "Appalachian Mountain Rimfire Pro",
+    "Allen Hurley",
   ],
   authors: [{ name: "Subsonic Society" }],
   icons: {
@@ -54,9 +57,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Subsonic Society | Precision Rimfire Competition & Media Platform",
+    title: "2026 Subsonic Society Invitational Money Match — Competitor Packet",
     description:
-      "Premier precision rimfire shootout in the mountains of Bristol, Tennessee. Follow stage briefings, match results, community chat, and gear breakdowns.",
+      "Presented by Modacam Custom Rifles • November 13–15, 2026 at The Hideout in Bristol, Tennessee. 12 Main Event Stages + 2 Side Matches, schedule, rules, and hotel info.",
     url: siteUrl,
     siteName: "Subsonic Society",
     images: [
@@ -66,7 +69,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         type: "image/jpeg",
-        alt: "Subsonic Society - Precision Is In Our DNA | Competition • Testing • Education • Community",
+        alt: "2026 Subsonic Society Invitational Money Match — Presented by Modacam Custom Rifles | Nov 13–15, 2026 • Bristol, TN",
       },
     ],
     locale: "en_US",
@@ -74,9 +77,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Subsonic Society | Precision Rimfire Media & Mountain Pro Championship",
+    title: "2026 Subsonic Society Invitational Money Match — Competitor Packet",
     description:
-      "High-stakes precision rimfire shooting media, pro competitions in Bristol, TN mountains, and tactical community.",
+      "Presented by Modacam Custom Rifles • November 13–15, 2026 at The Hideout in Bristol, Tennessee. 12 Main Event Stages + 2 Side Matches, schedule, rules, and hotel info.",
     images: [`${siteUrl}/assets/subsonic-social-share-clean.jpg?v=4`],
   },
 };
@@ -101,30 +104,54 @@ const structuredData = {
         `${siteUrl}/assets/subsonic-banner-wide.png`,
         `${siteUrl}/images/SS-RWB-LOGO.png`
       ],
-      "description": "Subsonic Society is a precision rimfire shooting media and community platform. We cover competitions, highlight athletes, discuss equipment, showcase venues and performance within the growing rimfire shooting sports world.",
+      "description": "Official 2026 Competitor Packet for the Subsonic Society Invitational Money Match presented by Modacam Custom Rifles. November 13–15, 2026 at The Hideout (111 Hwy 44, Bristol, TN).",
       "sameAs": [
         "https://www.facebook.com/p/Subsonic-Society-61578052196057/"
       ],
       "sport": "Precision Rimfire Rifle Shooting (.22LR)",
       "address": {
         "@type": "PostalAddress",
+        "streetAddress": "111 Hwy 44",
         "addressLocality": "Bristol",
         "addressRegion": "TN",
         "addressCountry": "US"
       }
     },
     {
+      "@type": "SportsEvent",
+      "@id": "https://subsonicsociety.com/#invitational-2026",
+      "name": "Subsonic Society Invitational Money Match",
+      "description": "Invite-only precision .22LR rimfire competition presented by Modacam Custom Rifles at The Hideout in Bristol, Tennessee. Features 12 Main Event Stages and 2 Side Matches.",
+      "startDate": "2026-11-13",
+      "endDate": "2026-11-15",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "location": {
+        "@type": "Place",
+        "name": "The Hideout",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "111 Hwy 44",
+          "addressLocality": "Bristol",
+          "addressRegion": "TN",
+          "addressCountry": "US"
+        }
+      },
+      "organizer": {
+        "@id": "https://subsonicsociety.com/#organization"
+      },
+      "sponsor": {
+        "@type": "Organization",
+        "name": "Modacam Custom Rifles"
+      }
+    },
+    {
       "@type": "WebSite",
       "@id": "https://subsonicsociety.com/#website",
       "url": "https://subsonicsociety.com",
-      "name": "Subsonic Society",
+      "name": "Subsonic Society Invitational Money Match",
       "publisher": {
         "@id": "https://subsonicsociety.com/#organization"
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://subsonicsociety.com/matches?q={search_term_string}",
-        "query-input": "required name=search_term_string"
       }
     }
   ]

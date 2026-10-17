@@ -1,7 +1,7 @@
 {
   "name": "SUBSONIC SOCIETY",
   "short_name": "SUBSONIC",
-  "description": "America's premier precision rimfire competition series, ballistics testing laboratory, and marksman fraternity. Home of the $7,500 Subsonic Invitational at The Hideout (Bristol, TN • 3,420 FT).",
+  "description": "Official 2026 Competitor Packet for the Subsonic Society Invitational Money Match presented by Modacam Custom Rifles • November 13–15, 2026 at The Hideout (111 Hwy 44, Bristol, TN).",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -37,31 +37,24 @@
   ],
   "shortcuts": [
     {
-      "name": "Matches",
-      "short_name": "Matches",
-      "description": "View 2026 Precision Rimfire Match Schedule & Rules",
-      "url": "/matches",
+      "name": "2026 Invitational Packet",
+      "short_name": "Packet",
+      "description": "View 2026 Subsonic Society Invitational Money Match Competitor Packet",
+      "url": "/",
       "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
     },
     {
-      "name": "DNA Lab",
-      "short_name": "DNA",
-      "description": "View .22LR Ammunition Lot Testing & Tuner Data",
-      "url": "/dna",
+      "name": "Shooters",
+      "short_name": "Shooters",
+      "description": "View Invitational Shooter Roster & Profiles",
+      "url": "/shooters",
       "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
     },
     {
-      "name": "The Hideout",
-      "short_name": "Hideout",
-      "description": "View 3,420 FT Mountain Range Topography in Bristol, TN",
-      "url": "/the-hideout",
-      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Invitational",
-      "short_name": "Invitational",
-      "description": "Register for the $7,500 Subsonic Society Invitational",
-      "url": "/bristol-pro",
+      "name": "Squad Chat",
+      "short_name": "Chat",
+      "description": "Open Subsonic Society Shooter Comms",
+      "url": "/chat",
       "icons": [{ "src": "/apple-touch-icon.png", "sizes": "192x192" }]
     }
   ]
