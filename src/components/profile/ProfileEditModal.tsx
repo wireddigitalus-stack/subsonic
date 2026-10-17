@@ -19,7 +19,7 @@ import {
   ClipboardPaste,
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
-import { compressImageFile } from "@/lib/imageCompression";
+import { compressImageFile, ensureCompressedDataUrl } from "@/lib/imageCompression";
 import { getAvatarColor, getUserInitials, DARK_AVATAR_COLORS } from "@/lib/avatar-colors";
 import { playTacticalChirp } from "@/lib/chat-audio";
 
@@ -612,6 +612,13 @@ export function ProfileEditModal({
         ? "subx"
         : cleanCallsign.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
 
+    const compressedHeadshot = headshotPhoto
+      ? await ensureCompressedDataUrl(headshotPhoto, 1000, 0.82)
+      : "";
+    const compressedAction = actionPhoto
+      ? await ensureCompressedDataUrl(actionPhoto, 1200, 0.80)
+      : "";
+
     const payload = {
       id: resolvedId,
       name: name.trim(),
@@ -626,8 +633,8 @@ export function ProfileEditModal({
       phone: existingProfileData?.phone || initialShooter?.phone,
       mailingAddress: existingProfileData?.mailingAddress || initialShooter?.mailingAddress,
       quote: quote.trim(),
-      image: headshotPhoto || "",
-      actionPhoto: actionPhoto || "",
+      image: compressedHeadshot,
+      actionPhoto: compressedAction,
       posterImage: existingProfileData?.posterImage || initialShooter?.posterImage,
       accolades,
       sponsors,

@@ -25,7 +25,7 @@ import {
   Check,
   FileText
 } from "lucide-react";
-import { compressImageFile, CompressionResult } from "@/lib/imageCompression";
+import { compressImageFile, ensureCompressedDataUrl, CompressionResult } from "@/lib/imageCompression";
 import { CallsignInput } from "@/components/common/CallsignInput";
 
 const POPULAR_SPONSORS = [
@@ -389,8 +389,10 @@ function ProInviteContent() {
     setIsSubmitting(true);
 
     try {
-      const primaryImage = headshotResult.dataUrl;
-      const secondaryImage = actionPhotoResult?.dataUrl || "";
+      const primaryImage = await ensureCompressedDataUrl(headshotResult.dataUrl, 1000, 0.82);
+      const secondaryImage = actionPhotoResult?.dataUrl
+        ? await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1200, 0.80)
+        : "";
 
       // One server call does everything (invite check → profile → member → claim),
       // and only succeeds once the database has confirmed every step.
@@ -428,7 +430,11 @@ function ProInviteContent() {
 
       if (!res.ok || !data.success) {
         if (data.code === "CALLSIGN_TAKEN") setIsCallsignValid(false);
-        throw new Error(data.error || "We couldn't finish creating your profile. Please try again.");
+        const fallbackMsg =
+          res.status === 413
+            ? "Your uploaded photo file size was too large. Please re-select your photo and submit again."
+            : "We couldn't finish creating your profile. Please try again.";
+        throw new Error(data.detail ? `${data.error} (${data.detail})` : (data.error || fallbackMsg));
       }
 
       const savedShooter = data.shooter;
