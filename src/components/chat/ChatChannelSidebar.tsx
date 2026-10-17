@@ -128,16 +128,6 @@ export function ChatChannelSidebar({
           
           {/* Section 1: Official Match Frequency */}
           <div>
-            <div className="flex items-center justify-between px-1 mb-2.5 shrink-0">
-              <span className="text-xs font-mono uppercase tracking-wider text-slate-300 font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-                Match Frequency
-              </span>
-              <span className="text-xs font-mono font-semibold text-amber-400">
-                {visibleChannels.reduce((acc, c) => acc + c.activeUsers, 0)} Shooters
-              </span>
-            </div>
-
             <div className="space-y-1.5">
               {visibleChannels.map((ch) => {
                 const isActive = currentChannel === ch.id;
