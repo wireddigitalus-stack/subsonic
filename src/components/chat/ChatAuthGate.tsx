@@ -25,25 +25,7 @@ export function ChatAuthGate({
   handleUnlockRoom,
 }: ChatAuthGateProps) {
   return (
-    <div className="min-h-screen flex flex-col justify-between px-4 py-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
-      {/* Top Mobile/Headless PWA Breadcrumb Navigation */}
-      <div className="w-full max-w-md mx-auto mb-3 flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-mono text-slate-300 hover:text-white transition-all group"
-          title="Return to Main Portal"
-        >
-          <ChevronLeft className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
-          <span className="font-bold">HOME</span>
-          <span className="text-white/30">/</span>
-          <span className="text-amber-400 font-extrabold">CHAT ROOM</span>
-        </Link>
-
-        <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest px-2.5 py-1 rounded-lg bg-black/40 border border-white/5">
-          RESTRICTED NET
-        </span>
-      </div>
-
+    <div className="min-h-screen flex flex-col justify-center px-4 py-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
       <div className="flex-1 flex items-center justify-center">
         <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
         <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-white/20 mx-auto relative">
@@ -113,32 +95,7 @@ export function ChatAuthGate({
           </button>
         </form>
 
-        <div className="pt-3 border-t border-white/10 space-y-3">
-          <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-center space-y-2">
-            <span className="text-[11px] font-medium text-slate-300 block">
-              Membership & Chat by Invitation Only
-            </span>
-            <p className="text-[11px] text-slate-300">
-              Have an invitation code from Allen or a Range Officer?
-            </p>
-            <div className="flex items-center justify-center gap-2 pt-1">
-              <Link
-                href="/invite"
-                className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 transition-all"
-              >
-                <span>Claim Member Code</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-              <Link
-                href="/invite/pro"
-                className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all"
-              >
-                <span>Pro VIP Intake</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
+        <div className="pt-3 border-t border-white/10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1">
             <Link href="/" className="hover:text-slate-300 transition-colors">
               ← Return to Main Portal
