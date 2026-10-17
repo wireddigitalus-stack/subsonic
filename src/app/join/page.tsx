@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
@@ -21,6 +21,27 @@ export default function JoinSocietyGatePage() {
   const [inviteCode, setInviteCode] = useState("");
   const [validating, setValidating] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isChatAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
+    const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+    const rawMember = localStorage.getItem("subsonic_member_profile");
+    let hasSavedCallsign = false;
+    try {
+      if (rawShooter) {
+        const parsed = JSON.parse(rawShooter);
+        if (parsed?.callsign && parsed.callsign !== "GUEST") hasSavedCallsign = true;
+      }
+      if (!hasSavedCallsign && rawMember) {
+        const parsedMem = JSON.parse(rawMember);
+        if (parsedMem?.callsign && parsedMem.callsign !== "GUEST") hasSavedCallsign = true;
+      }
+    } catch {}
+    if (isChatAuth || hasSavedCallsign) {
+      router.replace("/");
+    }
+  }, [router]);
 
   const handleValidateAndClaim = async (e: React.FormEvent) => {
     e.preventDefault();

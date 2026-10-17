@@ -14,11 +14,15 @@ import {
   Fish,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   Target,
   Trophy,
   Car,
   Share2,
   Download,
+  FileText,
+  X,
+  Printer,
 } from "lucide-react";
 
 interface HotelItem {
@@ -256,6 +260,8 @@ const ATTRACTIONS_DATA: AttractionItem[] = [
 
 export default function CompetitorPacketPage() {
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+  const [isSavingPdf, setIsSavingPdf] = useState(false);
 
   const handleShare = () => {
     if (typeof window !== "undefined") {
@@ -265,31 +271,76 @@ export default function CompetitorPacketPage() {
     }
   };
 
+  // Safe PDF Share / Save that NEVER navigates the iOS standalone PWA WebView to a raw .pdf URL
+  const handleSaveOrSharePdf = async () => {
+    if (typeof window === "undefined") return;
+    setIsSavingPdf(true);
+    try {
+      const response = await fetch("/documents/invitational-competitor-packet.pdf");
+      const blob = await response.blob();
+      const fileName = "Subsonic-Society-2026-Competitor-Packet.pdf";
+      const pdfFile = new File([blob], fileName, { type: "application/pdf" });
+
+      // On iOS / Android, use native Web Share sheet ("Save to Files", "Print", Messages, etc.) so user never leaves the app
+      const nav: any = navigator;
+      if (typeof nav.canShare === "function" && nav.canShare({ files: [pdfFile] })) {
+        await nav.share({
+          title: "Subsonic Society 2026 Competitor Packet",
+          text: "Official 2026 Subsonic Society Invitational Money Match Competitor Packet",
+          files: [pdfFile],
+        });
+        setIsSavingPdf(false);
+        return;
+      }
+
+      // Desktop / fallback: trigger Blob download without navigating current window
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+    } catch (err: any) {
+      // Ignore user abort on native share sheet
+      if (err?.name !== "AbortError") {
+        console.warn("PDF save notice:", err);
+      }
+    } finally {
+      setIsSavingPdf(false);
+    }
+  };
+
   return (
     <div className="min-h-screen text-slate-100 pb-28">
       {/* Post-registration welcome (only when ?welcome=CALLSIGN) */}
       <PacketWelcomeBanner />
 
       {/* Top Banner / Breadcrumb */}
-      <div className="border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm font-mono text-slate-300">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
+      <div className="border-b border-white/10 bg-black/80 backdrop-blur-md sticky top-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:top-[calc(5.5rem+env(safe-area-inset-top,0px))] z-40">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-mono text-slate-300">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold transition-all active:scale-95"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400 -ml-0.5" />
+              <span>Home</span>
             </Link>
-            <ChevronRight className="w-4 h-4 text-slate-500" />
-            <span className="text-amber-400 font-bold">The 2026 Invitational</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500 hidden sm:inline" />
+            <span className="text-amber-400 font-bold truncate">2026 Competitor Packet</span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <a
-              href="/documents/invitational-competitor-packet.pdf"
-              download="Subsonic-Society-2026-Competitor-Packet.pdf"
-              className="px-3.5 py-2 rounded-lg text-sm font-black bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center gap-2 shadow-sm"
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsPdfModalOpen(true)}
+              className="px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black bg-amber-500 hover:bg-amber-400 text-black transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
             >
-              <Download className="w-4 h-4" />
-              <span>Download PDF Packet</span>
-            </a>
+              <FileText className="w-4 h-4" />
+              <span>View / Save PDF</span>
+            </button>
           </div>
         </div>
       </div>
@@ -324,14 +375,25 @@ export default function CompetitorPacketPage() {
               </p>
             </div>
 
-            <a
-              href="/documents/invitational-competitor-packet.pdf"
-              download="Subsonic-Society-2026-Competitor-Packet.pdf"
-              className="px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download PDF Packet</span>
-            </a>
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsPdfModalOpen(true)}
+                className="px-5 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)] cursor-pointer active:scale-95"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Open PDF Packet</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveOrSharePdf}
+                disabled={isSavingPdf}
+                className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60"
+              >
+                <Download className="w-4 h-4 text-amber-400" />
+                <span>{isSavingPdf ? "Preparing..." : "Save / Share PDF"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Info Bar */}
@@ -699,6 +761,257 @@ export default function CompetitorPacketPage() {
           </div>
         </section>
       </div>
+
+      {/* IN-APP COMPETITOR PACKET VIEWER MODAL (Prevents iOS PWA / Mobile WebView from getting trapped on a raw .pdf URL) */}
+      {isPdfModalOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col h-[100dvh] w-full overflow-hidden animate-fadeIn">
+          {/* Sticky Top Action Bar — Always visible on mobile & PWA so user can exit in 1 tap */}
+          <div className="shrink-0 bg-[#0B0F17] border-b border-white/15 px-3 sm:px-6 pt-[max(0.75rem,calc(env(safe-area-inset-top,0px)+0.5rem))] pb-3 flex items-center justify-between gap-2 shadow-xl">
+            <button
+              type="button"
+              onClick={() => setIsPdfModalOpen(false)}
+              className="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4 text-amber-400 -ml-0.5" />
+              <span>Back / Exit Packet</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSaveOrSharePdf}
+                disabled={isSavingPdf}
+                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                <span>{isSavingPdf ? "Preparing..." : "Save / Share PDF"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsPdfModalOpen(false)}
+                aria-label="Close Packet Viewer"
+                className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 hover:text-white transition-all active:scale-95 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Scrollable 4-Page Official Competitor Packet Document View */}
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain px-3 sm:px-6 py-6 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+3rem))] space-y-6"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {/* PAGE 1 */}
+            <div className="max-w-3xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10 space-y-6 border border-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+                <span>SUBSONIC SOCIETY | INVITATIONAL 2026</span>
+                <span>PAGE 1 OF 4</span>
+              </div>
+
+              <div className="text-center space-y-2 border-b-2 border-red-700/80 pb-5">
+                <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-amber-500 bg-black">
+                  <img
+                    src="/images/SS-RWB-LOGO.png"
+                    alt="Subsonic Society"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-widest text-red-700 pt-1">
+                  SUBSONIC SOCIETY
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-slate-900">
+                  INVITATIONAL MONEY MATCH
+                </h2>
+                <p className="text-xs sm:text-sm font-bold uppercase text-slate-700">
+                  2026 COMPETITOR PACKET
+                </p>
+                <p className="text-xs font-bold uppercase text-red-700">
+                  PRESENTED BY MODACAM CUSTOM RIFLES
+                </p>
+                <p className="text-xs font-semibold text-slate-800">
+                  November 13–15, 2026 | The Hideout | Bristol, Tennessee
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+                <div>
+                  <div className="text-[10px] font-bold uppercase text-red-700">MATCH DATES</div>
+                  <div className="text-sm font-black text-slate-900 mt-0.5">November 13–15, 2026</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold uppercase text-red-700">MATCH PROPERTY</div>
+                  <div className="text-sm font-bold text-slate-900 mt-0.5">111 Hwy 44 • Bristol, TN</div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-bold uppercase text-red-700">HOST</div>
+                  <div className="text-sm font-black text-slate-900 mt-0.5">Subsonic Society</div>
+                  <div className="text-xs font-semibold text-slate-700">Founder: Allen Hurley</div>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-sm sm:text-base leading-relaxed text-slate-800">
+                <h3 className="text-lg font-black text-slate-900">Welcome to the Invitational</h3>
+                <p className="font-semibold">Competitors,</p>
+                <p>
+                  On behalf of Subsonic Society, welcome to Bristol and thank you for accepting the Invitational Challenge. This match was created to bring outstanding rimfire competitors together, remove the ordinary barriers, raise the level of competition and build an experience worthy of the shooters who earned an invitation.
+                </p>
+                <p>
+                  You are part of a limited field coming to The Hideout for a weekend of serious competition, great people and a little fun along the way. We have worked hard to make the Invitational different - challenging stages, a meaningful cash purse, dedicated staff and spotters, hospitality, and an atmosphere where the competitors are the focus. We are proud to have Modacam Custom Rifles as the presenting sponsor of the Subsonic Society Invitational Money Match.
+                </p>
+                <p>
+                  Bristol is home for us, and I want you and anyone traveling with you to enjoy it while you are here. This packet gives you a quick guide to the match weekend, lodging, downtown dining and some of the things that make Bristol, Tennessee and Bristol, Virginia special.
+                </p>
+                <p>
+                  Most importantly, thank you for accepting the challenge and helping us build something special. We look forward to welcoming you to Bristol and seeing you on the range.
+                </p>
+                <div className="pt-2">
+                  <div className="font-bold text-slate-900">Allen Hurley</div>
+                  <div className="text-xs text-slate-600">Founder, Subsonic Society</div>
+                </div>
+              </div>
+            </div>
+
+            {/* PAGE 2 */}
+            <div className="max-w-3xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10 space-y-6 border border-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+                <span>SUBSONIC SOCIETY | INVITATIONAL 2026</span>
+                <span>PAGE 2 OF 4</span>
+              </div>
+
+              <div className="space-y-3 text-sm sm:text-base leading-relaxed text-slate-800">
+                <h3 className="text-lg font-black text-slate-900">
+                  Welcome to Bristol, Tennessee &amp; Bristol, Virginia
+                </h3>
+                <p>
+                  Bristol is a true two-state city in the Appalachian Mountains. Historic State Street follows the Tennessee-Virginia line through downtown, giving visitors the unusual opportunity to stand with one foot in Tennessee and one foot in Virginia at the same time beneath the iconic Bristol sign. Downtown blends local restaurants, live music, shops, historic architecture and Bristol&apos;s nationally recognized music heritage.
+                </p>
+                <p>
+                  The area is also known for motorsports, outdoor recreation and entertainment - from Bristol Motor Speedway and Bristol Dragway to Hard Rock Hotel &amp; Casino Bristol, South Holston Lake and the South Holston River. Bristol is the official Birthplace of Country Music, and the downtown museum tells the story of the historic 1927 Bristol Sessions.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-lg font-black text-red-700">Invitational Weekend Schedule</h3>
+                <p className="text-xs font-semibold text-slate-600">
+                  Schedule is subject to change. Final adjustments will be communicated to competitors.
+                </p>
+                <div className="border border-slate-300 rounded-xl overflow-hidden text-xs sm:text-sm">
+                  <div className="grid grid-cols-12 bg-slate-900 text-white font-bold p-3">
+                    <div className="col-span-4">Day</div>
+                    <div className="col-span-4">Time</div>
+                    <div className="col-span-4">Schedule</div>
+                  </div>
+                  <div className="grid grid-cols-12 p-3 border-t border-slate-200 bg-white">
+                    <div className="col-span-4 font-bold">Friday • Nov. 13</div>
+                    <div className="col-span-4">Range open 12:00–5:00 PM</div>
+                    <div className="col-span-4">Registration and sight in only.</div>
+                  </div>
+                  <div className="grid grid-cols-12 p-3 border-t border-slate-200 bg-slate-50">
+                    <div className="col-span-4 font-bold">Saturday • Nov. 14</div>
+                    <div className="col-span-4">Open 7:00 AM • Brief 8:30 AM • First shot 9:00 AM</div>
+                    <div className="col-span-4 font-semibold">8 stages (Main Event) — lunch and dinner provided.</div>
+                  </div>
+                  <div className="grid grid-cols-12 p-3 border-t border-slate-200 bg-white">
+                    <div className="col-span-4 font-bold">Sunday • Nov. 15</div>
+                    <div className="col-span-4">Open 7:00 AM • Sight in 7–8:30 • Brief 8:30 • First shot 9:00 AM</div>
+                    <div className="col-span-4 font-semibold">4 stages (Main Event) followed by 2 side matches.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PAGE 3 */}
+            <div className="max-w-3xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10 space-y-6 border border-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+                <span>SUBSONIC SOCIETY | INVITATIONAL 2026</span>
+                <span>PAGE 3 OF 4</span>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-lg font-black text-slate-900">Where to Stay</h3>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  Match property: 111 Hwy 44, Bristol, TN. All listed hotels are generally a 10–15 minute drive to The Hideout. Airbnb and VRBO also have many nearby homes, cabins and group rentals.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  {HOTELS_DATA.map((h, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                      <div>
+                        <div className="font-bold text-slate-900">{h.name}</div>
+                        <div className="text-slate-600">{h.city} • {h.distance}</div>
+                      </div>
+                      <a href={`tel:${h.phone.replace(/[^0-9]/g, "")}`} className="font-mono font-bold text-red-700 shrink-0">
+                        {h.phone}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <h3 className="text-lg font-black text-slate-900">Downtown Bristol — Places to Eat</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {DINING_DATA.map((d, i) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="font-bold text-slate-900">{d.name}: </span>
+                      <span className="text-slate-700">{d.description}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* PAGE 4 */}
+            <div className="max-w-3xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10 space-y-6 border border-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-200 pb-2">
+                <span>SUBSONIC SOCIETY | INVITATIONAL 2026</span>
+                <span>PAGE 4 OF 4</span>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-lg font-black text-slate-900">Bristol Attractions &amp; Things to Do</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {ATTRACTIONS_DATA.map((a, i) => (
+                    <div key={i} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+                      <span className="font-bold text-slate-900">{a.title}: </span>
+                      <span className="text-slate-700">{a.summary}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-100 border border-slate-300 space-y-1.5 text-xs sm:text-sm">
+                <h4 className="font-black text-slate-900">Worth an Extra Day: South Holston River Trout Fishing</h4>
+                <p className="text-slate-700 leading-relaxed">
+                  The South Holston River is one of the region&apos;s premier trout fisheries and is widely regarded among the best fly-fishing waters in the East. Cold water released from South Holston Dam supports strong brown and rainbow trout populations, and local guides offer half-day and full-day trips.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom Exit Button for Easy Mobile Thumb Reach */}
+            <div className="max-w-3xl mx-auto pt-2 pb-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsPdfModalOpen(false)}
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/20 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer"
+              >
+                <ChevronLeft className="w-5 h-5 text-amber-400" />
+                <span>Close Packet &amp; Return</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveOrSharePdf}
+                disabled={isSavingPdf}
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+              >
+                <Download className="w-5 h-5" />
+                <span>{isSavingPdf ? "Preparing PDF..." : "Save / Share PDF File"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

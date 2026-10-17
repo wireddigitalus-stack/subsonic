@@ -92,14 +92,64 @@ function ProInviteContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<any | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [checkingExistingAuth, setCheckingExistingAuth] = useState(true);
+
+  // If user is already signed up / logged in on this device, redirect straight to Home page (/)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const forceNew = searchParams.get("new") === "1";
+    if (forceNew) {
+      setCheckingExistingAuth(false);
+      return;
+    }
+
+    const isChatAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
+    const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+    const rawMember = localStorage.getItem("subsonic_member_profile");
+    let hasSavedCallsign = false;
+    try {
+      if (rawShooter) {
+        const parsed = JSON.parse(rawShooter);
+        if (parsed?.callsign && parsed.callsign !== "GUEST") {
+          hasSavedCallsign = true;
+        }
+      }
+      if (!hasSavedCallsign && rawMember) {
+        const parsedMem = JSON.parse(rawMember);
+        if (parsedMem?.callsign && parsedMem.callsign !== "GUEST") {
+          hasSavedCallsign = true;
+        }
+      }
+    } catch {}
+
+    if (isChatAuth || hasSavedCallsign) {
+      router.replace("/");
+      return;
+    }
+
+    // Also check active server session (e.g., Allen or Rob logged in via cookie)
+    fetch("/api/admin/session")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.authenticated && data?.session) {
+          router.replace("/");
+        } else {
+          setCheckingExistingAuth(false);
+        }
+      })
+      .catch(() => {
+        setCheckingExistingAuth(false);
+      });
+  }, [router, searchParams]);
 
   // Validate invite code on mount if in URL
   useEffect(() => {
+    if (checkingExistingAuth) return;
     const queryCode = searchParams.get("code");
     if (queryCode) {
       validateCode(queryCode);
     }
-  }, [searchParams]);
+  }, [searchParams, checkingExistingAuth]);
 
   const validateCode = async (codeToTest: string) => {
     const clean = codeToTest.trim().toUpperCase();
@@ -381,6 +431,14 @@ function ProInviteContent() {
       setIsSubmitting(false);
     }
   };
+
+  if (checkingExistingAuth) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   // SUCCESS SCREEN
   if (submissionSuccess) {
