@@ -93,77 +93,109 @@ export async function compressImageFile(
   const maxHeight = options.maxHeight || 1200;
   const initialQuality = options.quality || 0.84;
 
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+  const compressLoadedImage = (img: HTMLImageElement, fallbackSrc: string): CompressionResult => {
+    const naturalWidth = img.naturalWidth || img.width || 1200;
+    const naturalHeight = img.naturalHeight || img.height || 900;
 
-    reader.onerror = () => reject(new Error("Failed to read image file"));
-    reader.onload = (e) => {
-      const rawDataUrl = e.target?.result as string;
-      const img = new Image();
+    let targetWidth = naturalWidth;
+    let targetHeight = naturalHeight;
 
-      img.onerror = () => reject(new Error("Failed loading image"));
-      img.onload = () => {
-        const naturalWidth = img.naturalWidth || img.width || 1200;
-        const naturalHeight = img.naturalHeight || img.height || 900;
+    if (targetWidth > maxWidth || targetHeight > maxHeight) {
+      const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
+      targetWidth = Math.max(1, Math.round(targetWidth * ratio));
+      targetHeight = Math.max(1, Math.round(targetHeight * ratio));
+    }
 
-        let targetWidth = naturalWidth;
-        let targetHeight = naturalHeight;
+    let finalDataUrl = fallbackSrc;
+    const outFormat: "image/webp" | "image/jpeg" = "image/jpeg";
 
-        if (targetWidth > maxWidth || targetHeight > maxHeight) {
-          const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
-          targetWidth = Math.max(1, Math.round(targetWidth * ratio));
-          targetHeight = Math.max(1, Math.round(targetHeight * ratio));
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext("2d");
+
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+        let quality = initialQuality;
+        finalDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+        // Guarantee payload stays well under ~550KB so mobile LTE uploads and Vercel 4.5MB limit never fail
+        while (finalDataUrl.length > 750_000 && quality > 0.45) {
+          quality -= 0.12;
+          finalDataUrl = canvas.toDataURL("image/jpeg", quality);
         }
+      }
+    } catch {
+      finalDataUrl = fallbackSrc;
+    }
 
-        let finalDataUrl = rawDataUrl;
-        let outFormat: "image/webp" | "image/jpeg" = "image/jpeg";
+    const base64Length = finalDataUrl.split(",")[1]?.length || finalDataUrl.length;
+    const compressedSizeBytes = Math.round((base64Length * 3) / 4);
+    const savingsPercent =
+      originalSizeBytes > 0
+        ? Math.max(0, Math.round(((originalSizeBytes - compressedSizeBytes) / originalSizeBytes) * 100))
+        : 0;
 
-        try {
-          const canvas = document.createElement("canvas");
-          canvas.width = targetWidth;
-          canvas.height = targetHeight;
-          const ctx = canvas.getContext("2d");
-
-          if (ctx) {
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = "high";
-            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-            let quality = initialQuality;
-            finalDataUrl = canvas.toDataURL("image/jpeg", quality);
-
-            // Guarantee payload stays well under ~550KB so mobile LTE uploads and Vercel 4.5MB limit never fail
-            while (finalDataUrl.length > 750_000 && quality > 0.45) {
-              quality -= 0.12;
-              finalDataUrl = canvas.toDataURL("image/jpeg", quality);
-            }
-          }
-        } catch {
-          finalDataUrl = rawDataUrl;
-        }
-
-        const base64Length = finalDataUrl.split(",")[1]?.length || finalDataUrl.length;
-        const compressedSizeBytes = Math.round((base64Length * 3) / 4);
-        const savingsPercent =
-          originalSizeBytes > 0
-            ? Math.max(0, Math.round(((originalSizeBytes - compressedSizeBytes) / originalSizeBytes) * 100))
-            : 0;
-
-        resolve({
-          dataUrl: finalDataUrl,
-          originalSizeBytes,
-          compressedSizeBytes,
-          originalSizeFormatted: formatBytes(originalSizeBytes),
-          compressedSizeFormatted: formatBytes(compressedSizeBytes),
-          width: targetWidth,
-          height: targetHeight,
-          aspectRatio: targetWidth / targetHeight,
-          savingsPercent,
-          format: outFormat,
-        });
-      };
-      img.src = rawDataUrl;
+    return {
+      dataUrl: finalDataUrl,
+      originalSizeBytes,
+      compressedSizeBytes,
+      originalSizeFormatted: formatBytes(originalSizeBytes),
+      compressedSizeFormatted: formatBytes(compressedSizeBytes),
+      width: targetWidth,
+      height: targetHeight,
+      aspectRatio: targetWidth / targetHeight,
+      savingsPercent,
+      format: outFormat,
     };
-    reader.readAsDataURL(file);
+  };
+
+  return new Promise((resolve, reject) => {
+    // Fast low-memory path: decode directly from blob Object URL on iOS/Android
+    if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+      try {
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const result = compressLoadedImage(img, "");
+          URL.revokeObjectURL(objectUrl);
+          if (result.dataUrl && result.dataUrl.startsWith("data:image/")) {
+            resolve(result);
+            return;
+          }
+          // Fallback to FileReader if canvas failed
+          readViaFileReader();
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          readViaFileReader();
+        };
+        img.src = objectUrl;
+        return;
+      } catch {
+        // Fallback to FileReader below
+      }
+    }
+
+    function readViaFileReader() {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Failed to read image file"));
+      reader.onload = (e) => {
+        const rawDataUrl = e.target?.result as string;
+        const img = new Image();
+        img.onerror = () => reject(new Error("Failed loading image"));
+        img.onload = () => {
+          resolve(compressLoadedImage(img, rawDataUrl));
+        };
+        img.src = rawDataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    readViaFileReader();
   });
 }

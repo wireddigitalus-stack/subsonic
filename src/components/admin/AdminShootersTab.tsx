@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { ShooterProfile } from "@/lib/types";
 import { ProfileEditModal } from "@/components/profile/ProfileEditModal";
+import { compressImageFile } from "@/lib/imageCompression";
 
 export interface AdminShootersTabProps {
   shooterProfiles: ShooterProfile[];
@@ -44,13 +45,13 @@ export function AdminShootersTab(props: AdminShootersTabProps) {
   const [isSavingShooter, setIsSavingShooter] = useState(false);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
 
-  const readFileAsOriginalDataUrl = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = () => reject(new Error("Failed to read image"));
-      reader.readAsDataURL(file);
+  const readFileAsOriginalDataUrl = async (file: File): Promise<string> => {
+    const result = await compressImageFile(file, {
+      maxWidth: 1200,
+      maxHeight: 1200,
+      quality: 0.84,
     });
+    return result.dataUrl;
   };
 
   const formatShooterProfileText = (shooter: ShooterProfile | Partial<ShooterProfile>) => {

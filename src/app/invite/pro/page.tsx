@@ -444,7 +444,6 @@ function ProInviteContent() {
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("subsonic_chat_authenticated", "true");
-          localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(savedShooter));
           localStorage.setItem(
             "subsonic_shooter_profile",
             JSON.stringify({
@@ -458,7 +457,15 @@ function ProInviteContent() {
             })
           );
           localStorage.setItem("subsonic_member_profile", JSON.stringify(savedMember));
-        } catch (e) { console.warn("localStorage profile warning:", e); }
+        } catch (e) {
+          console.warn("localStorage session warning:", e);
+        }
+        try {
+          const { actionPhoto: _omitActionPhoto, ...lightweightShooter } = savedShooter || {};
+          localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(lightweightShooter));
+        } catch (e) {
+          console.warn("localStorage full profile warning:", e);
+        }
       }
 
       // Straight to the Home / 2026 Invitational Page

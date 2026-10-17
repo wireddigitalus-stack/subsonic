@@ -677,14 +677,15 @@ export function ProfileEditModal({
               currentShooter.callsign.toUpperCase() === (initialShooter.callsign || "").toUpperCase());
 
           if (isEditingSelf) {
+            const { actionPhoto: _omitMergedAction, ...currentWithoutAction } = currentShooter || {};
+            const { actionPhoto: _omitSavedAction, ...savedWithoutAction } = savedShooter || {};
             const merged = {
-              ...(currentShooter || {}),
-              ...savedShooter,
+              ...currentWithoutAction,
+              ...savedWithoutAction,
               name: payload.name,
               callsign: payload.callsign,
               division: payload.division,
               image: payload.image,
-              actionPhoto: payload.actionPhoto,
               avatarColor: avatarColor || currentShooter?.avatarColor,
               rifleSetup: `${payload.rifleSetup.action}${payload.rifleSetup.optic ? ` / ${payload.rifleSetup.optic}` : ""}`,
               badgeText: isRob
@@ -700,10 +701,14 @@ export function ProfileEditModal({
             };
 
             localStorage.setItem("subsonic_shooter_profile", JSON.stringify(merged));
-            localStorage.setItem(
-              "subsonic_pro_full_profile",
-              JSON.stringify({ ...savedShooter, avatarColor })
-            );
+            try {
+              localStorage.setItem(
+                "subsonic_pro_full_profile",
+                JSON.stringify({ ...savedWithoutAction, avatarColor })
+              );
+            } catch (e) {
+              console.warn("localStorage full profile warning:", e);
+            }
 
             window.dispatchEvent(
               new CustomEvent("subsonic_profile_updated", {

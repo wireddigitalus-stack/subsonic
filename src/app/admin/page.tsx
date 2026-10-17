@@ -65,6 +65,7 @@ import {
   Bot
 } from "lucide-react";
 import { BotRosterCard } from "@/components/chat/BotRosterCard";
+import { compressImageFile } from "@/lib/imageCompression";
 import { BotSpeed, getBotActivityLog, subscribeToBotActivity, logBotActivity, clearBotActivityLog } from "@/lib/chat-bots";
 import { 
   getLocalTelemetryEvents, 
@@ -3815,17 +3816,18 @@ export default function AdminDashboardPage() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
-                              if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = () => {
-                                if (typeof reader.result === "string") {
-                                  setMemberForm((prev) => ({ ...prev, image: reader.result as string }));
-                                }
-                              };
-                              reader.readAsDataURL(file);
                               e.target.value = "";
+                              if (!file) return;
+                              try {
+                                const result = await compressImageFile(file, {
+                                  maxWidth: 1000,
+                                  maxHeight: 1000,
+                                  quality: 0.84,
+                                });
+                                setMemberForm((prev) => ({ ...prev, image: result.dataUrl }));
+                              } catch {}
                             }}
                           />
                         </label>
@@ -3849,7 +3851,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={memberForm.image || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, image: e.target.value }))}
-                        onPaste={(e) => {
+                        onPaste={async (e) => {
                           const items = e.clipboardData?.items;
                           if (items) {
                             for (let i = 0; i < items.length; i++) {
@@ -3857,13 +3859,14 @@ export default function AdminDashboardPage() {
                                 e.preventDefault();
                                 const file = items[i].getAsFile();
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    if (typeof reader.result === "string") {
-                                      setMemberForm((prev) => ({ ...prev, image: reader.result as string }));
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
+                                  try {
+                                    const result = await compressImageFile(file, {
+                                      maxWidth: 1000,
+                                      maxHeight: 1000,
+                                      quality: 0.84,
+                                    });
+                                    setMemberForm((prev) => ({ ...prev, image: result.dataUrl }));
+                                  } catch {}
                                 }
                                 return;
                               }
@@ -3905,17 +3908,18 @@ export default function AdminDashboardPage() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
-                              if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = () => {
-                                if (typeof reader.result === "string") {
-                                  setMemberForm((prev) => ({ ...prev, actionPhoto: reader.result as string }));
-                                }
-                              };
-                              reader.readAsDataURL(file);
                               e.target.value = "";
+                              if (!file) return;
+                              try {
+                                const result = await compressImageFile(file, {
+                                  maxWidth: 1200,
+                                  maxHeight: 1200,
+                                  quality: 0.82,
+                                });
+                                setMemberForm((prev) => ({ ...prev, actionPhoto: result.dataUrl }));
+                              } catch {}
                             }}
                           />
                         </label>
@@ -3939,7 +3943,7 @@ export default function AdminDashboardPage() {
                         type="text"
                         value={memberForm.actionPhoto || ""}
                         onChange={(e) => setMemberForm((prev) => ({ ...prev, actionPhoto: e.target.value }))}
-                        onPaste={(e) => {
+                        onPaste={async (e) => {
                           const items = e.clipboardData?.items;
                           if (items) {
                             for (let i = 0; i < items.length; i++) {
@@ -3947,13 +3951,14 @@ export default function AdminDashboardPage() {
                                 e.preventDefault();
                                 const file = items[i].getAsFile();
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    if (typeof reader.result === "string") {
-                                      setMemberForm((prev) => ({ ...prev, actionPhoto: reader.result as string }));
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
+                                  try {
+                                    const result = await compressImageFile(file, {
+                                      maxWidth: 1200,
+                                      maxHeight: 1200,
+                                      quality: 0.82,
+                                    });
+                                    setMemberForm((prev) => ({ ...prev, actionPhoto: result.dataUrl }));
+                                  } catch {}
                                 }
                                 return;
                               }

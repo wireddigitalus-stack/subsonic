@@ -12,6 +12,7 @@ import {
   deleteShooterFromStorageAsync,
 } from "@/lib/shooters";
 import {
+  getMembersFromStorage,
   refreshMembersFromDb,
   addOrUpdateMemberAsync,
   deleteMemberFromStorageAsync,
@@ -38,6 +39,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   let createdShooterId: string | null = null;
   let createdMemberId: string | null = null;
+  let isRetryForSamePerson = false;
 
   try {
     if (Boolean(process.env.VERCEL) && !isDbConfigured) {
@@ -56,23 +58,51 @@ export async function POST(req: NextRequest) {
     // Always work from the latest database records
     await Promise.all([refreshInvitesFromDb(0), refreshShootersFromDb(0), refreshMembersFromDb(0)]);
 
+    const email = String(body.email || "").trim().toLowerCase();
+    const phone = String(body.phone || "").trim();
+    const mailingAddress = String(body.mailingAddress || "").trim();
+
+    // Detect idempotent retry (e.g. mobile Safari dropped connection after the first request succeeded)
+    const slug = callsign.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const shooterId = slug.length > 2 ? slug : `shooter-${Date.now().toString(36)}`;
+    const existingShooter = getShootersFromStorage().find(
+      (s) => s.callsign?.toUpperCase() === callsign || s.id.toLowerCase() === shooterId
+    );
+    const existingMember = getMembersFromStorage().find(
+      (m) => m.callsign?.toUpperCase() === callsign
+    );
+    if (existingShooter || existingMember) {
+      const sameEmail =
+        Boolean(email) &&
+        ((existingShooter?.email && existingShooter.email.toLowerCase() === email) ||
+          (existingMember?.email && existingMember.email.toLowerCase() === email));
+      const sameName =
+        Boolean(fullName) &&
+        ((existingShooter?.name && existingShooter.name.trim().toLowerCase() === fullName.toLowerCase()) ||
+          (existingMember?.full_name && existingMember.full_name.trim().toLowerCase() === fullName.toLowerCase()));
+      isRetryForSamePerson = Boolean(sameEmail || sameName);
+    }
+
     // ── 1. Invite code ─────────────────────────────────────────────
     if (!code) return fail("Please enter your invitation code.", 400, "INVITE_REQUIRED");
     // Only invites that actually exist (created by an admin) are accepted.
     const invite = getInvitesFromStorage().find((i) => i.code.toUpperCase() === code);
     if (!invite) return fail("Invalid invite code. Check spelling or request a new code.", 404, "INVITE_INVALID");
     if (invite.status === "REVOKED") return fail("This invite code has been revoked.", 403, "INVITE_REVOKED");
-    if (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)
+    const alreadyClaimedByCallsign = Boolean(
+      invite.claimedBy?.some((c) => c.toUpperCase() === callsign)
+    );
+    if (
+      ! (isRetryForSamePerson && alreadyClaimedByCallsign) &&
+      (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)
+    ) {
       return fail("This invite code has reached its usage limit.", 410, "INVITE_EXHAUSTED");
+    }
     if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
       return fail("This invite code has expired.", 410, "INVITE_EXPIRED");
 
     // ── 2. Identity & Contact Details ─────────────────────────────
     if (!fullName || !callsign) return fail("Full name and callsign are required.", 400, "MISSING_FIELDS");
-    
-    const email = String(body.email || "").trim().toLowerCase();
-    const phone = String(body.phone || "").trim();
-    const mailingAddress = String(body.mailingAddress || "").trim();
 
     if (!email || !email.includes("@")) {
       return fail("Valid email address is required to complete sign up.", 400, "EMAIL_REQUIRED");
@@ -87,7 +117,10 @@ export async function POST(req: NextRequest) {
     const pinError = validatePin(pin, "MEMBER");
     if (pinError) return fail(pinError, 400, "INVALID_PIN");
 
-    const callsignCheck = checkCallsignAvailability(callsign, { state: "TN" });
+    const callsignCheck = checkCallsignAvailability(callsign, {
+      state: "TN",
+      excludeMemberId: isRetryForSamePerson ? callsign : undefined,
+    });
     if (!callsignCheck.isAvailable) {
       return NextResponse.json(
         { error: callsignCheck.message, suggestions: callsignCheck.suggestions, code: "CALLSIGN_TAKEN" },
@@ -95,9 +128,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const slug = callsign.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const shooterId = slug.length > 2 ? slug : `shooter-${Date.now().toString(36)}`;
-    if (getShootersFromStorage().some((s) => s.id.toLowerCase() === shooterId)) {
+    if (!isRetryForSamePerson && existingShooter) {
       return fail("That callsign is already in use. Please choose another.", 409, "CALLSIGN_TAKEN");
     }
 
@@ -194,7 +225,9 @@ export async function POST(req: NextRequest) {
 
     // ── 5. Claim the invite ────────────────────────────────────────
     {
-      const usedCount = (invite.usedCount || 0) + 1;
+      const usedCount = alreadyClaimedByCallsign
+        ? invite.usedCount || 1
+        : (invite.usedCount || 0) + 1;
       const claimedBy = Array.from(new Set([...(invite.claimedBy || []), callsign]));
       await saveInviteAsync({
         ...invite,
@@ -227,11 +260,13 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Onboarding failed:", err);
     // Roll back anything already created so the member can simply try again
-    try {
-      if (createdMemberId) await deleteMemberFromStorageAsync(createdMemberId);
-      if (createdShooterId) await deleteShooterFromStorageAsync(createdShooterId);
-    } catch (rollbackErr) {
-      console.error("Onboarding rollback error:", rollbackErr);
+    if (!isRetryForSamePerson) {
+      try {
+        if (createdMemberId) await deleteMemberFromStorageAsync(createdMemberId);
+        if (createdShooterId) await deleteShooterFromStorageAsync(createdShooterId);
+      } catch (rollbackErr) {
+        console.error("Onboarding rollback error:", rollbackErr);
+      }
     }
     return fail(
       "We couldn't finish creating your profile. Nothing was saved — please try again in a moment.",
