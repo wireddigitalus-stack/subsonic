@@ -222,12 +222,12 @@ export default function ChatPage() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (chatUserMenuRef.current && !chatUserMenuRef.current.contains(e.target as Node)) {
-        setIsChatUserMenuOpen(false);
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest && target.closest('[data-chat-user-dropdown="true"]')) {
+        return;
       }
-      if (chatMobileUserMenuRef.current && !chatMobileUserMenuRef.current.contains(e.target as Node)) {
-        setIsChatMobileUserMenuOpen(false);
-      }
+      setIsChatUserMenuOpen(false);
+      setIsChatMobileUserMenuOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -2098,6 +2098,14 @@ export default function ChatPage() {
 
   const handleLogout = () => {
     const prevCallsign = shooterProfile.callsign;
+    setIsChatUserMenuOpen(false);
+    setIsChatMobileUserMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    setIsProfileModalOpen(false);
+    setIsFullProfileModalOpen(false);
+    setIsRosterModalOpen(false);
+    setIsNewRoomModalOpen(false);
+
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("subsonic_chat_authenticated");
@@ -2106,6 +2114,9 @@ export default function ChatPage() {
       } catch (e) {
         console.warn("Failed to clear chat authentication from storage:", e);
       }
+      try {
+        fetch("/api/admin/logout", { method: "POST", keepalive: true }).catch(() => {});
+      } catch {}
       // Signal server that this marksman logged out
       if (prevCallsign && prevCallsign !== "GUEST") {
         try {
@@ -2118,6 +2129,7 @@ export default function ChatPage() {
         } catch {}
       }
     }
+    setAuthChecked(true);
     setIsAuthenticated(false);
     setCurrentChannel("invitational");
     setDirectPartners(INITIAL_DIRECT_PARTNERS);
@@ -2126,7 +2138,6 @@ export default function ChatPage() {
     setProfileForm(DEFAULT_PROFILE);
     setLoginCallsign("");
     setLoginPasscode("");
-    setIsProfileModalOpen(false);
     playTacticalChirp(400);
   };
 
@@ -2157,8 +2168,8 @@ export default function ChatPage() {
     >
       {/* 1. TOP LIVE MOUNTAIN TELEMETRY & RANGE WEATHER BANNER */}
       {!isFullscreen ? (
-        <div className="shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.75rem,calc(env(safe-area-inset-top,0px)+0.35rem))] sm:pt-3">
-        <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-white/10">
+        <div className="relative z-50 shrink-0 px-2 sm:px-4 lg:px-6 pt-[max(0.75rem,calc(env(safe-area-inset-top,0px)+0.35rem))] sm:pt-3">
+        <div className="ios-glass rounded-2xl p-2 sm:p-3 border border-white/10 relative z-50">
           {/* Mobile Top Bar: Tactical Breadcrumbs + Quick Hub Switcher + Callsign + Actions */}
           <div className="flex sm:hidden items-center justify-between gap-1.5">
             <div className="flex items-center gap-1 min-w-0">
@@ -2175,11 +2186,11 @@ export default function ChatPage() {
               </Link>
 
               {/* Shooter Callsign & Account Options Pill */}
-              <div className="relative" ref={chatMobileUserMenuRef}>
+              <div className="relative" ref={chatMobileUserMenuRef} data-chat-user-dropdown="true">
                 <button
                   id="tour-step-pass"
                   type="button"
-                  onClick={() => setIsChatMobileUserMenuOpen(!isChatMobileUserMenuOpen)}
+                  onClick={() => setIsChatMobileUserMenuOpen((prev) => !prev)}
                   data-telemetry="chat_mobile_account_menu"
                   className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-black/60 border border-white/15 hover:border-amber-400/40 text-xs min-w-0 shrink cursor-pointer active:scale-95 transition-all"
                   title={`${shooterProfile.callsign} — Account & Session Options`}
@@ -2213,7 +2224,7 @@ export default function ChatPage() {
                 </button>
 
                 {isChatMobileUserMenuOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-60 ios-glass rounded-2xl p-2 border border-white/15 shadow-2xl backdrop-blur-2xl animate-fadeIn z-50 space-y-1">
+                  <div className="absolute left-0 top-full mt-2 w-64 bg-[#0B0F17]/95 rounded-2xl p-2 border border-white/20 shadow-2xl backdrop-blur-2xl animate-fadeIn z-[100] space-y-1">
                     <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
@@ -2250,6 +2261,36 @@ export default function ChatPage() {
                     >
                       <Camera className="w-4 h-4 text-amber-400" />
                       <span>Edit Profile &amp; Photos</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChatMobileUserMenuOpen(false);
+                        setProfileForm(shooterProfile);
+                        setProfileActiveTab("PASS");
+                        setIsProfileModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                    >
+                      <QrCode className="w-4 h-4 text-cyan-400" />
+                      <span>Member Pass &amp; QR</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChatMobileUserMenuOpen(false);
+                        setIsRosterModalOpen(true);
+                        playTacticalChirp(1050);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                    >
+                      <Users className="w-4 h-4 text-emerald-400" />
+                      <span className="flex-1">In Chat Now</span>
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                        {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
+                      </span>
                     </button>
 
                     {isShooterAdmin && (
@@ -2365,13 +2406,13 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              {/* Right: Profile Pill */}
+              {/* Right: Profile Pill & Quick Logout */}
               <div className="flex items-center gap-2">
                 {/* Unified User Account & Session Options */}
-                <div className="relative" ref={chatUserMenuRef}>
+                <div className="relative" ref={chatUserMenuRef} data-chat-user-dropdown="true">
                   <button
                     type="button"
-                    onClick={() => setIsChatUserMenuOpen(!isChatUserMenuOpen)}
+                    onClick={() => setIsChatUserMenuOpen((prev) => !prev)}
                     data-telemetry="chat_shooter_account_menu"
                     className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:border-amber-400/40 transition-all text-xs group cursor-pointer"
                     title={`${shooterProfile.callsign} — Account & Session Options`}
@@ -2405,7 +2446,7 @@ export default function ChatPage() {
                   </button>
 
                   {isChatUserMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-56 sm:w-64 ios-glass rounded-2xl p-2 border border-white/15 shadow-2xl backdrop-blur-2xl animate-fadeIn z-50 space-y-1">
+                    <div className="absolute right-0 top-full mt-2 w-60 sm:w-64 bg-[#0B0F17]/95 rounded-2xl p-2 border border-white/20 shadow-2xl backdrop-blur-2xl animate-fadeIn z-[100] space-y-1">
                       <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
                         <div
                           className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
@@ -2448,13 +2489,27 @@ export default function ChatPage() {
                         type="button"
                         onClick={() => {
                           setIsChatUserMenuOpen(false);
+                          setProfileForm(shooterProfile);
+                          setProfileActiveTab("PASS");
+                          setIsProfileModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                      >
+                        <QrCode className="w-4 h-4 text-cyan-400" />
+                        <span>Member Pass &amp; QR</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
                           setIsRosterModalOpen(true);
                           playTacticalChirp(1050);
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
                       >
                         <Users className="w-4 h-4 text-emerald-400" />
-                        <span className="flex-1">Active Marksmen</span>
+                        <span className="flex-1">In Chat Now</span>
                         <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
                           {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
                         </span>
@@ -2502,6 +2557,17 @@ export default function ChatPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Direct 1-Click Logout Button */}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-2.5 py-1 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 hover:text-red-200 text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  title="Log Out of Chat"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-red-400" />
+                  <span className="hidden md:inline">Log Out</span>
+                </button>
               </div>
             </div>
 
@@ -2566,33 +2632,176 @@ export default function ChatPage() {
         </div>
       ) : (
         /* Fullscreen Top Bar — Messenger-clean on mobile, richer on desktop */
-        <div className="bg-black/90 backdrop-blur-md md:ios-glass rounded-none md:rounded-2xl px-2 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-2 md:py-2.5 border-b md:border border-white/10 flex items-center justify-between gap-1.5 sm:gap-3 md:mb-1.5 shrink-0 z-30">
-          {/* Left: Breadcrumbs to Home + Fullscreen Exit */}
+        <div className="relative z-50 bg-black/90 backdrop-blur-md md:ios-glass rounded-none md:rounded-2xl px-2 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-2 md:py-2.5 border-b md:border border-white/10 flex items-center justify-between gap-1.5 sm:gap-3 md:mb-1.5 shrink-0">
+          {/* Left: Breadcrumbs to Home + Fullscreen Exit + Account Dropdown */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <Link
               href="/"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all"
+              className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono text-slate-200 active:scale-95 transition-all"
               title="Return to Main Portal"
             >
-              <ChevronLeft className="w-4 h-4 text-amber-400 -mr-0.5" />
-              <span className="font-extrabold text-xs text-slate-100">HOME</span>
+              <ChevronLeft className="w-3.5 h-3.5 text-amber-400 -mr-0.5" />
+              <span className="font-extrabold text-[11px] text-slate-100">HOME</span>
             </Link>
 
             <button
               type="button"
               onClick={() => setIsFullscreen(false)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold active:scale-95 transition-all"
+              className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold active:scale-95 transition-all"
               title="Exit Fullscreen Mode"
             >
               <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs font-bold">EXIT</span>
+              <span className="text-[11px] font-bold">EXIT</span>
             </button>
+
+            {/* Fullscreen User Account Dropdown */}
+            <div className="relative" data-chat-user-dropdown="true">
+              <button
+                type="button"
+                onClick={() => setIsChatUserMenuOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-white/[0.06] border border-white/15 hover:border-amber-400/40 text-xs cursor-pointer active:scale-95 transition-all"
+                title={`${shooterProfile.callsign} — Account & Session Options`}
+                aria-expanded={isChatUserMenuOpen}
+                aria-haspopup="true"
+              >
+                <div
+                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                  style={{
+                    backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                  }}
+                >
+                  {shooterProfile.image ? (
+                    <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                  ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                    <Radar className="w-3 h-3 text-cyan-300 stroke-[2.5]" />
+                  ) : (
+                    <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
+                  )}
+                </div>
+                <span className="font-mono font-bold text-[11px] sm:text-xs text-amber-300 truncate max-w-[75px] sm:max-w-[110px]">
+                  {shooterProfile.callsign}
+                </span>
+                <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-200 ${isChatUserMenuOpen ? "rotate-180 text-amber-400" : ""}`} />
+              </button>
+
+              {isChatUserMenuOpen && (
+                <div className="absolute left-0 top-full mt-2 w-60 sm:w-64 bg-[#0B0F17]/95 rounded-2xl p-2 border border-white/20 shadow-2xl backdrop-blur-2xl animate-fadeIn z-[100] space-y-1">
+                  <div className="px-3 py-2 border-b border-white/10 flex items-center gap-2.5">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0 overflow-hidden ring-1 ring-white/20 text-white font-bold font-mono"
+                      style={{
+                        backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex,
+                      }}
+                    >
+                      {shooterProfile.image ? (
+                        <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                      ) : shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB" || shooterProfile.role === "MASTER_OWNER" ? (
+                        <Radar className="w-3.5 h-3.5 text-cyan-300 stroke-[2.5]" />
+                      ) : (
+                        <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-mono font-bold text-xs text-white truncate flex items-center gap-1.5">
+                        <span>{shooterProfile.callsign}</span>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-sans uppercase">Online</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                        {shooterProfile.badgeText || "SOCIETY OPERATIVE"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChatUserMenuOpen(false);
+                      setIsFullProfileModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                  >
+                    <Camera className="w-4 h-4 text-amber-400" />
+                    <span>Edit Profile &amp; Photos</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChatUserMenuOpen(false);
+                      setProfileForm(shooterProfile);
+                      setProfileActiveTab("PASS");
+                      setIsProfileModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                  >
+                    <QrCode className="w-4 h-4 text-cyan-400" />
+                    <span>Member Pass &amp; QR</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChatUserMenuOpen(false);
+                      setIsRosterModalOpen(true);
+                      playTacticalChirp(1050);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-left cursor-pointer"
+                  >
+                    <Users className="w-4 h-4 text-emerald-400" />
+                    <span className="flex-1">In Chat Now</span>
+                    <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">
+                      {onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}
+                    </span>
+                  </button>
+
+                  {isShooterAdmin && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsChatUserMenuOpen(false);
+                          handleOpenNewRoomModal();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:text-white hover:bg-amber-500/15 transition-colors text-left cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4 text-amber-400" />
+                        <span>Add New Chat Room</span>
+                      </button>
+
+                      <Link
+                        href="/admin"
+                        target="_blank"
+                        onClick={() => setIsChatUserMenuOpen(false)}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white hover:bg-emerald-500/10 transition-colors text-left cursor-pointer"
+                      >
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                        <span>Admin Control Center</span>
+                      </Link>
+                    </>
+                  )}
+
+                  <div className="border-t border-white/10 my-1" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChatUserMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 text-red-400" />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Center: Room Name */}
-          <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-left min-w-0 flex-1 justify-center px-1">
+          {/* Center: Room Name (Hidden on tiny screens if crowded, visible on sm+) */}
+          <div className="hidden sm:flex items-center gap-1.5 sm:gap-2 font-mono text-left min-w-0 flex-1 justify-center px-1">
             <span className="text-amber-400 font-bold text-sm sm:text-base md:text-lg">#</span>
-            <span className="font-mono font-bold text-sm sm:text-base md:text-lg text-white whitespace-nowrap truncate max-w-[110px] xs:max-w-[160px] sm:max-w-[220px] md:max-w-none">
+            <span className="font-mono font-bold text-sm sm:text-base md:text-lg text-white whitespace-nowrap truncate max-w-[160px] sm:max-w-[220px] md:max-w-none">
               {currentChannelData.name}
             </span>
             <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 font-bold flex items-center gap-1 shrink-0" title={`${currentChannelEngagement.postCount} transmissions in this channel`}>
@@ -2607,10 +2816,6 @@ export default function ChatPage() {
             <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 border border-white/10 text-slate-200 text-xs font-mono" title={liveWeather ? `Wind ${liveWeather.windSpeed}-${liveWeather.windGusts} mph from ${liveWeather.windDirection} (${liveWeather.windDegrees}°) • DA ${liveWeather.densityAltitude >= 0 ? "+" : ""}${liveWeather.densityAltitude?.toLocaleString()} ft • Baro ${liveWeather.pressureInHg || (Math.round(liveWeather.pressureHpa * 0.02953 * 100) / 100)} inHg` : "Live Wind Telemetry"}>
               <Wind className="w-3.5 h-3.5 text-cyan-400" />
               <span>{liveWeather ? `${liveWeather.windSpeed}-${liveWeather.windGusts} MPH ${liveWeather.windDirection}` : "4-6 MPH SE"}</span>
-            </div>
-            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 font-mono font-medium" title="Staff Moderated">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>Moderated</span>
             </div>
 
             {isShooterAdmin && (
@@ -2633,17 +2838,30 @@ export default function ChatPage() {
                 playTacticalChirp(1050);
               }}
               className="h-7 px-2 sm:px-2.5 rounded-lg border text-[11px] flex items-center gap-1.5 font-medium bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/30 transition-all cursor-pointer"
-              title="View Active Marksmen Online Roster"
+              title="View In Chat Now Roster"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="hidden xs:inline">{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
+              <span>{onlineCallsigns.length > 0 ? `${onlineCallsigns.length} Online` : "1 Online"}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(true);
+                playTacticalChirp(1100);
+              }}
+              className="sm:hidden h-7 px-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-slate-200 text-xs font-mono font-bold flex items-center gap-1 active:scale-95 transition-all"
+              title="Open Menu"
+            >
+              <Menu className="w-3.5 h-3.5 text-amber-400" />
+              <span className="font-extrabold text-[11px]">MENU</span>
             </button>
           </div>
         </div>
       )}
 
       {/* 2. CHANNEL SELECTOR — Visible on mobile & desktop so switching rooms (e.g. #invitational, #lunch-menu) and adding rooms (Admin) is 1 tap */}
-      <div id="tour-step-channels" className="shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1">
+      <div id="tour-step-channels" className="relative z-20 shrink-0 px-2 sm:px-4 lg:px-6 pt-1 pb-1">
         {/* MOBILE ROOM BAR (Horizontally scrollable room pills + Admin '+ Room' button) */}
         <div className="md:hidden">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">

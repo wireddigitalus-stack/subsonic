@@ -400,6 +400,56 @@ export function ChatChannelSidebar({
           </div>
         </div>
 
+        {/* Bottom Member Account & Quick Logout Bar */}
+        {shooterProfile?.callsign && (
+          <div className="pt-3 mt-2 border-t border-white/10 shrink-0 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => onEditProfile && onEditProfile()}
+              className="flex items-center gap-2 min-w-0 flex-1 p-1.5 rounded-xl hover:bg-white/[0.06] transition-colors text-left cursor-pointer"
+              title="Edit Profile & Photos"
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-xs ring-2 ring-white/20 text-white overflow-hidden shrink-0"
+                style={
+                  !shooterProfile.image
+                    ? { backgroundColor: getAvatarColor(shooterProfile.avatarColor, shooterProfile.callsign || shooterProfile.name).hex }
+                    : undefined
+                }
+              >
+                {shooterProfile.image ? (
+                  <img src={shooterProfile.image} alt="" className="w-full h-full object-cover" />
+                ) : (shooterProfile.role === "MASTER_OWNER" || shooterProfile.callsign === "RADAR" || shooterProfile.callsign === "ROB") ? (
+                  <Radar className="w-4 h-4 text-cyan-300" />
+                ) : (
+                  <span>{getUserInitials(shooterProfile.name, shooterProfile.callsign)}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-mono font-bold text-white truncate">
+                  {shooterProfile.callsign}
+                </div>
+                <div className="text-[10px] text-amber-400 flex items-center gap-1">
+                  <Camera className="w-3 h-3" />
+                  <span>Edit Profile</span>
+                </div>
+              </div>
+            </button>
+
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-2.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 hover:text-red-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer"
+                title="Log Out of Chat"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Out</span>
+              </button>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );
