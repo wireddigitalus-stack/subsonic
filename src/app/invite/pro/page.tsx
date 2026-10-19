@@ -380,6 +380,12 @@ function ProInviteContent() {
       return;
     }
 
+    if (!actionPhotoResult?.dataUrl) {
+      setFormError("An action shooting photo is required. Please upload both a headshot and an action shooting photo to publish your competitor profile.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!agreeTerms) {
       setFormError("You must read and agree to the Terms of Use and platform conduct rules to publish your Pro Profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -390,9 +396,7 @@ function ProInviteContent() {
 
     try {
       const primaryImage = await ensureCompressedDataUrl(headshotResult.dataUrl, 1000, 0.82);
-      const secondaryImage = actionPhotoResult?.dataUrl
-        ? await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1200, 0.80)
-        : "";
+      const secondaryImage = await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1200, 0.80);
 
       // One server call does everything (invite check → profile → member → claim),
       // and only succeeds once the database has confirmed every step.
@@ -999,8 +1003,8 @@ function ProInviteContent() {
               </div>
             </div>
 
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
-              Original Resolution
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/15 text-red-300 border border-red-500/30 font-bold">
+              Both Photos Required
             </span>
           </div>
 
@@ -1073,9 +1077,14 @@ function ProInviteContent() {
             {/* Photo 2: Action Shooting Image */}
             <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-blue-400 uppercase">
-                  2. Action Shooting Image
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-blue-400 uppercase">
+                    2. Action Shooting Image
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold border border-red-500/30">
+                    REQUIRED *
+                  </span>
+                </div>
                 {actionPhotoResult && (
                   <span className="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
                     <Check className="w-3 h-3" />
@@ -1085,7 +1094,9 @@ function ProInviteContent() {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-blue-500/40 bg-zinc-950 shrink-0 relative flex items-center justify-center">
+                <div className={`w-24 h-24 rounded-2xl overflow-hidden border-2 bg-zinc-950 shrink-0 relative flex items-center justify-center ${
+                  actionPhotoResult ? "border-emerald-500/60" : "border-blue-500/60 shadow-[0_0_12px_rgba(59,130,246,0.25)]"
+                }`}>
                   {actionPhotoResult ? (
                     <img
                       src={actionPhotoResult.dataUrl}
@@ -1093,7 +1104,7 @@ function ProInviteContent() {
                       className="w-full h-full object-cover object-top"
                     />
                   ) : (
-                    <Crosshair className="w-8 h-8 text-slate-600" />
+                    <Crosshair className="w-8 h-8 text-blue-400 animate-pulse" />
                   )}
                   {compressingAction && (
                     <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
@@ -1103,9 +1114,9 @@ function ProInviteContent() {
                 </div>
 
                 <div className="space-y-2 flex-1">
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-xs font-bold transition-all shadow-tactical-glow">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{actionPhotoResult ? "Replace Action Shooting Image" : "Upload Action Shooting Image"}</span>
+                    <span>{actionPhotoResult ? "Replace Action Shooting Image" : "Upload Action Shooting Image *"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -1120,8 +1131,8 @@ function ProInviteContent() {
                       <div>Resolution: {actionPhotoResult.width}x{actionPhotoResult.height}px</div>
                     </div>
                   ) : (
-                    <p className="text-[11px] text-slate-400 leading-snug">
-                      Upload an action shooting photo for Subsonic Society marketing &amp; media.
+                    <p className="text-[11px] text-blue-200/90 leading-snug">
+                      <strong>Required for your profile &amp; media spotlight:</strong> Upload an action shooting photo of yourself on the firing line.
                     </p>
                   )}
                 </div>

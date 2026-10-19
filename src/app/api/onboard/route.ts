@@ -176,6 +176,13 @@ export async function POST(req: NextRequest) {
       !rawActionPhoto.includes("subsonic-coin")
         ? rawActionPhoto
         : "";
+    if (!actionPhoto) {
+      return fail(
+        "Both a profile headshot and an action shooting photo are required to publish a competitor profile.",
+        400,
+        "ACTION_PHOTO_REQUIRED"
+      );
+    }
 
     // ── 3. Shooter profile ─────────────────────────────────────────
     const shooter: ShooterProfile = {
