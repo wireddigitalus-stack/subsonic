@@ -96,19 +96,9 @@ export function ChatAuthGate({
         </form>
 
         <div className="pt-3 border-t border-white/10">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-xs text-slate-500 pt-1">
+          <div className="flex items-center justify-center text-xs text-slate-500 pt-1">
             <Link href="/" className="hover:text-slate-300 transition-colors">
               ← Return to Home
-            </Link>
-            <span className="hidden sm:inline text-slate-700">•</span>
-            <Link 
-              href="/terms" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-amber-400/80 hover:text-amber-300 transition-colors inline-flex items-center gap-1"
-            >
-              <Scale className="w-3 h-3 text-amber-400" />
-              <span>Terms of Use &amp; Code of Conduct</span>
             </Link>
           </div>
         </div>

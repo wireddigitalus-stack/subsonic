@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
     const pinHash = await hashPin(pin);
     const now = new Date().toISOString();
-    const division = String(body.division || "Open Division Pro").trim();
+    const division = String(body.division || "Pro Shooter").trim();
     const homeRange = String(body.homeRange || "").trim();
     const ranking = String(body.ranking || "").trim();
     const quote = String(body.quote || "").trim();

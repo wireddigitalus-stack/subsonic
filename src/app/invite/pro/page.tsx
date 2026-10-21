@@ -71,7 +71,7 @@ function ProInviteContent() {
   const [mailingAddress, setMailingAddress] = useState("");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
-  const [division, setDivision] = useState("Open Division Pro");
+  const [division, setDivision] = useState("Pro Shooter");
   const [homeRange, setHomeRange] = useState("The Hideout, Bristol, TN");
   const [ranking, setRanking] = useState("");
   const [podiums, setPodiums] = useState<number>(0);
@@ -868,25 +868,6 @@ function ProInviteContent() {
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
               <p className="text-[11px] text-slate-400">Required for official competitor credentials and match registration.</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Competition Division *
-              </label>
-              <select
-                required
-                value={division}
-                onChange={(e) => setDivision(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              >
-                <option value="Open Division Pro">Open Division Pro</option>
-                <option value="Open Rimfire Pro">Open Rimfire Pro</option>
-                <option value="Production Class">Production Class</option>
-                <option value="Senior Division">Senior Division (55+)</option>
-                <option value="Ladies Rimfire Division">Ladies Rimfire Division</option>
-                <option value="Junior Marksman">Junior Marksman</option>
-              </select>
             </div>
 
             <div className="space-y-1.5">
