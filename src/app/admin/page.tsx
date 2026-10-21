@@ -1169,21 +1169,7 @@ export default function AdminDashboardPage() {
 
     setIsDeletingMember(true);
     try {
-      // 1. Delete from members API
-      await fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
-        method: "DELETE",
-      }).catch(() => {});
-
-      // 2. Cross-delete by callsign and ID from shooters API and chat messages
-      if (targetCallsign) {
-        fetch(`/api/shooters?id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
-        fetch(`/api/join?member_id=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
-        fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
-      }
-      fetch(`/api/shooters?id=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
-      fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
-
-      // 3. Unconditionally remove from local state
+      // 1. Optimistically remove from local UI state immediately so mobile never gets stuck on "Deleting..."
       setMembers((prev) =>
         prev.filter(
           (m) =>
@@ -1205,6 +1191,30 @@ export default function AdminDashboardPage() {
       setSelectedMember(null);
       setShowDeleteConfirm(false);
       setCardDeleteConfirmId(null);
+
+      // 2. Delete from server (handles society_members + shooters + releasing invite claims)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      await Promise.allSettled([
+        fetch(`/api/join?member_id=${encodeURIComponent(memberId)}`, {
+          method: "DELETE",
+          signal: controller.signal,
+        }),
+        targetCallsign
+          ? fetch(`/api/shooters?id=${encodeURIComponent(targetCallsign)}`, {
+              method: "DELETE",
+              signal: controller.signal,
+            })
+          : Promise.resolve(),
+      ]);
+      clearTimeout(timeoutId);
+
+      // 3. Purge chat messages in background
+      if (targetCallsign) {
+        fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(targetCallsign)}`, { method: "DELETE" }).catch(() => {});
+      }
+      fetch(`/api/chat/messages?purgeCallsign=${encodeURIComponent(memberId)}`, { method: "DELETE" }).catch(() => {});
+
       setMemberActionNotice(`Member ${targetName || targetCallsign || memberId} permanently deleted.`);
     } catch (err: any) {
       setMemberActionNotice("Error deleting member: " + err.message);

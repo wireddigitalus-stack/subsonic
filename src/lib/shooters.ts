@@ -282,7 +282,7 @@ export function saveAllShootersToStorage(shooters: ShooterProfile[]): void {
   }
 }
 
-export function deleteShooterFromStorage(idOrCallsign: string): boolean {
+export function deleteShooterFromStorage(idOrCallsign: string, skipCrossClean = false): boolean {
   if (!idOrCallsign) return false;
   const clean = idOrCallsign.trim().toLowerCase();
 
@@ -341,22 +341,28 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
       const targetId = target?.id || strippedPro || clean;
       const { error } = await db.from("shooters").delete().eq("id", targetId);
       if (error) console.error("Error deleting shooter from database:", error.message);
-      if (target?.callsign) {
-        await db.from("shooters").delete().ilike("callsign", target.callsign);
+      const callsignToDelete = target?.callsign || strippedPro.toUpperCase();
+      if (callsignToDelete) {
+        await db.from("shooters").delete().ilike("callsign", callsignToDelete);
+      }
+      if (target?.name) {
+        await db.from("shooters").delete().ilike("name", target.name);
       }
     } catch (err) {
       console.error("Database delete error (shooters):", err);
     }
   })();
 
-  // Cross-clean matching society member if exists
-  try {
-    const { deleteMemberFromStorage } = require("@/lib/members");
-    if (target?.callsign) deleteMemberFromStorage(target.callsign);
-    if (target?.id) deleteMemberFromStorage(target.id);
-    deleteMemberFromStorage(strippedPro);
-  } catch (e) {
-    // avoid cyclic errors
+  // Cross-clean matching society member if exists (single hop — no recursion)
+  if (!skipCrossClean) {
+    try {
+      const { deleteMemberFromStorage } = require("@/lib/members");
+      if (target?.callsign) deleteMemberFromStorage(target.callsign, true);
+      if (target?.id) deleteMemberFromStorage(target.id, true);
+      deleteMemberFromStorage(strippedPro, true);
+    } catch (e) {
+      // avoid cyclic errors
+    }
   }
 
   return true;
@@ -364,10 +370,26 @@ export function deleteShooterFromStorage(idOrCallsign: string): boolean {
 
 let lastShooterDbDelete: Promise<void> = Promise.resolve();
 
+export function getLastShooterDbDeletePromise(): Promise<void> {
+  return lastShooterDbDelete;
+}
+
 /** Delete a shooter and wait for the database delete to finish. */
 export async function deleteShooterFromStorageAsync(idOrCallsign: string): Promise<boolean> {
-  const ok = deleteShooterFromStorage(idOrCallsign);
+  const ok = deleteShooterFromStorage(idOrCallsign, false);
   await lastShooterDbDelete;
+  try {
+    const { getLastMemberDbDeletePromise } = require("@/lib/members");
+    if (typeof getLastMemberDbDeletePromise === "function") {
+      await getLastMemberDbDeletePromise();
+    }
+  } catch {}
+  try {
+    const { releaseInviteClaimsForCallsignAsync } = require("@/lib/invites");
+    if (typeof releaseInviteClaimsForCallsignAsync === "function") {
+      await releaseInviteClaimsForCallsignAsync(idOrCallsign);
+    }
+  } catch {}
   return ok;
 }
 

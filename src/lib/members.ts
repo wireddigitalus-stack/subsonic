@@ -146,6 +146,8 @@ function readMembersFile(file: string, into: Map<string, SocietyMember>) {
   }
 }
 
+const deletedMemberKeys = new Set<string>();
+
 export function getMembersFromStorage(): SocietyMember[] {
   // Kick off a background refresh for sync callers (routes should await refreshMembersFromDb()).
   if (db && membersLastRefreshMs === 0) void refreshMembersFromDb();
@@ -167,6 +169,12 @@ export function getMembersFromStorage(): SocietyMember[] {
 
     // 3. Memory cache last — it holds the freshest database data + this instance's writes
     for (const mem of memoryMembers) {
+      if (
+        deletedMemberKeys.has(mem.member_id.toLowerCase()) ||
+        (mem.callsign && deletedMemberKeys.has(mem.callsign.toLowerCase()))
+      ) {
+        continue;
+      }
       memberMap.set(mem.member_id.toLowerCase(), mem);
       if (mem.callsign) memberMap.set(mem.callsign.toLowerCase(), mem);
     }
@@ -176,6 +184,14 @@ export function getMembersFromStorage(): SocietyMember[] {
       const shooters = getShootersFromStorage();
       for (const sh of shooters) {
         const key = sh.callsign?.toLowerCase() || sh.id.toLowerCase();
+        const proIdLower = `ss-pro-${(sh.callsign || sh.id).toLowerCase()}`;
+        if (
+          deletedMemberKeys.has(key) ||
+          deletedMemberKeys.has(sh.id.toLowerCase()) ||
+          deletedMemberKeys.has(proIdLower)
+        ) {
+          continue;
+        }
         if (!memberMap.has(key)) {
           const proMember: SocietyMember = {
             member_id: `SS-PRO-${sh.callsign || sh.id.toUpperCase()}`,
@@ -281,6 +297,11 @@ export async function upsertMemberToDb(member: SocietyMember): Promise<void> {
 }
 
 function applyMemberLocally(member: SocietyMember): SocietyMember {
+  if (member.member_id) deletedMemberKeys.delete(member.member_id.toLowerCase());
+  if (member.callsign) {
+    deletedMemberKeys.delete(member.callsign.toLowerCase());
+    deletedMemberKeys.delete(`ss-pro-${member.callsign.toLowerCase()}`);
+  }
   const current = getMembersFromStorage();
   const index = current.findIndex(
     (m) =>
@@ -326,7 +347,7 @@ export function addOrUpdateMember(member: SocietyMember): SocietyMember {
   return savedMember;
 }
 
-export function deleteMemberFromStorage(memberId: string): boolean {
+export function deleteMemberFromStorage(memberId: string, skipCrossClean = false): boolean {
   if (!memberId) return false;
   const cleanId = memberId.trim().toUpperCase();
 
@@ -347,6 +368,10 @@ export function deleteMemberFromStorage(memberId: string): boolean {
   const rawSlug = rawLower.replace(/[^a-z0-9]+/g, "-");
   const strippedPro = cleanId.replace(/^SS-PRO-/, "");
 
+  deletedMemberKeys.add(rawLower);
+  deletedMemberKeys.add(strippedPro.toLowerCase());
+  deletedMemberKeys.add(`ss-pro-${strippedPro.toLowerCase()}`);
+
   const current = getMembersFromStorage();
   const target = current.find(
     (m) =>
@@ -360,20 +385,14 @@ export function deleteMemberFromStorage(memberId: string): boolean {
       (m.email && m.email.toLowerCase() === rawLower)
   );
 
-  if (!target) {
-    // If not found in memoryMembers or file directly, try cross-deleting from shooters in case it was a shooter
-    try {
-      const { deleteShooterFromStorage } = require("@/lib/shooters");
-      deleteShooterFromStorage(cleanId);
-      deleteShooterFromStorage(strippedPro);
-      deleteShooterFromStorage(rawLower);
-    } catch {}
-    return true; // Return true so client doesn't error out on already-clean or local-only members
+  if (target) {
+    deletedMemberKeys.add(target.member_id.toLowerCase());
+    if (target.callsign) deletedMemberKeys.add(target.callsign.toLowerCase());
   }
 
-  const targetMemberId = target.member_id.toUpperCase();
-  const targetCallsign = target.callsign?.toUpperCase();
-  const targetName = target.full_name;
+  const targetMemberId = target?.member_id.toUpperCase() || cleanId;
+  const targetCallsign = target?.callsign?.toUpperCase() || strippedPro;
+  const targetName = target?.full_name;
 
   const filtered = current.filter(
     (m) =>
@@ -385,23 +404,26 @@ export function deleteMemberFromStorage(memberId: string): boolean {
   memoryMembers = filtered;
   saveAllMembersToStorage(filtered);
 
-  // Cross-clean shooter profile if exists
-  try {
-    const { deleteShooterFromStorage } = require("@/lib/shooters");
-    if (targetCallsign) deleteShooterFromStorage(targetCallsign);
-    deleteShooterFromStorage(target.member_id);
-    deleteShooterFromStorage(target.full_name);
-    deleteShooterFromStorage(rawSlug);
-  } catch (e) {
-    // Avoid circular import errors
+  // Cross-clean shooter profile if exists (single hop — no recursion)
+  if (!skipCrossClean) {
+    try {
+      const { deleteShooterFromStorage } = require("@/lib/shooters");
+      if (targetCallsign) deleteShooterFromStorage(targetCallsign, true);
+      if (target?.member_id) deleteShooterFromStorage(target.member_id, true);
+      if (targetName) deleteShooterFromStorage(targetName, true);
+      deleteShooterFromStorage(rawSlug, true);
+    } catch (e) {
+      // Avoid circular import errors
+    }
   }
 
   lastMemberDbDelete = (async () => {
     if (!db) return;
     try {
-      await db.from("society_members").delete().eq("member_id", target.member_id);
+      await db.from("society_members").delete().eq("member_id", target?.member_id || cleanId);
       if (targetCallsign) {
         await db.from("society_members").delete().ilike("callsign", targetCallsign);
+        await db.from("society_members").delete().eq("member_id", `SS-PRO-${targetCallsign}`);
       }
       if (targetName) {
         await db.from("society_members").delete().ilike("full_name", targetName);
@@ -416,9 +438,25 @@ export function deleteMemberFromStorage(memberId: string): boolean {
 
 let lastMemberDbDelete: Promise<void> = Promise.resolve();
 
+export function getLastMemberDbDeletePromise(): Promise<void> {
+  return lastMemberDbDelete;
+}
+
 /** Delete a member and wait for the database delete to finish. */
 export async function deleteMemberFromStorageAsync(memberId: string): Promise<boolean> {
-  const ok = deleteMemberFromStorage(memberId);
+  const ok = deleteMemberFromStorage(memberId, false);
   await lastMemberDbDelete;
+  try {
+    const { getLastShooterDbDeletePromise } = require("@/lib/shooters");
+    if (typeof getLastShooterDbDeletePromise === "function") {
+      await getLastShooterDbDeletePromise();
+    }
+  } catch {}
+  try {
+    const { releaseInviteClaimsForCallsignAsync } = require("@/lib/invites");
+    if (typeof releaseInviteClaimsForCallsignAsync === "function") {
+      await releaseInviteClaimsForCallsignAsync(memberId);
+    }
+  } catch {}
   return ok;
 }

@@ -276,3 +276,35 @@ export function ensureInviteExists(rawCode: string): SocietyInvite | null {
 
   return null;
 }
+
+/**
+ * Releases any invite claims held by a deleted callsign so the invite link can be reused immediately.
+ */
+export async function releaseInviteClaimsForCallsignAsync(callsignOrId: string): Promise<void> {
+  if (!callsignOrId) return;
+  const cleanUpper = callsignOrId.trim().toUpperCase().replace(/^SS-PRO-/, "");
+  if (!cleanUpper) return;
+
+  try {
+    await refreshInvitesFromDb(0);
+    const current = getInvitesFromStorage();
+    for (const inv of current) {
+      const claimed = Array.isArray(inv.claimedBy) ? inv.claimedBy : [];
+      const hadClaim = claimed.some((c) => String(c).trim().toUpperCase() === cleanUpper);
+      if (hadClaim) {
+        const nextClaimed = claimed.filter((c) => String(c).trim().toUpperCase() !== cleanUpper);
+        const nextUsedCount = Math.max(0, Math.min(nextClaimed.length, (inv.usedCount || 1) - 1));
+        const nextStatus =
+          inv.status === "EXHAUSTED" && nextUsedCount < inv.maxUses ? "ACTIVE" : inv.status;
+        await saveInviteAsync({
+          ...inv,
+          claimedBy: nextClaimed,
+          usedCount: nextUsedCount,
+          status: nextStatus,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Error releasing invite claims for deleted member:", err);
+  }
+}
