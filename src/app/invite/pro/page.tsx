@@ -721,7 +721,7 @@ function ProInviteContent() {
             </button>
           </div>
 
-          <div className="pt-3 border-t border-white/10 space-y-2.5">
+          <div className="pt-3 border-t border-white/10">
             <Link
               href="/"
               className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-300 font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
@@ -729,13 +729,6 @@ function ProInviteContent() {
               <span>Already Signed Up? Go to Home Page</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-            <div className="text-[11px] text-slate-400">
-              Need an invite code? Contact Event Director{" "}
-              <span className="text-white font-semibold">Allen Hurley</span> or email{" "}
-              <a href="mailto:info@subsonicsociety.com" className="text-amber-400 hover:underline">
-                info@subsonicsociety.com
-              </a>
-            </div>
           </div>
         </div>
       </div>
