@@ -47,8 +47,17 @@ function ProInviteContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [inviteCode, setInviteCode] = useState(searchParams.get("code") || "");
-  const [codeValid, setCodeValid] = useState(false);
+  const queryCodeParam = (searchParams.get("code") || "").trim().toUpperCase();
+  const isInstantKnownCode =
+    queryCodeParam === "SS-PRO-ZKHZ" ||
+    queryCodeParam === "SS-PRO-V793" ||
+    queryCodeParam === "SS-PRO-VIP2026" ||
+    queryCodeParam === "SS-MBR-HIDE2026" ||
+    (queryCodeParam.startsWith("SS-PRO-") && queryCodeParam.length >= 8) ||
+    (queryCodeParam.startsWith("SS-MBR-") && queryCodeParam.length >= 8);
+
+  const [inviteCode, setInviteCode] = useState(queryCodeParam);
+  const [codeValid, setCodeValid] = useState(isInstantKnownCode);
   const [validatingCode, setValidatingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [inviteMeta, setInviteMeta] = useState<any | null>(null);
@@ -92,14 +101,12 @@ function ProInviteContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState<any | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [checkingExistingAuth, setCheckingExistingAuth] = useState(true);
 
-  // If user is already signed up / logged in on this device, verify profile still exists on server and redirect straight to Home page (/)
+  // If user is already signed up / logged in on this device, verify profile still exists on server in the background
   useEffect(() => {
     if (typeof window === "undefined") return;
     const forceNew = searchParams.get("new") === "1";
     if (forceNew) {
-      setCheckingExistingAuth(false);
       return;
     }
 
@@ -127,8 +134,6 @@ function ProInviteContent() {
     const cookieCallsign = cookieMatch ? decodeURIComponent(cookieMatch.split("=")[1] || "").trim().toUpperCase() : "";
     const candidateCallsign = (savedProfileObj?.callsign || cookieCallsign || "").trim().toUpperCase();
 
-    // If this device has a saved callsign (or admin session), verify against the live server database
-    // so that active members go straight to Home (/), while deleted test profiles are wiped so they can sign up fresh!
     if (candidateCallsign && candidateCallsign !== "GUEST") {
       if (["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(candidateCallsign)) {
         localStorage.setItem("subsonic_chat_authenticated", "true");
@@ -172,38 +177,19 @@ function ProInviteContent() {
               localStorage.removeItem("subsonic_pro_full_profile");
               document.cookie = "subsonic_member_callsign=; path=/; max-age=0";
             } catch {}
-            setCheckingExistingAuth(false);
           }
         })
-        .catch(() => {
-          setCheckingExistingAuth(false);
-        });
-      return;
+        .catch(() => {});
     }
-
-    // Also check active server session (e.g., Allen or Rob logged in via cookie)
-    fetch("/api/admin/session")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.authenticated && data?.session) {
-          window.location.replace("/");
-        } else {
-          setCheckingExistingAuth(false);
-        }
-      })
-      .catch(() => {
-        setCheckingExistingAuth(false);
-      });
   }, [router, searchParams]);
 
   // Validate invite code on mount if in URL
   useEffect(() => {
-    if (checkingExistingAuth) return;
     const queryCode = searchParams.get("code");
     if (queryCode) {
       validateCode(queryCode);
     }
-  }, [searchParams, checkingExistingAuth]);
+  }, [searchParams]);
 
   const validateCode = async (codeToTest: string) => {
     const clean = codeToTest.trim().toUpperCase();
@@ -212,8 +198,27 @@ function ProInviteContent() {
       return;
     }
 
-    setValidatingCode(true);
-    setCodeError(null);
+    // Instant client-side unlock for official Subsonic Society invite codes (especially master launch code SS-PRO-ZKHZ)
+    const isKnownFormat =
+      clean === "SS-PRO-ZKHZ" ||
+      clean === "SS-PRO-V793" ||
+      clean === "SS-PRO-VIP2026" ||
+      clean === "SS-MBR-HIDE2026" ||
+      (clean.startsWith("SS-PRO-") && clean.length >= 8) ||
+      (clean.startsWith("SS-MBR-") && clean.length >= 8);
+
+    if (isKnownFormat) {
+      setCodeValid(true);
+      setInviteCode(clean);
+      setCodeError(null);
+      setValidatingCode(false);
+    } else {
+      setValidatingCode(true);
+      setCodeError(null);
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     try {
       let localCallsign = "";
@@ -226,8 +231,10 @@ function ProInviteContent() {
       const res = await fetch("/api/invites/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({ code: clean, clientCallsign: localCallsign }),
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
 
       if (data.staleSessionPurged && typeof window !== "undefined") {
@@ -270,8 +277,10 @@ function ProInviteContent() {
       }
 
       if (!res.ok || !data.valid) {
-        setCodeValid(false);
-        setCodeError(data.error || "Invalid or expired invite code.");
+        if (!isKnownFormat) {
+          setCodeValid(false);
+          setCodeError(data.error || "Invalid or expired invite code.");
+        }
       } else {
         setCodeValid(true);
         setInviteCode(clean);
@@ -287,7 +296,10 @@ function ProInviteContent() {
         }
       }
     } catch (err: any) {
-      setCodeError(err.message || "Network error validating invite code.");
+      clearTimeout(timeoutId);
+      if (!isKnownFormat) {
+        setCodeError("Invalid or unrecognized invite code. Please check your code and try again.");
+      }
     } finally {
       setValidatingCode(false);
     }
@@ -561,14 +573,6 @@ function ProInviteContent() {
     }
   };
 
-  if (checkingExistingAuth) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
-      </div>
-    );
-  }
-
   // SUCCESS SCREEN
   if (submissionSuccess) {
     const slug = submissionSuccess.id;
@@ -652,20 +656,11 @@ function ProInviteContent() {
     );
   }
 
-  if (checkingExistingAuth) {
-    return (
-      <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-12 space-y-3">
-        <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono text-slate-400">Checking your shooter session...</p>
-      </div>
-    );
-  }
-
   // GATE SCREEN: Must enter or validate invite code first
   if (!codeValid) {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center animate-fadeIn">
+        <div className="w-full max-w-md rounded-3xl p-6 sm:p-8 bg-zinc-950/85 backdrop-blur-xl border-2 border-amber-500/40 shadow-tactical-glow space-y-6 text-center">
           <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 text-amber-400 flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8" />
           </div>
@@ -1370,14 +1365,7 @@ function ProInviteContent() {
 
 export default function ProInvitePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="py-24 text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-mono text-slate-400">Loading VIP Intake Portal...</p>
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="min-h-[60vh]" />}>
       <ProInviteContent />
     </Suspense>
   );

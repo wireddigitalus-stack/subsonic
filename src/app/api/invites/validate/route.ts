@@ -19,7 +19,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await Promise.all([refreshInvitesFromDb(0), refreshShootersFromDb(0)]);
+    // Fast path: only pull shooters from DB if this device actually has a saved callsign to verify
+    const hasDeviceSessionToVerify =
+      Boolean(deviceCallsign) &&
+      deviceCallsign !== "GUEST" &&
+      !["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(deviceCallsign);
+
+    if (hasDeviceSessionToVerify) {
+      await Promise.all([refreshInvitesFromDb(3000), refreshShootersFromDb(3000)]);
+    } else if (rawCode !== "SS-PRO-ZKHZ") {
+      await refreshInvitesFromDb(3000);
+    }
 
     // 1. Check if THIS device already has a registered callsign
     let staleSessionPurged = false;

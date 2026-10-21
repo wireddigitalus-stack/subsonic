@@ -27,7 +27,7 @@ export function ChatAuthGate({
   return (
     <div className="min-h-screen flex flex-col justify-center px-4 py-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))]">
       <div className="flex-1 flex items-center justify-center">
-        <div className={`w-full max-w-md ios-glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-6 text-center animate-fadeIn transition-all ${authShake ? "animate-shake" : ""}`}>
+        <div className={`w-full max-w-md rounded-3xl p-6 sm:p-8 bg-zinc-950/85 backdrop-blur-xl border border-white/10 space-y-6 text-center ${authShake ? "animate-shake" : ""}`}>
         <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-white/20 mx-auto relative">
           <Image
             src="/images/SS-RWB-LOGO.png"
