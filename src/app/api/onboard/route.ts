@@ -138,11 +138,11 @@ export async function POST(req: NextRequest) {
     const pinHash = await hashPin(pin);
     const now = new Date().toISOString();
     const division = String(body.division || "Pro Shooter").trim();
-    const homeRange = String(body.homeRange || "").trim();
+    const homeRange = String(body.homeRange || "The Hideout, Bristol, TN").trim();
     const ranking = String(body.ranking || "").trim();
     const quote = String(body.quote || "").trim();
-    if (!homeRange || !ranking) {
-      return fail("Home Range and Ranking/Title are required.", 400, "MISSING_PROFILE_FIELDS");
+    if (!ranking) {
+      return fail("Ranking/Title is required.", 400, "MISSING_PROFILE_FIELDS");
     }
 
     const rawRig = typeof body.rifleSetup === "object" && body.rifleSetup ? body.rifleSetup : {};

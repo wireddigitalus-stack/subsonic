@@ -422,12 +422,6 @@ function ProInviteContent() {
       return;
     }
 
-    if (!homeRange.trim()) {
-      setFormError("Please enter your Home Range facility. All profile fields are required.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
     if (!ranking.trim()) {
       setFormError("Please enter your Experience Level or Match Title (e.g. PRS Competitor, Club Marksman). All profile fields are required.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -868,20 +862,6 @@ function ProInviteContent() {
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
               <p className="text-[11px] text-slate-400">Required for official competitor credentials and match registration.</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Home Club / Home Range *
-              </label>
-              <input
-                type="text"
-                required
-                value={homeRange}
-                onChange={(e) => setHomeRange(e.target.value)}
-                placeholder="e.g. The Hideout, Bristol, TN"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
-              />
             </div>
 
             <div className="space-y-1.5">
