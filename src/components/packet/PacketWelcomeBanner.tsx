@@ -53,6 +53,13 @@ export function PacketWelcomeBanner() {
 
         <div className="flex flex-col sm:flex-row gap-2 shrink-0">
           <Link
+            href="/chat"
+            className="px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <MessageSquare className="w-4 h-4 fill-black" />
+            <span>Enter Live Chat Room</span>
+          </Link>
+          <Link
             href={`/shooters/${profileSlug}`}
             className="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all"
           >

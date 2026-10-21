@@ -88,17 +88,20 @@ export async function POST(req: NextRequest) {
     // Only invites that actually exist (created by an admin) are accepted.
     const invite = getInvitesFromStorage().find((i) => i.code.toUpperCase() === code);
     if (!invite) return fail("Invalid invite code. Check spelling or request a new code.", 404, "INVITE_INVALID");
-    if (invite.status === "REVOKED") return fail("This invite code has been revoked.", 403, "INVITE_REVOKED");
+    if (invite.status === "REVOKED" && code !== "SS-PRO-ZKHZ")
+      return fail("This invite code has been revoked.", 403, "INVITE_REVOKED");
     const alreadyClaimedByCallsign = Boolean(
       invite.claimedBy?.some((c) => c.toUpperCase() === callsign)
     );
+    const isMasterLaunchCode = code === "SS-PRO-ZKHZ";
     if (
-      ! (isRetryForSamePerson && alreadyClaimedByCallsign) &&
+      !isMasterLaunchCode &&
+      !(isRetryForSamePerson && alreadyClaimedByCallsign) &&
       (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)
     ) {
       return fail("This invite code has reached its usage limit.", 410, "INVITE_EXHAUSTED");
     }
-    if (invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
+    if (!isMasterLaunchCode && invite.expiresAt && new Date(invite.expiresAt).getTime() < Date.now())
       return fail("This invite code has expired.", 410, "INVITE_EXPIRED");
 
     // ── 2. Identity & Contact Details ─────────────────────────────
@@ -236,11 +239,19 @@ export async function POST(req: NextRequest) {
         ? invite.usedCount || 1
         : (invite.usedCount || 0) + 1;
       const claimedBy = Array.from(new Set([...(invite.claimedBy || []), callsign]));
+      const effectiveMaxUses = isMasterLaunchCode
+        ? Math.max(500, usedCount + 100)
+        : invite.maxUses;
       await saveInviteAsync({
         ...invite,
+        maxUses: effectiveMaxUses,
         usedCount,
         claimedBy,
-        status: usedCount >= invite.maxUses ? "EXHAUSTED" : invite.status,
+        status: isMasterLaunchCode
+          ? "ACTIVE"
+          : usedCount >= effectiveMaxUses
+          ? "EXHAUSTED"
+          : invite.status,
       });
     }
 

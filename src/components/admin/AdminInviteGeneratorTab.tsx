@@ -200,10 +200,6 @@ export function AdminInviteGeneratorTab() {
   };
 
   const handleRegenerateCode = async (inviteId: string) => {
-    if (!confirm("Are you sure you want to regenerate this invite code? The old code will immediately stop working.")) {
-      return;
-    }
-
     setIsRegenerating(true);
     try {
       const res = await fetch("/api/invites", {
@@ -234,10 +230,6 @@ export function AdminInviteGeneratorTab() {
   };
 
   const handleDeleteInvite = async (inviteId: string) => {
-    if (!confirm("Are you sure you want to delete this invite? This action cannot be undone.")) {
-      return;
-    }
-
     try {
       const res = await fetch(`/api/invites?id=${encodeURIComponent(inviteId)}`, {
         method: "DELETE",

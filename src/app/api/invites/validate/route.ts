@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvitesFromStorage, refreshInvitesFromDb } from "@/lib/invites";
+import { getInvitesFromStorage, refreshInvitesFromDb, ensureInviteExists } from "@/lib/invites";
 import { getShootersFromStorage, refreshShootersFromDb } from "@/lib/shooters";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +8,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const rawCode = (body.code || "").trim().toUpperCase();
+    const bodyCallsign = typeof body.clientCallsign === "string" ? body.clientCallsign.trim().toUpperCase() : "";
+    const cookieCallsign = (req.cookies.get("subsonic_member_callsign")?.value || "").trim().toUpperCase();
+    const deviceCallsign = bodyCallsign || cookieCallsign;
 
     if (!rawCode) {
       return NextResponse.json(
@@ -16,10 +19,43 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Only invites that actually exist (created by an admin) are accepted.
-    await refreshInvitesFromDb();
+    await Promise.all([refreshInvitesFromDb(0), refreshShootersFromDb(0)]);
+
+    // 1. Check if THIS device already has a registered callsign
+    let staleSessionPurged = false;
+    if (deviceCallsign && deviceCallsign !== "GUEST") {
+      const shooters = getShootersFromStorage();
+      const deviceShooter = shooters.find(
+        (s) =>
+          s.callsign?.toUpperCase() === deviceCallsign ||
+          s.id?.toLowerCase() === deviceCallsign.toLowerCase()
+      );
+      if (deviceShooter) {
+        const { pin: _omit, ...publicShooter } = deviceShooter as any;
+        const claimedRes = NextResponse.json({
+          valid: false,
+          alreadyClaimed: true,
+          claimedCallsign: deviceShooter.callsign.toUpperCase(),
+          shooter: publicShooter,
+          error: "Already registered! Redirecting you to the Home page...",
+        });
+        claimedRes.cookies.set("subsonic_member_callsign", deviceShooter.callsign.toUpperCase(), {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: "lax",
+        });
+        return claimedRes;
+      } else if (!["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(deviceCallsign)) {
+        // Profile was deleted by Admin — purge stale device session so they can register fresh
+        staleSessionPurged = true;
+      }
+    }
+
     const invites = getInvitesFromStorage();
-    const invite = invites.find((i) => i.code.toUpperCase() === rawCode);
+    let invite = invites.find((i) => i.code.toUpperCase() === rawCode);
+    if (!invite && rawCode === "SS-PRO-ZKHZ") {
+      invite = ensureInviteExists(rawCode) || undefined;
+    }
 
     if (!invite) {
       return NextResponse.json(
@@ -35,40 +71,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses) {
+    // Only treat single-use personal codes (not shared master codes like SS-PRO-ZKHZ) as exhausted
+    const isMasterSharedCode = rawCode === "SS-PRO-ZKHZ" || (invite.maxUses || 1) > 1;
+    if (!isMasterSharedCode && (invite.status === "EXHAUSTED" || invite.usedCount >= invite.maxUses)) {
       const claimedCallsign =
         Array.isArray(invite.claimedBy) && invite.claimedBy.length > 0
           ? String(invite.claimedBy[invite.claimedBy.length - 1]).toUpperCase()
           : null;
 
       if (claimedCallsign) {
-        await refreshShootersFromDb(0);
         const shooters = getShootersFromStorage();
         const foundShooter = shooters.find(
           (s) =>
             s.callsign?.toUpperCase() === claimedCallsign ||
             s.id?.toLowerCase() === claimedCallsign.toLowerCase()
         );
-        const publicShooter = foundShooter
-          ? (() => {
-              const { pin: _omit, ...rest } = foundShooter as any;
-              return rest;
-            })()
-          : null;
-
-        const claimedRes = NextResponse.json({
-          valid: false,
-          alreadyClaimed: true,
-          claimedCallsign,
-          shooter: publicShooter,
-          error: "Already registered! Redirecting you to the Home page...",
-        });
-        claimedRes.cookies.set("subsonic_member_callsign", claimedCallsign, {
-          path: "/",
-          maxAge: 60 * 60 * 24 * 365,
-          sameSite: "lax",
-        });
-        return claimedRes;
+        if (foundShooter) {
+          const { pin: _omit, ...publicShooter } = foundShooter as any;
+          const claimedRes = NextResponse.json({
+            valid: false,
+            alreadyClaimed: true,
+            claimedCallsign,
+            shooter: publicShooter,
+            error: "Already registered! Redirecting you to the Home page...",
+          });
+          claimedRes.cookies.set("subsonic_member_callsign", claimedCallsign, {
+            path: "/",
+            maxAge: 60 * 60 * 24 * 365,
+            sameSite: "lax",
+          });
+          return claimedRes;
+        }
       }
 
       return NextResponse.json(
@@ -84,14 +117,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    const validRes = NextResponse.json({
       valid: true,
+      staleSessionPurged,
       tier: invite.tier,
       code: invite.code,
-      recipientName: invite.recipientName || null,
+      recipientName: isMasterSharedCode ? null : invite.recipientName || null,
       maxUses: invite.maxUses,
-      remainingUses: invite.maxUses - invite.usedCount,
+      remainingUses: Math.max(1, invite.maxUses - invite.usedCount),
     });
+    if (staleSessionPurged) {
+      validRes.cookies.delete("subsonic_member_callsign");
+    }
+    return validRes;
   } catch (err: any) {
     return NextResponse.json(
       { valid: false, error: err.message || "Failed to validate invite" },

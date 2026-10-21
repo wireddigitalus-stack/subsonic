@@ -13,16 +13,17 @@ const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute window
 const RATE_LIMITS: Record<string, number> = {
-  "/api/admin/auth": 10,       // 10 login attempts per minute
-  "/api/join": 5,              // 5 member signups per minute
-  "/api/shooters": 10,         // 10 shooter operations per minute
-  "/api/invites": 15,          // 15 invite operations per minute
-  "/api/contact": 5,           // 5 contact form submissions per minute
-  "/api/register": 5,          // 5 registrations per minute
-  "/api/callsigns/check": 30,  // 30 callsign checks per minute (live validation)
+  "/api/admin/auth": 25,       // 25 login attempts per minute
+  "/api/onboard": 40,          // 40 onboarding submissions per minute
+  "/api/join": 60,             // 60 member operations per minute
+  "/api/shooters": 60,         // 60 shooter operations per minute
+  "/api/invites": 120,         // 120 invite operations per minute
+  "/api/contact": 15,          // 15 contact form submissions per minute
+  "/api/register": 30,         // 30 registrations per minute
+  "/api/callsigns/check": 90,  // 90 callsign checks per minute (live validation)
 };
 
-const DEFAULT_RATE_LIMIT = 60; // 60 requests per minute for unlisted routes
+const DEFAULT_RATE_LIMIT = 120; // 120 requests per minute for unlisted routes
 
 function getClientIdentifier(req: NextRequest): string {
   return (

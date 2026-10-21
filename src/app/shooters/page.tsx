@@ -144,11 +144,29 @@ function ShootersContent() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isProfileEditOpen, setIsProfileEditOpen] = useState(false);
+  const [loggedInCallsign, setLoggedInCallsign] = useState<string>("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchShooters = async () => {
       if (typeof window !== "undefined") {
         try {
+          const rawShooter = localStorage.getItem("subsonic_shooter_profile");
+          if (rawShooter) {
+            const parsedShooter = JSON.parse(rawShooter);
+            const cs = (parsedShooter.callsign || "").toUpperCase();
+            setLoggedInCallsign(cs);
+            const role = (parsedShooter.role || "").toUpperCase();
+            if (
+              role === "MASTER_OWNER" ||
+              role === "OWNER_ADMIN" ||
+              role === "ADMIN" ||
+              ["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(cs)
+            ) {
+              setIsAdmin(true);
+            }
+          }
+
           // Purge any stale test / deleted profiles from browser localStorage
           localStorage.removeItem("subsonic_all_shooters");
           for (const key of ["subsonic_pro_full_profile", "subsonic_shooter_profile", "subsonic_member_profile"]) {
@@ -456,14 +474,19 @@ function ShootersContent() {
                   )}
 
                   <div className="flex flex-wrap items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsProfileEditOpen(true)}
-                      className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
-                    >
-                      <Camera className="w-3.5 h-3.5" />
-                      <span>Edit Profile &amp; Photos</span>
-                    </button>
+                    {(isAdmin ||
+                      (loggedInCallsign &&
+                        selectedShooter?.callsign &&
+                        loggedInCallsign === selectedShooter.callsign.toUpperCase())) && (
+                      <button
+                        type="button"
+                        onClick={() => setIsProfileEditOpen(true)}
+                        className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        <span>Edit Profile &amp; Photos</span>
+                      </button>
+                    )}
 
                     <Link
                       href={`/shooters/${selectedShooter.id}`}
@@ -475,6 +498,19 @@ function ShootersContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Competitor Bio / Quote */}
+              {selectedShooter.quote && selectedShooter.quote.trim() && (
+                <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/30 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-amber-400 font-bold">
+                    <Quote className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Competitor Bio &amp; Spotlight Quote</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-200 italic leading-relaxed">
+                    &ldquo;{selectedShooter.quote}&rdquo;
+                  </p>
+                </div>
+              )}
 
               {/* Accolades & Badges if present */}
               {selectedShooter.accolades && selectedShooter.accolades.length > 0 && (
@@ -531,6 +567,29 @@ function ShootersContent() {
                       src={selectedShooter.posterImage}
                       alt={`${selectedShooter.name} Spotlight Poster`}
                       className="w-full h-full object-contain object-top"
+                    />
+                  </div>
+                </div>
+              ) : isRealShooterPhoto(selectedShooter.actionPhoto) ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase text-amber-400 tracking-wider font-bold flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Range Action &amp; Rig Showcase</span>
+                    </span>
+                    <Link
+                      href={`/shooters/${selectedShooter.id}`}
+                      className="text-[11px] font-mono text-slate-400 hover:text-amber-400 transition-colors flex items-center gap-1"
+                    >
+                      <span>Full SEO Profile</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                  <div className="w-full aspect-[16/10] rounded-2xl overflow-hidden border border-amber-500/30 shadow-xl bg-black relative">
+                    <img
+                      src={selectedShooter.actionPhoto!}
+                      alt={`${selectedShooter.name} Action Rig`}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 </div>

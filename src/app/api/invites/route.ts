@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { SocietyInvite, InviteTier } from "@/lib/types";
 import {
   getInvitesFromStorage,
-  saveAllInvitesToStorage,
+  refreshInvitesFromDb,
+  saveInviteAsync,
+  deleteInviteAsync,
   generateRandomCode
 } from "@/lib/invites";
 
@@ -10,6 +12,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    await refreshInvitesFromDb(0);
     const invites = getInvitesFromStorage();
     const sorted = [...invites].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -48,6 +51,7 @@ export async function POST(req: NextRequest) {
     const maxUses = typeof body.maxUses === "number" && body.maxUses > 0 ? body.maxUses : 1;
     const customCode = (body.customCode || "").trim().toUpperCase();
 
+    await refreshInvitesFromDb(0);
     const existingInvites = getInvitesFromStorage();
 
     let finalCode = customCode;
@@ -83,8 +87,7 @@ export async function POST(req: NextRequest) {
       status: "ACTIVE",
     };
 
-    const updated = [newInvite, ...existingInvites];
-    saveAllInvitesToStorage(updated);
+    await saveInviteAsync(newInvite);
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://subsonic-omega.vercel.app";
     const inviteUrl = `${baseUrl}/invite/pro?code=${finalCode}`;
@@ -114,6 +117,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Invite ID required." }, { status: 400 });
     }
 
+    await refreshInvitesFromDb(0);
     const existingInvites = getInvitesFromStorage();
     const targetIndex = existingInvites.findIndex((i) => i.id === id);
 
@@ -149,9 +153,7 @@ export async function PUT(req: NextRequest) {
       status: status || target.status,
     };
 
-    const updatedList = [...existingInvites];
-    updatedList[targetIndex] = updatedInvite;
-    saveAllInvitesToStorage(updatedList);
+    await saveInviteAsync(updatedInvite);
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://subsonic-omega.vercel.app";
     const inviteUrl =
@@ -187,14 +189,11 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Invite ID required." }, { status: 400 });
     }
 
-    const existingInvites = getInvitesFromStorage();
-    const filtered = existingInvites.filter((i) => i.id !== id);
-
-    if (filtered.length === existingInvites.length) {
-      return NextResponse.json({ success: false, error: "Invite not found." }, { status: 404 });
+    await refreshInvitesFromDb(0);
+    const deleted = await deleteInviteAsync(id);
+    if (!deleted) {
+      return NextResponse.json({ success: false, error: "Invite not found or protected." }, { status: 404 });
     }
-
-    saveAllInvitesToStorage(filtered);
 
     return NextResponse.json({ success: true, message: "Invite removed successfully." });
   } catch (err: any) {

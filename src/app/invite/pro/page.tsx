@@ -94,7 +94,7 @@ function ProInviteContent() {
   const [formError, setFormError] = useState<string | null>(null);
   const [checkingExistingAuth, setCheckingExistingAuth] = useState(true);
 
-  // If user is already signed up / logged in on this device, redirect straight to Home page (/)
+  // If user is already signed up / logged in on this device, verify profile still exists on server and redirect straight to Home page (/)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const forceNew = searchParams.get("new") === "1";
@@ -103,22 +103,16 @@ function ProInviteContent() {
       return;
     }
 
-    const isChatAuth = localStorage.getItem("subsonic_chat_authenticated") === "true";
     const rawShooter = localStorage.getItem("subsonic_shooter_profile");
     const rawMember = localStorage.getItem("subsonic_member_profile");
     const rawFull = localStorage.getItem("subsonic_pro_full_profile");
-    const hasCookieCallsign = document.cookie
-      .split(";")
-      .some((c) => c.trim().startsWith("subsonic_member_callsign="));
 
-    let hasSavedCallsign = false;
     let savedProfileObj: any = null;
     try {
       for (const raw of [rawShooter, rawFull, rawMember]) {
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed?.callsign && parsed.callsign !== "GUEST") {
-            hasSavedCallsign = true;
             savedProfileObj = parsed;
             break;
           }
@@ -126,37 +120,64 @@ function ProInviteContent() {
       }
     } catch {}
 
-    const queryCode = searchParams.get("code");
+    const cookieMatch = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("subsonic_member_callsign="));
+    const cookieCallsign = cookieMatch ? decodeURIComponent(cookieMatch.split("=")[1] || "").trim().toUpperCase() : "";
+    const candidateCallsign = (savedProfileObj?.callsign || cookieCallsign || "").trim().toUpperCase();
 
-    if (isChatAuth && hasSavedCallsign) {
-      window.location.replace("/");
-      return;
-    }
-
-    // If user previously registered on this device (or has a saved full profile) and no invite code is being validated to restore from server, restore session & go to Home
-    if (hasSavedCallsign && savedProfileObj && !queryCode) {
-      try {
-        if (!rawShooter) {
-          const rigStr =
-            typeof savedProfileObj.rifleSetup === "object" && savedProfileObj.rifleSetup
-              ? [savedProfileObj.rifleSetup.action, savedProfileObj.rifleSetup.optic].filter(Boolean).join(" / ")
-              : savedProfileObj.rifleSetup || "Precision Rimfire";
-          localStorage.setItem(
-            "subsonic_shooter_profile",
-            JSON.stringify({
-              name: savedProfileObj.name || savedProfileObj.full_name || savedProfileObj.callsign,
-              callsign: String(savedProfileObj.callsign).toUpperCase(),
-              role: savedProfileObj.role || "PRO_COMPETITOR",
-              division: savedProfileObj.division || savedProfileObj.experience_level || "Open Division Pro",
-              rifleSetup: rigStr,
-              badgeText: savedProfileObj.badgeText || "PRO SHOOTER",
-              image: savedProfileObj.image,
-            })
-          );
-        }
+    // If this device has a saved callsign (or admin session), verify against the live server database
+    // so that active members go straight to Home (/), while deleted test profiles are wiped so they can sign up fresh!
+    if (candidateCallsign && candidateCallsign !== "GUEST") {
+      if (["RADAR", "ROB", "LTDAN", "SUBX", "ALLEN"].includes(candidateCallsign)) {
         localStorage.setItem("subsonic_chat_authenticated", "true");
-      } catch {}
-      window.location.replace("/");
+        window.location.replace("/");
+        return;
+      }
+
+      fetch(`/api/shooters?slug=${encodeURIComponent(candidateCallsign.toLowerCase())}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.shooter) {
+            const s = data.shooter;
+            const rigStr =
+              typeof s.rifleSetup === "object" && s.rifleSetup
+                ? [s.rifleSetup.action, s.rifleSetup.optic].filter(Boolean).join(" / ")
+                : s.rifleSetup || "Precision Rimfire";
+            try {
+              localStorage.setItem(
+                "subsonic_shooter_profile",
+                JSON.stringify({
+                  name: s.name || candidateCallsign,
+                  callsign: (s.callsign || candidateCallsign).toUpperCase(),
+                  role: "PRO_COMPETITOR",
+                  division: s.division || "Open Division Pro",
+                  rifleSetup: rigStr,
+                  badgeText: "PRO SHOOTER",
+                  image: s.image,
+                })
+              );
+              const { actionPhoto: _omit, ...lightShooter } = s;
+              localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(lightShooter));
+              localStorage.setItem("subsonic_chat_authenticated", "true");
+            } catch {}
+            window.location.replace("/");
+          } else {
+            // Profile was deleted on the server — clear stale local session so user can register fresh!
+            try {
+              localStorage.removeItem("subsonic_chat_authenticated");
+              localStorage.removeItem("subsonic_shooter_profile");
+              localStorage.removeItem("subsonic_member_profile");
+              localStorage.removeItem("subsonic_pro_full_profile");
+              document.cookie = "subsonic_member_callsign=; path=/; max-age=0";
+            } catch {}
+            setCheckingExistingAuth(false);
+          }
+        })
+        .catch(() => {
+          setCheckingExistingAuth(false);
+        });
       return;
     }
 
@@ -195,37 +216,52 @@ function ProInviteContent() {
     setCodeError(null);
 
     try {
+      let localCallsign = "";
+      if (typeof window !== "undefined") {
+        try {
+          const rawS = localStorage.getItem("subsonic_shooter_profile");
+          if (rawS) localCallsign = JSON.parse(rawS)?.callsign || "";
+        } catch {}
+      }
       const res = await fetch("/api/invites/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: clean }),
+        body: JSON.stringify({ code: clean, clientCallsign: localCallsign }),
       });
       const data = await res.json();
 
-      // If this invite link was already claimed to sign up, restore session & go straight to Home (/)
-      if (data.alreadyClaimed) {
+      if (data.staleSessionPurged && typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("subsonic_chat_authenticated");
+          localStorage.removeItem("subsonic_shooter_profile");
+          localStorage.removeItem("subsonic_member_profile");
+          localStorage.removeItem("subsonic_pro_full_profile");
+        } catch {}
+      }
+
+      // If this device already registered and profile still exists, restore session & go straight to Home (/)
+      if (data.alreadyClaimed && data.shooter) {
         if (typeof window !== "undefined") {
           try {
-            if (data.shooter) {
-              const s = data.shooter;
-              const rigStr =
-                typeof s.rifleSetup === "object" && s.rifleSetup
-                  ? [s.rifleSetup.action, s.rifleSetup.optic].filter(Boolean).join(" / ")
-                  : s.rifleSetup || "Precision Rimfire";
-              localStorage.setItem(
-                "subsonic_shooter_profile",
-                JSON.stringify({
-                  name: s.name || data.claimedCallsign,
-                  callsign: (s.callsign || data.claimedCallsign || "").toUpperCase(),
-                  role: "PRO_COMPETITOR",
-                  division: s.division || "Open Division Pro",
-                  rifleSetup: rigStr,
-                  badgeText: "PRO SHOOTER",
-                  image: s.image,
-                })
-              );
-              localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(s));
-            }
+            const s = data.shooter;
+            const rigStr =
+              typeof s.rifleSetup === "object" && s.rifleSetup
+                ? [s.rifleSetup.action, s.rifleSetup.optic].filter(Boolean).join(" / ")
+                : s.rifleSetup || "Precision Rimfire";
+            localStorage.setItem(
+              "subsonic_shooter_profile",
+              JSON.stringify({
+                name: s.name || data.claimedCallsign,
+                callsign: (s.callsign || data.claimedCallsign || "").toUpperCase(),
+                role: "PRO_COMPETITOR",
+                division: s.division || "Open Division Pro",
+                rifleSetup: rigStr,
+                badgeText: "PRO SHOOTER",
+                image: s.image,
+              })
+            );
+            const { actionPhoto: _omit, ...lightShooter } = s;
+            localStorage.setItem("subsonic_pro_full_profile", JSON.stringify(lightShooter));
             localStorage.setItem("subsonic_chat_authenticated", "true");
           } catch {}
           window.location.replace("/");

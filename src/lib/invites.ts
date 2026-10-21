@@ -19,6 +19,19 @@ const DB_AUTHORITATIVE = IS_SERVERLESS && isDbConfigured;
 
 export const SEED_INVITES: SocietyInvite[] = [
   {
+    id: "seed-pro-zkhz",
+    code: "SS-PRO-ZKHZ",
+    tier: "PRO",
+    recipientName: "VIP Pro Competitor",
+    note: "Official Master Pro Competitor Invite Code",
+    createdBy: "SUBX",
+    createdAt: "2026-10-01T12:00:00Z",
+    maxUses: 500,
+    usedCount: 0,
+    claimedBy: [],
+    status: "ACTIVE",
+  },
+  {
     id: "seed-pro-v793",
     code: "SS-PRO-V793",
     tier: "PRO",
@@ -127,6 +140,34 @@ export async function refreshInvitesFromDb(maxAgeMs = 3000): Promise<void> {
         for (const inv of rows) map.set(inv.code.toUpperCase(), inv);
         memoryInvites = Array.from(map.values());
       }
+
+      // Ensure master launch code SS-PRO-ZKHZ is always present, ACTIVE, and multi-use (500+)
+      const masterIdx = memoryInvites.findIndex((i) => i.code.toUpperCase() === "SS-PRO-ZKHZ");
+      if (masterIdx === -1) {
+        const masterSeed = SEED_INVITES[0];
+        memoryInvites.unshift(masterSeed);
+        await db.from("invites").upsert(mapInviteToDb(masterSeed), { onConflict: "id" });
+      } else {
+        const existingMaster = memoryInvites[masterIdx];
+        if (
+          existingMaster.status !== "ACTIVE" ||
+          (existingMaster.maxUses || 0) < 500 ||
+          (existingMaster.usedCount || 0) >= (existingMaster.maxUses || 500) ||
+          (existingMaster.recipientName && existingMaster.recipientName !== "VIP Pro Competitor")
+        ) {
+          const upgradedMaster: SocietyInvite = {
+            ...existingMaster,
+            tier: "PRO",
+            recipientName: "VIP Pro Competitor",
+            maxUses: Math.max(500, (existingMaster.usedCount || 0) + 500),
+            status: "ACTIVE",
+            expiresAt: undefined,
+          };
+          memoryInvites[masterIdx] = upgradedMaster;
+          await db.from("invites").upsert(mapInviteToDb(upgradedMaster), { onConflict: "id" });
+        }
+      }
+
       invitesLastRefreshMs = Date.now();
     } catch (err) {
       console.error("Database refresh error (invites):", err);
@@ -160,6 +201,22 @@ export function getInvitesFromStorage(): SocietyInvite[] {
       }
     }
     for (const mem of memoryInvites) map.set(mem.code.toUpperCase(), mem);
+
+    // Always guarantee master launch code SS-PRO-ZKHZ is available and active
+    const zkhz = map.get("SS-PRO-ZKHZ");
+    if (!zkhz) {
+      map.set("SS-PRO-ZKHZ", SEED_INVITES[0]);
+    } else if (zkhz.status !== "ACTIVE" || (zkhz.maxUses || 0) < 500) {
+      map.set("SS-PRO-ZKHZ", {
+        ...zkhz,
+        tier: "PRO",
+        recipientName: "VIP Pro Competitor",
+        maxUses: Math.max(500, (zkhz.usedCount || 0) + 500),
+        status: "ACTIVE",
+        expiresAt: undefined,
+      });
+    }
+
     memoryInvites = Array.from(map.values());
     return memoryInvites;
   } catch (err) {
@@ -190,7 +247,9 @@ function writeInvitesLocally(invites: SocietyInvite[]): void {
 /** Save ONE invite and wait for the database to confirm. Throws on database error. */
 export async function saveInviteAsync(invite: SocietyInvite): Promise<void> {
   const current = getInvitesFromStorage();
-  const idx = current.findIndex((i) => i.code.toUpperCase() === invite.code.toUpperCase());
+  const idx = current.findIndex(
+    (i) => i.id === invite.id || i.code.toUpperCase() === invite.code.toUpperCase()
+  );
   const next = [...current];
   if (idx >= 0) next[idx] = invite;
   else next.unshift(invite);
@@ -200,6 +259,29 @@ export async function saveInviteAsync(invite: SocietyInvite): Promise<void> {
     const { error } = await db.from("invites").upsert(mapInviteToDb(invite), { onConflict: "id" });
     if (error) throw new Error(`Database save failed (invite): ${error.message}`);
   }
+}
+
+/** Delete ONE invite from local cache and wait for the database delete to confirm. */
+export async function deleteInviteAsync(id: string): Promise<boolean> {
+  if (!id) return false;
+  const current = getInvitesFromStorage();
+  const target = current.find((i) => i.id === id || i.code.toUpperCase() === id.toUpperCase());
+  if (!target) return false;
+  if (target.code.toUpperCase() === "SS-PRO-ZKHZ") {
+    return false; // Protect master launch invite code from accidental deletion
+  }
+  const filtered = current.filter((i) => i.id !== target.id && i.code.toUpperCase() !== target.code.toUpperCase());
+  writeInvitesLocally(filtered);
+
+  if (db) {
+    try {
+      await db.from("invites").delete().eq("id", target.id);
+      await db.from("invites").delete().eq("code", target.code);
+    } catch (err) {
+      console.error("Database delete error (invite):", err);
+    }
+  }
+  return true;
 }
 
 /** Save the full invite list (database write is best-effort). */
