@@ -154,16 +154,6 @@ export async function POST(req: NextRequest) {
       optic: String(rawRig.optic || "").trim(),
       ammoLot: String(rawRig.ammoLot || "").trim(),
     };
-    if (
-      !rifleSetup.action ||
-      !rifleSetup.barrel ||
-      !rifleSetup.trigger ||
-      !rifleSetup.chassis ||
-      !rifleSetup.optic ||
-      !rifleSetup.ammoLot
-    ) {
-      return fail("All Competition Rifle Build & Ammunition fields are required.", 400, "MISSING_RIFLE_SPECS");
-    }
 
     const accolades: string[] = Array.isArray(body.accolades) && body.accolades.length ? body.accolades : ["VIP COMPETITOR"];
     const sponsors: string[] = Array.isArray(body.sponsors) && body.sponsors.length ? body.sponsors : ["Modacam Custom Rifles"];
@@ -222,7 +212,7 @@ export async function POST(req: NextRequest) {
       email,
       state: typeof body.state === "string" && body.state ? body.state : "TN",
       experience_level: division,
-      rifle_setup: `${rifleSetup.action} / ${rifleSetup.optic}`,
+      rifle_setup: [rifleSetup.action, rifleSetup.optic].filter(Boolean).join(" / ") || "Precision Rimfire",
       interests: ["Competition", "PRS Rimfire"],
       created_at: now,
       status: "ACTIVE",

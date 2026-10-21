@@ -851,44 +851,56 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                 <span className="text-[11px] font-mono text-slate-500">{shooter.division}</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                {shooter.rifleSetup.action && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Action</span>
-                    <span className="font-bold text-white">{shooter.rifleSetup.action}</span>
-                  </div>
-                )}
-                {shooter.rifleSetup.barrel && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Barrel</span>
-                    <span className="font-bold text-white">{shooter.rifleSetup.barrel}</span>
-                  </div>
-                )}
-                {shooter.rifleSetup.chassis && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Chassis / Stock</span>
-                    <span className="font-bold text-white">{shooter.rifleSetup.chassis}</span>
-                  </div>
-                )}
-                {shooter.rifleSetup.optic && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Optic</span>
-                    <span className="font-bold text-amber-300">{shooter.rifleSetup.optic}</span>
-                  </div>
-                )}
-                {shooter.rifleSetup.trigger && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Trigger</span>
-                    <span className="font-bold text-white">{shooter.rifleSetup.trigger}</span>
-                  </div>
-                )}
-                {shooter.rifleSetup.ammoLot && (
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/5">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase block">Ammunition</span>
-                    <span className="font-bold text-emerald-400">{shooter.rifleSetup.ammoLot}</span>
-                  </div>
-                )}
-              </div>
+              {shooter.rifleSetup.action ||
+              shooter.rifleSetup.barrel ||
+              shooter.rifleSetup.chassis ||
+              shooter.rifleSetup.optic ||
+              shooter.rifleSetup.trigger ||
+              shooter.rifleSetup.ammoLot ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {shooter.rifleSetup.action && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Action</span>
+                      <span className="font-bold text-white">{shooter.rifleSetup.action}</span>
+                    </div>
+                  )}
+                  {shooter.rifleSetup.barrel && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Barrel</span>
+                      <span className="font-bold text-white">{shooter.rifleSetup.barrel}</span>
+                    </div>
+                  )}
+                  {shooter.rifleSetup.chassis && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Chassis / Stock</span>
+                      <span className="font-bold text-white">{shooter.rifleSetup.chassis}</span>
+                    </div>
+                  )}
+                  {shooter.rifleSetup.optic && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Optic</span>
+                      <span className="font-bold text-amber-300">{shooter.rifleSetup.optic}</span>
+                    </div>
+                  )}
+                  {shooter.rifleSetup.trigger && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Trigger</span>
+                      <span className="font-bold text-white">{shooter.rifleSetup.trigger}</span>
+                    </div>
+                  )}
+                  {shooter.rifleSetup.ammoLot && (
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase block">Ammunition</span>
+                      <span className="font-bold text-emerald-400">{shooter.rifleSetup.ammoLot}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-xs text-slate-400 space-y-1">
+                  <div className="font-mono text-amber-400 font-bold uppercase">{shooter.division || "Open Division Pro"}</div>
+                  <p>Precision Rimfire Competition Rig — {shooter.homeRange || "The Hideout, Bristol, TN"}</p>
+                </div>
+              )}
             </div>
           )}
 

@@ -428,19 +428,6 @@ function ProInviteContent() {
       return;
     }
 
-    if (
-      !rifleAction.trim() ||
-      !barrel.trim() ||
-      !trigger.trim() ||
-      !chassis.trim() ||
-      !optic.trim() ||
-      !ammoLot.trim()
-    ) {
-      setFormError("Please complete all Competition Rifle Build & Ammunition fields. All profile fields are required.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
     if (!headshotResult?.dataUrl) {
       setFormError("A profile headshot photo is required. Please upload a clear photo of yourself to publish your competitor profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -978,30 +965,29 @@ function ProInviteContent() {
             </div>
           </div>
 
-          {/* Competition Rifle Build & Ammunition Specs (All Required) */}
+          {/* Competition Rifle Build & Ammunition Specs (Optional) */}
           <div className="pt-4 border-t border-white/10 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block">
-                  Required Equipment Dossier
+                  Equipment Dossier (Optional)
                 </span>
                 <h3 className="text-sm sm:text-base font-black text-white uppercase">
-                  Competition Rifle Build &amp; Ammunition *
+                  Competition Rifle Build &amp; Ammunition
                 </h3>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">
-                All Fields Required
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10 font-bold">
+                Optional
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Rifle Action / Model *
+                  Rifle Action / Model
                 </label>
                 <input
                   type="text"
-                  required
                   value={rifleAction}
                   onChange={(e) => setRifleAction(e.target.value)}
                   placeholder="e.g. RimX / Vudoo V-22 / CZ 457"
@@ -1011,11 +997,10 @@ function ProInviteContent() {
 
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Barrel Specs *
+                  Barrel Specs
                 </label>
                 <input
                   type="text"
-                  required
                   value={barrel}
                   onChange={(e) => setBarrel(e.target.value)}
                   placeholder="e.g. 22&quot; Bartlein / Modacam Custom"
@@ -1025,11 +1010,10 @@ function ProInviteContent() {
 
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Trigger *
+                  Trigger
                 </label>
                 <input
                   type="text"
-                  required
                   value={trigger}
                   onChange={(e) => setTrigger(e.target.value)}
                   placeholder="e.g. TriggerTech Diamond / Bix'n Andy"
@@ -1039,11 +1023,10 @@ function ProInviteContent() {
 
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Chassis / Stock *
+                  Chassis / Stock
                 </label>
                 <input
                   type="text"
-                  required
                   value={chassis}
                   onChange={(e) => setChassis(e.target.value)}
                   placeholder="e.g. MDT ACC Elite / Foundation"
@@ -1053,11 +1036,10 @@ function ProInviteContent() {
 
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Optic / Scope *
+                  Optic / Scope
                 </label>
                 <input
                   type="text"
-                  required
                   value={optic}
                   onChange={(e) => setOptic(e.target.value)}
                   placeholder="e.g. ZCO 527 / Nightforce ATACR"
@@ -1067,11 +1049,10 @@ function ProInviteContent() {
 
               <div className="space-y-1">
                 <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                  Match Ammunition *
+                  Match Ammunition
                 </label>
                 <input
                   type="text"
-                  required
                   value={ammoLot}
                   onChange={(e) => setAmmoLot(e.target.value)}
                   placeholder="e.g. Lapua Center-X / Eley Tenex"
