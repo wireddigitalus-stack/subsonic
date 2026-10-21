@@ -112,19 +112,50 @@ function ProInviteContent() {
       .some((c) => c.trim().startsWith("subsonic_member_callsign="));
 
     let hasSavedCallsign = false;
+    let savedProfileObj: any = null;
     try {
-      for (const raw of [rawShooter, rawMember, rawFull]) {
+      for (const raw of [rawShooter, rawFull, rawMember]) {
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed?.callsign && parsed.callsign !== "GUEST") {
             hasSavedCallsign = true;
+            savedProfileObj = parsed;
             break;
           }
         }
       }
     } catch {}
 
-    if (isChatAuth || hasSavedCallsign || hasCookieCallsign) {
+    const queryCode = searchParams.get("code");
+
+    if (isChatAuth && hasSavedCallsign) {
+      window.location.replace("/");
+      return;
+    }
+
+    // If user previously registered on this device (or has a saved full profile) and no invite code is being validated to restore from server, restore session & go to Home
+    if (hasSavedCallsign && savedProfileObj && !queryCode) {
+      try {
+        if (!rawShooter) {
+          const rigStr =
+            typeof savedProfileObj.rifleSetup === "object" && savedProfileObj.rifleSetup
+              ? [savedProfileObj.rifleSetup.action, savedProfileObj.rifleSetup.optic].filter(Boolean).join(" / ")
+              : savedProfileObj.rifleSetup || "Precision Rimfire";
+          localStorage.setItem(
+            "subsonic_shooter_profile",
+            JSON.stringify({
+              name: savedProfileObj.name || savedProfileObj.full_name || savedProfileObj.callsign,
+              callsign: String(savedProfileObj.callsign).toUpperCase(),
+              role: savedProfileObj.role || "PRO_COMPETITOR",
+              division: savedProfileObj.division || savedProfileObj.experience_level || "Open Division Pro",
+              rifleSetup: rigStr,
+              badgeText: savedProfileObj.badgeText || "PRO SHOOTER",
+              image: savedProfileObj.image,
+            })
+          );
+        }
+        localStorage.setItem("subsonic_chat_authenticated", "true");
+      } catch {}
       window.location.replace("/");
       return;
     }

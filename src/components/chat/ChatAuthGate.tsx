@@ -38,15 +38,15 @@ export function ChatAuthGate({
         </div>
 
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
             <Lock className="w-3 h-3" />
-            <span>Restricted Network • Member Key Required</span>
+            <span>Subsonic Society • Member Access</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-black text-white">
-            PRIVATE CHAT ROOM
+            MEMBER LOGIN
           </h2>
           <p className="text-xs text-slate-300">
-            Enter your callsign and member key to access the live Chat Room and DOPE drops.
+            Enter your callsign and 4-digit PIN to sign in and return to the Home page.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export function ChatAuthGate({
             className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs flex items-center justify-center gap-2 active:scale-95 transition-all"
           >
             <Unlock className="w-4 h-4 fill-black" />
-            <span>Unlock Chat Room</span>
+            <span>Member Login</span>
           </button>
         </form>
 

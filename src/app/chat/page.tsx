@@ -2176,6 +2176,9 @@ export default function ChatPage() {
       }
       setIsAuthenticated(true);
       playTacticalChirp(1200);
+      if (typeof window !== "undefined") {
+        window.location.replace("/");
+      }
     } catch (err) {
       triggerAuthError("Network error. Please try again.");
     }
