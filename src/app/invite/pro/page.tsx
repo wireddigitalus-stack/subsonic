@@ -301,9 +301,9 @@ function ProInviteContent() {
       setCompressingHeadshot(true);
       // Compress with 1:1 aspect ratio targeting headshot portraits
       const result = await compressImageFile(file, {
-        maxWidth: 1000,
-        maxHeight: 1000,
-        quality: 0.85,
+        maxWidth: 900,
+        maxHeight: 900,
+        quality: 0.80,
         targetAspectRatio: 1.0,
       });
       setHeadshotResult(result);
@@ -322,9 +322,9 @@ function ProInviteContent() {
       setCompressingAction(true);
       // Compress with wide aspect ratio targeting rifle rigs and barricades
       const result = await compressImageFile(file, {
-        maxWidth: 1400,
-        maxHeight: 900,
-        quality: 0.84,
+        maxWidth: 1100,
+        maxHeight: 800,
+        quality: 0.78,
       });
       setActionPhotoResult(result);
     } catch (err) {
@@ -461,15 +461,25 @@ function ProInviteContent() {
 
     setIsSubmitting(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
     try {
-      const primaryImage = await ensureCompressedDataUrl(headshotResult.dataUrl, 1000, 0.82);
-      const secondaryImage = await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1200, 0.80);
+      const primaryImage =
+        headshotResult.dataUrl.length < 520_000
+          ? headshotResult.dataUrl
+          : await ensureCompressedDataUrl(headshotResult.dataUrl, 900, 0.78);
+      const secondaryImage =
+        actionPhotoResult.dataUrl.length < 520_000
+          ? actionPhotoResult.dataUrl
+          : await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1100, 0.76);
 
       // One server call does everything (invite check → profile → member → claim),
       // and only succeeds once the database has confirmed every step.
       const res = await fetch("/api/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           code: inviteCode,
           fullName: fullName.trim(),
@@ -497,6 +507,7 @@ function ProInviteContent() {
           actionPhoto: secondaryImage,
         }),
       });
+      clearTimeout(timeoutId);
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.success) {
@@ -508,7 +519,10 @@ function ProInviteContent() {
         throw new Error(data.detail ? `${data.error} (${data.detail})` : (data.error || fallbackMsg));
       }
 
-      const savedShooter = data.shooter;
+      const savedShooter = {
+        ...data.shooter,
+        image: data.shooter?.image || primaryImage,
+      };
       const savedMember = data.member;
 
       // Save the session so the member lands in chat already signed in
@@ -521,10 +535,10 @@ function ProInviteContent() {
               name: savedShooter.name,
               callsign: savedShooter.callsign,
               division: savedShooter.division,
-              rifleSetup: "",
+              rifleSetup: `${rifleAction.trim()} / ${optic.trim()}`,
               badgeText: "PRO SHOOTER",
               role: "PRO_COMPETITOR",
-              image: savedShooter.image,
+              image: primaryImage,
             })
           );
           localStorage.setItem("subsonic_member_profile", JSON.stringify(savedMember));
@@ -539,13 +553,24 @@ function ProInviteContent() {
         }
       }
 
-      // Straight to the Home / 2026 Invitational Page
-      router.push(`/?welcome=${encodeURIComponent(savedShooter.callsign)}`);
-    } catch (err: any) {
-      setFormError(err.message || "Failed generating your profile. Please try again.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } finally {
+      // Immediately show the success state and navigate to the Home / 2026 Invitational Page
+      setSubmissionSuccess(savedShooter);
       setIsSubmitting(false);
+      if (typeof window !== "undefined") {
+        window.location.assign(`/?welcome=${encodeURIComponent(savedShooter.callsign)}`);
+      } else {
+        router.push(`/?welcome=${encodeURIComponent(savedShooter.callsign)}`);
+      }
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      const isAbort = err?.name === "AbortError";
+      setFormError(
+        isAbort
+          ? "Connection timed out while uploading your photos. Please tap 'Publish Pro Profile' once more to finish."
+          : err.message || "Failed generating your profile. Please try again."
+      );
+      setIsSubmitting(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

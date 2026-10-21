@@ -152,8 +152,7 @@ export async function refreshInvitesFromDb(maxAgeMs = 3000): Promise<void> {
         if (
           existingMaster.status !== "ACTIVE" ||
           (existingMaster.maxUses || 0) < 500 ||
-          (existingMaster.usedCount || 0) >= (existingMaster.maxUses || 500) ||
-          (existingMaster.recipientName && existingMaster.recipientName !== "VIP Pro Competitor")
+          (existingMaster.usedCount || 0) >= (existingMaster.maxUses || 500)
         ) {
           const upgradedMaster: SocietyInvite = {
             ...existingMaster,

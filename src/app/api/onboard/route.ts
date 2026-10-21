@@ -255,10 +255,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const { pin: _omit, ...publicShooter } = shooter;
+    // Omit heavy Base64 photos from the JSON response echo (they are already saved in DB and in browser memory)
+    // so mobile responses download in <50ms instead of re-downloading 1MB+ over cellular.
+    const { pin: _omitPin, image: _omitImg, actionPhoto: _omitAction, ...lightweightPublicShooter } = shooter;
     const response = NextResponse.json({
       success: true,
-      shooter: publicShooter,
+      shooter: lightweightPublicShooter,
       member: {
         member_id: savedMember.member_id,
         full_name: savedMember.full_name,

@@ -36,19 +36,29 @@ export function formatBytes(bytes: number): string {
  */
 export async function ensureCompressedDataUrl(
   dataUrl: string,
-  maxDimension = 1200,
-  initialQuality = 0.82
+  maxDimension = 1000,
+  initialQuality = 0.80
 ): Promise<string> {
-  if (!dataUrl || !dataUrl.startsWith("data:image/") || dataUrl.length < 700_000) {
+  if (!dataUrl || !dataUrl.startsWith("data:image/") || dataUrl.length < 520_000) {
     return dataUrl;
   }
 
   return new Promise((resolve) => {
+    let settled = false;
+    const finish = (val: string) => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        resolve(val);
+      }
+    };
+    const timer = setTimeout(() => finish(dataUrl), 4000);
+
     const img = new Image();
     img.onload = () => {
       try {
-        let width = img.naturalWidth || img.width || 1200;
-        let height = img.naturalHeight || img.height || 1200;
+        let width = img.naturalWidth || img.width || 1000;
+        let height = img.naturalHeight || img.height || 1000;
 
         if (width > maxDimension || height > maxDimension) {
           const scale = Math.min(maxDimension / width, maxDimension / height);
@@ -61,7 +71,7 @@ export async function ensureCompressedDataUrl(
         canvas.height = height;
         const ctx = canvas.getContext("2d");
         if (!ctx) {
-          resolve(dataUrl);
+          finish(dataUrl);
           return;
         }
         ctx.imageSmoothingEnabled = true;
@@ -70,16 +80,16 @@ export async function ensureCompressedDataUrl(
 
         let quality = initialQuality;
         let out = canvas.toDataURL("image/jpeg", quality);
-        while (out.length > 750_000 && quality > 0.45) {
+        while (out.length > 480_000 && quality > 0.42) {
           quality -= 0.12;
           out = canvas.toDataURL("image/jpeg", quality);
         }
-        resolve(out);
+        finish(out);
       } catch {
-        resolve(dataUrl);
+        finish(dataUrl);
       }
     };
-    img.onerror = () => resolve(dataUrl);
+    img.onerror = () => finish(dataUrl);
     img.src = dataUrl;
   });
 }
@@ -123,8 +133,8 @@ export async function compressImageFile(
         let quality = initialQuality;
         finalDataUrl = canvas.toDataURL("image/jpeg", quality);
 
-        // Guarantee payload stays well under ~550KB so mobile LTE uploads and Vercel 4.5MB limit never fail
-        while (finalDataUrl.length > 750_000 && quality > 0.45) {
+        // Guarantee payload stays well under ~350KB (< 480k base64 chars) so two photos upload in <1s on mobile LTE
+        while (finalDataUrl.length > 480_000 && quality > 0.42) {
           quality -= 0.12;
           finalDataUrl = canvas.toDataURL("image/jpeg", quality);
         }
