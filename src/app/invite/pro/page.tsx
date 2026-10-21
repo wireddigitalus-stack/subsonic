@@ -434,12 +434,6 @@ function ProInviteContent() {
       return;
     }
 
-    if (!quote.trim()) {
-      setFormError("Please enter a short Competitor Bio or Quote. All profile fields are required.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
     if (!headshotResult?.dataUrl) {
       setFormError("A profile headshot photo is required. Please upload a clear photo of yourself to publish your competitor profile.");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -939,15 +933,15 @@ function ProInviteContent() {
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
-              <label className="text-xs font-mono font-bold text-slate-300 uppercase">
-                Competitor Bio / Personal Quote *
+              <label className="text-xs font-mono font-bold text-slate-300 uppercase flex items-center justify-between">
+                <span>Competitor Bio / Personal Quote</span>
+                <span className="text-[10px] text-slate-500 font-normal">Optional</span>
               </label>
               <textarea
                 rows={2}
-                required
                 value={quote}
                 onChange={(e) => setQuote(e.target.value)}
-                placeholder="Share a brief competitor bio, shooting philosophy, or wind-reading quote for your spotlight card..."
+                placeholder="Share a brief competitor bio, shooting philosophy, or wind-reading quote for your spotlight card (optional)..."
                 className="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs sm:text-sm focus:border-amber-400 focus:outline-none"
               />
             </div>

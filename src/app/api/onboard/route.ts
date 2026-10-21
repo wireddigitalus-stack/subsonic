@@ -141,8 +141,8 @@ export async function POST(req: NextRequest) {
     const homeRange = String(body.homeRange || "").trim();
     const ranking = String(body.ranking || "").trim();
     const quote = String(body.quote || "").trim();
-    if (!homeRange || !ranking || !quote) {
-      return fail("All profile fields (Home Range, Ranking/Title, and Bio Quote) are required.", 400, "MISSING_PROFILE_FIELDS");
+    if (!homeRange || !ranking) {
+      return fail("Home Range and Ranking/Title are required.", 400, "MISSING_PROFILE_FIELDS");
     }
 
     const rawRig = typeof body.rifleSetup === "object" && body.rifleSetup ? body.rifleSetup : {};
