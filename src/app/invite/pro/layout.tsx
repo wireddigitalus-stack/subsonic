@@ -7,30 +7,34 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
+  title: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation",
   description:
-    "Exclusive invitation portal for precision rimfire competitors. Enter your VIP key, configure your marksman profile, upload match photos, and generate your public shooter profile.",
+    "Presented by Modacam Custom Rifles • $7,500+ Money Match at The Hideout (Bristol, TN). Tap to claim your Pro Shooter Spotlight Profile & Chat Room access (Code: SS-PRO-ZKHZ).",
   keywords: [
-    "Subsonic Society Pro VIP",
-    "Competition Shooter Profile",
-    "VIP Invitation Setup",
+    "Subsonic Society Invitational",
+    "Pro Shooter VIP Invitation",
+    "Modacam Custom Rifles",
+    "The Hideout Bristol TN",
+    "SS-PRO-ZKHZ",
     "Precision Rimfire Competitor",
   ],
   alternates: {
     canonical: "/invite/pro",
   },
   openGraph: {
-    title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
+    title: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation",
     description:
-      "Exclusive invitation portal for precision rimfire competitors. Activate your VIP profile and shooter profile.",
-    url: "/invite/pro",
+      "Presented by Modacam Custom Rifles • $7,500+ Money Match at The Hideout (Bristol, TN). Tap to claim your Pro Shooter Spotlight Profile & Chat Room access (Code: SS-PRO-ZKHZ).",
+    url: `${siteUrl}/invite/pro?code=SS-PRO-ZKHZ`,
     siteName: "Subsonic Society",
     images: [
       {
-        url: "/assets/subsonic-invite-social-share.jpg?v=5",
-        width: 1280,
-        height: 720,
-        alt: "Subsonic Society Pro VIP Invitation & Profile Setup",
+        url: `${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=1`,
+        secureUrl: `${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=1`,
+        width: 1376,
+        height: 768,
+        type: "image/jpeg",
+        alt: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation (Code: SS-PRO-ZKHZ)",
       },
     ],
     locale: "en_US",
@@ -38,9 +42,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Competition Pro VIP Invitation & Profile Setup | Subsonic Society",
-    description: "Activate your VIP marksman profile and Chat Room access.",
-    images: ["/assets/subsonic-invite-social-share.jpg?v=5"],
+    title: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation",
+    description:
+      "Presented by Modacam Custom Rifles • $7,500+ Money Match at The Hideout (Bristol, TN). Tap to claim your Pro Shooter Spotlight Profile & Chat Room access (Code: SS-PRO-ZKHZ).",
+    images: [`${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=1`],
   },
 };
 
