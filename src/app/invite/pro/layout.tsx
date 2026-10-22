@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://subsonic-omega.vercel.app");
+const siteUrl = "https://subsonic-omega.vercel.app";
+const ogImageUrl = `${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=3`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -19,20 +17,20 @@ export const metadata: Metadata = {
     "Precision Rimfire Competitor",
   ],
   alternates: {
-    canonical: "/invite/pro",
+    canonical: `${siteUrl}/invite/pro`,
   },
   openGraph: {
     title: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation",
     description:
       "Presented by Modacam Custom Rifles • $7,500+ Money Match at The Hideout (Bristol, TN). Tap to claim your Pro Shooter Spotlight Profile & Chat Room access (Code: SS-PRO-ZKHZ).",
-    url: `${siteUrl}/invite/pro?code=SS-PRO-ZKHZ`,
+    url: `${siteUrl}/invite/pro`,
     siteName: "Subsonic Society",
     images: [
       {
-        url: `${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=2`,
-        secureUrl: `${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=2`,
-        width: 1376,
-        height: 768,
+        url: ogImageUrl,
+        secureUrl: ogImageUrl,
+        width: 1200,
+        height: 630,
         type: "image/jpeg",
         alt: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation (Code: SS-PRO-ZKHZ)",
       },
@@ -45,7 +43,7 @@ export const metadata: Metadata = {
     title: "2026 Subsonic Society Invitational — Pro Shooter VIP Invitation",
     description:
       "Presented by Modacam Custom Rifles • $7,500+ Money Match at The Hideout (Bristol, TN). Tap to claim your Pro Shooter Spotlight Profile & Chat Room access (Code: SS-PRO-ZKHZ).",
-    images: [`${siteUrl}/assets/subsonic-pro-zkhz-social-share.jpg?v=2`],
+    images: [ogImageUrl],
   },
 };
 
