@@ -461,6 +461,15 @@ function ProInviteContent() {
           ? actionPhotoResult.dataUrl
           : await ensureCompressedDataUrl(actionPhotoResult.dataUrl, 1100, 0.76);
 
+      const finalAccolades = Array.from(
+        new Set(
+          [...accolades, customAccolade.trim().toUpperCase()].filter(Boolean)
+        )
+      );
+      const finalSponsors = Array.from(
+        new Set([...sponsors, customSponsor.trim()].filter(Boolean))
+      );
+
       // One server call does everything (invite check → profile → member → claim),
       // and only succeeds once the database has confirmed every step.
       const res = await fetch("/api/onboard", {
@@ -488,8 +497,8 @@ function ProInviteContent() {
             optic: optic.trim(),
             ammoLot: ammoLot.trim(),
           },
-          accolades,
-          sponsors,
+          accolades: finalAccolades,
+          sponsors: finalSponsors,
           image: primaryImage,
           actionPhoto: secondaryImage,
         }),

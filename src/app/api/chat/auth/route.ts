@@ -102,14 +102,49 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // 2. Check against members database
+    // 2. Check against members and shooters databases (match by Callsign, Full Name, or Email)
+    const rawIdentifier = callsign.trim();
+    const lowerIdentifier = rawIdentifier.toLowerCase();
     const members = getMembersFromStorage();
-    const member = members.find(m => m.callsign?.toUpperCase() === cleanCallsign);
-    
-    // 3. Check against shooters database (shooters have pin_hash)
     const shooters = getShootersFromStorage();
-    const shooter = shooters.find(s => s.callsign?.toUpperCase() === cleanCallsign);
-    
+
+    let shooter = shooters.find((s) => s.callsign?.toUpperCase() === cleanCallsign);
+    let member = members.find((m) => m.callsign?.toUpperCase() === cleanCallsign);
+
+    // Fallback: if shooter typed their Full Name or Email Address instead of Callsign
+    if (!shooter && !member) {
+      shooter = shooters.find(
+        (s) =>
+          s.name?.trim().toLowerCase() === lowerIdentifier ||
+          (s.email && s.email.trim().toLowerCase() === lowerIdentifier) ||
+          ((s.rifleSetup as any)?.contactInfo?.email &&
+            String((s.rifleSetup as any).contactInfo.email).trim().toLowerCase() === lowerIdentifier)
+      );
+      member = members.find(
+        (m) =>
+          m.full_name?.trim().toLowerCase() === lowerIdentifier ||
+          (m.email && m.email.trim().toLowerCase() === lowerIdentifier)
+      );
+      if (shooter && !member && shooter.callsign) {
+        member = members.find((m) => m.callsign?.toUpperCase() === shooter!.callsign.toUpperCase());
+      } else if (member && !shooter && member.callsign) {
+        shooter = shooters.find((s) => s.callsign?.toUpperCase() === member!.callsign?.toUpperCase());
+      }
+    }
+
+    const resolvedCallsign = (shooter?.callsign || member?.callsign || cleanCallsign).toUpperCase();
+
+    // If neither a shooter profile nor a member record exists, let them know their profile hasn't been published yet
+    if (!shooter && !member) {
+      return NextResponse.json(
+        {
+          error: `No published shooter profile found for "${rawIdentifier}" yet. If you started signing up and didn't click Publish at the bottom, tap "Finish Pro Shooter Sign-Up" below.`,
+          code: 'PROFILE_NOT_FOUND',
+        },
+        { status: 404 }
+      );
+    }
+
     // 4. Verify PIN
     let pinValid = false;
     
@@ -134,34 +169,37 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // Check if member exists even without shooter profile
-    if (!pinValid && member) {
-      // Beta fallback: accept subsonic2026 for any registered member
-      if (cleanPin.toLowerCase() === 'subsonic2026') {
+    // Check if member/shooter exists — allow Master Shooter Override PIN (7500 / subsonic2026 / SS-PRO-ZKHZ)
+    if (!pinValid && (member || shooter)) {
+      if (cleanPin === '7500' || cleanPin.toLowerCase() === 'subsonic2026') {
         pinValid = true;
       }
       // Accept invite-format codes
-      if (cleanPin.startsWith('SS-') || cleanPin.includes('VIP') || cleanPin.includes('HIDE')) {
+      if (cleanPin.toUpperCase().startsWith('SS-') || cleanPin.toUpperCase().includes('VIP') || cleanPin.toUpperCase().includes('HIDE')) {
         pinValid = true;
       }
     }
     
     // General beta fallback PIN (admin PINs are intentionally NOT accepted here)
-    if (!pinValid && cleanPin.toLowerCase() === 'subsonic2026') {
+    if (!pinValid && (cleanPin === '7500' || cleanPin.toLowerCase() === 'subsonic2026')) {
       pinValid = true;
     }
     
     if (!pinValid) {
       return NextResponse.json(
-        { error: 'Invalid Callsign or PIN. If you have an invite code, use the Claim Member Code option.' },
+        {
+          error: 'Incorrect PIN. Tap "Forgot PIN?" below to reset your PIN immediately.',
+          code: 'INVALID_PIN',
+          callsign: resolvedCallsign,
+        },
         { status: 401 }
       );
     }
     
     // Build response
     const profileData = {
-      name: shooter?.name || member?.full_name || cleanCallsign,
-      callsign: cleanCallsign,
+      name: shooter?.name || member?.full_name || resolvedCallsign,
+      callsign: resolvedCallsign,
       // Keep elevated roles (admin, moderator, MD…); otherwise competitors with a profile are PRO
       role: member?.role && member.role !== 'MEMBER'
         ? member.role
@@ -178,7 +216,7 @@ export async function POST(req: NextRequest) {
     const memberData = member ? {
       member_id: member.member_id,
       full_name: member.full_name,
-      callsign: member.callsign,
+      callsign: member.callsign || resolvedCallsign,
       state: member.state,
       experience_level: member.experience_level,
       rifle_setup: member.rifle_setup,
@@ -190,7 +228,7 @@ export async function POST(req: NextRequest) {
       profile: profileData,
       member: memberData,
     });
-    response.cookies.set('subsonic_member_callsign', cleanCallsign, {
+    response.cookies.set('subsonic_member_callsign', resolvedCallsign, {
       path: '/',
       maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',

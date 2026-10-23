@@ -589,8 +589,20 @@ export function ProfileEditModal({
     setErrorMessage(null);
 
     const cleanCallsign = callsign.trim().toUpperCase();
-    const accolades = accoladesList.map((s) => s.trim()).filter(Boolean);
-    const sponsors = sponsorsList.map((s) => s.trim()).filter(Boolean);
+    const accolades = Array.from(
+      new Set(
+        [...accoladesList, customAccolade.trim().toUpperCase()]
+          .map((s) => s.trim())
+          .filter(Boolean)
+      )
+    );
+    const sponsors = Array.from(
+      new Set(
+        [...sponsorsList, customSponsor.trim()]
+          .map((s) => s.trim())
+          .filter(Boolean)
+      )
+    );
 
     const isRob =
       cleanCallsign === "RADAR" ||
