@@ -45,11 +45,11 @@ CORE DOMAIN KNOWLEDGE:
 
 2. 2026 SUBSONIC SOCIETY INVITATIONAL MONEY MATCH:
    - Dates: November 13–15, 2026.
-   - Format: 10 main event stages followed by 2 side matches on Sunday after the main event.
+   - Format: 10 main event stages (8 stages Saturday, 2 stages Sunday), then 2 side matches on Sunday after the match is over.
    - Hospitality: Saturday lunch & dinner provided. Presented by Modacam Custom Rifles.
    - Friday Nov 13: Range open 12:00 – 5:00 PM for registration and sight-in only (50/100/200-yard zero).
-   - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (Main Event stages, lunch and dinner provided).
-   - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (Final Main Event stages followed by 2 side matches after the main event).
+   - Saturday Nov 14: Open 7:00 AM; Registration & sight-in until 8:30 AM; Shooter brief 8:30 AM; First shot 9:00 AM (8 Main Event stages, lunch and dinner provided).
+   - Sunday Nov 15: Open 7:00 AM; 7:00 – 8:30 AM sight-in; Shooter brief 8:30 AM; First shot 9:00 AM (2 Main Event stages — Match is over, followed by 2 side matches after the match).
 
 3. BALLISTICS & AMMUNITION SOPs:
    - Ammo: Subsonic or standard-velocity .22LR only (< 1,120 FPS at sea level).
@@ -174,7 +174,7 @@ export function getNexusDeterministicAnswer(query: string, context?: NexusQueryC
     lower.includes("timeline") ||
     lower.includes("agenda")
   ) {
-    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday range is open 12:00 to 5:00 PM for registration and sight-in only. Saturday opens at 7:00 AM with registration and sight-in until 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM with lunch and dinner provided. Sunday opens at 7:00 AM with sight-in from 7:00 to 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM to complete the 10 main event stages followed by 2 side matches after the main event.`;
+    return `The 2026 Subsonic Society Invitational runs November 13 through 15 at The Hideout. Friday range is open 12:00 to 5:00 PM for registration and sight-in only. Saturday opens at 7:00 AM with registration and sight-in until 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM for 8 main event stages with lunch and dinner provided. Sunday opens at 7:00 AM with sight-in from 7:00 to 8:30 AM, shooter brief at 8:30 AM, and first shot at 9:00 AM for the final 2 main event stages — then after the match is over on Sunday, 2 side matches follow.`;
   }
 
   // 8. CASH PURSE, SIDE MATCHES & PRIZE TABLE

@@ -12,7 +12,7 @@
 - **Contact**: contact@subsonicsociety.com | Bristol, TN
 
 ## Core Pillars
-1. **Competition Without Gatekeeping**: High-stakes, 18-stage matches on technical reactive steel from 25 yards to 465 yards. Equal access for grassroots club competitors and national pro marksmen across Open, Production, Senior, Ladies, and Youth divisions.
+1. **Competition Without Gatekeeping**: High-stakes, 10-stage main event matches (plus 2 side matches) on technical reactive steel from 25 yards to 200 yards. Equal access for grassroots club competitors and national pro marksmen across Open, Production, Senior, Ladies, and Youth divisions.
 2. **Subsonic DNA Ballistic Testing**: Independent, empirical chronograph velocity data (SD/ES), 50y/100y/300y group dispersion, harmonic tuner benchmarks (Harrell, EC Tuner, PVA), and high-altitude density altitude DOPE tables.
 3. **Education & Mentorship**: Free open-source DOPE cards, wind-reading masterclasses in mountain canyon thermals, positional barricade mechanics, and competitor debriefs.
 4. **Authentic Community**: 100% free digital membership with instant credential minting, decentralized tactical comms network, and sportsmanship code of conduct.

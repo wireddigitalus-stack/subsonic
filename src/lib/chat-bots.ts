@@ -180,8 +180,8 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-garrett": [
       "All competitors: Range is open Friday Nov 13 from 12:00 to 5:00 PM for registration and sight-in only (50, 100, and 200-yard zero).",
       "Reminder: Range opens at 7:00 AM Saturday and Sunday with sight-in until 8:30 AM. Shooter brief is at 8:30 AM and first shot is at 9:00 AM.",
-      "Saturday features the Day 1 main event stages with lunch and dinner provided for all competitors.",
-      "Sunday completes the 10 main event stages followed by 2 side matches after the main event.",
+      "Saturday features 8 main event stages with lunch and dinner provided for all competitors.",
+      "Sunday finishes the main match with 2 stages, followed by 2 side matches after the match is over.",
     ],
     "bot-wyatt": [
       "The Bristol Hotel on State Street is where our squad is staging. Lumac Rooftop Bar has killer sunset views over the mountains.",

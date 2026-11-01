@@ -597,8 +597,8 @@ export default function CompetitorPacketPage() {
                 <li>7–8:30 sight in</li>
                 <li>Shooter brief 8:30</li>
                 <li>First shot 9am</li>
-                <li className="font-bold text-amber-400">4 stages (Main Event)</li>
-                <li className="font-bold text-emerald-400">2 side matches following the main event</li>
+                <li className="font-bold text-amber-400">2 stages (Main Event) — Match is over</li>
+                <li className="font-bold text-emerald-400">2 side matches after the match</li>
               </ul>
             </div>
           </div>
@@ -916,7 +916,7 @@ export default function CompetitorPacketPage() {
                   <div className="grid grid-cols-12 p-3 border-t border-slate-200 bg-white">
                     <div className="col-span-4 font-bold">Sunday • Nov. 15</div>
                     <div className="col-span-4">Open 7:00 AM • Sight in 7–8:30 • Brief 8:30 • First shot 9:00 AM</div>
-                    <div className="col-span-4 font-semibold">4 stages (Main Event) followed by 2 side matches.</div>
+                    <div className="col-span-4 font-semibold">2 stages (Main Event) — Match is over. Followed by 2 side matches after the match.</div>
                   </div>
                 </div>
               </div>

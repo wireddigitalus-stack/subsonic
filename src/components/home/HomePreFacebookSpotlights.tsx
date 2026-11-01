@@ -167,7 +167,7 @@ export function HomePreFacebookSpotlights() {
               </div>
               <h4 className="text-base font-bold text-white">Full 3-Day Championship Timeline</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Nov 13–15 at The Hideout. Friday registration & sight-in, Saturday & Sunday 10 main event stages (Saturday lunch & dinner provided) followed by 2 side matches.
+                Nov 13–15 at The Hideout. Friday registration &amp; sight-in, 8 stages Saturday (lunch &amp; dinner provided), and 2 stages Sunday to finish the 10-stage match — followed by 2 side matches after the match.
               </p>
             </div>
 
