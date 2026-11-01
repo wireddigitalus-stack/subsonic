@@ -83,7 +83,7 @@ export function MobileTabs() {
     { name: "Home", href: "/", icon: Home },
     { name: "Chat", href: "/chat", icon: MessageSquare },
     { name: "Shooters", href: "/shooters", icon: Trophy },
-    { name: "Packet", href: "/competitor-packet", icon: FileText },
+    { name: "Packet", href: "/competitor-packet?v=2", icon: FileText },
   ];
 
   // Visual configuration for color-coded pulsing beacon
@@ -112,14 +112,16 @@ export function MobileTabs() {
     >
       <div className="ios-bottom-sheet rounded-3xl p-1.5 px-3 border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.85)] flex items-center justify-around">
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href || (tab.href.startsWith("/#") && pathname === "/" && typeof window !== "undefined" && window.location.hash === tab.href.slice(1));
+          const tabPath = tab.href.split("?")[0];
+          const isActive = pathname === tabPath || (tab.href.startsWith("/#") && pathname === "/" && typeof window !== "undefined" && window.location.hash === tab.href.slice(1));
           const Icon = tab.icon;
-          const isChat = tab.href === "/chat";
+          const isChat = tabPath === "/chat";
 
           return (
             <Link
               key={tab.name}
               href={tab.href}
+              prefetch={false}
               data-telemetry={`mobile_bottom_tab_${tab.name.toLowerCase().replace(/\s+/g, "_")}`}
               className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all duration-200 ${
                 isActive

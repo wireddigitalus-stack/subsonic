@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { PacketWelcomeBanner } from "@/components/packet/PacketWelcomeBanner";
 import {
@@ -599,8 +601,8 @@ export default function CompetitorPacketPage() {
                 <li>7–8:30 sight in</li>
                 <li>Shooter brief 8:30</li>
                 <li>First shot 9am</li>
-                <li className="font-bold text-amber-400">2 stages (Main Event) — Match is over</li>
-                <li className="font-bold text-emerald-400">2 side matches after the match</li>
+                <li className="font-bold text-amber-400">2 stages (Main Event)</li>
+                <li className="font-bold text-emerald-400">2 side matches following the main event</li>
               </ul>
             </div>
           </div>
