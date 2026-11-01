@@ -431,7 +431,7 @@ export default function CompetitorPacketPage() {
                 <Target className="w-4 h-4 text-amber-400" />
                 Match Format
               </div>
-              <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">12 Main Event Stages</div>
+              <div className="text-lg sm:text-xl font-black text-amber-300 mt-1">10 Main Event Stages</div>
               <div className="text-xs sm:text-sm text-slate-300 font-medium mt-0.5">
                 Followed by 2 Side Matches
               </div>

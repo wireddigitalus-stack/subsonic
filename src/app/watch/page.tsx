@@ -49,7 +49,7 @@ const VIDEOS_DATA: VideoItem[] = [
     duration: "2:45",
     views: "24.1K",
     published: "1 week ago",
-    description: "Cinematic overview of the 12 main event stages and 2 side matches awaiting shooters at The Hideout in Bristol, TN, presented by Modacam Custom Rifles.",
+    description: "Cinematic overview of the 10 main event stages and 2 side matches awaiting shooters at The Hideout in Bristol, TN, presented by Modacam Custom Rifles.",
     thumbnail: "/assets/subsonic-competition-mountain.png",
     tags: ["Invitational", "MoneyMatch", "Modacam", "BristolTN"],
   },

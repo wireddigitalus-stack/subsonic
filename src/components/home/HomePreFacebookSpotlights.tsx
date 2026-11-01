@@ -58,7 +58,7 @@ export function HomePreFacebookSpotlights() {
               </div>
 
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-                The premier precision rimfire shootout in East Tennessee. 12 main event stages plus 2 side matches at The Hideout in Bristol, Tennessee.
+                The premier precision rimfire shootout in East Tennessee. 10 main event stages plus 2 side matches at The Hideout in Bristol, Tennessee.
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
@@ -72,7 +72,7 @@ export function HomePreFacebookSpotlights() {
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-[10px] font-mono text-slate-400 block">COURSE OF FIRE</span>
-                  <span className="text-xs sm:text-sm font-bold text-amber-400">12 Stages + 2 Side</span>
+                  <span className="text-xs sm:text-sm font-bold text-amber-400">10 Stages + 2 Side</span>
                 </div>
                 <div className="p-3 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-[10px] font-mono text-slate-400 block">FORMAT</span>
@@ -167,7 +167,7 @@ export function HomePreFacebookSpotlights() {
               </div>
               <h4 className="text-base font-bold text-white">Full 3-Day Championship Timeline</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Nov 13–15 at The Hideout. Friday registration & sight-in, Saturday 8 main event stages (lunch & dinner provided), Sunday 4 main event stages followed by 2 side matches.
+                Nov 13–15 at The Hideout. Friday registration & sight-in, Saturday & Sunday 10 main event stages (Saturday lunch & dinner provided) followed by 2 side matches.
               </p>
             </div>
 

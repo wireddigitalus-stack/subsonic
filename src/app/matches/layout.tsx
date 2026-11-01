@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "2026 Precision Rimfire Match Schedule & Rules | Subsonic Society",
     description:
-      "Compete in premier high-country rimfire matches. 12 Main Event stages followed by 2 side matches, presented by Modacam Custom Rifles.",
+      "Compete in premier high-country rimfire matches. 10 Main Event stages followed by 2 side matches, presented by Modacam Custom Rifles.",
     url: "https://subsonicsociety.com/matches",
     siteName: "Subsonic Society",
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "2026 Precision Rimfire Match Schedule | Subsonic Society",
     description:
-      "18 stages, 3,420 FT elevation, $7,500 guaranteed cash purse. Official Subsonic Society Invitational.",
+      "10 Main Event stages + 2 side matches, 3,420 FT elevation. Official Subsonic Society Invitational.",
     images: ["/assets/subsonic-social-share-clean.jpg?v=4"],
   },
 };
@@ -68,7 +68,7 @@ const matchesSchema = {
       "@type": "SportsEvent",
       "@id": "https://subsonicsociety.com/matches#invitational-2026",
       "name": "Subsonic Society Invitational (Presented by Modacam Custom Rifles)",
-      "description": "The premier 18-stage high-stakes precision rimfire pro championship in Bristol, TN at 3,420 FT elevation. $7,500 guaranteed cash purse.",
+      "description": "The premier 10-stage high-stakes precision rimfire pro championship (+ 2 side matches) in Bristol, TN at 3,420 FT elevation.",
       "startDate": "2026-10-17T08:00:00-04:00",
       "endDate": "2026-10-18T17:00:00-04:00",
       "eventStatus": "https://schema.org/EventScheduled",

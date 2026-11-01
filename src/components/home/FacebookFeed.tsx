@@ -506,7 +506,7 @@ export function FacebookFeed() {
                     <div className="text-[9px] text-slate-400 uppercase">Zero Range</div>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5">
-                    <div className="text-xs font-black text-blue-400">12 STAGES</div>
+                    <div className="text-xs font-black text-blue-400">10 STAGES</div>
                     <div className="text-[9px] text-slate-400 uppercase">Main Event</div>
                   </div>
                   <div className="p-2 rounded-xl bg-white/[0.03] border border-white/5">

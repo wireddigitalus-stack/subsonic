@@ -805,7 +805,7 @@ export function ShooterProfileClient({ initialShooter, slug }: Props) {
                   SUBSONIC SOCIETY INVITATIONAL MONEY MATCH
                 </div>
                 <div className="text-slate-400 text-xs font-mono uppercase tracking-wider pt-0.5">
-                  12 Main Event Stages + 2 Side Matches • Sat Lunch &amp; Dinner Provided • The Hideout • Bristol, TN
+                  10 Main Event Stages + 2 Side Matches • Sat Lunch &amp; Dinner Provided • The Hideout • Bristol, TN
                 </div>
               </div>
 

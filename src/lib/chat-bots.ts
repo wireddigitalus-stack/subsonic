@@ -180,8 +180,8 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-garrett": [
       "All competitors: Range is open Friday Nov 13 from 12:00 to 5:00 PM for registration and sight-in only (50, 100, and 200-yard zero).",
       "Reminder: Range opens at 7:00 AM Saturday and Sunday with sight-in until 8:30 AM. Shooter brief is at 8:30 AM and first shot is at 9:00 AM.",
-      "Saturday features 8 main event stages with lunch and dinner provided for all competitors.",
-      "Sunday features the final 4 main event stages followed by 2 side matches after the main event.",
+      "Saturday features the Day 1 main event stages with lunch and dinner provided for all competitors.",
+      "Sunday completes the 10 main event stages followed by 2 side matches after the main event.",
     ],
     "bot-wyatt": [
       "The Bristol Hotel on State Street is where our squad is staging. Lumac Rooftop Bar has killer sunset views over the mountains.",
@@ -204,7 +204,7 @@ const MESSAGE_POOLS: MessagePool = {
     "bot-marcus": [
       "Southern Craft BBQ at The Sessions Hotel complex is a great spot for dinner.",
       "Courtyard by Marriott off Exit 74 is only 14 minutes from the range. Clean, quiet, and easy gear loading.",
-      "Looking forward to the Sunday side matches after the final 4 main event stages.",
+      "Looking forward to the Sunday side matches after the 10 main event stages.",
       "Downtown Bristol is walkable on both sides of the Tennessee-Virginia state line.",
     ],
     "bot-sofia": [

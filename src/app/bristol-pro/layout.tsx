@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Subsonic Society Invitational Money Match | Presented by Modacam",
   description:
-    "The premier precision rimfire championship. 12 Main Event stages (8 Saturday, 4 Sunday) followed by 2 side matches, presented by Modacam Custom Rifles in Bristol, TN.",
+    "The premier precision rimfire championship. 10 Main Event stages followed by 2 side matches, presented by Modacam Custom Rifles in Bristol, TN.",
   keywords: [
     "Subsonic Society Invitational",
     "Bristol TN rimfire championship",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Subsonic Society Invitational Money Match | Presented by Modacam",
     description:
-      "12 Main Event stages followed by 2 side matches in the Appalachian mountain winds. Presented by Modacam Custom Rifles.",
+      "10 Main Event stages followed by 2 side matches in the Appalachian mountain winds. Presented by Modacam Custom Rifles.",
     url: "https://subsonicsociety.com/bristol-pro",
     siteName: "Subsonic Society",
     images: [
@@ -66,7 +66,7 @@ const bristolProSchema = {
       "@type": "SportsEvent",
       "@id": "https://subsonicsociety.com/bristol-pro#event",
       "name": "Subsonic Society Invitational - High Country Championship",
-      "description": "18 natural terrain barricade and long-distance steel stages across 465 yards. Featuring an unprecedented $7,500 guaranteed cash purse and $15,000+ prize table sponsored by Modacam Custom Rifles.",
+      "description": "10 Main Event stages and 2 side matches at The Hideout in Bristol, TN, sponsored by Modacam Custom Rifles.",
       "startDate": "2026-10-17T08:00:00-04:00",
       "endDate": "2026-10-18T17:00:00-04:00",
       "eventStatus": "https://schema.org/EventScheduled",
