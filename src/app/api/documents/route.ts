@@ -17,10 +17,10 @@ const SEED_DOCUMENTS: CompetitionDocument[] = [
     matchTitle: "Subsonic Society Invitational 2026",
     description: "Official 4-page competitor packet presented by Modacam Custom Rifles. Includes Allen Hurley welcome letter, weekend schedule (Nov 13-15), 10 Main Event stages followed by 2 side matches, Saturday lunch & dinner included, hotel directory, and Bristol dining & attractions guide.",
     fileName: "invitational-competitor-packet.pdf",
-    fileSize: "476 KB",
-    fileUrl: "/documents/invitational-competitor-packet.pdf",
+    fileSize: "558 KB",
+    fileUrl: "/documents/invitational-competitor-packet.pdf?v=20261101",
     version: "Official Nov 2026",
-    updatedAt: "2026-10-15T12:00:00Z",
+    updatedAt: "2026-11-01T12:00:00Z",
     isMandatory: true,
   },
   {

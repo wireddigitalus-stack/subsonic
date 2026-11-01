@@ -276,7 +276,9 @@ export default function CompetitorPacketPage() {
     if (typeof window === "undefined") return;
     setIsSavingPdf(true);
     try {
-      const response = await fetch("/documents/invitational-competitor-packet.pdf");
+      const response = await fetch("/documents/invitational-competitor-packet.pdf?v=20261101", {
+        cache: "no-store",
+      });
       const blob = await response.blob();
       const fileName = "Subsonic-Society-2026-Competitor-Packet.pdf";
       const pdfFile = new File([blob], fileName, { type: "application/pdf" });
