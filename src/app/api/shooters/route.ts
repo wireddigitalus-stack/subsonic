@@ -35,12 +35,16 @@ export async function GET(req: NextRequest) {
     const members = getMembersFromStorage();
 
     // Synthesize registered members into shooter list so any competitor appears in directory & chat
-    const shooterCallsigns = new Set(shooters.map((s) => (s.callsign || "").toUpperCase()));
+    const shooterCallsigns = new Set(shooters.map((s) => (s.callsign || "").trim().toUpperCase()));
+    const shooterIds = new Set(shooters.map((s) => (s.id || "").trim().toUpperCase()));
+    const shooterNames = new Set(shooters.map((s) => (s.name || "").trim().toUpperCase()).filter(Boolean));
+    const shooterEmails = new Set(shooters.map((s) => (s.email || "").trim().toLowerCase()).filter(Boolean));
     const allShooters: ShooterProfile[] = [...shooters];
 
     for (const m of members) {
       const call = (m.callsign || "").trim().toUpperCase();
       const name = (m.full_name || "").trim().toUpperCase();
+      const email = (m.email || "").trim().toLowerCase();
       // Exclude non-shooters (Rob Neilson / RADAR / Master Owner) and test accounts (John Doe, Test, Test 2)
       if (
         call === "RADAR" ||
@@ -64,7 +68,15 @@ export async function GET(req: NextRequest) {
       ) {
         continue;
       }
-      if (!call || shooterCallsigns.has(call)) continue;
+      if (
+        !call ||
+        shooterCallsigns.has(call) ||
+        shooterIds.has(call) ||
+        (name && shooterNames.has(name)) ||
+        (email && shooterEmails.has(email))
+      ) {
+        continue;
+      }
       if (isShooterExplicitlyDeleted(call) || isShooterExplicitlyDeleted(m.member_id)) continue;
       const isOwner = call === "SUBX" || call === "ALLEN" || m.role === "OWNER_ADMIN";
       allShooters.push({
@@ -376,12 +388,16 @@ export async function POST(req: NextRequest) {
     // Cross-sync to society_members so name, rifle build, and callsign match across both datastores
     try {
       const members = getMembersFromStorage();
+      const prevCallsign = existingShooter?.callsign?.trim().toUpperCase();
       const existingMember = members.find(
         (m) =>
           (isRob && (m.member_id === "SS-2026-0001" || m.callsign === "RADAR" || m.callsign === "ROB" || m.callsign === "LTDAN")) ||
           (isAllen && (m.member_id === "SS-2026-0002" || m.callsign === "SUBX" || m.callsign === "ALLEN")) ||
           m.member_id === `SS-PRO-${candidateCallsign}` ||
-          m.callsign?.toUpperCase() === candidateCallsign
+          m.callsign?.toUpperCase() === candidateCallsign ||
+          (prevCallsign && (m.member_id === `SS-PRO-${prevCallsign}` || m.callsign?.toUpperCase() === prevCallsign)) ||
+          (newShooter.email && m.email?.toLowerCase() === newShooter.email.toLowerCase()) ||
+          (newShooter.name && m.full_name?.trim().toLowerCase() === newShooter.name.trim().toLowerCase())
       );
 
       if (existingMember) {
@@ -393,6 +409,8 @@ export async function POST(req: NextRequest) {
           ...existingMember,
           full_name: newShooter.name,
           callsign: newShooter.callsign,
+          email: newShooter.email || existingMember.email,
+          pin: newShooter.pin || existingMember.pin,
           rifle_setup: rifleSummary,
           experience_level: newShooter.division,
           role: isRob ? "MASTER_OWNER" : isAllen ? "OWNER_ADMIN" : existingMember.role,
