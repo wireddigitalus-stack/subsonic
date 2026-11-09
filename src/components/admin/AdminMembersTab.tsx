@@ -163,11 +163,11 @@ export function AdminMembersTab(props: AdminMembersTabProps) {
 
             <button
               onClick={downloadMembersExport}
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-amber-300 font-bold text-xs flex items-center gap-1.5 transition-all"
-              title="Export roster to CSV"
+              className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-300 font-bold text-xs flex items-center gap-1.5 transition-all"
+              title="Download Registered Shooter Roster (CSV)"
             >
               <Download className="w-3.5 h-3.5 text-amber-400" />
-              <span>Export CSV</span>
+              <span>Download Shooter Roster</span>
             </button>
           </div>
         </div>

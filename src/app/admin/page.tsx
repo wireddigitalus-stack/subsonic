@@ -828,7 +828,11 @@ export default function AdminDashboardPage() {
   };
 
   const downloadMembersExport = () => {
-    window.open("/api/join?export=csv", "_blank");
+    window.open("/api/admin/roster-export?format=csv", "_blank");
+  };
+
+  const downloadShooterRosterTxt = () => {
+    window.open("/api/admin/roster-export?format=txt", "_blank");
   };
 
   const handleOpenPasskeysModal = async () => {
@@ -1833,6 +1837,24 @@ export default function AdminDashboardPage() {
           >
             <Bot className="w-3.5 h-3.5" />
             <span>Test Bots: <strong className={botsEnabled ? "text-cyan-300" : "text-slate-400"}>{botsEnabled ? "ON" : "OFF"}</strong></span>
+          </button>
+
+          <button
+            onClick={downloadMembersExport}
+            className="h-9 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-tactical-glow"
+            title="Download Registered Shooter Roster (CSV for Excel / Numbers / Google Sheets)"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Download Shooter Roster</span>
+          </button>
+
+          <button
+            onClick={downloadShooterRosterTxt}
+            className="h-9 px-3.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 text-xs font-bold flex items-center gap-1.5 transition-colors"
+            title="Download Readable Email / Text List of All Registered Shooters"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Email List (.TXT)</span>
           </button>
 
           <button
