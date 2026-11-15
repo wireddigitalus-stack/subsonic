@@ -31,7 +31,7 @@ function canonicalizeCallsign(raw: string): string[] {
 async function syncPresenceFromDb(force = false): Promise<void> {
   if (!db) return;
   const now = Date.now();
-  if (!force && now - lastDbFetchMs < 2500) return;
+  if (!force && now - lastDbFetchMs < 15000) return;
   lastDbFetchMs = now;
 
   try {
@@ -62,7 +62,7 @@ async function syncPresenceFromDb(force = false): Promise<void> {
 async function flushPresenceToDb(force = false): Promise<void> {
   if (!db) return;
   const now = Date.now();
-  if (!force && now - lastDbWriteMs < 2500) return;
+  if (!force && now - lastDbWriteMs < 15000) return;
   lastDbWriteMs = now;
 
   const mapObj: Record<string, number> = {};
@@ -184,15 +184,16 @@ export async function getPresenceSnapshotAsync(callerCallsign?: string): Promise
   onlineCallsigns: string[];
   lastActiveMap: Record<string, number>;
 }> {
-  await syncPresenceFromDb();
   if (callerCallsign) {
     const keys = canonicalizeCallsign(callerCallsign);
     const now = Date.now();
     for (const k of keys) {
       activeMarksmen.set(k, now);
     }
-    await flushPresenceToDb();
   }
+  void syncPresenceFromDb().then(() => {
+    if (callerCallsign) void flushPresenceToDb();
+  });
   return getPresenceSnapshot();
 }
 

@@ -37,6 +37,32 @@ export interface UserDmConversation {
 const VALID_TYPES = new Set(["STANDARD", "DOPE_DROP", "MATCH_ALERT", "RADIO_CHECK"]);
 const VALID_STATUS = new Set(["APPROVED", "FLAGGED", "PENDING_REVIEW", "REJECTED"]);
 
+const SEED_CHAT_MESSAGES: StoredChatMessage[] = [
+  {
+    id: "msg_seed_invitational_welcome",
+    channelId: "invitational",
+    type: "STANDARD",
+    author: {
+      id: "subx",
+      name: "Allen Hurley",
+      callsign: "SUBX",
+      role: "OWNER_ADMIN",
+      badgeText: "OWNER ADMIN",
+      division: "Owner Admin / Executive",
+      rifleSetup: "Modacam RimX / Nightforce ATACR 7x35",
+    },
+    content: "Welcome to The Hideout for the 2026 Subsonic Society Invitational! Live match comms, stage updates, and competitor discussion are active here.",
+    timestamp: "8:30 AM",
+    reactions: [],
+    moderationStatus: "APPROVED",
+    createdAtMs: 1763127000000,
+  },
+];
+
+const memoryChatMessages = new Map<string, StoredChatMessage>(
+  SEED_CHAT_MESSAGES.map((m) => [m.id, m])
+);
+
 function formatDisplayTime(ms: number): string {
   // The Society is Tennessee-based; show Eastern time consistently for everyone.
   return new Date(ms).toLocaleTimeString("en-US", {
@@ -114,15 +140,21 @@ export async function saveStoredChatMessage(message: ChatMessage): Promise<Store
     createdAtMs: Date.now(),
   };
 
+  memoryChatMessages.set(record.id, record);
+  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+  await fs.appendFile(CHAT_FILE, JSON.stringify(record) + "\n", "utf-8").catch(() => {});
+
   if (db) {
-    const { error } = await db.from("chat_messages").upsert(mapToDb(record), { onConflict: "id" });
-    if (error) throw new Error(`Database save failed (chat): ${error.message}`);
-    return record;
+    try {
+      const { error } = await db.from("chat_messages").upsert(mapToDb(record), { onConflict: "id" });
+      if (error) {
+        console.warn(`Chat DB save warning (fallback active): ${error.message}`);
+      }
+    } catch (err: any) {
+      console.warn(`Chat DB save exception (fallback active): ${err?.message || err}`);
+    }
   }
 
-  // Offline fallback (no database configured)
-  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
-  await fs.appendFile(CHAT_FILE, JSON.stringify(record) + "\n", "utf-8");
   return record;
 }
 
@@ -139,94 +171,109 @@ export async function getStoredChatMessages(
   const participants = isDm ? parseDmParticipants(channelId!) : null;
 
   if (db) {
-    let query = db
-      .from("chat_messages")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(limit || 100);
+    try {
+      let query = db
+        .from("chat_messages")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit || 100);
 
-    if (channelId && channelId !== "all") {
-      if (participants) {
-        const [p1, p2] = participants;
-        // Search canonical channel OR legacy single-callsign DM channels
-        query = query.or(`channel_id.eq.${channelId},channel_id.eq.dm_${p1},channel_id.eq.dm_${p2}`);
+      if (channelId && channelId !== "all") {
+        if (participants) {
+          const [p1, p2] = participants;
+          // Search canonical channel OR legacy single-callsign DM channels
+          query = query.or(`channel_id.eq.${channelId},channel_id.eq.dm_${p1},channel_id.eq.dm_${p2}`);
+        } else {
+          query = query.eq("channel_id", channelId);
+        }
       } else {
-        query = query.eq("channel_id", channelId);
+        query = query.neq("channel_id", "__system_channels__");
       }
-    } else {
-      query = query.neq("channel_id", "__system_channels__");
-    }
-    if (sinceMs) query = query.gt("created_at", new Date(sinceMs).toISOString());
+      if (sinceMs) query = query.gt("created_at", new Date(sinceMs).toISOString());
 
-    const { data, error } = await query;
-    if (error) {
-      console.error("Error reading chat messages from database:", error.message);
-      return [];
-    }
+      const { data, error } = await query;
+      if (!error && data) {
+        let mapped = (data || []).map(mapFromDb);
+        for (const m of mapped) {
+          memoryChatMessages.set(m.id, m);
+        }
 
-    let mapped = (data || []).map(mapFromDb);
+        if (participants) {
+          const [p1, p2] = participants;
+          mapped = mapped.filter((m) => {
+            if (m.channelId === channelId) return true;
+            const author = normalizeCallsign(m.author?.callsign || "");
+            return author === p1 || author === p2;
+          });
 
-    if (participants) {
-      const [p1, p2] = participants;
-      mapped = mapped.filter((m) => {
-        if (m.channelId === channelId) return true;
-        const author = normalizeCallsign(m.author?.callsign || "");
-        return author === p1 || author === p2;
-      });
+          // Background migration for legacy rows
+          const legacyRows = (data || []).filter(
+            (r: any) => r.channel_id !== channelId && (r.channel_id === `dm_${p1}` || r.channel_id === `dm_${p2}`)
+          );
+          if (legacyRows.length > 0) {
+            const legacyIds = legacyRows.map((r: any) => r.id);
+            Promise.resolve(
+              db.from("chat_messages").update({ channel_id: channelId }).in("id", legacyIds)
+            )
+              .then((res: any) => {
+                if (res?.error) console.warn("Chat legacy DM migration warning:", res.error.message);
+                else console.log(`Migrated ${legacyIds.length} legacy DM messages to ${channelId}`);
+              })
+              .catch(() => {});
+          }
+        }
 
-      // Background migration for legacy rows
-      const legacyRows = (data || []).filter(
-        (r: any) => r.channel_id !== channelId && (r.channel_id === `dm_${p1}` || r.channel_id === `dm_${p2}`)
-      );
-      if (legacyRows.length > 0) {
-        const legacyIds = legacyRows.map((r: any) => r.id);
-        Promise.resolve(
-          db.from("chat_messages").update({ channel_id: channelId }).in("id", legacyIds)
-        )
-          .then((res: any) => {
-            if (res?.error) console.warn("Chat legacy DM migration warning:", res.error.message);
-            else console.log(`Migrated ${legacyIds.length} legacy DM messages to ${channelId}`);
-          })
-          .catch(() => {});
+        return mapped.reverse();
+      } else if (error) {
+        console.warn("Chat DB read fallback active:", error.message);
       }
+    } catch (err: any) {
+      console.warn("Chat DB read exception (fallback active):", err?.message || err);
     }
-
-    return mapped.reverse();
   }
 
-  // Offline fallback
+  // Fallback: read from CHAT_FILE + memoryChatMessages
+  const combinedMap = new Map<string, StoredChatMessage>();
+  for (const [id, m] of Array.from(memoryChatMessages.entries())) {
+    combinedMap.set(id, m);
+  }
   try {
     const raw = await fs.readFile(CHAT_FILE, "utf-8");
-    const messages: StoredChatMessage[] = [];
     for (const line of raw.trim().split("\n").filter(Boolean)) {
       try {
         const parsed: StoredChatMessage = JSON.parse(line);
-        if (sinceMs && parsed.createdAtMs <= sinceMs) continue;
-        if (channelId && channelId !== "all") {
-          if (participants) {
-            const [p1, p2] = participants;
-            const matchesCanonical = parsed.channelId === channelId;
-            const author = normalizeCallsign(parsed.author?.callsign || "");
-            const matchesLegacy =
-              (parsed.channelId === `dm_${p1}` || parsed.channelId === `dm_${p2}`) &&
-              (author === p1 || author === p2);
-            if (!matchesCanonical && !matchesLegacy) continue;
-          } else if (parsed.channelId !== channelId) {
-            continue;
-          }
-        } else if (parsed.channelId === "__system_channels__") {
-          continue;
+        if (parsed?.id) {
+          combinedMap.set(parsed.id, parsed);
+          memoryChatMessages.set(parsed.id, parsed);
         }
-        messages.push(parsed);
-      } catch {
-        // Skip malformed lines
-      }
+      } catch {}
     }
-    return limit && messages.length > limit ? messages.slice(-limit) : messages;
   } catch (err: any) {
     if (err.code !== "ENOENT") console.error("Error reading stored chat messages:", err);
-    return [];
   }
+
+  const messages: StoredChatMessage[] = [];
+  for (const parsed of Array.from(combinedMap.values())) {
+    if (sinceMs && parsed.createdAtMs <= sinceMs) continue;
+    if (channelId && channelId !== "all") {
+      if (participants) {
+        const [p1, p2] = participants;
+        const matchesCanonical = parsed.channelId === channelId;
+        const author = normalizeCallsign(parsed.author?.callsign || "");
+        const matchesLegacy =
+          (parsed.channelId === `dm_${p1}` || parsed.channelId === `dm_${p2}`) &&
+          (author === p1 || author === p2);
+        if (!matchesCanonical && !matchesLegacy) continue;
+      } else if (parsed.channelId !== channelId) {
+        continue;
+      }
+    } else if (parsed.channelId === "__system_channels__") {
+      continue;
+    }
+    messages.push(parsed);
+  }
+  messages.sort((a, b) => (a.createdAtMs || 0) - (b.createdAtMs || 0));
+  return limit && messages.length > limit ? messages.slice(-limit) : messages;
 }
 
 /**
@@ -359,9 +406,18 @@ export async function getLatestChatTimestamp(
  */
 export async function getStoredChatMessageById(id: string): Promise<StoredChatMessage | null> {
   if (db) {
-    const { data, error } = await db.from("chat_messages").select("*").eq("id", id).maybeSingle();
-    if (error || !data) return null;
-    return mapFromDb(data);
+    try {
+      const { data, error } = await db.from("chat_messages").select("*").eq("id", id).maybeSingle();
+      if (!error && data) {
+        const mapped = mapFromDb(data);
+        memoryChatMessages.set(mapped.id, mapped);
+        return mapped;
+      }
+    } catch {}
+  }
+
+  if (memoryChatMessages.has(id)) {
+    return memoryChatMessages.get(id)!;
   }
 
   // Offline fallback
@@ -388,38 +444,54 @@ export async function updateStoredChatMessage(
   const nowIso = new Date().toISOString();
 
   if (db) {
-    const { data: existing, error: fetchErr } = await db
-      .from("chat_messages")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+    try {
+      const { data: existing, error: fetchErr } = await db
+        .from("chat_messages")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
 
-    if (fetchErr || !existing) {
-      throw new Error(`Message ${id} not found.`);
-    }
+      if (!fetchErr && existing) {
+        const updatedAuthor = {
+          ...(existing.author || {}),
+          isEdited: true,
+          editedAt: nowIso,
+          lastEditedBy: editorCallsign,
+        };
 
-    const updatedAuthor = {
-      ...(existing.author || {}),
+        const { data: updated, error: updateErr } = await db
+          .from("chat_messages")
+          .update({
+            content: newContent,
+            author: updatedAuthor,
+          })
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (!updateErr && updated) {
+          const mapped = mapFromDb(updated);
+          memoryChatMessages.set(mapped.id, mapped);
+          return mapped;
+        }
+      }
+    } catch {}
+  }
+
+  const memTarget = memoryChatMessages.get(id);
+  if (memTarget) {
+    const updatedMem: StoredChatMessage = {
+      ...memTarget,
+      content: newContent,
       isEdited: true,
       editedAt: nowIso,
-      lastEditedBy: editorCallsign,
+      author: {
+        ...(memTarget.author || {}),
+        isEdited: true,
+        editedAt: nowIso,
+      },
     };
-
-    const { data: updated, error: updateErr } = await db
-      .from("chat_messages")
-      .update({
-        content: newContent,
-        author: updatedAuthor,
-      })
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (updateErr) {
-      throw new Error(`Database update failed: ${updateErr.message}`);
-    }
-
-    return mapFromDb(updated);
+    memoryChatMessages.set(id, updatedMem);
   }
 
   // Offline fallback
@@ -427,7 +499,7 @@ export async function updateStoredChatMessage(
     await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
     const raw = await fs.readFile(CHAT_FILE, "utf-8");
     const lines = raw.trim().split("\n").filter(Boolean);
-    let updatedRecord: StoredChatMessage | null = null;
+    let updatedRecord: StoredChatMessage | null = memoryChatMessages.get(id) || null;
     const newLines: string[] = [];
 
     for (const line of lines) {
@@ -443,6 +515,7 @@ export async function updateStoredChatMessage(
             editedAt: nowIso,
           };
           updatedRecord = parsed;
+          memoryChatMessages.set(id, parsed);
           newLines.push(JSON.stringify(parsed));
         } else {
           newLines.push(line);
@@ -457,10 +530,11 @@ export async function updateStoredChatMessage(
       return updatedRecord;
     }
   } catch (err: any) {
+    if (memoryChatMessages.has(id)) return memoryChatMessages.get(id)!;
     console.error("Error updating stored chat message offline:", err);
   }
 
-  return null;
+  return memoryChatMessages.get(id) || null;
 }
 
 /**
@@ -476,71 +550,93 @@ export async function toggleStoredChatMessageReaction(
   const normUser = (userCallsign || "MARKSMAN").trim().toUpperCase();
 
   if (db) {
-    const { data: existing, error: fetchErr } = await db
-      .from("chat_messages")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+    try {
+      const { data: existing, error: fetchErr } = await db
+        .from("chat_messages")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
 
-    if (fetchErr || !existing) {
-      throw new Error(`Message ${id} not found.`);
-    }
+      if (!fetchErr && existing) {
+        const currentReactions: Array<{ emoji: string; count: number; users: string[] }> = Array.isArray(existing.reactions)
+          ? existing.reactions
+          : [];
 
-    const currentReactions: Array<{ emoji: string; count: number; users: string[] }> = Array.isArray(existing.reactions)
-      ? existing.reactions
-      : [];
+        let updatedReactions = [...currentReactions];
+        const existingIndex = updatedReactions.findIndex((r) => r.emoji === emoji);
 
-    let updatedReactions = [...currentReactions];
+        if (existingIndex >= 0) {
+          const target = updatedReactions[existingIndex];
+          const userList = Array.isArray(target.users) ? target.users : [];
+          const userIndex = userList.findIndex(
+            (u) => u.trim().toUpperCase() === normUser || u === "you"
+          );
+
+          if (userIndex >= 0) {
+            const newUsers = userList.filter((_, idx) => idx !== userIndex);
+            if (newUsers.length === 0 || target.count <= 1) {
+              updatedReactions.splice(existingIndex, 1);
+            } else {
+              updatedReactions[existingIndex] = {
+                ...target,
+                count: Math.max(1, target.count - 1),
+                users: newUsers,
+              };
+            }
+          } else {
+            updatedReactions[existingIndex] = {
+              ...target,
+              count: target.count + 1,
+              users: [...userList, normUser],
+            };
+          }
+        } else {
+          updatedReactions.push({
+            emoji,
+            count: 1,
+            users: [normUser],
+          });
+        }
+
+        const { data: updated, error: updateErr } = await db
+          .from("chat_messages")
+          .update({ reactions: updatedReactions })
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (!updateErr && updated) {
+          const mapped = mapFromDb(updated);
+          memoryChatMessages.set(mapped.id, mapped);
+          return mapped;
+        }
+      }
+    } catch {}
+  }
+
+  // Fallback reaction toggle in memory + file
+  const memTarget = memoryChatMessages.get(id);
+  if (memTarget) {
+    const currentReactions = Array.isArray(memTarget.reactions) ? memTarget.reactions : [];
+    const updatedReactions = [...currentReactions];
     const existingIndex = updatedReactions.findIndex((r) => r.emoji === emoji);
-
     if (existingIndex >= 0) {
       const target = updatedReactions[existingIndex];
       const userList = Array.isArray(target.users) ? target.users : [];
-      const userIndex = userList.findIndex(
-        (u) => u.trim().toUpperCase() === normUser || u === "you"
-      );
-
+      const userIndex = userList.findIndex((u) => u.trim().toUpperCase() === normUser || u === "you");
       if (userIndex >= 0) {
-        // Toggle OFF: Remove user
         const newUsers = userList.filter((_, idx) => idx !== userIndex);
-        if (newUsers.length === 0 || target.count <= 1) {
-          updatedReactions.splice(existingIndex, 1);
-        } else {
-          updatedReactions[existingIndex] = {
-            ...target,
-            count: Math.max(1, target.count - 1),
-            users: newUsers,
-          };
-        }
+        if (newUsers.length === 0 || target.count <= 1) updatedReactions.splice(existingIndex, 1);
+        else updatedReactions[existingIndex] = { ...target, count: Math.max(1, target.count - 1), users: newUsers };
       } else {
-        // Add user to existing emoji
-        updatedReactions[existingIndex] = {
-          ...target,
-          count: target.count + 1,
-          users: [...userList, normUser],
-        };
+        updatedReactions[existingIndex] = { ...target, count: target.count + 1, users: [...userList, normUser] };
       }
     } else {
-      // New reaction emoji
-      updatedReactions.push({
-        emoji,
-        count: 1,
-        users: [normUser],
-      });
+      updatedReactions.push({ emoji, count: 1, users: [normUser] });
     }
-
-    const { data: updated, error: updateErr } = await db
-      .from("chat_messages")
-      .update({ reactions: updatedReactions })
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (updateErr) {
-      throw new Error(`Failed to update reactions: ${updateErr.message}`);
-    }
-
-    return mapFromDb(updated);
+    const updatedMem = { ...memTarget, reactions: updatedReactions };
+    memoryChatMessages.set(id, updatedMem);
+    return updatedMem;
   }
 
   // Offline fallback
@@ -594,6 +690,7 @@ export async function toggleStoredChatMessageReaction(
 
           parsed.reactions = updatedReactions;
           updatedRecord = parsed;
+          memoryChatMessages.set(id, parsed);
           newLines.push(JSON.stringify(parsed));
         } else {
           newLines.push(line);
@@ -618,12 +715,13 @@ export async function toggleStoredChatMessageReaction(
  * Deletes a chat message by ID.
  */
 export async function deleteStoredChatMessage(id: string): Promise<boolean> {
+  const hadMem = memoryChatMessages.delete(id);
+
   if (db) {
-    const { error } = await db.from("chat_messages").delete().eq("id", id);
-    if (error) {
-      throw new Error(`Database delete failed: ${error.message}`);
-    }
-    return true;
+    try {
+      const { error } = await db.from("chat_messages").delete().eq("id", id);
+      if (!error) return true;
+    } catch {}
   }
 
   // Offline fallback
@@ -654,7 +752,7 @@ export async function deleteStoredChatMessage(id: string): Promise<boolean> {
     console.error("Error deleting stored chat message offline:", err);
   }
 
-  return false;
+  return hadMem;
 }
 
 /**
@@ -863,16 +961,19 @@ export async function saveStoredCustomChannel(
     createdAtMs: normalized.createdAtMs!,
   };
 
+  memoryChatMessages.set(sysRecord.id, sysRecord);
+  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
+  await fs.appendFile(CHAT_FILE, JSON.stringify(sysRecord) + "\n", "utf-8").catch(() => {});
+
   if (db) {
-    const { error } = await db.from("chat_messages").upsert(mapToDb(sysRecord), { onConflict: "id" });
-    if (error) {
-      throw new Error(`Failed to save custom room: ${error.message}`);
-    }
-    return normalized;
+    try {
+      const { error } = await db.from("chat_messages").upsert(mapToDb(sysRecord), { onConflict: "id" });
+      if (error) {
+        console.warn(`Failed to save custom room in DB (fallback active): ${error.message}`);
+      }
+    } catch {}
   }
 
-  await fs.mkdir(DATA_DIR, { recursive: true }).catch(() => {});
-  await fs.appendFile(CHAT_FILE, JSON.stringify(sysRecord) + "\n", "utf-8");
   return normalized;
 }
 

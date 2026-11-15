@@ -119,7 +119,7 @@ let invitesLastRefreshMs = 0;
 let invitesRefreshInFlight: Promise<void> | null = null;
 
 /** Pull the latest invites from the database. Await in API routes. */
-export async function refreshInvitesFromDb(maxAgeMs = 3000): Promise<void> {
+export async function refreshInvitesFromDb(maxAgeMs = 30000): Promise<void> {
   if (!db) return;
   if (Date.now() - invitesLastRefreshMs < maxAgeMs) return;
   if (invitesRefreshInFlight) return invitesRefreshInFlight;
@@ -132,10 +132,9 @@ export async function refreshInvitesFromDb(maxAgeMs = 3000): Promise<void> {
         return;
       }
       const rows = (data || []).map(mapDbToInvite);
-      if (DB_AUTHORITATIVE) {
-        memoryInvites = rows;
-      } else {
+      if (rows.length > 0) {
         const map = new Map<string, SocietyInvite>();
+        for (const seed of SEED_INVITES) map.set(seed.code.toUpperCase(), seed);
         for (const i of memoryInvites) map.set(i.code.toUpperCase(), i);
         for (const inv of rows) map.set(inv.code.toUpperCase(), inv);
         memoryInvites = Array.from(map.values());
@@ -255,8 +254,12 @@ export async function saveInviteAsync(invite: SocietyInvite): Promise<void> {
   writeInvitesLocally(next);
 
   if (db) {
-    const { error } = await db.from("invites").upsert(mapInviteToDb(invite), { onConflict: "id" });
-    if (error) throw new Error(`Database save failed (invite): ${error.message}`);
+    try {
+      const { error } = await db.from("invites").upsert(mapInviteToDb(invite), { onConflict: "id" });
+      if (error) console.warn(`Database save warning (invite fallback active): ${error.message}`);
+    } catch (err: any) {
+      console.warn(`Database save exception (invite fallback active): ${err?.message || err}`);
+    }
   }
 }
 

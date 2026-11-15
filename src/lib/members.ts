@@ -96,7 +96,7 @@ function mapDbToMember(row: any): SocietyMember {
  * Pull the latest members from the database into the in-memory cache.
  * Await this at the top of any API route that needs up-to-date member data.
  */
-export async function refreshMembersFromDb(maxAgeMs = 3000): Promise<void> {
+export async function refreshMembersFromDb(maxAgeMs = 30000): Promise<void> {
   if (!db) return;
   if (Date.now() - membersLastRefreshMs < maxAgeMs) return;
   if (membersRefreshInFlight) return membersRefreshInFlight;
@@ -109,15 +109,14 @@ export async function refreshMembersFromDb(maxAgeMs = 3000): Promise<void> {
         return;
       }
       const rows = (data || []).map(mapDbToMember);
-      if (DB_AUTHORITATIVE) {
-        memoryMembers = rows;
-      } else {
+      if (rows.length > 0) {
         const map = new Map<string, SocietyMember>();
+        for (const sm of SEED_MEMBERS) map.set(sm.member_id.toLowerCase(), sm);
         for (const m of memoryMembers) map.set(m.member_id.toLowerCase(), m);
         for (const m of rows) map.set(m.member_id.toLowerCase(), m);
         memoryMembers = Array.from(map.values());
+        membersLastRefreshMs = Date.now();
       }
-      membersLastRefreshMs = Date.now();
     } catch (err) {
       console.error("Database refresh error (members):", err);
     } finally {
@@ -161,10 +160,12 @@ export function getMembersFromStorage(): SocietyMember[] {
       if (sm.callsign) memberMap.set(sm.callsign.toLowerCase(), sm);
     }
 
-    // 2. Local files (skipped on the live site where the database is authoritative)
+    // 2. Local / writable files
     if (!DB_AUTHORITATIVE) {
       readMembersFile(REPO_MEMBERS_FILE, memberMap);
-      if (IS_SERVERLESS) readMembersFile(WRITABLE_MEMBERS_FILE, memberMap);
+    }
+    if (IS_SERVERLESS) {
+      readMembersFile(WRITABLE_MEMBERS_FILE, memberMap);
     }
 
     // 3. Memory cache last — it holds the freshest database data + this instance's writes
@@ -192,12 +193,13 @@ export function getMembersFromStorage(): SocietyMember[] {
         ) {
           continue;
         }
-        if (!memberMap.has(key)) {
+        const existingMem = memberMap.get(key) || memberMap.get(proIdLower);
+        if (!existingMem) {
           const proMember: SocietyMember = {
             member_id: `SS-PRO-${sh.callsign || sh.id.toUpperCase()}`,
             full_name: sh.name,
             callsign: sh.callsign || sh.id.toUpperCase(),
-            email: `${(sh.callsign || sh.id).toLowerCase()}@competitor.subsonicsociety.com`,
+            email: sh.email || `${(sh.callsign || sh.id).toLowerCase()}@competitor.subsonicsociety.com`,
             state: "TN",
             experience_level: sh.division || "Pro Competitor",
             rifle_setup: `${sh.rifleSetup?.action || "Precision Rig"} / ${sh.rifleSetup?.optic || "Optic"}`,
@@ -205,9 +207,20 @@ export function getMembersFromStorage(): SocietyMember[] {
             created_at: sh.createdAt || new Date().toISOString(),
             status: "ACTIVE",
             role: "MEMBER",
-            notes: `Pro Series Marksman. Podiums: ${sh.podiums}. Home Range: ${sh.homeRange}`,
+            pin: sh.pin,
+            notes: `Pro Series Marksman.${sh.phone ? ` Phone: ${sh.phone}.` : ""}${sh.mailingAddress ? ` Address: ${sh.mailingAddress}.` : ""} Podiums: ${sh.podiums}. Home Range: ${sh.homeRange}`,
           };
           memberMap.set(key, proMember);
+        } else {
+          if (sh.email && (!existingMem.email || existingMem.email.endsWith("@competitor.subsonicsociety.com"))) {
+            existingMem.email = sh.email;
+          }
+          if (sh.pin && !existingMem.pin) {
+            existingMem.pin = sh.pin;
+          }
+          if (sh.phone && (!existingMem.notes || !existingMem.notes.includes("Phone:"))) {
+            existingMem.notes = `${existingMem.notes || "Pro Series Marksman."} Phone: ${sh.phone}.`;
+          }
         }
       }
     } catch (e) {
@@ -290,10 +303,16 @@ export function saveAllMembersToStorage(members: SocietyMember[]): void {
 
 export async function upsertMemberToDb(member: SocietyMember): Promise<void> {
   if (!db) return;
-  const { error } = await db
-    .from("society_members")
-    .upsert(mapMemberToDb(member), { onConflict: "member_id" });
-  if (error) throw new Error(`Database save failed (member): ${error.message}`);
+  try {
+    const { error } = await db
+      .from("society_members")
+      .upsert(mapMemberToDb(member), { onConflict: "member_id" });
+    if (error) {
+      console.warn(`Database save warning (member fallback active): ${error.message}`);
+    }
+  } catch (err: any) {
+    console.warn(`Database save exception (member fallback active): ${err?.message || err}`);
+  }
 }
 
 function applyMemberLocally(member: SocietyMember): SocietyMember {
